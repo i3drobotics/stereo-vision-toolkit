@@ -8,13 +8,11 @@
 
 #include <abstractstereocamera.h>
 
-// All the Windows hoops we have to jump through to check USB devices
+// Correct for math.h warnings
 #define NOMINMAX
 #define _MATH_DEFINES_DEFINED
 #include <windows.h>
 #include <dshow.h>
-
-#include <QWinEventNotifier>
 #include <hidapi/hidapi.h>
 
 
@@ -67,10 +65,8 @@ private:
     hid_device* deimos_device = NULL;
     bool send_hid(std::vector<unsigned char> &buffer, size_t command_len);
 
-    int getSerial(void);
+    qint64 getSerial(void);
 
 };
-
-std::string wchar_to_string(WCHAR* buffer);
 
 #endif // STEREOCAMERADEIMOS_H

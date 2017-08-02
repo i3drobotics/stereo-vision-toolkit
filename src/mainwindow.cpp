@@ -1,4 +1,9 @@
-﻿#include "mainwindow.h"
+﻿/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -43,9 +48,9 @@ void MainWindow::statusBarInit(void) {
 
   status_widget->setLayout(_hlayout);
 
-  statusBarTimer = new QTimer;
+  status_bar_timer = new QTimer;
 
-  connect(statusBarTimer, SIGNAL(timeout()), this,
+  connect(status_bar_timer, SIGNAL(timeout()), this,
           SLOT(statusMessageTimeout()));
 }
 
@@ -82,11 +87,11 @@ void MainWindow::controlsInit(void) {
   connect(ui->tabWidget, SIGNAL(currentChanged(int)), this,
           SLOT(enable3DViz(int)));
 
-  disparityView = new DisparityViewer();
-  disparityView->setViewer(ui->disparityViewLabel);
-  connect(disparityView, SIGNAL(newDisparity(QPixmap)), ui->disparityViewLabel,
+  disparity_view = new DisparityViewer();
+  disparity_view->setViewer(ui->disparityViewLabel);
+  connect(disparity_view, SIGNAL(newDisparity(QPixmap)), ui->disparityViewLabel,
           SLOT(setPixmap(QPixmap)));
-  ui->disparityViewSettingsLayout->addWidget(disparityView);
+  ui->disparityViewSettingsLayout->addWidget(disparity_view);
 
   connect(ui->reset3DViewButton, SIGNAL(clicked(bool)), this, SLOT(resetPointCloudView()));
 }
@@ -139,6 +144,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   ui->singleShotButton->setEnabled(true);
   ui->saveButton->setEnabled(true);
   ui->toggleVideoButton->setEnabled(true);
+  ui->actionCalibration_wizard->setEnabled(true);
 
   connect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
           SLOT(setExposure(double)));
@@ -153,7 +159,7 @@ void MainWindow::stereoCameraInitConnections(void) {
           SLOT(enableMatching(bool)));
   connect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), stereo_cam,
           SLOT(enableRectify(bool)));
-  connect(stereo_cam, SIGNAL(matched()), disparityView,
+  connect(stereo_cam, SIGNAL(matched()), disparity_view,
           SLOT(updateDisparityAsync(void)));
   connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableAutoExpose(bool)));
 
@@ -176,12 +182,13 @@ void MainWindow::stereoCameraRelease(void) {
   ui->singleShotButton->setDisabled(true);
   ui->saveButton->setDisabled(true);
   ui->toggleVideoButton->setDisabled(true);
+  ui->actionCalibration_wizard->setDisabled(true);
 
   if (cameras_connected) {
     disconnect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
                SLOT(setExposure(double)));
     disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
-    disconnect(stereo_cam, SIGNAL(matched()), disparityView,
+    disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
                SLOT(updateDisparityAsync(void)));
     disconnect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
     disconnect(stereo_cam, SIGNAL(framecount(qint64)), this,
@@ -222,8 +229,8 @@ void MainWindow::stereoCameraLoad(void) {
 
   /* Look for Deimos present */
   StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
-  QThread* tara_thread = new QThread;
-  stereo_cam_deimos->assignThread(tara_thread);
+  QThread* deimos_thread = new QThread;
+  stereo_cam_deimos->assignThread(deimos_thread);
 
   if (stereo_cam_deimos->initCamera()) {
     stereo_cam = (AbstractStereoCamera*)stereo_cam_deimos;
@@ -259,19 +266,19 @@ void MainWindow::stereoCameraInit() {
     setupMatchers();
     setMatcher(0);
 
-    if (saveDir != "") {
-      stereo_cam->setSavelocation(saveDir);
+    if (save_directory != "") {
+      stereo_cam->setSavelocation(save_directory);
     }
 
-    bool res = stereo_cam->setCalibration(calibrationDir);
-    qDebug() << calibrationDir << res;
+    bool res = stereo_cam->setCalibration(calibration_directory);
+    qDebug() << calibration_directory << res;
     stereo_cam->enableRectify(res);
     stereo_cam->enableMatching(res);
     ui->enableStereo->setEnabled(res);
     ui->enableStereo->setChecked(res);
 
-    disparityView->setCalibration(stereo_cam->Q, 60e-3, 4.3e-3);
-    disparityView->updatePixmapRange();
+    disparity_view->setCalibration(stereo_cam->Q, 60e-3, 4.3e-3);
+    disparity_view->updatePixmapRange();
 
     QTimer::singleShot(1, stereo_cam, SLOT(freerun()));
     ui->statusBar->showMessage("Freerunning.");
@@ -376,9 +383,9 @@ void MainWindow::stopVideoCapture(void) {
 }
 
 void MainWindow::startCalibrationFromImages(void) {
-  calImDialog = new CalibrateFromImagesDialog(this);
-  calImDialog->move(100, 100);
-  calImDialog->show();
+  calibration_images_dialog = new CalibrateFromImagesDialog(this);
+  calibration_images_dialog->move(100, 100);
+  calibration_images_dialog->show();
 }
 
 void MainWindow::startCalibration(void) {
@@ -387,11 +394,11 @@ void MainWindow::startCalibration(void) {
 
   /* Connect calibration */
   calibrator = new StereoCalibrate(this, stereo_cam);
-  calibrator->setPattern(cv::Size(8, 6), 3.9e-3);
+  calibrator->setPattern(cv::Size(9, 6), 25e-3);
   calibrator->setDisplays(ui->left_image_view, ui->right_image_view);
-  calibrator->loadBoardPoses("default_calibration.ini");
+  calibrator->loadBoardPoses("./calibration_template_a4.ini");
 
-  calDialog = new CalibrationDialog(this, calibrator);
+  calibration_dialog = new CalibrationDialog(this, calibrator);
 
   ui->tabWidget->setCurrentIndex(0);
 
@@ -399,21 +406,21 @@ void MainWindow::startCalibration(void) {
 
   disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
 
-  connect(calDialog, SIGNAL(stopCalibration()), calibrator,
+  connect(calibration_dialog, SIGNAL(stopCalibration()), calibrator,
           SLOT(abortCalibration()));
   connect(calibrator, SIGNAL(doneCalibration(bool)), this,
           SLOT(doneCalibration(bool)));
 
   calibrator->startCalibration();
 
-  calDialog->move(100, 100);
-  calDialog->show();
+  calibration_dialog->move(100, 100);
+  calibration_dialog->show();
 }
 
 void MainWindow::doneCalibration(bool) {
   connect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
 
-  disconnect(calDialog, SIGNAL(stopCalibration()), calibrator,
+  disconnect(calibration_dialog, SIGNAL(stopCalibration()), calibrator,
              SLOT(abortCalibration()));
   disconnect(calibrator, SIGNAL(doneCalibration(bool)), this,
              SLOT(doneCalibration(bool)));
@@ -433,7 +440,7 @@ void MainWindow::setMatcher(int index) {
       widget->setVisible(false);
     } else {
       widget->setVisible(true);
-      disparityView->setMatcher(matcher_widget->getMatcher());
+      disparity_view->setMatcher(matcher_widget->getMatcher());
     }
   }
 }
@@ -517,12 +524,12 @@ void MainWindow::toggleAcquire(void) {
 
 void MainWindow::displaySaved(QString fname) {
   ui->statusBar->showMessage(QString("Saved to: %1").arg(fname));
-  statusBarTimer->setSingleShot(true);
-  statusBarTimer->start(1500);
+  status_bar_timer->setSingleShot(true);
+  status_bar_timer->start(1500);
 }
 
 void MainWindow::updateFrameCount(qint64 count) {
-  this->frame_counter->setText(QString("Frame count: %1").arg(count));
+  frame_counter->setText(QString("Frame count: %1").arg(count));
 }
 
 void MainWindow::updateDisplay(void) {
@@ -556,15 +563,18 @@ void MainWindow::setSaveDirectory(void) {
   if (dir != "") {
     ui->saveDirLabel->setText(dir);
     stereo_cam->setSavelocation(dir);
-    this->updatePreviousDirectory(dir);
+    updatePreviousDirectory(dir);
   }
 }
 
 void MainWindow::checkParamFile(void) {
   QDomDocument doc("deimosParameters");
 
-  if (!this->paramFile->exists()) {
-    qDebug() << "Making file";
+  if (!paramFile->exists()) {
+    qDebug() << "Making parameter file.";
+
+    auto dir = QDir(QDir::currentPath());
+    dir.mkpath("./params/");
 
     QDomElement root = doc.createElement("deimosParameters");
     doc.appendChild(root);
@@ -583,12 +593,12 @@ void MainWindow::checkParamFile(void) {
 
     QString xml = doc.toString();
 
-    if (!this->paramFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
+    if (!paramFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
       qDebug() << "Failed to write file";
       return;
     }
 
-    QTextStream out(this->paramFile);
+    QTextStream out(paramFile);
     out << xml;
 
     paramFile->close();
@@ -598,7 +608,7 @@ void MainWindow::checkParamFile(void) {
 void MainWindow::loadParamFile(void) {
   paramFile = new QFile(QDir::currentPath() + "/params/params.xml", this);
 
-  qDebug() << "Looking for param file at "
+  qDebug() << "Looking for param file: "
            << QDir::currentPath() + "/params/params.xml";
 
   checkParamFile();
@@ -607,14 +617,14 @@ void MainWindow::loadParamFile(void) {
     QString dir = getParamFromFile("saveDir");
 
     if (dir != "") {
-      saveDir = dir;
-      ui->saveDirLabel->setText(saveDir);
+      save_directory = dir;
+      ui->saveDirLabel->setText(save_directory);
     }
 
     dir = getParamFromFile("calDir");
 
     if (dir != "") {
-      calibrationDir = dir;
+      calibration_directory = dir;
     }
   }
 
@@ -653,12 +663,12 @@ void MainWindow::updateParamFile(QString tagName, QString value) {
 
   QDomDocument doc("deimosParameters");
 
-  if (!this->paramFile->open(QIODevice::ReadWrite | QIODevice::Text)) {
+  if (!paramFile->open(QIODevice::ReadWrite | QIODevice::Text)) {
     qDebug() << "Failed to open param file";
     return;
   }
 
-  if (!doc.setContent(this->paramFile)) {
+  if (!doc.setContent(paramFile)) {
     qDebug() << "Failed to load XML";
   } else {
     auto node = doc.elementsByTagName(tagName);
@@ -677,10 +687,10 @@ void MainWindow::updateParamFile(QString tagName, QString value) {
     }
   }
 
-  this->paramFile->close();
+  paramFile->close();
 
-  QFile file(QDir::currentPath() + "/~params_temp.xml");
-  QDir outdir(QDir::currentPath() + "/");
+  QFile file(QDir::currentPath() + "/params/~params_temp.xml");
+  QDir outdir(QDir::currentPath() + "/params/");
 
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     return;
@@ -706,7 +716,7 @@ void MainWindow::updatePreviousDirectory(QString dir) {
 
 void MainWindow::updateFPS(qint64 time) {
   int fps = 1000.0 / time;
-  this->fps_counter->setText(QString("FPS: %1").arg(fps));
+  fps_counter->setText(QString("FPS: %1").arg(fps));
 }
 
 MainWindow::~MainWindow() {

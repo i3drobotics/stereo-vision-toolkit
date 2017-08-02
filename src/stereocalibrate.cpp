@@ -1,102 +1,109 @@
+/*
+ * Copyright I3D Robotics Ltd, 2017
+ * Author: Josh Veitch-Michaelis
+ */
+
 #include "stereocalibrate.h"
 
 StereoCalibrate::StereoCalibrate(QObject* parent,
-                                   AbstractStereoCamera* stereoCamera)
+                                 AbstractStereoCamera* stereoCamera)
     : QObject(parent) {
-  this->stereoCamera = stereoCamera;
+  this->stereo_camera = stereoCamera;
 
   if (stereoCamera) {
-    imageSize = cv::Size(stereoCamera->getWidth(), stereoCamera->getHeight());
+    image_size = cv::Size(stereoCamera->getWidth(), stereoCamera->getHeight());
   }
 }
 
 void StereoCalibrate::setPattern(cv::Size size, double squareSize) {
-  patternsize = size;
+  pattern_size = size;
 
-  patternPoints.clear();
+  pattern_points.clear();
 
-  for (int j = 0; j < patternsize.height; j++) {
-    for (int i = 0; i < patternsize.width; i++) {
-      patternPoints.push_back(cv::Point3f(i * squareSize, j * squareSize, 0));
+  for (int j = 0; j < pattern_size.height; j++) {
+    for (int i = 0; i < pattern_size.width; i++) {
+      pattern_points.push_back(cv::Point3f(i * squareSize, j * squareSize, 0));
     }
   }
 }
 
-void StereoCalibrate::setImageSize(cv::Size size) { this->imageSize = size; }
+void StereoCalibrate::setImageSize(cv::Size size) { this->image_size = size; }
 
 void StereoCalibrate::abortCalibration() {
-  disconnect(this->stereoCamera, SIGNAL(acquired()), this, SLOT(checkImages()));
-  disconnect(this, SIGNAL(requestImage()), this->stereoCamera,
-             SLOT(singleShot()));
+  if (stereo_camera) {
+    disconnect(stereo_camera, SIGNAL(acquired()), this, SLOT(checkImages()));
+    disconnect(this, SIGNAL(requestImage()), stereo_camera, SLOT(singleShot()));
+  }
   emit doneCalibration(false);
 }
 
 void StereoCalibrate::finishedCalibration() {
-  disconnect(this->stereoCamera, SIGNAL(acquired()), this, SLOT(checkImages()));
-  disconnect(this, SIGNAL(requestImage()), this->stereoCamera,
-             SLOT(singleShot()));
+  if (stereo_camera) {
+    disconnect(stereo_camera, SIGNAL(acquired()), this, SLOT(checkImages()));
+    disconnect(this, SIGNAL(requestImage()), stereo_camera, SLOT(singleShot()));
+  }
   emit doneCalibration(true);
 }
 
 void StereoCalibrate::setDisplays(QLabel* left, QLabel* right) {
-  this->leftView = left;
-  this->rightView = right;
+  this->left_view = left;
+  this->right_view = right;
 }
 
 void StereoCalibrate::setBoardOrientations(
     std::vector<Chessboard*>& orientations) {
-  this->boardOrientations = orientations;
+  this->board_orientations = orientations;
 }
 
 void StereoCalibrate::startCalibration(void) {
+  imageProgress(0, total_poses);
 
-  imageProgress(0, totalPoses);
+  total_images = 0;
 
-  totalImages = 0;
+  left_images.clear();
+  right_images.clear();
 
-  leftImages.clear();
-  rightImages.clear();
-
-  connect(this->stereoCamera, SIGNAL(acquired()), this, SLOT(checkImages()));
-  connect(this, SIGNAL(requestImage()), this->stereoCamera, SLOT(singleShot()));
-  this->stereoCamera->singleShot();
+  connect(this->stereo_camera, SIGNAL(acquired()), this, SLOT(checkImages()));
+  connect(this, SIGNAL(requestImage()), this->stereo_camera,
+          SLOT(singleShot()));
+  this->stereo_camera->singleShot();
 }
 
 void StereoCalibrate::checkImages(void) {
-  if (currentPose == totalPoses) {
-    if (calibratingLeft) {
-      calibratingLeft = false;
+  if (current_pose == total_poses) {
+    if (calibrating_left) {
+      calibrating_left = false;
 
-      currentPose = 0;
-      imageProgress(currentPose, totalPoses);
+      current_pose = 0;
+      imageProgress(current_pose, total_poses);
 
-      calibratingRight = true;
-    } else if (calibratingRight) {
-      calibratingRight = false;
+      calibrating_right = true;
+    } else if (calibrating_right) {
+      calibrating_right = false;
     } else {
       jointCalibration();
     }
   } else {
     if (imageValid()) {
-      currentPose++;
+      current_pose++;
 
-      imageProgress(currentPose, totalPoses);
+      imageProgress(current_pose, total_poses);
       cv::Mat image;
 
       std::string fname;
 
       // We need to save both left and right images for every view
-      stereoCamera->getLeftImage(image);
-      leftImages.push_back(image);
-      fname = QString("calibration_l_%1.png").arg(totalImages).toStdString();
+      stereo_camera->getLeftImage(image);
+      left_images.push_back(image);
+      fname = QString("calibration_l_%1.png").arg(total_images).toStdString();
       cv::imwrite(fname, image);
 
-      stereoCamera->getRightImage(image);
-      rightImages.push_back(image);
-      fname = QString("calibration_r_%1.png").arg(totalImages).toStdString();
+      stereo_camera->getRightImage(image);
+      right_images.push_back(image);
+      fname = QString("calibration_r_%1.png").arg(total_images).toStdString();
       cv::imwrite(fname, image);
 
-      totalImages++;
+      total_images++;
     }
   }
 
@@ -105,63 +112,81 @@ void StereoCalibrate::checkImages(void) {
 }
 
 void StereoCalibrate::jointCalibration(void) {
-  assert(leftImages.size() != 0);
-  assert(rightImages.size() != 0);
-  assert(leftImagePoints.size() == rightImagePoints.size());
+  assert(left_images.size() != 0);
+  assert(right_images.size() != 0);
+  assert(left_image_points.size() == right_image_points.size());
 
-  setImageSize(leftImages.at(0).size());
+  setImageSize(left_images.at(0).size());
 
   int cornerFlags = cv::CALIB_CB_ADAPTIVE_THRESH +
                     cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK;
 
+  auto cal_dialog = new calibrateconfirmdialog;
+  cal_dialog->setNumberImages(left_images.size());
+  cal_dialog->setModal(false);
+  cal_dialog->open();
+
+  connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
+
   /* Left Camera */
-  leftValid.clear();
-  leftRMSError = singleCameraCalibration(leftImages, leftImagePoints, leftValid,
-                                         leftCameraMatrix, leftDistCoeffs,
-                                         leftRvecs, leftTvecs, cornerFlags);
+  left_valid.clear();
+  left_rms_error = singleCameraCalibration(
+      left_images, left_image_points, left_valid, left_camera_matrix,
+      left_distortion, left_r_vecs, left_t_vecs, cornerFlags);
 
   cv::FileStorage leftIntrinsicFS("left_calibration.xml",
                                   cv::FileStorage::WRITE);
-  leftIntrinsicFS << "cameraMatrix" << leftCameraMatrix;
-  leftIntrinsicFS << "distCoeffs" << leftDistCoeffs;
-  leftIntrinsicFS << "rms_error" << leftRMSError;
+  leftIntrinsicFS << "cameraMatrix" << left_camera_matrix;
+  leftIntrinsicFS << "distCoeffs" << left_distortion;
+  leftIntrinsicFS << "rms_error" << left_rms_error;
   leftIntrinsicFS.release();
 
-  qDebug() << "Left RMS reprojection error: " << leftRMSError;
+  cal_dialog->updateLeft(left_camera_matrix, left_distortion, left_rms_error);
+  disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
 
+  qDebug() << "Left RMS reprojection error: " << left_rms_error;
+
+  connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
   /* Right Camera */
-  rightValid.clear();
-  rightRMSError = singleCameraCalibration(
-      rightImages, rightImagePoints, rightValid, rightCameraMatrix,
-      rightDistCoeffs, rightRvecs, rightTvecs, cornerFlags);
+  right_valid.clear();
+  right_rms_error = singleCameraCalibration(
+      right_images, right_image_points, right_valid, right_camera_matrix,
+      right_distortion, right_r_vecs, right_t_vecs, cornerFlags);
 
   cv::FileStorage rightIntrinsicFS("right_calibration.xml",
                                    cv::FileStorage::WRITE);
-  rightIntrinsicFS << "cameraMatrix" << rightCameraMatrix;
-  rightIntrinsicFS << "distCoeffs" << rightDistCoeffs;
-  rightIntrinsicFS << "rms_error" << rightRMSError;
+  rightIntrinsicFS << "cameraMatrix" << right_camera_matrix;
+  rightIntrinsicFS << "distCoeffs" << right_distortion;
+  rightIntrinsicFS << "rms_error" << right_rms_error;
   rightIntrinsicFS.release();
 
-  qDebug() << "Right RMS reprojection error: " << rightRMSError;
+  cal_dialog->updateRight(right_camera_matrix, right_distortion, right_rms_error);
+  disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
 
-  qDebug() << "Stereo RMS reprojection error: " << stereoCameraCalibration();
+  qDebug() << "Right RMS reprojection error: " << right_rms_error;
+
+  stereo_rms_error = stereoCameraCalibration();
+
+  qDebug() << "Stereo RMS reprojection error: " << stereo_rms_error;
+
+  cal_dialog->updateStereo(stereo_q, stereo_rms_error);
 
   finishedCalibration();
+
 }
 
 double StereoCalibrate::stereoCameraCalibration(int stereoFlags) {
-
   /* Check valid images */
   std::vector<std::vector<cv::Point2f> > leftImagePointsMask;
   std::vector<std::vector<cv::Point2f> > rightImagePointsMask;
   std::vector<std::vector<cv::Point3f> > objectPointsMask;
 
   /* Mask image arrays */
-  for (int i = 0; i < leftValid.size(); i++) {
-    if (leftValid[i] && rightValid[i]) {
-      leftImagePointsMask.push_back(leftImagePoints[i]);
-      rightImagePointsMask.push_back(rightImagePoints[i]);
-      objectPointsMask.push_back(patternPoints);
+  for (int i = 0; i < left_valid.size(); i++) {
+    if (left_valid[i] && right_valid[i]) {
+      leftImagePointsMask.push_back(left_image_points[i]);
+      rightImagePointsMask.push_back(right_image_points[i]);
+      objectPointsMask.push_back(pattern_points);
     }
   }
 
@@ -170,56 +195,58 @@ double StereoCalibrate::stereoCameraCalibration(int stereoFlags) {
 
   double stereoRes = cv::stereoCalibrate(
       objectPointsMask, leftImagePointsMask, rightImagePointsMask,
-      leftCameraMatrix, leftDistCoeffs, rightCameraMatrix, rightDistCoeffs,
-      imageSize, stereoR, stereoT, stereoE, stereoF, stereoFlags);
+      left_camera_matrix, left_distortion, right_camera_matrix,
+      right_distortion, image_size, stereo_r, stereo_t, stereo_e, stereo_f,
+      stereoFlags);
 
   cv::Mat R1, R2, P1, P2;
 
-  cv::stereoRectify(leftCameraMatrix, leftDistCoeffs, rightCameraMatrix,
-                    rightDistCoeffs, imageSize, stereoR, stereoT, R1, R2, P1,
-                    P2, stereoQ, 0);
+  cv::stereoRectify(left_camera_matrix, left_distortion, right_camera_matrix,
+                    right_distortion, image_size, stereo_r, stereo_t, R1, R2,
+                    P1, P2, stereo_q, 0);
 
-  cv::initUndistortRectifyMap(leftCameraMatrix, leftDistCoeffs, R1, P1,
-                              imageSize, CV_32FC1, leftRectmapX, leftRectmapY);
-  cv::initUndistortRectifyMap(rightCameraMatrix, rightDistCoeffs, R2, P2,
-                              imageSize, CV_32FC1, rightRectmapX,
-                              rightRectmapY);
+  cv::initUndistortRectifyMap(left_camera_matrix, left_distortion, R1, P1,
+                              image_size, CV_32FC1, left_rectification_x,
+                              left_rectification_y);
+  cv::initUndistortRectifyMap(right_camera_matrix, right_distortion, R2, P2,
+                              image_size, CV_32FC1, right_rectification_x,
+                              right_rectification_y);
 
   cv::FileStorage stereoFS("stereo_calibration.xml", cv::FileStorage::WRITE);
-  stereoFS << "R" << stereoR;
-  stereoFS << "T" << stereoT;
-  stereoFS << "Q" << stereoQ;
-  stereoFS << "E" << stereoE;
-  stereoFS << "F" << stereoF;
+  stereoFS << "R" << stereo_r;
+  stereoFS << "T" << stereo_t;
+  stereoFS << "Q" << stereo_q;
+  stereoFS << "E" << stereo_e;
+  stereoFS << "F" << stereo_f;
   stereoFS << "rms_error" << stereoRes;
   stereoFS.release();
 
   cv::FileStorage leftRectFs("left_rectification.xml", cv::FileStorage::WRITE);
-  leftRectFs << "x" << leftRectmapX;
-  leftRectFs << "y" << leftRectmapY;
+  leftRectFs << "x" << left_rectification_x;
+  leftRectFs << "y" << left_rectification_y;
   leftRectFs.release();
 
   cv::FileStorage rightRectFS("right_rectification.xml",
                               cv::FileStorage::WRITE);
-  rightRectFS << "x" << rightRectmapX;
-  rightRectFS << "y" << rightRectmapY;
+  rightRectFS << "x" << right_rectification_x;
+  rightRectFS << "y" << right_rectification_y;
   rightRectFS.release();
 
   return stereoRes;
 }
 
 void StereoCalibrate::fromImages(QList<QString> left, QList<QString> right) {
-  leftImages.clear();
-  rightImages.clear();
+  left_images.clear();
+  right_images.clear();
 
   for (auto& fname : left) {
     cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
-    if (im.total() > 0) leftImages.push_back(im);
+    if (im.total() > 0) left_images.push_back(im);
   }
 
   for (auto& fname : right) {
     cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
-    if (im.total() > 0) rightImages.push_back(im);
+    if (im.total() > 0) right_images.push_back(im);
   }
 
   jointCalibration();
@@ -243,7 +270,7 @@ double StereoCalibrate::singleCameraCalibration(
     if (findCorners(image, corners, cornerFlags)) {
       imagePoints.push_back(corners);
       validImagePoints.push_back(corners);
-      objectPoints.push_back(patternPoints);
+      objectPoints.push_back(pattern_points);
       valid.push_back(true);
     } else {
       valid.push_back(false);
@@ -252,21 +279,23 @@ double StereoCalibrate::singleCameraCalibration(
     }
 
     i++;
+
+    emit done_image(i);
   }
 
   assert(objectPoints.size() == validImagePoints.size());
 
   res =
-      cv::calibrateCamera(objectPoints, validImagePoints, imageSize,
+      cv::calibrateCamera(objectPoints, validImagePoints, image_size,
                           cameraMatrix, distCoeffs, rvecs, tvecs, stereoFlags);
 
   return res;
 }
 
 bool StereoCalibrate::findCorners(cv::Mat image,
-                                   std::vector<cv::Point2f>& corners,
-                                   int flags) {
-  bool found = cv::findChessboardCorners(image, patternsize, corners, flags);
+                                  std::vector<cv::Point2f>& corners,
+                                  int flags) {
+  bool found = cv::findChessboardCorners(image, pattern_size, corners, flags);
 
   if (found) {
     cv::cornerSubPix(
@@ -279,112 +308,65 @@ bool StereoCalibrate::findCorners(cv::Mat image,
 }
 
 void StereoCalibrate::overlayImage(cv::Mat& image, Chessboard* board,
-                                    bool found) {
+                                   bool found, bool valid) {
   CvScalar red(255, 0, 0, 255);
   CvScalar green(0, 255, 0, 255);
+  CvScalar blue(0, 0, 255, 255);
   CvScalar overlayColour = red;
 
-  if (board->leftMargin > 0) {
-    cv::line(image, cv::Point2f(board->leftMargin, 0),
-             cv::Point2f(board->leftMargin, image.rows), overlayColour, 4);
-  }
+  // cv::drawChessboardCorners(image, pattern_size, board->board_points, found);
 
-  if (board->rightMargin > 0) {
-    cv::line(image, cv::Point2f(image.cols - board->rightMargin, 0),
-             cv::Point2f(image.cols - board->rightMargin, image.rows),
-             overlayColour, 4);
-  }
-
-  if (board->topMargin > 0) {
-    cv::line(image, cv::Point2f(0, board->topMargin),
-             cv::Point2f(image.cols, board->topMargin), overlayColour, 4);
-  }
-
-  if (board->bottomMargin > 0) {
-    cv::line(image, cv::Point2f(0, image.rows - board->bottomMargin),
-             cv::Point2f(image.cols, image.rows - board->bottomMargin),
-             overlayColour, 4);
-  }
-
-  cv::drawChessboardCorners(image, patternsize, board->boardPoints, found);
+  cv::polylines(image, board->template_contour, true, blue, 3);
 
   if (found) {
-
     // Draw board outline
-    cv::line(image, board->vertices[0], board->vertices[1], green, 3);
-    cv::line(image, board->vertices[1], board->vertices[2], green, 3);
-    cv::line(image, board->vertices[2], board->vertices[3], green, 3);
-    cv::line(image, board->vertices[3], board->vertices[0], green, 3);
-
-    std::vector<cv::Point> ellipse_points;
-/*
-    if (board->horizontalTiltOver) {
-
-        auto left_margin_middle = (board->leftPoints.front()+board->leftPoints.back())/2;
-
-        cv::ellipse2Poly(left_margin_middle + cv::Point2f(50,0) , cv::Size(100, 50), 0, 180, 10, 10, ellipse_points);
-        cv::polylines(image, ellipse_points, false, red, 5);
-        cv::line(image, ellipse_points.back(), ellipse_points.back()+cv::Point(20,0), red, 5);
-        cv::line(image, ellipse_points.back(), ellipse_points.back()+cv::Point(0,-20), red, 5);
-    } else if (board->horizontalTiltUnder) {
-        cv::ellipse2Poly((board->leftPoints[0]+board->leftPoints[1])/2, cv::Size(100, 50), 0, -180, -10, 10, ellipse_points);
-        cv::polylines(image, ellipse_points, false, red, 5);
-        cv::line(image, ellipse_points.back(), ellipse_points.back()+cv::Point(-20,0), red, 5);
-        cv::line(image, ellipse_points.back(), ellipse_points.back()+cv::Point(0,-20), red, 5);
-    }
-
-    if (board->verticalTiltOver) {
-    } else if (board->verticalTiltUnder) {
-    }
-
-*/
-    if (board->boardAreaOver) {
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[0]},
-                   cv::Point2f(25, 25), red, 5);
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[1]},
-                   cv::Point2f(-25, 25), red, 5);
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[2]},
-                   cv::Point2f(-25, -25), red, 5);
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[3]},
-                   cv::Point2f(25, -25), red, 5);
-    } else if (board->boardAreaUnder) {
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[0]},
-                   cv::Point2f(-25, -25), red, 5);
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[1]},
-                   cv::Point2f(25, -25), red, 5);
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[2]},
-                   cv::Point2f(25, 25), red, 5);
-      overlayArrow(image, std::vector<cv::Point2f>{board->vertices[3]},
-                   cv::Point2f(-25, 25), red, 5);
-    }
-
-    if (board->leftOutOfBounds) {
-      overlayArrow(image, board->leftPoints, cv::Point2f(-50, 0), red);
-    }
-
-    if (board->rightOutOfBounds) {
-      overlayArrow(image, board->rightPoints, cv::Point2f(50, 0), red);
-    }
-
-    if (board->topOutOfBounds) {
-      overlayArrow(image, board->topPoints, cv::Point2f(0, -50), red);
-    }
-
-    if (board->bottomOutOfBounds) {
-      overlayArrow(image, board->bottomPoints, cv::Point2f(0, 50), red);
+    if (valid) {
+      cv::line(image, board->vertices[0], board->vertices[1], green, 3);
+      cv::line(image, board->vertices[1], board->vertices[2], green, 3);
+      cv::line(image, board->vertices[2], board->vertices[3], green, 3);
+      cv::line(image, board->vertices[3], board->vertices[0], green, 3);
+    } else {
+      cv::line(image, board->vertices[0], board->vertices[1], red, 3);
+      cv::line(image, board->vertices[1], board->vertices[2], red, 3);
+      cv::line(image, board->vertices[2], board->vertices[3], red, 3);
+      cv::line(image, board->vertices[3], board->vertices[0], red, 3);
     }
   }
+  /*
+      std::vector<cv::Point> ellipse_points;
+
+      if (board->horizontalTiltOver) {
+
+          auto left_margin_middle =
+     (board->leftPoints.front()+board->leftPoints.back())/2;
+
+          cv::ellipse2Poly(left_margin_middle + cv::Point2f(50,0) ,
+     cv::Size(100, 50), 0, 180, 10, 10, ellipse_points); cv::polylines(image,
+     ellipse_points, false, red, 5); cv::line(image, ellipse_points.back(),
+     ellipse_points.back()+cv::Point(20,0), red, 5); cv::line(image,
+     ellipse_points.back(), ellipse_points.back()+cv::Point(0,-20), red, 5); }
+     else if (board->horizontalTiltUnder) {
+          cv::ellipse2Poly((board->leftPoints[0]+board->leftPoints[1])/2,
+     cv::Size(100, 50), 0, -180, -10, 10, ellipse_points); cv::polylines(image,
+     ellipse_points, false, red, 5); cv::line(image, ellipse_points.back(),
+     ellipse_points.back()+cv::Point(-20,0), red, 5); cv::line(image,
+     ellipse_points.back(), ellipse_points.back()+cv::Point(0,-20), red, 5);
+      }
+
+      if (board->verticalTiltOver) {
+      } else if (board->verticalTiltUnder) {
+      }
+
+  */
 }
 
 void StereoCalibrate::overlayArrow(cv::Mat& image,
-                                    std::vector<cv::Point2f>& points,
-                                    cv::Point2f offset, CvScalar colour,
-                                    int thickness) {
+                                   std::vector<cv::Point2f>& points,
+                                   cv::Point2f offset, CvScalar colour,
+                                   int thickness) {
   cv::Mat mean_;
   cv::reduce(points, mean_, 1, CV_REDUCE_AVG);
   cv::Point2f centrepoint(mean_.at<float>(0, 0), mean_.at<float>(0, 1));
-
-  qDebug() << centrepoint.x << centrepoint.y;
 
   auto end = centrepoint + offset;
   auto start = centrepoint;
@@ -396,38 +378,39 @@ void StereoCalibrate::overlayArrow(cv::Mat& image,
 bool StereoCalibrate::imageValid() {
   std::vector<cv::Point2f> corners;
 
-  int flags = cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE +
-              cv::CALIB_CB_FAST_CHECK;
+  // int flags = cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE +
+  //            cv::CALIB_CB_FAST_CHECK;
+  int flags = cv::CALIB_CB_FAST_CHECK;
   bool valid = false;
   bool found_left = false;
   bool found_right = false;
 
-  cv::cvtColor(stereoCamera->getLeftImage(), leftImageOverlay,
+  cv::cvtColor(stereo_camera->getLeftImage(), left_image_overlay,
                cv::COLOR_GRAY2RGB);
-  cv::cvtColor(stereoCamera->getRightImage(), rightImageOverlay,
+  cv::cvtColor(stereo_camera->getRightImage(), right_image_overlay,
                cv::COLOR_GRAY2RGB);
 
-  if (calibratingLeft) {
-    found_left = findCorners(stereoCamera->getLeftImage(), corners, flags);
+  if (calibrating_left) {
+    found_left = findCorners(stereo_camera->getLeftImage(), corners, flags);
 
     if (found_left) {
-      valid = this->boardOrientations[currentPose]->check(corners);
-      emit chessboardFound(this->boardOrientations[currentPose]);
+      valid = this->board_orientations[current_pose]->check(corners);
+      emit chessboardFound(this->board_orientations[current_pose]);
     }
 
-    overlayImage(leftImageOverlay, this->boardOrientations[currentPose],
-                 found_left);
+    overlayImage(left_image_overlay, this->board_orientations[current_pose],
+                 found_left, valid);
 
   } else {
-    found_right = findCorners(stereoCamera->getRightImage(), corners, flags);
+    found_right = findCorners(stereo_camera->getRightImage(), corners, flags);
 
     if (found_right) {
-      valid = this->boardOrientations[currentPose]->check(corners);
-      emit chessboardFound(this->boardOrientations[currentPose]);
+      valid = this->board_orientations[current_pose]->check(corners);
+      emit chessboardFound(this->board_orientations[current_pose]);
     }
 
-    overlayImage(rightImageOverlay, this->boardOrientations[currentPose],
-                 found_right);
+    overlayImage(right_image_overlay, this->board_orientations[current_pose],
+                 found_right, valid);
   }
 
   updateViews();
@@ -438,28 +421,32 @@ bool StereoCalibrate::imageValid() {
 void StereoCalibrate::loadBoardPoses(std::string fname) {
   std::ifstream posefile(fname, std::ifstream::in);
 
-  if (posefile.good()) {
+  if (!posefile.is_open()) {
+    qDebug() << "Failed to open pose file" << fname.c_str();
+  } else if (posefile.good()) {
     std::string line;
-    totalPoses = 0;
+    total_poses = 0;
 
     while (std::getline(posefile, line)) {
       std::istringstream iss(line);
-      Chessboard* board = new Chessboard(this, patternsize, imageSize);
-
+      Chessboard* board = new Chessboard(this, pattern_size, image_size);
 
       // Load the corners of the pattern pose
       double x, y;
-      std::vector<cv::Point2f> vertices;
+      std::vector<cv::Point2i> vertices;
 
-      for(int i=0; i < 4; i++){
+      for (int i = 0; i < 4; i++) {
         iss >> x;
         iss >> y;
 
-        vertices.push_back(cv::Point2f(x, y));
+        vertices.push_back(cv::Point2i(x, y));
       }
 
       // We need a closed contour
       vertices.push_back(vertices.at(0));
+
+      // Double check the area isn't zero
+      assert(cv::contourArea(vertices) > 0);
 
       board->setTemplate(vertices);
 
@@ -469,10 +456,10 @@ void StereoCalibrate::loadBoardPoses(std::string fname) {
             board->bottomMargin)) break;
       */
 
-      boardOrientations.push_back(board);
-      totalPoses++;
+      board_orientations.push_back(board);
+      total_poses++;
     }
-    currentPose = 0;
+    current_pose = 0;
   } else {
     abortCalibration();
   }
@@ -480,19 +467,19 @@ void StereoCalibrate::loadBoardPoses(std::string fname) {
 
 void StereoCalibrate::updateViews(void) {
   cv::Mat output_buffer;
-  leftImageOverlay.copyTo(output_buffer);
+  left_image_overlay.copyTo(output_buffer);
 
-  QImage im_left(output_buffer.data, stereoCamera->getWidth(),
-                 stereoCamera->getHeight(), QImage::Format_RGB888);
+  QImage im_left(output_buffer.data, stereo_camera->getWidth(),
+                 stereo_camera->getHeight(), QImage::Format_RGB888);
   QPixmap pmap_left = QPixmap::fromImage(im_left);
-  this->leftView->setPixmap(
-      pmap_left.scaled(this->leftView->size(), Qt::KeepAspectRatio));
+  this->left_view->setPixmap(
+      pmap_left.scaled(this->left_view->size(), Qt::KeepAspectRatio));
 
-  rightImageOverlay.copyTo(output_buffer);
+  right_image_overlay.copyTo(output_buffer);
 
-  QImage im_right(output_buffer.data, stereoCamera->getWidth(),
-                  stereoCamera->getHeight(), QImage::Format_RGB888);
+  QImage im_right(output_buffer.data, stereo_camera->getWidth(),
+                  stereo_camera->getHeight(), QImage::Format_RGB888);
   QPixmap pmap_right = QPixmap::fromImage(im_right);
-  this->rightView->setPixmap(
-      pmap_right.scaled(this->rightView->size(), Qt::KeepAspectRatio));
+  this->right_view->setPixmap(
+      pmap_right.scaled(this->right_view->size(), Qt::KeepAspectRatio));
 }

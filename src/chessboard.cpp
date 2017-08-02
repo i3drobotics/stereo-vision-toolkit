@@ -1,122 +1,127 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "chessboard.h"
 
 Chessboard::Chessboard(QObject *parent, cv::Size pattern, cv::Size imsize)
     : QObject(parent) {
-  this->imSize = imsize;
+  this->image_size = imsize;
   this->pattern = pattern;
 }
 
 void Chessboard::setHorizontalTilt(double minHt, double maxHt) {
   assert(minHt < maxHt);
 
-  this->minHt = minHt;
-  this->maxHt = maxHt;
+  this->min_horizontal_tilt = minHt;
+  this->max_horizontal_tilt = maxHt;
 }
 
 void Chessboard::setVerticalTilt(double minVt, double maxVt) {
   assert(minVt < maxVt);
 
-  this->minVt = minVt;
-  this->maxVt = maxVt;
+  this->min_vertical_tilt = minVt;
+  this->max_vertical_tilt = maxVt;
 }
 
 void Chessboard::setBoardArea(double minArea, double maxArea) {
   assert(minArea < maxArea);
 
-  this->minArea = minArea;
-  this->maxArea = maxArea;
+  this->min_area = minArea;
+  this->max_area = maxArea;
 }
 
-void Chessboard::setTemplate(std::vector<cv::Point2f> contour){
+void Chessboard::setTemplate(std::vector<cv::Point2i> contour){
     template_contour = contour;
     template_area = cv::contourArea(contour);
 }
 
 void Chessboard::setBoardMargins(double leftMargin, double rightMargin,
                                   double topMargin, double bottomMargin) {
-  this->leftMargin = leftMargin;
+  this->left_margin = leftMargin;
 
-  if (this->rightMargin > 0) {
-    this->rightMargin = this->imSize.width - rightMargin;
+  if (this->right_margin > 0) {
+    this->right_margin = this->image_size.width - rightMargin;
   }
-  this->topMargin = this->imSize.height - topMargin;
+  this->top_margin = this->image_size.height - topMargin;
 
-  if (this->bottomMargin > 0) {
-    this->bottomMargin = this->imSize.height - bottomMargin;
+  if (this->bottom_margin > 0) {
+    this->bottom_margin = this->image_size.height - bottomMargin;
   }
 }
 
 void Chessboard::getMargins() {
-  topPoints.clear();
-  bottomPoints.clear();
-  leftPoints.clear();
-  rightPoints.clear();
+  top_points.clear();
+  bottom_points.clear();
+  left_points.clear();
+  right_points.clear();
   vertices.clear();
 
   /* Check top */
   for (int i = 0; i < pattern.width; i++) {
-    topPoints.push_back(boardPoints.at(i));
+    top_points.push_back(board_points.at(i));
   }
 
   /* Check bottom */
   for (int i = pattern.area() - pattern.width; i < pattern.area(); i++) {
-    bottomPoints.push_back(boardPoints.at(i));
+    bottom_points.push_back(board_points.at(i));
   }
 
   /* Check left */
   for (int i = 0; i < pattern.height; i++) {
-    leftPoints.push_back(boardPoints.at(i * pattern.width));
+    left_points.push_back(board_points.at(i * pattern.width));
   }
 
   /* Check right */
   for (int i = 0; i < pattern.height; i++) {
-    rightPoints.push_back(
-        boardPoints.at((pattern.width - 1) + i * pattern.width));
+    right_points.push_back(
+        board_points.at((pattern.width - 1) + i * pattern.width));
   }
 
-  vertices.push_back(topPoints.front());
-  vertices.push_back(topPoints.back());
-  vertices.push_back(bottomPoints.back());
-  vertices.push_back(bottomPoints.front());
+  vertices.push_back(top_points.front());
+  vertices.push_back(top_points.back());
+  vertices.push_back(bottom_points.back());
+  vertices.push_back(bottom_points.front());
 }
 
 bool Chessboard::checkMargins(void) {
-  leftOutOfBounds = false;
-  rightOutOfBounds = false;
-  topOutOfBounds = false;
-  bottomOutOfBounds = false;
+  left_out_of_bounds = false;
+  right_out_of_bounds = false;
+  top_out_of_bounds = false;
+  bottom_out_of_bounds = false;
 
-  if (leftMargin > 0) {
-    for (cv::Point2f point : leftPoints) {
-      if (point.x > leftMargin) {
-        leftOutOfBounds = true;
+  if (left_margin > 0) {
+    for (cv::Point2f point : left_points) {
+      if (point.x > left_margin) {
+        left_out_of_bounds = true;
         return false;
       }
     }
   }
 
-  if (topMargin > 0) {
-    for (cv::Point2f point : topPoints) {
-      if (point.y > topMargin) {
-        topOutOfBounds = true;
+  if (top_margin > 0) {
+    for (cv::Point2f point : top_points) {
+      if (point.y > top_margin) {
+        top_out_of_bounds = true;
         return false;
       }
     }
   }
 
-  if (bottomMargin > 0) {
-    for (cv::Point2f point : bottomPoints) {
-      if (point.y < (this->imSize.height - bottomMargin)) {
-        bottomOutOfBounds = true;
+  if (bottom_margin > 0) {
+    for (cv::Point2f point : bottom_points) {
+      if (point.y < (this->image_size.height - bottom_margin)) {
+        bottom_out_of_bounds = true;
         return false;
       }
     }
   }
 
-  if (rightMargin > 0) {
-    for (cv::Point2f point : rightPoints) {
-      if (point.x < (this->imSize.width - rightMargin)) {
-        rightOutOfBounds = true;
+  if (right_margin > 0) {
+    for (cv::Point2f point : right_points) {
+      if (point.x < (this->image_size.width - right_margin)) {
+        right_out_of_bounds = true;
         return false;
       }
     }
@@ -126,22 +131,22 @@ bool Chessboard::checkMargins(void) {
 }
 
 void Chessboard::getTilts() {
-  leftLength = cv::norm(leftPoints.front() - leftPoints.back());
-  rightLength = cv::norm(rightPoints.front() - rightPoints.back());
-  topLength = cv::norm(topPoints.front() - topPoints.back());
-  bottomLength = cv::norm(bottomPoints.front() - bottomPoints.back());
+  left_length = cv::norm(left_points.front() - left_points.back());
+  right_length = cv::norm(right_points.front() - right_points.back());
+  top_length = cv::norm(top_points.front() - top_points.back());
+  bottom_length = cv::norm(bottom_points.front() - bottom_points.back());
 
-  emit gotTilts(horizontalTilt, verticalTilt);
+  emit gotTilts(horizontal_tilt, vertical_tilt);
 
-  if (leftLength > rightLength)
-    horizontalTilt = leftLength / rightLength - 1;
+  if (left_length > right_length)
+    horizontal_tilt = left_length / right_length - 1;
   else
-    horizontalTilt = -rightLength / leftLength + 1;
+    horizontal_tilt = -right_length / left_length + 1;
 
-  if (topLength > bottomLength)
-    verticalTilt = topLength / bottomLength - 1;
+  if (top_length > bottom_length)
+    vertical_tilt = top_length / bottom_length - 1;
   else
-    verticalTilt = -bottomLength / topLength + 1;
+    vertical_tilt = -bottom_length / top_length + 1;
 }
 
 bool Chessboard::checkAgainstTemplate(){
@@ -150,35 +155,36 @@ bool Chessboard::checkAgainstTemplate(){
 
     // Check if the points are within the template bounding box
     for(auto &vertex : vertices){
-        if( ! cv::pointPolygonTest(template_contour, vertex, measure_distance))
+        if( cv::pointPolygonTest(template_contour, vertex, measure_distance) <= 0)
             return false;
     }
 
     // Check if the board area fills enough of the bounding box
-    if(board_area < template_area * fill_factor) return false;
+    if(board_area < (template_area * fill_factor)) return false;
+    if(board_area > template_area) return false;
 
     return true;
 }
 
 bool Chessboard::checkTilts() {
-  horizontalTiltUnder = false;
-  horizontalTiltOver = false;
-  verticalTiltUnder = false;
-  verticalTiltOver = false;
+  horizontal_tilt_under = false;
+  horizontal_tilt_over = false;
+  vertical_tilt_under = false;
+  vertical_tilt_over = false;
 
-  if (horizontalTilt < minHt) {
-    horizontalTiltUnder = true;
+  if (horizontal_tilt < min_horizontal_tilt) {
+    horizontal_tilt_under = true;
     return false;
-  } else if (horizontalTilt > maxHt) {
-    horizontalTiltOver = true;
+  } else if (horizontal_tilt > max_horizontal_tilt) {
+    horizontal_tilt_over = true;
     return false;
   }
 
-  if (verticalTilt < minVt) {
-    verticalTiltUnder = true;
+  if (vertical_tilt < min_vertical_tilt) {
+    vertical_tilt_under = true;
     return false;
-  } else if (verticalTilt > maxVt) {
-    verticalTiltOver = true;
+  } else if (vertical_tilt > max_vertical_tilt) {
+    vertical_tilt_over = true;
     return false;
   }
 
@@ -186,28 +192,30 @@ bool Chessboard::checkTilts() {
 }
 
 bool Chessboard::checkArea() {
-  boardAreaUnder = false;
-  boardAreaOver = false;
+  board_area_under = false;
+  board_area_over = false;
 
-  if (board_area < minArea) {
-    boardAreaUnder = true;
+  if (board_area < min_area) {
+    board_area_under = true;
     return false;
-  } else if (board_area > maxArea) {
-    boardAreaOver = true;
+  } else if (board_area > max_area) {
+    board_area_over = true;
     return false;
   } else {
     return true;
   }
 }
 
-bool Chessboard::check(std::vector<cv::Point2f> &boardPoints) {
-  boardPoints = boardPoints;
+bool Chessboard::check(std::vector<cv::Point2f> &detected_points) {
+  board_points = detected_points;
   bool res = false;
+
+  getMargins();
 
   board_area = cv::contourArea(vertices);
   emit gotArea(board_area);
 
-  checkAgainstTemplate();
+  res = checkAgainstTemplate();
 
   valid = res;
 

@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "abstractstereocamera.h"
 
 AbstractStereoCamera::AbstractStereoCamera(QObject *parent) : QObject(parent) {
@@ -57,14 +62,14 @@ void AbstractStereoCamera::saveImage(QString fname) {
 
 void AbstractStereoCamera::setVisualZmin(double zmin){
   assert(zmin > 0);
-  visualZmin = zmin;
+  visualisation_min_z = zmin;
   qDebug() << "Set vmin: " << zmin;
 }
 
 
 void AbstractStereoCamera::setVisualZmax(double zmax){
     assert(zmax > 0);
-    visualZmax = zmax;
+    visualisation_max_z = zmax;
     qDebug() << "Set vmax: " << zmax;
 }
 
@@ -135,7 +140,7 @@ void AbstractStereoCamera::reproject3D() {
   pcl::PassThrough<pcl::PointXYZRGB> pass;
   pass.setInputCloud (ptCloudTemp);
   pass.setFilterFieldName ("z");
-  pass.setFilterLimits(-visualZmax, -visualZmin);
+  pass.setFilterLimits(-visualisation_max_z, -visualisation_min_z);
   pass.filter(*ptCloudTemp);
 
   /*
@@ -358,8 +363,6 @@ void AbstractStereoCamera::singleShot(void) {
 }
 
 void AbstractStereoCamera::finishCapture(void) {
-  qDebug() << "Waiting for capture finish";
-
   while (capturing) {
     QCoreApplication::processEvents();
   }
@@ -453,7 +456,7 @@ void AbstractStereoCamera::videoStreamStart(QString fname) {
     msgBox.setText("Unable to set up video streams.");
     msgBox.exec();
   } else {
-    acquiringVideo = true;
+    acquiring_video = true;
     acquiring = false;
 
     do {
@@ -461,7 +464,7 @@ void AbstractStereoCamera::videoStreamStart(QString fname) {
       QCoreApplication::processEvents();
       cv::hconcat(left_output, right_output, output_frame);
       stereo_video->write(output_frame);
-    } while (this->acquiringVideo);
+    } while (this->acquiring_video);
 
     stereo_video->release();
   }
@@ -485,7 +488,7 @@ bool AbstractStereoCamera::videoStreamInit(cv::VideoWriter *writer,
 }
 
 void AbstractStereoCamera::videoStreamStop(void) {
-  this->acquiringVideo = false;
+  this->acquiring_video = false;
    stereo_video.release();
 }
 

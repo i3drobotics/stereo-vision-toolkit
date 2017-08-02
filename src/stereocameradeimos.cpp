@@ -1,5 +1,9 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "stereocameradeimos.h"
-#include <Vfw.h>
 
 bool StereoCameraDeimos::initCamera(int devid) {
   bool res = false;
@@ -40,16 +44,16 @@ void StereoCameraDeimos::openHID(void) {
   } else {
     hid_set_nonblocking(deimos_device, 1);
     exposure = getExposure();
-    qDebug() << getSerial();
+    qDebug() << "Serial: " << (qint64) getSerial();
   }
 
   hid_exit();
 }
 
-int StereoCameraDeimos::getSerial() {
+qint64 StereoCameraDeimos::getSerial() {
   if (deimos_device == NULL) return -1;
 
-  int serial;
+  qint64 serial = 0;
 
   std::vector<unsigned char> buffer;
   buffer.resize(16);
@@ -201,7 +205,9 @@ int StereoCameraDeimos::findCamera(void) {
     }
 
     if (SUCCEEDED(hr)) {
-      if (wchar_to_string(var.bstrVal) == "See3CAM_Stereo") {
+      std::wstring str(var.bstrVal);
+
+      if (std::string(str.begin(), str.end()) == "See3CAM_Stereo") {
         qDebug() << "Found Deimos at device " << i;
 
         hr = pPropBag->Read(L"DevicePath", &var, 0);

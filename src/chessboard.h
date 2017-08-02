@@ -15,58 +15,59 @@ class Chessboard : public QObject {
  public:
   explicit Chessboard(QObject *parent = 0, cv::Size pattern = cv::Size(0, 0),
                       cv::Size imsize = cv::Size(0, 0));
-  double minHt = -0.1;
-  double maxHt = 0.1;
-  double minVt = -0.1;
-  double maxVt = 0.1;
-  double minArea = 0.4;
-  double maxArea = 1;
+  double min_horizontal_tilt = -0.1;
+  double max_horizontal_tilt = 0.1;
+  double min_vertical_tilt = -0.1;
+  double max_vertical_tilt = 0.1;
+  double min_area = 0.4;
+  double max_area = 1;
 
-  double leftMargin = -1;
-  double rightMargin = -1;
-  double topMargin = -1;
-  double bottomMargin = -1;
+  double left_margin = -1;
+  double right_margin = -1;
+  double top_margin = -1;
+  double bottom_margin = -1;
 
   bool valid = false;
 
-  double horizontalTilt;
-  double verticalTilt;
-  double leftLength;
-  double rightLength;
-  double topLength;
-  double bottomLength;
-  bool leftOutOfBounds = true;
-  bool rightOutOfBounds = true;
-  bool topOutOfBounds = true;
-  bool bottomOutOfBounds = true;
-  bool horizontalTiltUnder = true;
-  bool horizontalTiltOver = true;
-  bool verticalTiltUnder = true;
-  bool verticalTiltOver = true;
-  bool boardAreaUnder;
-  bool boardAreaOver;
+  double horizontal_tilt;
+  double vertical_tilt;
+  double left_length;
+  double right_length;
+  double top_length;
+  double bottom_length;
+  bool left_out_of_bounds = true;
+  bool right_out_of_bounds = true;
+  bool top_out_of_bounds = true;
+  bool bottom_out_of_bounds = true;
+  bool horizontal_tilt_under = true;
+  bool horizontal_tilt_over = true;
+  bool vertical_tilt_under = true;
+  bool vertical_tilt_over = true;
+  bool board_area_under;
+  bool board_area_over;
 
-  std::vector<cv::Point2f> boardPoints;
-  std::vector<cv::Point2f> topPoints;
-  std::vector<cv::Point2f> leftPoints;
-  std::vector<cv::Point2f> rightPoints;
-  std::vector<cv::Point2f> bottomPoints;
+  std::vector<cv::Point2f> board_points;
+  std::vector<cv::Point2f> top_points;
+  std::vector<cv::Point2f> left_points;
+  std::vector<cv::Point2f> right_points;
+  std::vector<cv::Point2f> bottom_points;
   std::vector<cv::Point2f> vertices;
+  std::vector<cv::Point2i> template_contour;
 
-  void setTemplate(std::vector<cv::Point2f> contour);
+  void setTemplate(std::vector<cv::Point2i> contour);
   bool checkAgainstTemplate();
 
   double getArea() { return board_area; }
 
  public slots:
 
-  void setHorizontalTilt(double minHt, double maxHt);
-  void setVerticalTilt(double minVt, double maxVt);
-  void setBoardArea(double minArea, double maxArea);
-  void setBoardMargins(double leftMargin, double rightMargin, double topMargin,
-                       double bottomMargin);
+  void setHorizontalTilt(double min_horizontal_tilt, double max_horizontal_tilt);
+  void setVerticalTilt(double min_vertical_tilt, double max_vertical_tilt);
+  void setBoardArea(double min_area, double max_area);
+  void setBoardMargins(double left_margin, double right_margin, double top_margin,
+                       double bottom_margin);
 
-  bool check(std::vector<cv::Point2f> &boardPoints);
+  bool check(std::vector<cv::Point2f> &board_points);
   bool isValid(void);
 
  signals:
@@ -74,14 +75,12 @@ class Chessboard : public QObject {
   void gotArea(double area);
 
  private:
-  cv::Size imSize;
+  cv::Size image_size;
   cv::Size pattern;
-
-  std::vector<cv::Point2f> template_contour;
 
   double template_area = DBL_MAX;
   double board_area = DBL_MAX;
-  double fill_factor = 0.8;
+  double fill_factor = 0.90;
 
   void getMargins();
   bool checkMargins();

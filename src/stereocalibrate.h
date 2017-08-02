@@ -8,6 +8,7 @@
 
 #include <abstractstereocamera.h>
 #include <chessboard.h>
+#include <calibrateconfirmdialog.h>
 #include <QLabel>
 #include <QtCore>
 #include <algorithm>
@@ -22,50 +23,51 @@ class StereoCalibrate : public QObject {
   Q_OBJECT
  public:
   explicit StereoCalibrate(QObject* parent = 0,
-                            AbstractStereoCamera* stereoCamera = 0);
+                            AbstractStereoCamera* stereo_camera = 0);
 
-  cv::Mat leftCameraMatrix;
-  cv::Mat leftDistCoeffs;
-  cv::Mat leftRvecs;
-  cv::Mat leftTvecs;
-  double leftRMSError;
+  cv::Mat left_camera_matrix;
+  cv::Mat left_distortion;
+  cv::Mat left_r_vecs;
+  cv::Mat left_t_vecs;
+  double left_rms_error;
 
-  cv::Mat rightCameraMatrix;
-  cv::Mat rightDistCoeffs;
-  cv::Mat rightRvecs;
-  cv::Mat rightTvecs;
-  double rightRMSError;
+  cv::Mat right_camera_matrix;
+  cv::Mat right_distortion;
+  cv::Mat right_r_vecs;
+  cv::Mat right_t_vecs;
+  double right_rms_error;
 
-  cv::Mat stereoR;
-  cv::Mat stereoT;
-  cv::Mat stereoE;
-  cv::Mat stereoF;
-  cv::Mat stereoQ;
+  cv::Mat stereo_r;
+  cv::Mat stereo_t;
+  cv::Mat stereo_e;
+  cv::Mat stereo_f;
+  cv::Mat stereo_q;
+  double stereo_rms_error;
 
-  cv::Mat leftRectmapX;
-  cv::Mat leftRectmapY;
-  cv::Mat rightRectmapX;
-  cv::Mat rightRectmapY;
+  cv::Mat left_rectification_x;
+  cv::Mat left_rectification_y;
+  cv::Mat right_rectification_x;
+  cv::Mat right_rectification_y;
 
  private:
-  QLabel* leftView;
-  QLabel* rightView;
-  AbstractStereoCamera* stereoCamera;
-  std::vector<Chessboard*> boardOrientations;
-  std::vector<cv::Mat> leftImages;
-  std::vector<cv::Mat> rightImages;
-  cv::Size patternsize = cv::Size(8, 6);
+  QLabel* left_view;
+  QLabel* right_view;
+  AbstractStereoCamera* stereo_camera;
+  std::vector<Chessboard*> board_orientations;
+  std::vector<cv::Mat> left_images;
+  std::vector<cv::Mat> right_images;
+  cv::Size pattern_size = cv::Size(8, 6);
 
-  std::vector<std::vector<cv::Point2f> > leftImagePoints;
-  std::vector<std::vector<cv::Point2f> > rightImagePoints;
-  std::vector<bool> leftValid;
-  std::vector<bool> rightValid;
+  std::vector<std::vector<cv::Point2f> > left_image_points;
+  std::vector<std::vector<cv::Point2f> > right_image_points;
+  std::vector<bool> left_valid;
+  std::vector<bool> right_valid;
 
-  std::vector<cv::Point3f> patternPoints;
+  std::vector<cv::Point3f> pattern_points;
 
-  int totalPoses = 0;
-  int currentPose = 0;
-  int totalImages = 0;
+  int total_poses = 0;
+  int current_pose = 0;
+  int total_images = 0;
 
   double singleCameraCalibration(
       std::vector<cv::Mat>& images,
@@ -75,16 +77,16 @@ class StereoCalibrate : public QObject {
   double stereoCameraCalibration(
       int stereoFlags = cv::CALIB_USE_INTRINSIC_GUESS);
   void jointCalibration(void);
-  bool calibratingLeft = true;
-  bool calibratingRight = false;
+  bool calibrating_left = true;
+  bool calibrating_right = false;
 
   void finishedCalibration();
   bool findCorners(cv::Mat image, std::vector<cv::Point2f>& corners, int flags);
 
-  cv::Mat leftImageOverlay;
-  cv::Mat rightImageOverlay;
+  cv::Mat left_image_overlay;
+  cv::Mat right_image_overlay;
 
-  cv::Size imageSize;
+  cv::Size image_size;
 
  public slots:
   void abortCalibration();
@@ -95,18 +97,20 @@ class StereoCalibrate : public QObject {
   void checkImages(void);
   void loadBoardPoses(std::string fname);
   bool imageValid(void);
-  void overlayImage(cv::Mat& image, Chessboard* board = 0, bool found = false);
+  void overlayImage(cv::Mat& image, Chessboard* board = 0, bool found = false, bool valid = false);
   void fromImages(QList<QString> left, QList<QString> right);
   void setPattern(cv::Size size, double squareSize);
   void setImageSize(cv::Size size);
   void overlayArrow(cv::Mat& image, std::vector<cv::Point2f>& points,
                     cv::Point2f offset, CvScalar colour, int thickness = 3);
 
+
  signals:
   void doneCalibration(bool);
   void imageProgress(int, int);
   void requestImage(void);
   void chessboardFound(Chessboard* board);
+  void done_image(int i);
 };
 
 #endif  // STEREOCALIBRATE_H
