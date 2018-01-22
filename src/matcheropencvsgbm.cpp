@@ -1,9 +1,14 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "matcheropencvsgbm.h"
 
 void MatcherOpenCVSGBM::init(void) {
   try {
     matcher =
-        cv::StereoSGBM::load<cv::StereoSGBM>("./params/stereo_sgbm_params.xml");
+        cv::StereoSGBM::load<cv::StereoSGBM>(QCoreApplication::applicationDirPath().toStdString() + "/params/stereo_sgbm_params.xml");
   } catch (cv::Exception& e) {
     matcher = cv::StereoSGBM::create(0, 64, 9);
     setUniquenessRatio(15);
@@ -59,10 +64,26 @@ int MatcherOpenCVSGBM::getErrorDisparity(void){
 
 void MatcherOpenCVSGBM::forwardMatch() {
   matcher->setMinDisparity(min_disparity);
+
+
+
   try {
     matcher->compute(*left, *right, disparity_lr);
 
-    disparity_lr.convertTo(disparity_lr, CV_32F);
+    if(wls_filter){
+        backwardMatch();
+        cv::Mat disparity_filter;
+        auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
+        wls_filter->setLambda(wls_lambda);
+        wls_filter->setSigmaColor(wls_sigma);
+        wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
+
+        disparity_filter.convertTo(disparity_lr, CV_32F);
+    }else{
+
+        disparity_lr.convertTo(disparity_lr, CV_32F);
+    }
+
 
   } catch (...) {
     qDebug() << "Error in SGBM match parameters";
@@ -70,10 +91,10 @@ void MatcherOpenCVSGBM::forwardMatch() {
 }
 
 void MatcherOpenCVSGBM::backwardMatch() {
-  matcher->setMinDisparity(-(min_disparity + disparity_range));
-  matcher->compute(*right, *left, disparity_rl);
+  auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
+  right_matcher->compute(*right, *left, disparity_rl);
 }
 
 void MatcherOpenCVSGBM::saveParams() {
-  matcher->save("./params/stereo_sgbm_params.xml");
+  matcher->save(QCoreApplication::applicationDirPath().toStdString()+"/params/stereo_sgbm_params.xml");
 }

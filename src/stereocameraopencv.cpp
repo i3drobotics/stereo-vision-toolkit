@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "stereocameraopencv.h"
 
 bool StereoCameraOpenCV::initCamera(int left_index, int right_index) {

@@ -173,57 +173,57 @@ int StereoCameraDeimos::findCamera(void) {
 
   HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL,
                                 CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pDevEnum));
-
   if (SUCCEEDED(hr)) {
     // Create an enumerator for the category.
     hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum,
                                          0);
-    if (hr == S_FALSE) {
-      hr = VFW_E_NOT_FOUND;  // The category is empty. Treat as an error.
+    if (hr != S_OK) {
+      hr = VFW_E_NOT_FOUND;  // The category is empty - no camera connected
+      return -1;
     }
 
     pDevEnum->Release();
-  }
 
-  IMoniker *pMoniker = NULL;
-  int i = 0;
-  while (pEnum->Next(1, &pMoniker, NULL) == S_OK) {
-    IPropertyBag *pPropBag;
-    HRESULT hr = pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPropBag));
-    if (FAILED(hr)) {
-      pMoniker->Release();
-      continue;
-    }
-
-    VARIANT var;
-    VariantInit(&var);
-
-    // Get description or friendly name.
-    hr = pPropBag->Read(L"Description", &var, 0);
-    if (FAILED(hr)) {
-      hr = pPropBag->Read(L"FriendlyName", &var, 0);
-    }
-
-    if (SUCCEEDED(hr)) {
-      std::wstring str(var.bstrVal);
-
-      if (std::string(str.begin(), str.end()) == "See3CAM_Stereo") {
-        qDebug() << "Found Deimos at device " << i;
-
-        hr = pPropBag->Read(L"DevicePath", &var, 0);
-
-        device_path = var.bstrVal;
-        return i;
+    IMoniker *pMoniker = NULL;
+    int i = 0;
+    while (pEnum->Next(1, &pMoniker, NULL) == S_OK) {
+      IPropertyBag *pPropBag;
+      HRESULT hr = pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPropBag));
+      if (FAILED(hr)) {
+        pMoniker->Release();
+        continue;
       }
 
-      VariantClear(&var);
+      VARIANT var;
+      VariantInit(&var);
+
+      // Get description or friendly name.
+      hr = pPropBag->Read(L"Description", &var, 0);
+      if (FAILED(hr)) {
+        hr = pPropBag->Read(L"FriendlyName", &var, 0);
+      }
+
+      if (SUCCEEDED(hr)) {
+        std::wstring str(var.bstrVal);
+
+        if (std::string(str.begin(), str.end()) == "See3CAM_Stereo") {
+          qDebug() << "Found Deimos at device " << i;
+
+          hr = pPropBag->Read(L"DevicePath", &var, 0);
+
+          device_path = var.bstrVal;
+          return i;
+        }
+
+        VariantClear(&var);
+      }
+
+      hr = pPropBag->Write(L"FriendlyName", &var);
+
+      pPropBag->Release();
+      pMoniker->Release();
+      i++;
     }
-
-    hr = pPropBag->Write(L"FriendlyName", &var);
-
-    pPropBag->Release();
-    pMoniker->Release();
-    i++;
   }
 
   return -1;

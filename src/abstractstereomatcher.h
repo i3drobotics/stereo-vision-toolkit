@@ -7,6 +7,7 @@
 #define ABSTRACTSTEREOMATCHER_H
 
 #include <QObject>
+#include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QThread>
 #include <QDebug>

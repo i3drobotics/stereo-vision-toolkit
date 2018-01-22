@@ -52,6 +52,7 @@ class StereoCalibrate : public QObject {
  private:
   QLabel* left_view;
   QLabel* right_view;
+  calibrateconfirmdialog* cal_dialog;
   AbstractStereoCamera* stereo_camera;
   std::vector<Chessboard*> board_orientations;
   std::vector<cv::Mat> left_images;
@@ -76,7 +77,7 @@ class StereoCalibrate : public QObject {
       cv::Mat& rvecs, cv::Mat& tvecs, int cornerFlags = 0, int stereoFlags = 0);
   double stereoCameraCalibration(
       int stereoFlags = cv::CALIB_USE_INTRINSIC_GUESS);
-  void jointCalibration(void);
+  bool jointCalibration(void);
   bool calibrating_left = true;
   bool calibrating_right = false;
 

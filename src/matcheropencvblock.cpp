@@ -1,8 +1,13 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "matcheropencvblock.h"
 
 void MatcherOpenCVBlock::init(void) {
   try {
-    matcher = cv::StereoBM::load<cv::StereoBM>("./params/stereo_bm_params.xml");
+    matcher = cv::StereoBM::load<cv::StereoBM>(QCoreApplication::applicationDirPath().toStdString()+"/params/stereo_bm_params.xml");
   } catch (cv::Exception& e) {
     matcher = cv::StereoBM::create(64, 9);
     setUniquenessRatio(15);
@@ -76,29 +81,29 @@ void MatcherOpenCVBlock::forwardMatch() {
   try {
     matcher->compute(*left, *right, disparity_lr);
 
+    if(wls_filter){
+        backwardMatch();
+        cv::Mat disparity_filter;
+        auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
+        wls_filter->setLambda(wls_lambda);
+        wls_filter->setSigmaColor(wls_sigma);
+        wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
+
+        disparity_filter.convertTo(disparity_lr, CV_32F);
+    }else{
+        disparity_lr.convertTo(disparity_lr, CV_32F);
+    }
+
   } catch (...) {
     qDebug() << "Error in OpenCV block match parameters";
   }
 }
 
 void MatcherOpenCVBlock::backwardMatch() {
-
-  cv::Mat right_flipped, left_flipped;
-
-  cv::flip(*right, right_flipped, 1);
-  cv::flip(*left, left_flipped, 1);
-
-  matcher->compute(right_flipped, left_flipped, disparity_rl);
-
-  cv::flip(disparity_rl, disparity_rl, 1);
-
-  cv::imwrite("./disp_lr.png", disparity_lr/16);
-  cv::imwrite("./disp_rl.png", disparity_rl/16);
-
-  disparity_rl.convertTo(disparity_rl, CV_32F);
-
+    auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
+    right_matcher->compute(*right, *left, disparity_rl);
 }
 
 void MatcherOpenCVBlock::saveParams() {
-  matcher->save("./params/stereo_bm_params.xml");
+  matcher->save(QCoreApplication::applicationDirPath().toStdString()+ "/params/stereo_bm_params.xml");
 }

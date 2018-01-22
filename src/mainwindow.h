@@ -58,7 +58,7 @@ class MainWindow : public QMainWindow {
   QFile* paramFile;
   QPixmap pmap_right;
   QPixmap pmap_disparity;
-  QTimer* statusBarTimer;
+  QTimer* status_bar_timer;
 
   QLabel* frame_counter;
   QLabel* fps_counter;
@@ -66,7 +66,7 @@ class MainWindow : public QMainWindow {
   QWidget* status_widget;
   QVariantMap icon_options;
   QtAwesome* awesome;
-  DisparityViewer* disparityView;
+  DisparityViewer* disparity_view;
 
   bool cameras_connected = false;
 
@@ -78,15 +78,12 @@ class MainWindow : public QMainWindow {
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
 
-  CalibrationDialog* calDialog;
-  CalibrateFromImagesDialog* calImDialog;
+  CalibrationDialog* calibration_dialog;
+  CalibrateFromImagesDialog* calibration_images_dialog;
 
-  QString calibrationDir = "";
-  QString saveDir = "";
+  QString calibration_directory = "";
+  QString save_directory = "";
 
-  unsigned int red;
-  unsigned int green;
-  unsigned int blue;
   QVTKWidget* vtk_widget;
 
   void setupMatchers();
@@ -114,8 +111,8 @@ class MainWindow : public QMainWindow {
   void autoloadCameraTriggered();
   void videoStreamLoad(void);
 
-  void setSaveDirectory(void);
-  void setCalibrationFolder(void);
+  void setSaveDirectory(QString dir = "");
+  void setCalibrationFolder(QString dir = "");
 
   void startCalibration(void);
   void doneCalibration(bool);

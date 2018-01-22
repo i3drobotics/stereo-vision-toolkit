@@ -47,6 +47,10 @@ class MatcherOpenCVSGBM : public AbstractStereoMatcher
    private:
     cv::Ptr<cv::StereoSGBM> matcher;
     void init(void);
+
+    bool wls_filter = true;
+    double wls_lambda = 8000;
+    double wls_sigma = 1.5;
 };
 
 #endif // MATCHEROPENCVSGBM_H

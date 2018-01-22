@@ -68,8 +68,7 @@ void MainWindow::controlsInit(void) {
           SLOT(setSaveDirectory()));
   connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
           SLOT(startVideoCapture(void)));
-  connect(ui->actionLoad_calibration, SIGNAL(triggered(bool)),
-          SLOT(setCalibrationFolder()));
+  connect(ui->actionLoad_calibration, SIGNAL(triggered(bool)),this, SLOT(setCalibrationFolder()));
   connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSetButton, SLOT(setDisabled(bool)));
   connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSpinBox, SLOT(setDisabled(bool)));
 
@@ -271,11 +270,15 @@ void MainWindow::stereoCameraInit() {
     }
 
     bool res = stereo_cam->setCalibration(calibration_directory);
-    qDebug() << calibration_directory << res;
+    if(res){
+        qDebug() << "Calibration folder: " << calibration_directory;
+    }else{
+        qDebug() << "Failed to load calibration";
+    }
+
+    ui->toggleRectifyCheckBox->setEnabled(res);
+    ui->toggleRectifyCheckBox->setChecked(res);
     stereo_cam->enableRectify(res);
-    stereo_cam->enableMatching(res);
-    ui->enableStereo->setEnabled(res);
-    ui->enableStereo->setChecked(res);
 
     disparity_view->setCalibration(stereo_cam->Q, 60e-3, 4.3e-3);
     disparity_view->updatePixmapRange();
@@ -317,6 +320,7 @@ void MainWindow::videoStreamLoad(void) {
     stereoCameraInit();
     ui->exposureSpinBox->setDisabled(true);
     ui->exposureSetButton->setDisabled(true);
+    ui->autoExposeCheck->setDisabled(true);
   }
 }
 
@@ -479,18 +483,25 @@ void MainWindow::setupMatchers(void) {
           SLOT(setMatcher(int)));
 }
 
-void MainWindow::setCalibrationFolder() {
-  QString directory = QFileDialog::getExistingDirectory(
+void MainWindow::setCalibrationFolder(QString dir) {
+  if(dir == ""){
+      dir = QFileDialog::getExistingDirectory(
       this, tr("Open Calibration Folder"), "/home",
       QFileDialog::DontResolveSymlinks);
-  if (directory != "") {
-    if (!stereo_cam->setCalibration(directory)) {
+  }
+
+  if (dir != "") {
+    if (!stereo_cam->setCalibration(dir)) {
       QMessageBox msg;
       msg.setText("Unable to load calibration files");
       msg.exec();
+    }else{
+      // Calibration valid
+      stereo_cam->enableRectify(true);
+      ui->toggleRectifyCheckBox->setEnabled(true);
     }
 
-    updateParamFile("calDir", directory);
+    updateParamFile("calDir", dir);
   }
 }
 
@@ -556,13 +567,20 @@ void MainWindow::updateDisplay(void) {
       pmap_right.scaled(ui->right_image_view->size(), Qt::KeepAspectRatio));
 }
 
-void MainWindow::setSaveDirectory(void) {
-  QString dir = QFileDialog::getExistingDirectory(
+void MainWindow::setSaveDirectory(QString dir) {
+
+  if(dir == ""){
+      dir = QFileDialog::getExistingDirectory(
       this, tr("Open Directory"), "/home",
       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+  }
+
   if (dir != "") {
     ui->saveDirLabel->setText(dir);
-    stereo_cam->setSavelocation(dir);
+
+    if(stereo_cam)
+        stereo_cam->setSavelocation(dir);
+
     updatePreviousDirectory(dir);
   }
 }
@@ -573,22 +591,29 @@ void MainWindow::checkParamFile(void) {
   if (!paramFile->exists()) {
     qDebug() << "Making parameter file.";
 
-    auto dir = QDir(QDir::currentPath());
-    dir.mkpath("./params/");
+    auto dir = QDir(QCoreApplication::applicationDirPath() + "/params/");
+    dir.mkpath(".");
 
     QDomElement root = doc.createElement("deimosParameters");
     doc.appendChild(root);
 
+    save_directory = QDir::homePath() + "/deimos/";
+
     QDomElement tag = doc.createElement("saveDir");
-    tag.appendChild(doc.createTextNode(QDir::homePath() + "/deimos/"));
+    tag.appendChild(doc.createTextNode(save_directory));
     root.appendChild(tag);
+
+    if(!QDir(save_directory).exists()){
+        auto saved = QDir(save_directory);
+        saved.mkpath(".");
+    }
 
     tag = doc.createElement("exposure");
     tag.appendChild(doc.createTextNode("5"));
     root.appendChild(tag);
 
     tag = doc.createElement("calDir");
-    tag.appendChild(doc.createTextNode(QDir::currentPath() + "/params/"));
+    tag.appendChild(doc.createTextNode(QCoreApplication::applicationDirPath() + "/params/"));
     root.appendChild(tag);
 
     QString xml = doc.toString();
@@ -606,10 +631,10 @@ void MainWindow::checkParamFile(void) {
 }
 
 void MainWindow::loadParamFile(void) {
-  paramFile = new QFile(QDir::currentPath() + "/params/params.xml", this);
+  paramFile = new QFile(QCoreApplication::applicationDirPath() + "/params/params.xml", this);
 
   qDebug() << "Looking for param file: "
-           << QDir::currentPath() + "/params/params.xml";
+           << QCoreApplication::applicationDirPath() + "/params/params.xml";
 
   checkParamFile();
 
@@ -689,8 +714,8 @@ void MainWindow::updateParamFile(QString tagName, QString value) {
 
   paramFile->close();
 
-  QFile file(QDir::currentPath() + "/params/~params_temp.xml");
-  QDir outdir(QDir::currentPath() + "/params/");
+  QFile file(QCoreApplication::applicationDirPath() + "/params/~params_temp.xml");
+  QDir outdir(QCoreApplication::applicationDirPath() + "/params/");
 
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     return;
@@ -700,9 +725,9 @@ void MainWindow::updateParamFile(QString tagName, QString value) {
   file.close();
 
   if (bytes == xml.count()) {
-    outdir.remove(QDir::currentPath() + "/params/params.xml");
-    outdir.rename(QDir::currentPath() + "/params/~params_temp.xml",
-                  QDir::currentPath() + "/params/params.xml");
+    outdir.remove(QCoreApplication::applicationDirPath() + "/params/params.xml");
+    outdir.rename(QCoreApplication::applicationDirPath() + "/params/~params_temp.xml",
+                  QCoreApplication::applicationDirPath() + "/params/params.xml");
   } else {
     qDebug() << xml.count() << bytes;
   }

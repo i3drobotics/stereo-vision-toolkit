@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #ifndef CALIBRATEFROMIMAGESDIALOG_H
 #define CALIBRATEFROMIMAGESDIALOG_H
 
@@ -29,25 +34,16 @@ public:
 private:
     Ui::CalibrateFromImagesDialog *ui;
 
-    QString leftPath = "";
-    QString rightPath = "";
-    QString leftMask = "";
-    QString rightMask = "";
+    QString left_path = "";
+    QString right_path = "";
+    QString left_mask = "";
+    QString right_mask = "";
 
-    QFileSystemModel *leftFileModel;
-    QFileSystemModel *rightFileModel;
+    QFileSystemModel *left_file_model;
+    QFileSystemModel *right_file_model;
 
-    QList<QString> leftImageList;
-    QList<QString> rightImageList;
-
-    std::vector<cv::Mat> leftImages;
-    std::vector<cv::Mat> rightImages;
-
-    std::vector< std::vector<cv::Point2f> > leftImagePoints;
-    std::vector< std::vector<cv::Point2f> > rightImagePoints;
-    std::vector< bool > leftValid;
-    std::vector< bool > rightValid;
-
+    QList<QString> left_image_list;
+    QList<QString> right_image_list;
 
 private slots:
     void selectLeftImageRoot(void);

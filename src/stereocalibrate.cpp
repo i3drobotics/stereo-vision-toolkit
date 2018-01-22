@@ -9,6 +9,7 @@ StereoCalibrate::StereoCalibrate(QObject* parent,
                                  AbstractStereoCamera* stereoCamera)
     : QObject(parent) {
   this->stereo_camera = stereoCamera;
+  cal_dialog = new calibrateconfirmdialog;
 
   if (stereoCamera) {
     image_size = cv::Size(stereoCamera->getWidth(), stereoCamera->getHeight());
@@ -66,6 +67,7 @@ void StereoCalibrate::startCalibration(void) {
   connect(this->stereo_camera, SIGNAL(acquired()), this, SLOT(checkImages()));
   connect(this, SIGNAL(requestImage()), this->stereo_camera,
           SLOT(singleShot()));
+
   this->stereo_camera->singleShot();
 }
 
@@ -111,7 +113,7 @@ void StereoCalibrate::checkImages(void) {
   return;
 }
 
-void StereoCalibrate::jointCalibration(void) {
+bool StereoCalibrate::jointCalibration(void) {
   assert(left_images.size() != 0);
   assert(right_images.size() != 0);
   assert(left_image_points.size() == right_image_points.size());
@@ -121,12 +123,14 @@ void StereoCalibrate::jointCalibration(void) {
   int cornerFlags = cv::CALIB_CB_ADAPTIVE_THRESH +
                     cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK;
 
-  auto cal_dialog = new calibrateconfirmdialog;
+
   cal_dialog->setNumberImages(left_images.size());
   cal_dialog->setModal(false);
   cal_dialog->open();
 
   connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
+
+  qDebug() << "Running left calibration.";
 
   /* Left Camera */
   left_valid.clear();
@@ -134,18 +138,25 @@ void StereoCalibrate::jointCalibration(void) {
       left_images, left_image_points, left_valid, left_camera_matrix,
       left_distortion, left_r_vecs, left_t_vecs, cornerFlags);
 
-  cv::FileStorage leftIntrinsicFS("left_calibration.xml",
-                                  cv::FileStorage::WRITE);
-  leftIntrinsicFS << "cameraMatrix" << left_camera_matrix;
-  leftIntrinsicFS << "distCoeffs" << left_distortion;
-  leftIntrinsicFS << "rms_error" << left_rms_error;
-  leftIntrinsicFS.release();
+  if(left_rms_error > 0){
+      cv::FileStorage leftIntrinsicFS("left_calibration.xml",
+                                      cv::FileStorage::WRITE);
+      leftIntrinsicFS << "cameraMatrix" << left_camera_matrix;
+      leftIntrinsicFS << "distCoeffs" << left_distortion;
+      leftIntrinsicFS << "rms_error" << left_rms_error;
+      leftIntrinsicFS.release();
 
-  cal_dialog->updateLeft(left_camera_matrix, left_distortion, left_rms_error);
+      cal_dialog->updateLeft(left_camera_matrix, left_distortion, left_rms_error);
+
+      qDebug() << "Left RMS reprojection error: " << left_rms_error;
+  }else{
+      qDebug() << "Left camera calibration failed.";
+      return false;
+  }
+
+  qDebug() << "Running right calibration.";
+
   disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
-
-  qDebug() << "Left RMS reprojection error: " << left_rms_error;
-
   connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
   /* Right Camera */
   right_valid.clear();
@@ -153,26 +164,36 @@ void StereoCalibrate::jointCalibration(void) {
       right_images, right_image_points, right_valid, right_camera_matrix,
       right_distortion, right_r_vecs, right_t_vecs, cornerFlags);
 
-  cv::FileStorage rightIntrinsicFS("right_calibration.xml",
-                                   cv::FileStorage::WRITE);
-  rightIntrinsicFS << "cameraMatrix" << right_camera_matrix;
-  rightIntrinsicFS << "distCoeffs" << right_distortion;
-  rightIntrinsicFS << "rms_error" << right_rms_error;
-  rightIntrinsicFS.release();
+  if(right_rms_error > 0){
 
-  cal_dialog->updateRight(right_camera_matrix, right_distortion, right_rms_error);
+      cv::FileStorage rightIntrinsicFS("right_calibration.xml",
+                                       cv::FileStorage::WRITE);
+      rightIntrinsicFS << "cameraMatrix" << right_camera_matrix;
+      rightIntrinsicFS << "distCoeffs" << right_distortion;
+      rightIntrinsicFS << "rms_error" << right_rms_error;
+      rightIntrinsicFS.release();
+
+      cal_dialog->updateRight(right_camera_matrix, right_distortion, right_rms_error);
+      qDebug() << "Right RMS reprojection error: " << left_rms_error;
+  }else{
+      qDebug() << "Right camera calibration failed.";
+      return false;
+  }
+
   disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
-
-  qDebug() << "Right RMS reprojection error: " << right_rms_error;
 
   stereo_rms_error = stereoCameraCalibration();
 
-  qDebug() << "Stereo RMS reprojection error: " << stereo_rms_error;
+  if(stereo_rms_error > 0){
+      qDebug() << "Stereo RMS reprojection error: " << stereo_rms_error;
 
-  cal_dialog->updateStereo(stereo_q, stereo_rms_error);
+      cal_dialog->updateStereo(stereo_q, stereo_rms_error);
 
-  finishedCalibration();
-
+      finishedCalibration();
+      return true;
+  }else{
+      return false;
+  }
 }
 
 double StereoCalibrate::stereoCameraCalibration(int stereoFlags) {
@@ -272,22 +293,30 @@ double StereoCalibrate::singleCameraCalibration(
       validImagePoints.push_back(corners);
       objectPoints.push_back(pattern_points);
       valid.push_back(true);
+      qDebug() << "Image " << i << " valid.";
     } else {
       valid.push_back(false);
       corners.clear();
       imagePoints.push_back(corners);
+      qDebug() << "Image " << i << " invalid.";
     }
 
     i++;
 
     emit done_image(i);
+    cal_dialog->update();
   }
 
   assert(objectPoints.size() == validImagePoints.size());
 
+  try{
   res =
       cv::calibrateCamera(objectPoints, validImagePoints, image_size,
                           cameraMatrix, distCoeffs, rvecs, tvecs, stereoFlags);
+  }catch(...){
+      qDebug() << "Calibration failed";
+      res = -1;
+  }
 
   return res;
 }

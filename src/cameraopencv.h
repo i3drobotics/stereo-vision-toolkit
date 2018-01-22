@@ -39,7 +39,7 @@ private:
     cv::Mat channels[3];
     cv::Mat image_buffer;
     enum format {Y800, Y16};
-    format imageformat;
+    format image_format;
 
 public slots:
     bool capture(void);

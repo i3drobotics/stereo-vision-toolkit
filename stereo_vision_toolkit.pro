@@ -71,11 +71,11 @@ FORMS    += mainwindow.ui \
 
 # For building in a single folder
 CONFIG(debug, debug|release) {
-    DESTDIR = bin_debug
+    DESTDIR = debug
     OBJECTS_DIR = .obj_debug
     MOC_DIR     = .moc_debug
 }else {
-    DESTDIR = bin
+    DESTDIR = release
     OBJECTS_DIR = .obj
     MOC_DIR     = .moc
 }
@@ -85,21 +85,20 @@ INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/VTK/include/vtk-7.0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/PCL/include/pcl-1.8"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/hidapi/include"
 
-
 CONFIG(debug, debug|release) {
     message("Debug mode")
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/x64/vc14/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/Debug" -lhidapi
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/debug" -lhidapi
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
     LIBS += -lopencv_ximgproc310d -lopencv_core310d -lopencv_highgui310d -lopencv_calib3d310d -lopencv_videoio310d -lopencv_imgproc310d -lopencv_imgcodecs310d -lopencv_cudastereo310d -lopencv_cudawarping310d
 }else {
     message("Release mode")
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/x64/vc14/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/Release" -lhidapi
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/release" -lhidapi
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
     LIBS += -lopencv_ximgproc310 -lopencv_core310 -lopencv_highgui310 -lopencv_calib3d310 -lopencv_videoio310 -lopencv_imgproc310 -lopencv_imgcodecs310 -lopencv_cudastereo310 -lopencv_cudawarping310
 }

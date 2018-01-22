@@ -43,7 +43,6 @@ class MatcherOpenCVBlock : public AbstractStereoMatcher {
   int getSpeckleFilterWindow(){return matcher->getSpeckleWindowSize();}
   int getSpeckleFilterRange(){return matcher->getSpeckleRange();}
 
-
   void saveParams();
 
   void forwardMatch(void);
@@ -52,6 +51,10 @@ class MatcherOpenCVBlock : public AbstractStereoMatcher {
  private:
   cv::Ptr<cv::StereoBM> matcher;
   void init(void);
+
+  bool wls_filter = false;
+  double wls_lambda = 8000;
+  double wls_sigma = 1.5;
 };
 
 #endif  // MATCHEROPENCVBLOCK_H

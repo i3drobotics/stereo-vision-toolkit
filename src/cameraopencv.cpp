@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "cameraopencv.h"
 
 CameraOpenCV::CameraOpenCV(QObject *parent) : QObject(parent) {}
@@ -44,7 +49,7 @@ bool CameraOpenCV::setFrame16(void) {
 
   res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
 
-  imageformat = Y16;
+  image_format = Y16;
 
   return res;
 }
@@ -54,7 +59,7 @@ bool CameraOpenCV::setFrame8(void) {
 
   res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '8', '0', '0'));
 
-  imageformat = Y800;
+  image_format = Y800;
 
   return res;
 }

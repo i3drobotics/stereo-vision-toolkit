@@ -114,8 +114,8 @@ class AbstractStereoCamera : public QObject {
   QString save_directory = ".";
 
   cv::VideoCapture stereo_video;
-  bool acquiringVideo = false;
-  bool videoStreamInit(cv::VideoWriter* writer, QString filename, cv::Size imsize, double fps = 60.0, int codec = CV_FOURCC('H', '2', '6', '4') );
+  bool acquiring_video = false;
+  bool videoStreamInit(cv::VideoWriter* writer, QString filename, cv::Size imsize, double fps = 60.0, int codec = CV_FOURCC('D', 'I', 'B', ' ') );
 
   void finishCapture(void);
   void captureAndProcess(void);
@@ -145,8 +145,8 @@ class AbstractStereoCamera : public QObject {
 
   AbstractStereoMatcher *matcher = NULL;
 
-  double visualZmin = 0.2;
-  double visualZmax = 2;
+  double visualisation_min_z = 0.2;
+  double visualisation_max_z = 2;
 
 
  protected:

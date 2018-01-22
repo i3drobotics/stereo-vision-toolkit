@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "calibrationdialog.h"
 #include "ui_calibrationdialog.h"
 
@@ -27,15 +32,15 @@ void CalibrationDialog::updateLabels(Chessboard* board) {
   ui->areaActual->setText(QString("%1").arg(board->getArea()));
 
   ui->areaTarget->setText(
-      QString("Between %1 and %2").arg(board->minArea).arg(board->maxArea));
+      QString("Between %1 and %2").arg(board->min_area).arg(board->max_area));
 
-  ui->hTiltActual->setText(QString("%1").arg(board->horizontalTilt));
+  ui->hTiltActual->setText(QString("%1").arg(board->horizontal_tilt));
   ui->hTiltTarget->setText(
-      QString("Between %1 and %2").arg(board->minHt).arg(board->maxHt));
+      QString("Between %1 and %2").arg(board->min_horizontal_tilt).arg(board->max_horizontal_tilt));
 
-  ui->vTiltActual->setText(QString("%1").arg(board->verticalTilt));
+  ui->vTiltActual->setText(QString("%1").arg(board->vertical_tilt));
   ui->vTiltTarget->setText(
-      QString("Between %1 and %2").arg(board->minVt).arg(board->maxVt));
+      QString("Between %1 and %2").arg(board->min_vertical_tilt).arg(board->max_vertical_tilt));
 }
 
 CalibrationDialog::~CalibrationDialog() {

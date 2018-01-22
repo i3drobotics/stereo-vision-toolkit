@@ -170,14 +170,14 @@
      <item row="2" column="2" colspan="3">
       <widget class="QLineEdit" name="leftMask">
        <property name="text">
-        <string/>
+        <string>*_l.png</string>
        </property>
       </widget>
      </item>
      <item row="3" column="2" colspan="3">
       <widget class="QLineEdit" name="rightMask">
        <property name="text">
-        <string/>
+        <string>*_r.png</string>
        </property>
       </widget>
      </item>
