@@ -151,6 +151,11 @@ void CalibrateFromImagesDialog::updateLeftPath(void) {
   QString dir = ui->leftPath->text();
   if (QDir(dir).exists()) {
     left_path = dir;
+    if(right_path == ""){
+        ui->rightPath->setText(left_path);
+        updateRightPath();
+    }
+
   }
 }
 
@@ -158,6 +163,9 @@ void CalibrateFromImagesDialog::updateRightPath(void) {
   QString dir = ui->rightPath->text();
   if (QDir(dir).exists()) {
     right_path = dir;
+    if(left_path == ""){
+        ui->leftPath->setText(right_path);
+    }
   }
 }
 

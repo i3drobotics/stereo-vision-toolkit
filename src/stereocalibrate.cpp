@@ -130,6 +130,7 @@ bool StereoCalibrate::jointCalibration(void) {
 
   connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
 
+  QMessageBox alert;
   qDebug() << "Running left calibration.";
 
   /* Left Camera */
@@ -150,6 +151,8 @@ bool StereoCalibrate::jointCalibration(void) {
 
       qDebug() << "Left RMS reprojection error: " << left_rms_error;
   }else{
+      alert.setText("Right camera calibration failed.");
+      alert.exec();
       qDebug() << "Left camera calibration failed.";
       return false;
   }
@@ -176,6 +179,8 @@ bool StereoCalibrate::jointCalibration(void) {
       cal_dialog->updateRight(right_camera_matrix, right_distortion, right_rms_error);
       qDebug() << "Right RMS reprojection error: " << left_rms_error;
   }else{
+      alert.setText("Right camera calibration failed.");
+      alert.exec();
       qDebug() << "Right camera calibration failed.";
       return false;
   }
@@ -192,6 +197,9 @@ bool StereoCalibrate::jointCalibration(void) {
       finishedCalibration();
       return true;
   }else{
+      alert.setText("Stereo camera calibration failed.");
+      alert.exec();
+      qDebug() << "Stereo camera calibration failed.";
       return false;
   }
 }
@@ -310,8 +318,7 @@ double StereoCalibrate::singleCameraCalibration(
   assert(objectPoints.size() == validImagePoints.size());
 
   try{
-  res =
-      cv::calibrateCamera(objectPoints, validImagePoints, image_size,
+    res = cv::calibrateCamera(objectPoints, validImagePoints, image_size,
                           cameraMatrix, distCoeffs, rvecs, tvecs, stereoFlags);
   }catch(...){
       qDebug() << "Calibration failed";
