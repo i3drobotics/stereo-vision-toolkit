@@ -7,7 +7,7 @@
 #define MATCHEROPENCVSGBM_H
 
 #include <abstractstereomatcher.h>
-#include <matcherwidgetopencvblock.h>
+#include <QFile>
 
 class MatcherOpenCVSGBM : public AbstractStereoMatcher
 {
@@ -47,6 +47,7 @@ class MatcherOpenCVSGBM : public AbstractStereoMatcher
    private:
     cv::Ptr<cv::StereoSGBM> matcher;
     void init(void);
+    void setupDefaultMatcher(void);
 
     bool wls_filter = true;
     double wls_lambda = 8000;

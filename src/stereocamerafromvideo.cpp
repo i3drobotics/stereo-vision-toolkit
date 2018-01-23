@@ -33,6 +33,10 @@ void StereoCameraFromVideo::setPosition(int position){
     stream.set(CV_CAP_PROP_POS_FRAMES, (0.01*number_frames) * position);
 }
 
+bool StereoCameraFromVideo::enableAutoExpose(bool enable) {
+  return enable;
+}
+
 bool StereoCameraFromVideo::capture() {
   bool res = stream.read(image_buffer);
 

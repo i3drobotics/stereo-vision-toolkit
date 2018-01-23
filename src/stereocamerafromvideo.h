@@ -22,6 +22,7 @@ public:
     bool initCamera(QString fname);
 public slots:
     void setPosition(int position);
+    bool enableAutoExpose(bool enable);
 private:
     cv::VideoCapture stream;
     cv::Mat image_buffer;

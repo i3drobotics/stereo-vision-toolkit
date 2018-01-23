@@ -9,6 +9,7 @@
 calibrateconfirmdialog::calibrateconfirmdialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::calibrateconfirmdialog) {
   ui->setupUi(this);
+
 }
 
 calibrateconfirmdialog::~calibrateconfirmdialog() { delete ui; }

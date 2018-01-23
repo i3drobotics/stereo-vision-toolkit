@@ -125,7 +125,7 @@ bool StereoCalibrate::jointCalibration(void) {
 
 
   cal_dialog->setNumberImages(left_images.size());
-  cal_dialog->setModal(false);
+  cal_dialog->setModal(true);
   cal_dialog->open();
 
   connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
@@ -140,15 +140,7 @@ bool StereoCalibrate::jointCalibration(void) {
       left_distortion, left_r_vecs, left_t_vecs, cornerFlags);
 
   if(left_rms_error > 0){
-      cv::FileStorage leftIntrinsicFS("left_calibration.xml",
-                                      cv::FileStorage::WRITE);
-      leftIntrinsicFS << "cameraMatrix" << left_camera_matrix;
-      leftIntrinsicFS << "distCoeffs" << left_distortion;
-      leftIntrinsicFS << "rms_error" << left_rms_error;
-      leftIntrinsicFS.release();
-
       cal_dialog->updateLeft(left_camera_matrix, left_distortion, left_rms_error);
-
       qDebug() << "Left RMS reprojection error: " << left_rms_error;
   }else{
       alert.setText("Right camera calibration failed.");
@@ -168,14 +160,6 @@ bool StereoCalibrate::jointCalibration(void) {
       right_distortion, right_r_vecs, right_t_vecs, cornerFlags);
 
   if(right_rms_error > 0){
-
-      cv::FileStorage rightIntrinsicFS("right_calibration.xml",
-                                       cv::FileStorage::WRITE);
-      rightIntrinsicFS << "cameraMatrix" << right_camera_matrix;
-      rightIntrinsicFS << "distCoeffs" << right_distortion;
-      rightIntrinsicFS << "rms_error" << right_rms_error;
-      rightIntrinsicFS.release();
-
       cal_dialog->updateRight(right_camera_matrix, right_distortion, right_rms_error);
       qDebug() << "Right RMS reprojection error: " << left_rms_error;
   }else{
@@ -194,7 +178,46 @@ bool StereoCalibrate::jointCalibration(void) {
 
       cal_dialog->updateStereo(stereo_q, stereo_rms_error);
 
+
+      cv::FileStorage leftIntrinsicFS("left_calibration.xml",
+                                      cv::FileStorage::WRITE);
+      leftIntrinsicFS << "cameraMatrix" << left_camera_matrix;
+      leftIntrinsicFS << "distCoeffs" << left_distortion;
+      leftIntrinsicFS << "rms_error" << left_rms_error;
+      leftIntrinsicFS.release();
+
+      cv::FileStorage rightIntrinsicFS("right_calibration.xml",
+                                       cv::FileStorage::WRITE);
+      rightIntrinsicFS << "cameraMatrix" << right_camera_matrix;
+      rightIntrinsicFS << "distCoeffs" << right_distortion;
+      rightIntrinsicFS << "rms_error" << right_rms_error;
+      rightIntrinsicFS.release();
+
+      cv::FileStorage stereoFS("stereo_calibration.xml", cv::FileStorage::WRITE);
+      stereoFS << "R" << stereo_r;
+      stereoFS << "T" << stereo_t;
+      stereoFS << "Q" << stereo_q;
+      stereoFS << "E" << stereo_e;
+      stereoFS << "F" << stereo_f;
+      stereoFS << "rms_error" << stereo_rms_error;
+      stereoFS.release();
+
+      cv::FileStorage leftRectFs("left_rectification.xml", cv::FileStorage::WRITE);
+      leftRectFs << "x" << left_rectification_x;
+      leftRectFs << "y" << left_rectification_y;
+      leftRectFs.release();
+
+      cv::FileStorage rightRectFS("right_rectification.xml",
+                                  cv::FileStorage::WRITE);
+      rightRectFS << "x" << right_rectification_x;
+      rightRectFS << "y" << right_rectification_y;
+      rightRectFS.release();
+
+      alert.setText(QString("Written calibration files to: %1").arg(QDir::currentPath()));
+      alert.exec();
+
       finishedCalibration();
+
       return true;
   }else{
       alert.setText("Stereo camera calibration failed.");
@@ -240,26 +263,6 @@ double StereoCalibrate::stereoCameraCalibration(int stereoFlags) {
   cv::initUndistortRectifyMap(right_camera_matrix, right_distortion, R2, P2,
                               image_size, CV_32FC1, right_rectification_x,
                               right_rectification_y);
-
-  cv::FileStorage stereoFS("stereo_calibration.xml", cv::FileStorage::WRITE);
-  stereoFS << "R" << stereo_r;
-  stereoFS << "T" << stereo_t;
-  stereoFS << "Q" << stereo_q;
-  stereoFS << "E" << stereo_e;
-  stereoFS << "F" << stereo_f;
-  stereoFS << "rms_error" << stereoRes;
-  stereoFS.release();
-
-  cv::FileStorage leftRectFs("left_rectification.xml", cv::FileStorage::WRITE);
-  leftRectFs << "x" << left_rectification_x;
-  leftRectFs << "y" << left_rectification_y;
-  leftRectFs.release();
-
-  cv::FileStorage rightRectFS("right_rectification.xml",
-                              cv::FileStorage::WRITE);
-  rightRectFS << "x" << right_rectification_x;
-  rightRectFS << "y" << right_rectification_y;
-  rightRectFS.release();
 
   return stereoRes;
 }

@@ -6,14 +6,18 @@
 #include "matcheropencvsgbm.h"
 
 void MatcherOpenCVSGBM::init(void) {
-  try {
-    matcher =
-        cv::StereoSGBM::load<cv::StereoSGBM>(QCoreApplication::applicationDirPath().toStdString() + "/params/stereo_sgbm_params.xml");
-  } catch (cv::Exception& e) {
-    matcher = cv::StereoSGBM::create(0, 64, 9);
-    setUniquenessRatio(15);
-    matcher->setDisp12MaxDiff(-1);
-    qDebug() << "Error loading SGBM matching parameters: " << e.msg.c_str();
+
+  QString matcher_parameters = QCoreApplication::applicationDirPath() + "/params/stereo_sgbm_params.xml";
+  if(QFile(matcher_parameters).exists()){
+      try {
+        matcher =
+            cv::StereoSGBM::load<cv::StereoSGBM>(matcher_parameters.toStdString());
+      } catch (cv::Exception& e) {
+          qDebug() << "Error loading SGBM matching parameters: " << e.msg.c_str();
+          setupDefaultMatcher();
+      }
+  }else{
+      setupDefaultMatcher();
   }
 
   // Setup for 16-bit disparity
@@ -21,6 +25,12 @@ void MatcherOpenCVSGBM::init(void) {
   cv::Mat(image_size, CV_16S).copyTo(disparity_rl);
 
   qDebug() << "Loaded OpenCV SGBM";
+}
+
+void MatcherOpenCVSGBM::setupDefaultMatcher(void){
+    matcher = cv::StereoSGBM::create(0, 64, 9);
+    setUniquenessRatio(15);
+    matcher->setDisp12MaxDiff(-1);
 }
 
 void MatcherOpenCVSGBM::setMinDisparity(int min_disparity) {

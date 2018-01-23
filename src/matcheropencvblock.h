@@ -7,6 +7,7 @@
 #define MATCHEROPENCVBLOCK_H
 
 #include <abstractstereomatcher.h>
+#include <QFile>
 
 class MatcherOpenCVBlock : public AbstractStereoMatcher {
   Q_OBJECT
@@ -51,6 +52,7 @@ class MatcherOpenCVBlock : public AbstractStereoMatcher {
  private:
   cv::Ptr<cv::StereoBM> matcher;
   void init(void);
+  void setupDefaultMatcher(void);
 
   bool wls_filter = false;
   double wls_lambda = 8000;

@@ -6,18 +6,28 @@
 #include "matcheropencvblock.h"
 
 void MatcherOpenCVBlock::init(void) {
-  try {
-    matcher = cv::StereoBM::load<cv::StereoBM>(QCoreApplication::applicationDirPath().toStdString()+"/params/stereo_bm_params.xml");
-  } catch (cv::Exception& e) {
-    matcher = cv::StereoBM::create(64, 9);
-    setUniquenessRatio(15);
-    matcher->setDisp12MaxDiff(-1);
-    qDebug() << "Error loading block matching parameters" << e.msg.c_str();
-  }
+
+    QString matcher_parameters = QCoreApplication::applicationDirPath() + "/params/stereo_bm_params.xml";
+    if(QFile(matcher_parameters).exists()){
+        try {
+            matcher = cv::StereoBM::load<cv::StereoBM>(matcher_parameters.toStdString());
+                  } catch (cv::Exception& e) {
+            qDebug() << "Error loading block matching parameters" << e.msg.c_str();
+            setupDefaultMatcher();
+        }
+    }else{
+        setupDefaultMatcher();
+    }
 
   // Setup for 16-bit disparity
   cv::Mat(image_size, CV_16S).copyTo(disparity_lr);
   cv::Mat(image_size, CV_16S).copyTo(disparity_rl);
+}
+
+void MatcherOpenCVBlock::setupDefaultMatcher(void){
+    matcher = cv::StereoBM::create(64, 9);
+    setUniquenessRatio(15);
+    matcher->setDisp12MaxDiff(-1);
 }
 
 void MatcherOpenCVBlock::setMinDisparity(int min_disparity) {
