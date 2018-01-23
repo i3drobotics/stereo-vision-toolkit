@@ -1,2 +1,3 @@
-stereo_vision_toolkit.pro.user
+*.pro.user*
 build/
+3rd_party/cuda
