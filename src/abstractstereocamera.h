@@ -43,6 +43,7 @@ class AbstractStereoCamera : public QObject {
     void gotPointCloud();
     void captured();
     void haveCuda();
+    void temperature(double);
 
  public:
   explicit AbstractStereoCamera(QObject *parent = 0);

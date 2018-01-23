@@ -20,7 +20,13 @@ bool StereoCameraDeimos::initCamera(int devid) {
     if (camera.isOpened()) {
       res = setFrameSize(752, 480);
       getFrameRate();
+      getTemperature();
       setExposure(5);
+
+      QTimer *temperature_timer = new QTimer(this);
+      temperature_timer->setInterval(1000);
+      connect(temperature_timer, SIGNAL(timeout()), this, SLOT(getTemperature()));
+      temperature_timer->start();
 
       if (!res) {
         camera.release();
@@ -58,7 +64,7 @@ qint64 StereoCameraDeimos::getSerial() {
   std::vector<unsigned char> buffer;
   buffer.resize(16);
 
-  buffer[1] = GETCAMERA_UNIQUEID;
+  buffer.at(1) = GETCAMERA_UNIQUEID;
 
   if (!send_hid(buffer, 1)) {
     serial = 0;
@@ -79,20 +85,44 @@ int StereoCameraDeimos::getExposure() {
   std::vector<unsigned char> buffer;
   buffer.resize(16);
 
-  buffer[1] = CAMERA_CONTROL_STEREO;
-  buffer[2] = GET_EXPOSURE_VALUE;
+  buffer.at(1) = CAMERA_CONTROL_STEREO;
+  buffer.at(2) = GET_EXPOSURE_VALUE;
 
   if (!send_hid(buffer, 2)) return -1;
 
   int exposure;
 
-  if (!buffer[10]) {
+  if (!buffer.at(10)) {
     return -1;
   } else {
-    exposure = ((int)buffer[2] << 24) + ((int)buffer[3] << 16) +
-               ((int)buffer[4] << 8) + (int)buffer[5];
+    exposure = ((int)buffer.at(2) << 24) + ((int)buffer.at(3) << 16) +
+               ((int)buffer.at(4) << 8) + (int)buffer.at(5);
     return exposure;
   }
+}
+
+double StereoCameraDeimos::getTemperature(void){
+    std::vector<unsigned char> buffer;
+    buffer.resize(16);
+
+    buffer.at(1) = CAMERA_CONTROL_STEREO;
+    buffer.at(2) = GET_IMU_TEMP_DATA;
+
+    if (!send_hid(buffer, 2)) return -1;
+
+    if (!buffer.at(6)) {
+      return -1;
+    } else {
+      uint8_t msb = buffer.at(2);
+      uint8_t lsb = buffer.at(3);
+      double temp = (msb << 8) | lsb;
+
+      temp = ((temp - 20.0) / 16.0) + 21.0;
+      emit temperature(temp);
+
+      return temp;
+    }
+
 }
 
 bool StereoCameraDeimos::enableAutoExpose(bool enable) {
@@ -135,6 +165,30 @@ bool StereoCameraDeimos::setExposure(double exposure_milliseconds) {
 
   return false;
 }
+
+bool StereoCameraDeimos::toggleHDR(bool enable){
+    if (deimos_device == NULL) return false;
+
+    std::vector<unsigned char> buffer;
+    buffer.resize(4);
+
+    buffer.at(1) = CAMERA_CONTROL_STEREO;
+    buffer.at(2) = SET_HDR_MODE_STEREO;
+
+    if(enable){
+        buffer.at(3) = 1;
+    }else{
+        buffer.at(3) = 0;
+    }
+
+    if (!send_hid(buffer, 2)){
+        qDebug() << "Failed to send HDR command";
+        return false;
+    }else{
+        return true;
+    }
+}
+
 
 bool StereoCameraDeimos::send_hid(std::vector<unsigned char> &buffer,
                                   size_t command_len) {

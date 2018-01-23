@@ -38,6 +38,7 @@ void MainWindow::statusBarInit(void) {
   ui->statusBar->addPermanentWidget(status_widget);
 
   fps_counter = new QLabel(this);
+  temp_label = new QLabel(this);
   frame_counter = new QLabel(this);
   status_bar_spacer = new QSpacerItem(20, 1);
 
@@ -45,6 +46,7 @@ void MainWindow::statusBarInit(void) {
   _hlayout->addWidget(frame_counter);
   _hlayout->addSpacerItem(status_bar_spacer);
   _hlayout->addWidget(fps_counter);
+  _hlayout->addWidget(temp_label);
 
   status_widget->setLayout(_hlayout);
 
@@ -138,6 +140,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   ui->exposureSpinBox->setEnabled(true);
   ui->autoExposeCheck->setEnabled(true);
   ui->exposureSetButton->setEnabled(true);
+  ui->enableHDRCheckbox->setEnabled(true);
 
   ui->pauseButton->setEnabled(true);
   ui->singleShotButton->setEnabled(true);
@@ -151,6 +154,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   connect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
   connect(stereo_cam, SIGNAL(framecount(qint64)), this,
           SLOT(updateFrameCount(qint64)));
+  connect(stereo_cam, SIGNAL(temperature(double)), this, SLOT(updateTemperature(double)));
   connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(requestSingle()));
   connect(stereo_cam, SIGNAL(savedImage(QString)), this,
           SLOT(displaySaved(QString)));
@@ -161,6 +165,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   connect(stereo_cam, SIGNAL(matched()), disparity_view,
           SLOT(updateDisparityAsync(void)));
   connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableAutoExpose(bool)));
+  connect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(toggleHDR(bool)));
 
   /* Point cloud */
   connect(stereo_cam, SIGNAL(gotPointCloud()), this, SLOT(updateCloud()));
@@ -176,6 +181,7 @@ void MainWindow::stereoCameraRelease(void) {
   ui->exposureSpinBox->setDisabled(true);
   ui->exposureSetButton->setDisabled(true);
   ui->autoExposeCheck->setDisabled(true);
+  ui->enableHDRCheckbox->setDisabled(true);
 
   ui->pauseButton->setDisabled(true);
   ui->singleShotButton->setDisabled(true);
@@ -189,6 +195,7 @@ void MainWindow::stereoCameraRelease(void) {
     disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
     disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
                SLOT(updateDisparityAsync(void)));
+    disconnect(stereo_cam, SIGNAL(cameraTemperature(double)), this, SLOT(updateTemperature(double)));
     disconnect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
     disconnect(stereo_cam, SIGNAL(framecount(qint64)), this,
                SLOT(updateFrameCount(qint64)));
@@ -201,6 +208,7 @@ void MainWindow::stereoCameraRelease(void) {
     disconnect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), stereo_cam,
                SLOT(enableRectify(bool)));
     disconnect(ui->autoExposeCheck, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableAutoExpose(bool)));
+    disconnect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(toggleHDR(bool)));
 
     /* Point cloud */
     disconnect(stereo_cam, SIGNAL(gotPointCloud()), this, SLOT(updateCloud()));
@@ -742,6 +750,10 @@ void MainWindow::updatePreviousDirectory(QString dir) {
 void MainWindow::updateFPS(qint64 time) {
   int fps = 1000.0 / time;
   fps_counter->setText(QString("FPS: %1").arg(fps));
+}
+
+void MainWindow::updateTemperature(double temperature) {
+  temp_label->setText(QString("Temp: %1 C").arg(QString::number(temperature, 'f', 2)));
 }
 
 MainWindow::~MainWindow() {

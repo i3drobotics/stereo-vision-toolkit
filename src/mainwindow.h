@@ -62,6 +62,7 @@ class MainWindow : public QMainWindow {
 
   QLabel* frame_counter;
   QLabel* fps_counter;
+  QLabel* temp_label;
   QSpacerItem* status_bar_spacer;
   QWidget* status_widget;
   QVariantMap icon_options;
@@ -99,6 +100,7 @@ class MainWindow : public QMainWindow {
  public slots:
   void updateDisplay(void);
   void updateFPS(qint64);
+  void updateTemperature(double temperature);
   void updateFrameCount(qint64);
   void toggleAcquire(void);
   void singleShotClicked(void);

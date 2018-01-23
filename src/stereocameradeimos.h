@@ -14,7 +14,7 @@
 #include <windows.h>
 #include <dshow.h>
 #include <hidapi/hidapi.h>
-
+#include <QTimer>
 
 enum DEIMOS_COMMAND{
     CAMERA_CONTROL_STEREO = 0x78,
@@ -23,10 +23,12 @@ enum DEIMOS_COMMAND{
     GET_EXPOSURE_VALUE = 0x01,
     SET_EXPOSURE_VALUE = 0x02,
     SET_IMU_CONFIG = 0x04,
+    SET_HDR_MODE_STEREO = 0x0E,
     CONTROL_IMU_VAL = 0x05,
     SEND_IMU_VAL_BUFF = 0x06,
     IMU_ACC_VAL = 0xFE,
-    IMU_GYRO_VAL = 0xFD
+    IMU_GYRO_VAL = 0xFD,
+    GET_IMU_TEMP_DATA = 0x0D
 };
 
 class StereoCameraDeimos : public AbstractStereoCamera
@@ -52,8 +54,10 @@ public:
     ~StereoCameraDeimos(void);
 
 public slots:
-    bool setExposure(double);
+    bool setExposure(double exposure_time);
+    bool toggleHDR(bool enable);
     bool enableAutoExpose(bool enable);
+    double getTemperature(void);
 
 private:
     cv::VideoCapture camera;
