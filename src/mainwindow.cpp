@@ -195,7 +195,7 @@ void MainWindow::stereoCameraRelease(void) {
     disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
     disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
                SLOT(updateDisparityAsync(void)));
-    disconnect(stereo_cam, SIGNAL(cameraTemperature(double)), this, SLOT(updateTemperature(double)));
+    disconnect(stereo_cam, SIGNAL(temperature(double)), this, SLOT(updateTemperature(double)));
     disconnect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
     disconnect(stereo_cam, SIGNAL(framecount(qint64)), this,
                SLOT(updateFrameCount(qint64)));

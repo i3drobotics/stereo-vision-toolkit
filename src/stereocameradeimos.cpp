@@ -23,7 +23,7 @@ bool StereoCameraDeimos::initCamera(int devid) {
       getTemperature();
       setExposure(5);
 
-      QTimer *temperature_timer = new QTimer(this);
+      temperature_timer = new QTimer(parent());
       temperature_timer->setInterval(1000);
       connect(temperature_timer, SIGNAL(timeout()), this, SLOT(getTemperature()));
       temperature_timer->start();

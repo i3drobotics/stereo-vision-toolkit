@@ -64,6 +64,7 @@ private:
     cv::Mat image_buffer;
     cv::Mat channels[3];
     double exposure;
+    QTimer *temperature_timer;
 
     BSTR device_path;
     hid_device* deimos_device = NULL;
