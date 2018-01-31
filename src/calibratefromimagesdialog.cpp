@@ -136,6 +136,18 @@ void CalibrateFromImagesDialog::findImages() {
   }
 }
 
+void CalibrateFromImagesDialog::checkImageCount(void){
+    // Only allow user to continue if we've got enough cal images
+    int n_left_images = left_image_list.size();
+    int n_right_images = right_image_list.size();
+
+    if(n_left_images >= 6 && n_right_images >= 6 && n_left_images == n_right_images){
+        ui->okPushButton->setEnabled(true);
+    }else{
+        ui->okPushButton->setEnabled(false);
+    }
+}
+
 void CalibrateFromImagesDialog::selectLeftImageRoot(void) {
   QFileDialog dialog;
   QString startPath = QStandardPaths::displayName(QStandardPaths::HomeLocation);

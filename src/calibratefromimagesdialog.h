@@ -53,6 +53,8 @@ private:
     QList<QString> left_image_list;
     QList<QString> right_image_list;
 
+    void checkImageCount(void);
+
 private slots:
     void selectLeftImageRoot(void);
     void selectRightImageRoot(void);
