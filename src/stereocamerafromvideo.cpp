@@ -7,6 +7,7 @@
 
 bool StereoCameraFromVideo::initCamera(QString fname) {
   stream = cv::VideoCapture(fname.toStdString());
+
   if (stream.isOpened()) {
     stream_valid = true;
     stream_file = fname.toStdString();
@@ -54,7 +55,8 @@ bool StereoCameraFromVideo::capture() {
 
     emit videoPosition(100*((float) stream.get(CV_CAP_PROP_POS_FRAMES))/number_frames);
 
-    cv::cvtColor(image_buffer, image_buffer, CV_RGB2GRAY);
+    if(image_buffer.channels() == 3)
+        cv::cvtColor(image_buffer, image_buffer, CV_RGB2GRAY);
 
     emit captured();
 
