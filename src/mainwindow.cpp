@@ -71,7 +71,6 @@ void MainWindow::controlsInit(void) {
   connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
           SLOT(startVideoCapture(void)));
   connect(ui->actionLoad_calibration, SIGNAL(triggered(bool)),this, SLOT(setCalibrationFolder()));
-  connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSetButton, SLOT(setDisabled(bool)));
   connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSpinBox, SLOT(setDisabled(bool)));
 
   QVariantMap icon_options;
@@ -139,14 +138,13 @@ void MainWindow::stereoCameraInitConnections(void) {
 
   ui->exposureSpinBox->setEnabled(true);
   ui->autoExposeCheck->setEnabled(true);
-  ui->exposureSetButton->setEnabled(true);
   ui->enableHDRCheckbox->setEnabled(true);
 
   ui->pauseButton->setEnabled(true);
   ui->singleShotButton->setEnabled(true);
   ui->saveButton->setEnabled(true);
   ui->toggleVideoButton->setEnabled(true);
-  ui->actionCalibration_wizard->setEnabled(true);
+  ui->actionCalibration_wizard->setEnabled(false);
 
   connect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
           SLOT(setExposure(double)));
@@ -179,7 +177,6 @@ void MainWindow::stereoCameraInitConnections(void) {
 void MainWindow::stereoCameraRelease(void) {
 
   ui->exposureSpinBox->setDisabled(true);
-  ui->exposureSetButton->setDisabled(true);
   ui->autoExposeCheck->setDisabled(true);
   ui->enableHDRCheckbox->setDisabled(true);
 
@@ -327,7 +324,6 @@ void MainWindow::videoStreamLoad(void) {
 
     stereoCameraInit();
     ui->exposureSpinBox->setDisabled(true);
-    ui->exposureSetButton->setDisabled(true);
     ui->autoExposeCheck->setDisabled(true);
   }
 }

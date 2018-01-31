@@ -298,16 +298,6 @@
          </widget>
         </item>
         <item row="1" column="2">
-         <widget class="QPushButton" name="exposureSetButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Set</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
          <widget class="QCheckBox" name="autoExposeCheck">
           <property name="enabled">
            <bool>false</bool>
@@ -317,7 +307,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4">
+        <item row="1" column="3">
          <widget class="QCheckBox" name="enableHDRCheckbox">
           <property name="enabled">
            <bool>false</bool>
@@ -637,7 +627,7 @@
              <string> m</string>
             </property>
             <property name="minimum">
-             <double>0.000000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="maximum">
              <double>10.000000000000000</double>
