@@ -11,6 +11,7 @@
 #include <calibrateconfirmdialog.h>
 #include <QLabel>
 #include <QtCore>
+#include <QProgressDialog>
 #include <algorithm>
 #include <fstream>
 #include <vector>
@@ -50,6 +51,7 @@ class StereoCalibrate : public QObject {
   cv::Mat right_rectification_y;
 
  private:
+
   QLabel* left_view;
   QLabel* right_view;
   calibrateconfirmdialog* cal_dialog;
@@ -77,7 +79,7 @@ class StereoCalibrate : public QObject {
       cv::Mat& rvecs, cv::Mat& tvecs, int cornerFlags = 0, int stereoFlags = 0);
   double stereoCameraCalibration(
       int stereoFlags = cv::CALIB_USE_INTRINSIC_GUESS);
-  bool jointCalibration(void);
+
   bool calibrating_left = true;
   bool calibrating_right = false;
 
@@ -99,12 +101,12 @@ class StereoCalibrate : public QObject {
   void loadBoardPoses(std::string fname);
   bool imageValid(void);
   void overlayImage(cv::Mat& image, Chessboard* board = 0, bool found = false, bool valid = false);
-  void fromImages(QList<QString> left, QList<QString> right);
+  void setImages(QList<QString> left, QList<QString> right);
   void setPattern(cv::Size size, double squareSize);
   void setImageSize(cv::Size size);
   void overlayArrow(cv::Mat& image, std::vector<cv::Point2f>& points,
                     cv::Point2f offset, CvScalar colour, int thickness = 3);
-
+  bool jointCalibration(void);
 
  signals:
   void doneCalibration(bool);

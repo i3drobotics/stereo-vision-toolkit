@@ -27,9 +27,17 @@ class CalibrateFromImagesDialog : public QDialog
 {
     Q_OBJECT
 
+signals:
+    void run_calibration();
+
 public:
     explicit CalibrateFromImagesDialog(QWidget *parent = 0);
     ~CalibrateFromImagesDialog();
+    QList<QString> getLeftImages(){return left_image_list;}
+    QList<QString> getRightImages(){return right_image_list;}
+    int getPatternCols();
+    int getPatternRows();
+    double getSquareSizeMm();
 
 private:
     Ui::CalibrateFromImagesDialog *ui;
@@ -59,7 +67,8 @@ private slots:
     void setLeftImages(void);
     void setRightImages(void);
 
-    void runCalibration(void);
+    void okClicked(void);
+    void cancelClicked(void);
 
 };
 

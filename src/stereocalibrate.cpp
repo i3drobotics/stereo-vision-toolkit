@@ -9,7 +9,7 @@ StereoCalibrate::StereoCalibrate(QObject* parent,
                                  AbstractStereoCamera* stereoCamera)
     : QObject(parent) {
   this->stereo_camera = stereoCamera;
-  cal_dialog = new calibrateconfirmdialog;
+  cal_dialog = new calibrateconfirmdialog();
 
   if (stereoCamera) {
     image_size = cv::Size(stereoCamera->getWidth(), stereoCamera->getHeight());
@@ -125,13 +125,10 @@ bool StereoCalibrate::jointCalibration(void) {
 
 
   cal_dialog->setNumberImages(left_images.size());
-  cal_dialog->setModal(true);
-  cal_dialog->open();
-
-  connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
-
+  cal_dialog->show();
   QMessageBox alert;
   qDebug() << "Running left calibration.";
+  connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
 
   /* Left Camera */
   left_valid.clear();
@@ -151,8 +148,9 @@ bool StereoCalibrate::jointCalibration(void) {
 
   qDebug() << "Running right calibration.";
 
-  disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
+  disconnect(this, SIGNAL(done_image(int)),  cal_dialog, SLOT(updateLeftProgress(int)));
   connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
+
   /* Right Camera */
   right_valid.clear();
   right_rms_error = singleCameraCalibration(
@@ -170,6 +168,7 @@ bool StereoCalibrate::jointCalibration(void) {
   }
 
   disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
+  qApp->processEvents(); // Otherwise we seem to go too fast for the GUI to keep up
 
   stereo_rms_error = stereoCameraCalibration();
 
@@ -215,6 +214,8 @@ bool StereoCalibrate::jointCalibration(void) {
 
       alert.setText(QString("Written calibration files to: %1").arg(QDir::currentPath()));
       alert.exec();
+
+
 
       finishedCalibration();
 
@@ -267,7 +268,7 @@ double StereoCalibrate::stereoCameraCalibration(int stereoFlags) {
   return stereoRes;
 }
 
-void StereoCalibrate::fromImages(QList<QString> left, QList<QString> right) {
+void StereoCalibrate::setImages(QList<QString> left, QList<QString> right) {
   left_images.clear();
   right_images.clear();
 
@@ -281,7 +282,6 @@ void StereoCalibrate::fromImages(QList<QString> left, QList<QString> right) {
     if (im.total() > 0) right_images.push_back(im);
   }
 
-  jointCalibration();
 }
 
 double StereoCalibrate::singleCameraCalibration(
@@ -315,7 +315,9 @@ double StereoCalibrate::singleCameraCalibration(
     i++;
 
     emit done_image(i);
-    cal_dialog->update();
+
+    // Allow the GUI to repaint between images
+    qApp->processEvents();
   }
 
   assert(objectPoints.size() == validImagePoints.size());

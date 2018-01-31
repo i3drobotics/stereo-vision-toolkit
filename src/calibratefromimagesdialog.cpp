@@ -24,7 +24,9 @@ CalibrateFromImagesDialog::CalibrateFromImagesDialog(QWidget *parent)
   connect(ui->rightMask, SIGNAL(editingFinished()), this,
           SLOT(updateRightMask()));
   connect(ui->okPushButton, SIGNAL(clicked(bool)), this,
-          SLOT(runCalibration()));
+          SLOT(okClicked()));
+  connect(ui->cancelPushButton, SIGNAL(clicked(bool)), this,
+          SLOT(cancelClicked()));
 
   left_file_model = new QFileSystemModel(this);
   right_file_model = new QFileSystemModel(this);
@@ -41,15 +43,26 @@ CalibrateFromImagesDialog::CalibrateFromImagesDialog(QWidget *parent)
   right_file_model->setFilter(QDir::NoDotAndDotDot | QDir::Files);
 }
 
-void CalibrateFromImagesDialog::runCalibration() {
-  StereoCalibrate calibrate(this, NULL);
-  cv::Size pattern(ui->patternCols->value(), ui->patternRows->value());
-  calibrate.setPattern(pattern, 1e-3 * ui->squareSizeBox->value());
-  calibrate.fromImages(left_image_list, right_image_list);
-
-  close();
-
+void CalibrateFromImagesDialog::okClicked() {
+  emit run_calibration();
   return;
+}
+
+void CalibrateFromImagesDialog::cancelClicked() {
+  close();
+  return;
+}
+
+int CalibrateFromImagesDialog::getPatternCols(){
+    return ui->patternCols->value();
+}
+
+int CalibrateFromImagesDialog::getPatternRows(){
+    return ui->patternRows->value();
+}
+
+double CalibrateFromImagesDialog::getSquareSizeMm(){
+    return ui->squareSizeBox->value() * 1e-3;
 }
 
 CalibrateFromImagesDialog::~CalibrateFromImagesDialog() { delete ui; }

@@ -97,6 +97,7 @@ class MainWindow : public QMainWindow {
 
   void stereoCameraInitConnections(void);
 
+
  public slots:
   void updateDisplay(void);
   void updateFPS(qint64);
@@ -120,6 +121,7 @@ class MainWindow : public QMainWindow {
   void doneCalibration(bool);
 
   void startCalibrationFromImages(void);
+  void runCalibrationFromImages(void);
 
   void checkParamFile(void);
   void loadParamFile(void);

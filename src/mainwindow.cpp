@@ -392,8 +392,32 @@ void MainWindow::stopVideoCapture(void) {
 
 void MainWindow::startCalibrationFromImages(void) {
   calibration_images_dialog = new CalibrateFromImagesDialog(this);
+  connect(calibration_images_dialog, SIGNAL(run_calibration()), this, SLOT(runCalibrationFromImages()));
   calibration_images_dialog->move(100, 100);
   calibration_images_dialog->show();
+}
+
+void MainWindow::runCalibrationFromImages(void){
+
+    qDebug() << "Beginning calibration from images";
+
+    if(calibration_images_dialog == NULL) return;
+    qDebug() << "Getting parameters";
+
+    int cols = calibration_images_dialog->getPatternCols();
+    int rows = calibration_images_dialog->getPatternRows();
+    double square_size_mm = calibration_images_dialog->getSquareSizeMm();
+    auto left_images = calibration_images_dialog->getLeftImages();
+    auto right_images = calibration_images_dialog->getRightImages();
+
+    calibration_images_dialog->close();
+
+    calibrator = new StereoCalibrate(this, NULL);
+    cv::Size pattern(cols, rows);
+    calibrator->setPattern(pattern, square_size_mm);
+    calibrator->setImages(left_images, right_images);
+    calibrator->jointCalibration();
+
 }
 
 void MainWindow::startCalibration(void) {
