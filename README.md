@@ -9,6 +9,18 @@ We expect that most people will write their own software to control the camera, 
 
 SVK is under active development. At the moment the software only officially supports the i3DR Deimos camera, but in principle any pre-rectified stereo video of the correct format (side-by-side) will work for evaluation.
 
+Roadmap
+---
+
+Currently SVK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your Deimos camera quickly. There are a number of features/improvements in development including:
+
+- More options for video handling
+- Support for other stereo matchers
+- Assisted camera calibration and more detailed feedback
+- Support for sequential capture (e.g. file naming options)
+- Support for our Phobos stereo camera
+- Unit tests and other deployment issues
+- Better 3D visualisation support
 
 Stereo matching support
 ---
