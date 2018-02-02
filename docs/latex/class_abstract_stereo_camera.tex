@@ -1,0 +1,524 @@
+\hypertarget{class_abstract_stereo_camera}{}\section{Abstract\+Stereo\+Camera Class Reference}
+\label{class_abstract_stereo_camera}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+Inheritance diagram for Abstract\+Stereo\+Camera\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_abstract_stereo_camera}
+\end{center}
+\end{figure}
+\subsection*{Public Slots}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_abstract_stereo_camera_a1020509400c9e05350211784dd75f8a9}{}void {\bfseries set\+Matcher} (\hyperlink{class_abstract_stereo_matcher}{Abstract\+Stereo\+Matcher} $\ast$matcher)\label{class_abstract_stereo_camera_a1020509400c9e05350211784dd75f8a9}
+
+\item 
+bool \hyperlink{class_abstract_stereo_camera_ab4a1141a26a7ba82b6e1b133df41b670}{load\+Calibration} (Q\+String directory)
+\begin{DoxyCompactList}\small\item\em Load calibration files from a directory and check them for validity. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a11404be55831f47d0954a0c3c9e749b1}{}void \hyperlink{class_abstract_stereo_camera_a11404be55831f47d0954a0c3c9e749b1}{single\+Shot} (void)\label{class_abstract_stereo_camera_a11404be55831f47d0954a0c3c9e749b1}
+
+\begin{DoxyCompactList}\small\item\em Acquire a single frame from the camera and then pause. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a3b78f07ba45be840810876cfbe354ce8}{}void \hyperlink{class_abstract_stereo_camera_a3b78f07ba45be840810876cfbe354ce8}{freerun} (void)\label{class_abstract_stereo_camera_a3b78f07ba45be840810876cfbe354ce8}
+
+\begin{DoxyCompactList}\small\item\em Place the camera in freerun mode (continuous acquisition. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a0ae4bc133a396a7085b556a62aa9e6f1}{}void \hyperlink{class_abstract_stereo_camera_a0ae4bc133a396a7085b556a62aa9e6f1}{pause} ()\label{class_abstract_stereo_camera_a0ae4bc133a396a7085b556a62aa9e6f1}
+
+\begin{DoxyCompactList}\small\item\em Pause the camera (note this may not actually pause acquisition, but halts frame requests) \end{DoxyCompactList}\item 
+virtual bool \hyperlink{class_abstract_stereo_camera_a01d0ecf3cf4bb8e9a6b9e34292483d14}{capture} (void)=0
+\begin{DoxyCompactList}\small\item\em Capture an image. \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_ac299030bbbc8a7445140ca419c94a558}{save\+Image\+Timestamped} ()
+\begin{DoxyCompactList}\small\item\em Save an image from the camera with a timestamped filename. \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_af58b04dd9c17e4d5cc139eb99d738cc6}{video\+Stream\+Start} (Q\+String fname=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Start writing a video stream to a file. \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_ae39e6f45c68b4bbd4442fdac161051bd}{video\+Stream\+Stop} (void)
+\begin{DoxyCompactList}\small\item\em Stop writing a video stream. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a1b8bc87de9f73731b0ca1c9b293b57ac}{}void \hyperlink{class_abstract_stereo_camera_a1b8bc87de9f73731b0ca1c9b293b57ac}{enable\+Capture} (bool \hyperlink{class_abstract_stereo_camera_a01d0ecf3cf4bb8e9a6b9e34292483d14}{capture})\label{class_abstract_stereo_camera_a1b8bc87de9f73731b0ca1c9b293b57ac}
+
+\begin{DoxyCompactList}\small\item\em Start or stop capturing an image. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_aa8bd29dcb39ee696e675087d0c119339}{}void \hyperlink{class_abstract_stereo_camera_aa8bd29dcb39ee696e675087d0c119339}{enable\+Acquire} (bool acquire)\label{class_abstract_stereo_camera_aa8bd29dcb39ee696e675087d0c119339}
+
+\begin{DoxyCompactList}\small\item\em Start or stop capturing images. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a0d63f01457d134b1f83d7c6c11e42010}{}void \hyperlink{class_abstract_stereo_camera_a0d63f01457d134b1f83d7c6c11e42010}{enable\+Matching} (bool match)\label{class_abstract_stereo_camera_a0d63f01457d134b1f83d7c6c11e42010}
+
+\begin{DoxyCompactList}\small\item\em Enable or disable stereo matching. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a16cb90b828f6f4d4e32a8df9d8b8be0f}{}void \hyperlink{class_abstract_stereo_camera_a16cb90b828f6f4d4e32a8df9d8b8be0f}{enable\+Rectify} (bool rectify)\label{class_abstract_stereo_camera_a16cb90b828f6f4d4e32a8df9d8b8be0f}
+
+\begin{DoxyCompactList}\small\item\em Enable or disable image rectification. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_ae3dec6f756ff3b6d3702ff3d85e95272}{}void \hyperlink{class_abstract_stereo_camera_ae3dec6f756ff3b6d3702ff3d85e95272}{enable\+Reproject} (bool reproject)\label{class_abstract_stereo_camera_ae3dec6f756ff3b6d3702ff3d85e95272}
+
+\begin{DoxyCompactList}\small\item\em Emable or disable disparity map reprojection to 3\+D. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a01c48565e18ae2ac7ea4f3322c2e5059}{}bool \hyperlink{class_abstract_stereo_camera_a01c48565e18ae2ac7ea4f3322c2e5059}{is\+Capturing} ()\label{class_abstract_stereo_camera_a01c48565e18ae2ac7ea4f3322c2e5059}
+
+\begin{DoxyCompactList}\small\item\em Returns whether the camera is currently capturing or processing a frame. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a490db3572c901f51f49d90016f856805}{}bool \hyperlink{class_abstract_stereo_camera_a490db3572c901f51f49d90016f856805}{is\+Acquiring} ()\label{class_abstract_stereo_camera_a490db3572c901f51f49d90016f856805}
+
+\begin{DoxyCompactList}\small\item\em Returns whether the camera is currently acquiring images (in general) \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a0096fcc42b50aa7fa4236f6bddcd81f7}{}bool \hyperlink{class_abstract_stereo_camera_a0096fcc42b50aa7fa4236f6bddcd81f7}{is\+Matching} ()\label{class_abstract_stereo_camera_a0096fcc42b50aa7fa4236f6bddcd81f7}
+
+\begin{DoxyCompactList}\small\item\em Returns whether matching is enabled. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a5376ae9c07bdc8e048cbb83a3f11d520}{}bool \hyperlink{class_abstract_stereo_camera_a5376ae9c07bdc8e048cbb83a3f11d520}{is\+Rectifying} ()\label{class_abstract_stereo_camera_a5376ae9c07bdc8e048cbb83a3f11d520}
+
+\begin{DoxyCompactList}\small\item\em Returns whether rectification is being performed. \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_aa25785c072f75c58b43578c2e718b3c1}{get\+Left\+Image} (cv\+::\+Mat \&dst)
+\begin{DoxyCompactList}\small\item\em Get the left stereo image. \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_aab92c03296efcc915e00cb31016c0c74}{get\+Right\+Image} (cv\+::\+Mat \&dst)
+\begin{DoxyCompactList}\small\item\em Get the right stereo image. \end{DoxyCompactList}\item 
+cv\+::\+Mat \hyperlink{class_abstract_stereo_camera_abafa9c808e5b2d32cc8e2c9e89fdbb09}{get\+Left\+Image} ()
+\begin{DoxyCompactList}\small\item\em Get the left stereo image. \end{DoxyCompactList}\item 
+cv\+::\+Mat \hyperlink{class_abstract_stereo_camera_a8b3611b30d65c90128ea59df9e5b9804}{get\+Right\+Image} ()
+\begin{DoxyCompactList}\small\item\em Get the right stereo image. \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_a176f96b1e0cadc210b4a4b73bd51069e}{set\+Visual\+Zmin} (double zmin)
+\begin{DoxyCompactList}\small\item\em Set the point cloud clipping distance closest to the camera (i.\+e. specify the closest distance to display) \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_a5da7d8b7074a30583f22d0efd0af5f28}{set\+Visual\+Zmax} (double zmax)
+\begin{DoxyCompactList}\small\item\em Set the point cloud clipping distance furthest from the camera (i.\+e. specify the farthest distance to display) \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a895b0205fd95e9cd59598d95da7e4b8a}{}void \hyperlink{class_abstract_stereo_camera_a895b0205fd95e9cd59598d95da7e4b8a}{save\+Point\+Cloud} ()\label{class_abstract_stereo_camera_a895b0205fd95e9cd59598d95da7e4b8a}
+
+\begin{DoxyCompactList}\small\item\em Save the current 3\+D reconstruction to a .P\+L\+Y file. \end{DoxyCompactList}\item 
+pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z\+R\+G\+B $>$\+::Ptr \hyperlink{class_abstract_stereo_camera_ad8f91d2d5e03a466c1066ab27ec3116f}{get\+Point\+Cloud} ()
+\begin{DoxyCompactList}\small\item\em Get a pointer to the current point cloud. \end{DoxyCompactList}\item 
+int \hyperlink{class_abstract_stereo_camera_a4a1e8d3823219d718f43d5859bfc5096}{get\+Width} (void)
+\begin{DoxyCompactList}\small\item\em Get the image width. \end{DoxyCompactList}\item 
+int \hyperlink{class_abstract_stereo_camera_ac0918099d91f7ed95f7897610d4aa8a5}{get\+Height} (void)
+\begin{DoxyCompactList}\small\item\em Get the image height. \end{DoxyCompactList}\item 
+cv\+::\+Size \hyperlink{class_abstract_stereo_camera_a1f35feaeb739af86eb89a25ad58870e4}{get\+Size} (void)
+\begin{DoxyCompactList}\small\item\em Get the image size. \end{DoxyCompactList}\item 
+void \hyperlink{class_abstract_stereo_camera_aad94fb2509d7c36d33eb176c28963991}{set\+Savelocation} (Q\+String dir)
+\begin{DoxyCompactList}\small\item\em Set the save directory. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Signals}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_abstract_stereo_camera_a84dad2b829994b2da0cc4c2c9f7000c4}{}void \hyperlink{class_abstract_stereo_camera_a84dad2b829994b2da0cc4c2c9f7000c4}{acquired} ()\label{class_abstract_stereo_camera_a84dad2b829994b2da0cc4c2c9f7000c4}
+
+\begin{DoxyCompactList}\small\item\em Emitted when a frame has been captured and processed. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a2c94f041f379bea5a5d2b4e2e5ba0217}{}void \hyperlink{class_abstract_stereo_camera_a2c94f041f379bea5a5d2b4e2e5ba0217}{fps} (qint64)\label{class_abstract_stereo_camera_a2c94f041f379bea5a5d2b4e2e5ba0217}
+
+\begin{DoxyCompactList}\small\item\em Emitted after a frame has been processed to indicate the current framerate. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a6eb388b6b235a928d5792d01db3e0654}{}void \hyperlink{class_abstract_stereo_camera_a6eb388b6b235a928d5792d01db3e0654}{saved\+Image} ()\label{class_abstract_stereo_camera_a6eb388b6b235a928d5792d01db3e0654}
+
+\begin{DoxyCompactList}\small\item\em Emitted when an image has been saved. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_ae7cf0a8b94f4ee9bba33d8f6fc1d2be0}{}void \hyperlink{class_abstract_stereo_camera_ae7cf0a8b94f4ee9bba33d8f6fc1d2be0}{finished} ()\label{class_abstract_stereo_camera_ae7cf0a8b94f4ee9bba33d8f6fc1d2be0}
+
+\begin{DoxyCompactList}\small\item\em Indicates that the camera has finished acquiring. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a23d9368ea4cf1fcac6da6c2b153694d3}{}void \hyperlink{class_abstract_stereo_camera_a23d9368ea4cf1fcac6da6c2b153694d3}{framecount} (qint64)\label{class_abstract_stereo_camera_a23d9368ea4cf1fcac6da6c2b153694d3}
+
+\begin{DoxyCompactList}\small\item\em Indicates the current frame count. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a1e8a9c0d394e1efe15ab8189ec3e2597}{}void \hyperlink{class_abstract_stereo_camera_a1e8a9c0d394e1efe15ab8189ec3e2597}{saved\+Image} (Q\+String filename)\label{class_abstract_stereo_camera_a1e8a9c0d394e1efe15ab8189ec3e2597}
+
+\begin{DoxyCompactList}\small\item\em Emit when an image has been saved, including the filename. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_ac24eaa1c0c62dae96a176f0eac053414}{}void \hyperlink{class_abstract_stereo_camera_ac24eaa1c0c62dae96a176f0eac053414}{matched} ()\label{class_abstract_stereo_camera_ac24eaa1c0c62dae96a176f0eac053414}
+
+\begin{DoxyCompactList}\small\item\em Emitted when an image has been matched. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a955561b40fdaeaf218e32fb117b6aa9b}{}void \hyperlink{class_abstract_stereo_camera_a955561b40fdaeaf218e32fb117b6aa9b}{reprojected} ()\label{class_abstract_stereo_camera_a955561b40fdaeaf218e32fb117b6aa9b}
+
+\begin{DoxyCompactList}\small\item\em Emitted when a disparity map has been reprojected to a point cloud. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_a28c67fb287ceef7cac927595959f5375}{}void \hyperlink{class_abstract_stereo_camera_a28c67fb287ceef7cac927595959f5375}{captured} ()\label{class_abstract_stereo_camera_a28c67fb287ceef7cac927595959f5375}
+
+\begin{DoxyCompactList}\small\item\em Emitted when a camera has captured an image, typically used in sub-\/classes. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_ae5165b33283bb368413543aeb863bf88}{}void \hyperlink{class_abstract_stereo_camera_ae5165b33283bb368413543aeb863bf88}{have\+Cuda} ()\label{class_abstract_stereo_camera_ae5165b33283bb368413543aeb863bf88}
+
+\begin{DoxyCompactList}\small\item\em Emitted if the host system is found to have a C\+U\+D\+A-\/capable graphics card installed. \end{DoxyCompactList}\item 
+\hypertarget{class_abstract_stereo_camera_ab661978020170e7d58906a96ec2fe61e}{}void \hyperlink{class_abstract_stereo_camera_ab661978020170e7d58906a96ec2fe61e}{temperature\+\_\+\+C} (double)\label{class_abstract_stereo_camera_ab661978020170e7d58906a96ec2fe61e}
+
+\begin{DoxyCompactList}\small\item\em Indicates the internal temperature of the camera in Celcius. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_abstract_stereo_camera_ac1e2dcd62f1f8b1478b16bf908ac2721}{}{\bfseries Abstract\+Stereo\+Camera} (Q\+Object $\ast$parent=0)\label{class_abstract_stereo_camera_ac1e2dcd62f1f8b1478b16bf908ac2721}
+
+\item 
+void \hyperlink{class_abstract_stereo_camera_a5496f7e9e10c2892d62091dd56709e7a}{assign\+Thread} (Q\+Thread $\ast$thread)
+\begin{DoxyCompactList}\small\item\em Assign the stereo camera object to a thread so as not to block the G\+U\+I. Typically called just after instantiation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_abstract_stereo_camera_a9b06e4ac7c5452615f718f76da64681b}{}cv\+::\+Mat {\bfseries left\+\_\+remapped}\label{class_abstract_stereo_camera_a9b06e4ac7c5452615f718f76da64681b}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_abf60a27f63d9b0aea7c4069da14fafc4}{}cv\+::\+Mat {\bfseries right\+\_\+remapped}\label{class_abstract_stereo_camera_abf60a27f63d9b0aea7c4069da14fafc4}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a9f3acb606a0e664a1a90877ed2c913a6}{}cv\+::\+Mat {\bfseries left\+\_\+raw}\label{class_abstract_stereo_camera_a9f3acb606a0e664a1a90877ed2c913a6}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a7f7c5484679ac56a23948a9f2cede212}{}cv\+::\+Mat {\bfseries right\+\_\+raw}\label{class_abstract_stereo_camera_a7f7c5484679ac56a23948a9f2cede212}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a97a0d9c267e030634bcd8618ad2966c3}{}cv\+::\+Mat {\bfseries Q}\label{class_abstract_stereo_camera_a97a0d9c267e030634bcd8618ad2966c3}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a7a56c181a09b21a07a389a68cab065a2}{}cv\+::\+Mat {\bfseries stereo\+\_\+reprojected}\label{class_abstract_stereo_camera_a7a56c181a09b21a07a389a68cab065a2}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_abstract_stereo_camera_ae7facc8693fc536cd62d0c3513f65ae1}{}int {\bfseries frame\+\_\+rate} = 30\label{class_abstract_stereo_camera_ae7facc8693fc536cd62d0c3513f65ae1}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a31d42714c8aafc3708051752bac5266a}{}int {\bfseries image\+\_\+width} = 0\label{class_abstract_stereo_camera_a31d42714c8aafc3708051752bac5266a}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a3b63f57eb44274ec09b6854e0ac4c831}{}int {\bfseries image\+\_\+height} = 0\label{class_abstract_stereo_camera_a3b63f57eb44274ec09b6854e0ac4c831}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a3194fe3b665c6ad61a2cdf0e56b9d58a}{}cv\+::\+Size {\bfseries image\+\_\+size}\label{class_abstract_stereo_camera_a3194fe3b665c6ad61a2cdf0e56b9d58a}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_a2c916eeb832136104dfa3cd625966b28}{}bool {\bfseries rectification\+\_\+valid} = false\label{class_abstract_stereo_camera_a2c916eeb832136104dfa3cd625966b28}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_aba9b93d70b25aef90dd5f00a0f00ca8a}{}bool {\bfseries calibration\+\_\+valid} = false\label{class_abstract_stereo_camera_aba9b93d70b25aef90dd5f00a0f00ca8a}
+
+\item 
+\hypertarget{class_abstract_stereo_camera_aa91b2dff7505fca206087c9559a0625b}{}bool {\bfseries connected} = false\label{class_abstract_stereo_camera_aa91b2dff7505fca206087c9559a0625b}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 32 of file abstractstereocamera.\+h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_abstract_stereo_camera_a5496f7e9e10c2892d62091dd56709e7a}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!assign\+Thread@{assign\+Thread}}
+\index{assign\+Thread@{assign\+Thread}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{assign\+Thread}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::assign\+Thread (
+\begin{DoxyParamCaption}
+\item[{Q\+Thread $\ast$}]{thread}
+\end{DoxyParamCaption}
+)}\label{class_abstract_stereo_camera_a5496f7e9e10c2892d62091dd56709e7a}
+
+
+Assign the stereo camera object to a thread so as not to block the G\+U\+I. Typically called just after instantiation. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em thread} & Pointer to thread \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 17 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_a01d0ecf3cf4bb8e9a6b9e34292483d14}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!capture@{capture}}
+\index{capture@{capture}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{capture}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool Abstract\+Stereo\+Camera\+::capture (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}, {\ttfamily [slot]}}\label{class_abstract_stereo_camera_a01d0ecf3cf4bb8e9a6b9e34292483d14}
+
+
+Capture an image. 
+
+This is a virtual function which should be implmeented by a particular camera driver.
+
+\begin{DoxyReturn}{Returns}
+True if an image was captured successfully, false otherwise 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_stereo_camera_deimos_a7526953f7562acc07841ebd6a49dc043}{Stereo\+Camera\+Deimos}, \hyperlink{class_stereo_camera_open_c_v_ac669e811da12df2bfd76f783c0550100}{Stereo\+Camera\+Open\+C\+V}, and \hyperlink{class_stereo_camera_from_video_af53503df1755c0a9cf84718128ed0a5d}{Stereo\+Camera\+From\+Video}.
+
+\hypertarget{class_abstract_stereo_camera_ac0918099d91f7ed95f7897610d4aa8a5}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Height@{get\+Height}}
+\index{get\+Height@{get\+Height}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Height}]{\setlength{\rightskip}{0pt plus 5cm}int Abstract\+Stereo\+Camera\+::get\+Height (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [slot]}}\label{class_abstract_stereo_camera_ac0918099d91f7ed95f7897610d4aa8a5}
+
+
+Get the image height. 
+
+\begin{DoxyReturn}{Returns}
+Image height 
+\end{DoxyReturn}
+
+
+Definition at line 222 of file abstractstereocamera.\+h.
+
+\hypertarget{class_abstract_stereo_camera_aa25785c072f75c58b43578c2e718b3c1}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Left\+Image@{get\+Left\+Image}}
+\index{get\+Left\+Image@{get\+Left\+Image}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Left\+Image}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::get\+Left\+Image (
+\begin{DoxyParamCaption}
+\item[{cv\+::\+Mat \&}]{dst}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_aa25785c072f75c58b43578c2e718b3c1}
+
+
+Get the left stereo image. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em dst} & Open\+C\+V matrix to store image into \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 202 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_abafa9c808e5b2d32cc8e2c9e89fdbb09}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Left\+Image@{get\+Left\+Image}}
+\index{get\+Left\+Image@{get\+Left\+Image}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Left\+Image}]{\setlength{\rightskip}{0pt plus 5cm}cv\+::\+Mat Abstract\+Stereo\+Camera\+::get\+Left\+Image (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_abafa9c808e5b2d32cc8e2c9e89fdbb09}
+
+
+Get the left stereo image. 
+
+\begin{DoxyReturn}{Returns}
+Open\+C\+V matrix containing left image 
+\end{DoxyReturn}
+
+
+Definition at line 210 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_ad8f91d2d5e03a466c1066ab27ec3116f}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Point\+Cloud@{get\+Point\+Cloud}}
+\index{get\+Point\+Cloud@{get\+Point\+Cloud}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Point\+Cloud}]{\setlength{\rightskip}{0pt plus 5cm}pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z\+R\+G\+B $>$\+::Ptr Abstract\+Stereo\+Camera\+::get\+Point\+Cloud (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_ad8f91d2d5e03a466c1066ab27ec3116f}
+
+
+Get a pointer to the current point cloud. 
+
+\begin{DoxyReturn}{Returns}
+Pointer to the current point cloud 
+\end{DoxyReturn}
+
+
+Definition at line 165 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_aab92c03296efcc915e00cb31016c0c74}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Right\+Image@{get\+Right\+Image}}
+\index{get\+Right\+Image@{get\+Right\+Image}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Right\+Image}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::get\+Right\+Image (
+\begin{DoxyParamCaption}
+\item[{cv\+::\+Mat \&}]{dst}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_aab92c03296efcc915e00cb31016c0c74}
+
+
+Get the right stereo image. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em dst} & Open\+C\+V matrix to store image into \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 206 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_a8b3611b30d65c90128ea59df9e5b9804}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Right\+Image@{get\+Right\+Image}}
+\index{get\+Right\+Image@{get\+Right\+Image}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Right\+Image}]{\setlength{\rightskip}{0pt plus 5cm}cv\+::\+Mat Abstract\+Stereo\+Camera\+::get\+Right\+Image (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_a8b3611b30d65c90128ea59df9e5b9804}
+
+
+Get the right stereo image. 
+
+\begin{DoxyReturn}{Returns}
+Open\+C\+V matrix containing right image 
+\end{DoxyReturn}
+
+
+Definition at line 212 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_a1f35feaeb739af86eb89a25ad58870e4}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Size@{get\+Size}}
+\index{get\+Size@{get\+Size}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Size}]{\setlength{\rightskip}{0pt plus 5cm}cv\+::\+Size Abstract\+Stereo\+Camera\+::get\+Size (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [slot]}}\label{class_abstract_stereo_camera_a1f35feaeb739af86eb89a25ad58870e4}
+
+
+Get the image size. 
+
+\begin{DoxyReturn}{Returns}
+Image size 
+\end{DoxyReturn}
+
+
+Definition at line 228 of file abstractstereocamera.\+h.
+
+\hypertarget{class_abstract_stereo_camera_a4a1e8d3823219d718f43d5859bfc5096}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!get\+Width@{get\+Width}}
+\index{get\+Width@{get\+Width}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{get\+Width}]{\setlength{\rightskip}{0pt plus 5cm}int Abstract\+Stereo\+Camera\+::get\+Width (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [slot]}}\label{class_abstract_stereo_camera_a4a1e8d3823219d718f43d5859bfc5096}
+
+
+Get the image width. 
+
+\begin{DoxyReturn}{Returns}
+Image width 
+\end{DoxyReturn}
+
+
+Definition at line 216 of file abstractstereocamera.\+h.
+
+\hypertarget{class_abstract_stereo_camera_ab4a1141a26a7ba82b6e1b133df41b670}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!load\+Calibration@{load\+Calibration}}
+\index{load\+Calibration@{load\+Calibration}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{load\+Calibration}]{\setlength{\rightskip}{0pt plus 5cm}bool Abstract\+Stereo\+Camera\+::load\+Calibration (
+\begin{DoxyParamCaption}
+\item[{Q\+String}]{directory}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_ab4a1141a26a7ba82b6e1b133df41b670}
+
+
+Load calibration files from a directory and check them for validity. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em directory} & The folder too check. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True or false, depending on whether the parameters are valid. 
+\end{DoxyReturn}
+
+
+Definition at line 241 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_ac299030bbbc8a7445140ca419c94a558}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!save\+Image\+Timestamped@{save\+Image\+Timestamped}}
+\index{save\+Image\+Timestamped@{save\+Image\+Timestamped}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{save\+Image\+Timestamped}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::save\+Image\+Timestamped (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_ac299030bbbc8a7445140ca419c94a558}
+
+
+Save an image from the camera with a timestamped filename. 
+
+The timestamp format is\+: yyyy\+M\+Mdd\+\_\+hhmmss\+\_\+zzz (year, month, day, hour, minute, second, millisecond)
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_abstract_stereo_camera_aad94fb2509d7c36d33eb176c28963991}{set\+Savelocation()} 
+\end{DoxySeeAlso}
+
+
+Definition at line 25 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_aad94fb2509d7c36d33eb176c28963991}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!set\+Savelocation@{set\+Savelocation}}
+\index{set\+Savelocation@{set\+Savelocation}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{set\+Savelocation}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::set\+Savelocation (
+\begin{DoxyParamCaption}
+\item[{Q\+String}]{dir}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [slot]}}\label{class_abstract_stereo_camera_aad94fb2509d7c36d33eb176c28963991}
+
+
+Set the save directory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & Desired save directory, will attempt to create if it doesn't exist. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 234 of file abstractstereocamera.\+h.
+
+\hypertarget{class_abstract_stereo_camera_a5da7d8b7074a30583f22d0efd0af5f28}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!set\+Visual\+Zmax@{set\+Visual\+Zmax}}
+\index{set\+Visual\+Zmax@{set\+Visual\+Zmax}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{set\+Visual\+Zmax}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::set\+Visual\+Zmax (
+\begin{DoxyParamCaption}
+\item[{double}]{zmax}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_a5da7d8b7074a30583f22d0efd0af5f28}
+
+
+Set the point cloud clipping distance furthest from the camera (i.\+e. specify the farthest distance to display) 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em zmax} & Distance to the camera in metres \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 70 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_a176f96b1e0cadc210b4a4b73bd51069e}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!set\+Visual\+Zmin@{set\+Visual\+Zmin}}
+\index{set\+Visual\+Zmin@{set\+Visual\+Zmin}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{set\+Visual\+Zmin}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::set\+Visual\+Zmin (
+\begin{DoxyParamCaption}
+\item[{double}]{zmin}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_a176f96b1e0cadc210b4a4b73bd51069e}
+
+
+Set the point cloud clipping distance closest to the camera (i.\+e. specify the closest distance to display) 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em zmin} & Distance to the camera in metres \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 63 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_af58b04dd9c17e4d5cc139eb99d738cc6}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!video\+Stream\+Start@{video\+Stream\+Start}}
+\index{video\+Stream\+Start@{video\+Stream\+Start}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{video\+Stream\+Start}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::video\+Stream\+Start (
+\begin{DoxyParamCaption}
+\item[{Q\+String}]{fname = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_af58b04dd9c17e4d5cc139eb99d738cc6}
+
+
+Start writing a video stream to a file. 
+
+If no filename is supplied, a timestamped video will be stored in the current selected save folder.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em fname} & The output filename \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_abstract_stereo_camera_aad94fb2509d7c36d33eb176c28963991}{set\+Savelocation()}, \hyperlink{class_abstract_stereo_camera_ae39e6f45c68b4bbd4442fdac161051bd}{video\+Stream\+Stop()} 
+\end{DoxySeeAlso}
+
+
+Definition at line 431 of file abstractstereocamera.\+cpp.
+
+\hypertarget{class_abstract_stereo_camera_ae39e6f45c68b4bbd4442fdac161051bd}{}\index{Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}!video\+Stream\+Stop@{video\+Stream\+Stop}}
+\index{video\+Stream\+Stop@{video\+Stream\+Stop}!Abstract\+Stereo\+Camera@{Abstract\+Stereo\+Camera}}
+\subsubsection[{video\+Stream\+Stop}]{\setlength{\rightskip}{0pt plus 5cm}void Abstract\+Stereo\+Camera\+::video\+Stream\+Stop (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [slot]}}\label{class_abstract_stereo_camera_ae39e6f45c68b4bbd4442fdac161051bd}
+
+
+Stop writing a video stream. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_abstract_stereo_camera_af58b04dd9c17e4d5cc139eb99d738cc6}{video\+Stream\+Start()} 
+\end{DoxySeeAlso}
+
+
+Definition at line 487 of file abstractstereocamera.\+cpp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/abstractstereocamera.\+h\item 
+src/abstractstereocamera.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,78 @@
+\hypertarget{class_stereo_camera_from_video}{}\section{Stereo\+Camera\+From\+Video Class Reference}
+\label{class_stereo_camera_from_video}\index{Stereo\+Camera\+From\+Video@{Stereo\+Camera\+From\+Video}}
+Inheritance diagram for Stereo\+Camera\+From\+Video\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_stereo_camera_from_video}
+\end{center}
+\end{figure}
+\subsection*{Public Slots}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_stereo_camera_from_video_ab0ea47d4b231ebbc892ca5b51773add9}{}void {\bfseries set\+Position} (int position)\label{class_stereo_camera_from_video_ab0ea47d4b231ebbc892ca5b51773add9}
+
+\item 
+\hypertarget{class_stereo_camera_from_video_a3699596ba9de3b2ae1959da6a6097cf3}{}bool {\bfseries enable\+Auto\+Expose} (bool enable)\label{class_stereo_camera_from_video_a3699596ba9de3b2ae1959da6a6097cf3}
+
+\end{DoxyCompactItemize}
+\subsection*{Signals}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_stereo_camera_from_video_ad9a777afd6aede6d23d09e4b86430669}{}void {\bfseries video\+Position} (int)\label{class_stereo_camera_from_video_ad9a777afd6aede6d23d09e4b86430669}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_stereo_camera_from_video_ae98c29028ab573c2c6d1ddaa104595c9}{}{\bfseries Stereo\+Camera\+From\+Video} (Q\+Object $\ast$parent=0)\label{class_stereo_camera_from_video_ae98c29028ab573c2c6d1ddaa104595c9}
+
+\item 
+bool \hyperlink{class_stereo_camera_from_video_af53503df1755c0a9cf84718128ed0a5d}{capture} ()
+\begin{DoxyCompactList}\small\item\em Capture an image. \end{DoxyCompactList}\item 
+\hypertarget{class_stereo_camera_from_video_a1156dab0196f1366e95f82b3d197eb34}{}void {\bfseries disconnect\+Camera} ()\label{class_stereo_camera_from_video_a1156dab0196f1366e95f82b3d197eb34}
+
+\item 
+\hypertarget{class_stereo_camera_from_video_af52f8d11867223d927c6b0f18dd4cdcb}{}bool {\bfseries init\+Camera} (Q\+String fname)\label{class_stereo_camera_from_video_af52f8d11867223d927c6b0f18dd4cdcb}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 11 of file stereocamerafromvideo.\+h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_stereo_camera_from_video_af53503df1755c0a9cf84718128ed0a5d}{}\index{Stereo\+Camera\+From\+Video@{Stereo\+Camera\+From\+Video}!capture@{capture}}
+\index{capture@{capture}!Stereo\+Camera\+From\+Video@{Stereo\+Camera\+From\+Video}}
+\subsubsection[{capture}]{\setlength{\rightskip}{0pt plus 5cm}bool Stereo\+Camera\+From\+Video\+::capture (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_stereo_camera_from_video_af53503df1755c0a9cf84718128ed0a5d}
+
+
+Capture an image. 
+
+This is a virtual function which should be implmeented by a particular camera driver.
+
+\begin{DoxyReturn}{Returns}
+True if an image was captured successfully, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_abstract_stereo_camera_a01d0ecf3cf4bb8e9a6b9e34292483d14}{Abstract\+Stereo\+Camera}.
+
+
+
+Definition at line 41 of file stereocamerafromvideo.\+cpp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/stereocamerafromvideo.\+h\item 
+src/stereocamerafromvideo.\+cpp\end{DoxyCompactItemize}

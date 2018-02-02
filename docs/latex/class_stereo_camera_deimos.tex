@@ -1,0 +1,96 @@
+\hypertarget{class_stereo_camera_deimos}{}\section{Stereo\+Camera\+Deimos Class Reference}
+\label{class_stereo_camera_deimos}\index{Stereo\+Camera\+Deimos@{Stereo\+Camera\+Deimos}}
+Inheritance diagram for Stereo\+Camera\+Deimos\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_stereo_camera_deimos}
+\end{center}
+\end{figure}
+\subsection*{Public Slots}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_stereo_camera_deimos_a2033de5e607f874b8c5e78b79d17e16e}{}bool {\bfseries set\+Exposure} (double exposure\+\_\+time)\label{class_stereo_camera_deimos_a2033de5e607f874b8c5e78b79d17e16e}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a755406c93b4ffd2ef58a4fc61d7c3ffd}{}bool {\bfseries toggle\+H\+D\+R} (bool enable)\label{class_stereo_camera_deimos_a755406c93b4ffd2ef58a4fc61d7c3ffd}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_aa29a36f98a63e0550f25c8f8b871fee0}{}bool {\bfseries enable\+Auto\+Expose} (bool enable)\label{class_stereo_camera_deimos_aa29a36f98a63e0550f25c8f8b871fee0}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a1eb7eb2521979e1e0d3d899aafd679d4}{}double {\bfseries get\+Temperature} (void)\label{class_stereo_camera_deimos_a1eb7eb2521979e1e0d3d899aafd679d4}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_stereo_camera_deimos_ae69499b39216ee6b6aa5b2e9512f3c09}{}{\bfseries Stereo\+Camera\+Deimos} (Q\+Object $\ast$parent=0)\label{class_stereo_camera_deimos_ae69499b39216ee6b6aa5b2e9512f3c09}
+
+\item 
+bool \hyperlink{class_stereo_camera_deimos_a7526953f7562acc07841ebd6a49dc043}{capture} ()
+\begin{DoxyCompactList}\small\item\em Capture an image. \end{DoxyCompactList}\item 
+\hypertarget{class_stereo_camera_deimos_a60c865353deac27471bbdc0316099c1b}{}void {\bfseries disconnect\+Camera} ()\label{class_stereo_camera_deimos_a60c865353deac27471bbdc0316099c1b}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a3af4df4317df52f1900f9372d9cbf8bd}{}bool {\bfseries init\+Camera} (int devid=-\/1)\label{class_stereo_camera_deimos_a3af4df4317df52f1900f9372d9cbf8bd}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a64982ba0f3de8f93e3e179f5575496e0}{}int {\bfseries find\+Camera} (void)\label{class_stereo_camera_deimos_a64982ba0f3de8f93e3e179f5575496e0}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a7b6f5773ef6266aa79b5970210e00d71}{}bool {\bfseries set\+Frame\+Size} (int width, int height)\label{class_stereo_camera_deimos_a7b6f5773ef6266aa79b5970210e00d71}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a538f481037c273608cfee38bb714a9f0}{}bool {\bfseries set\+Frame16} (void)\label{class_stereo_camera_deimos_a538f481037c273608cfee38bb714a9f0}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_ac734aa162a5994522b5ec4078e6d4d4f}{}void {\bfseries get\+Frame\+Rate} (void)\label{class_stereo_camera_deimos_ac734aa162a5994522b5ec4078e6d4d4f}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a9e40d1909c6552c982b06ed73eb737ba}{}void {\bfseries open\+H\+I\+D} ()\label{class_stereo_camera_deimos_a9e40d1909c6552c982b06ed73eb737ba}
+
+\item 
+\hypertarget{class_stereo_camera_deimos_a19578fe34c606f6d40f561b56bc3aad8}{}int {\bfseries get\+Exposure} ()\label{class_stereo_camera_deimos_a19578fe34c606f6d40f561b56bc3aad8}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 34 of file stereocameradeimos.\+h.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_stereo_camera_deimos_a7526953f7562acc07841ebd6a49dc043}{}\index{Stereo\+Camera\+Deimos@{Stereo\+Camera\+Deimos}!capture@{capture}}
+\index{capture@{capture}!Stereo\+Camera\+Deimos@{Stereo\+Camera\+Deimos}}
+\subsubsection[{capture}]{\setlength{\rightskip}{0pt plus 5cm}bool Stereo\+Camera\+Deimos\+::capture (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_stereo_camera_deimos_a7526953f7562acc07841ebd6a49dc043}
+
+
+Capture an image. 
+
+This is a virtual function which should be implmeented by a particular camera driver.
+
+\begin{DoxyReturn}{Returns}
+True if an image was captured successfully, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_abstract_stereo_camera_a01d0ecf3cf4bb8e9a6b9e34292483d14}{Abstract\+Stereo\+Camera}.
+
+
+
+Definition at line 323 of file stereocameradeimos.\+cpp.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/stereocameradeimos.\+h\item 
+src/stereocameradeimos.\+cpp\end{DoxyCompactItemize}

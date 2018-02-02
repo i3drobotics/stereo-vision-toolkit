@@ -118,7 +118,7 @@ double StereoCameraDeimos::getTemperature(void){
       double temp = (msb << 8) | lsb;
 
       temp = ((temp - 20.0) / 16.0) + 21.0;
-      emit temperature(temp);
+      emit temperature_C(temp);
 
       return temp;
     }

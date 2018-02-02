@@ -22,7 +22,7 @@ void AbstractStereoCamera::assignThread(QThread *thread) {
   thread->start();
 }
 
-void AbstractStereoCamera::requestSingle(void) {
+void AbstractStereoCamera::saveImageTimestamped(void) {
   QString fname;
   QDateTime dateTime = dateTime.currentDateTime();
   QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
@@ -159,7 +159,7 @@ void AbstractStereoCamera::reproject3D() {
 
   ptCloud = ptCloudTemp;
 
-  emit gotPointCloud();
+  emit reprojected();
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr AbstractStereoCamera::getPointCloud(){
@@ -238,7 +238,7 @@ bool AbstractStereoCamera::loadRectificationMaps(QString src_l, QString src_r) {
   return res;
 }
 
-bool AbstractStereoCamera::setCalibration(QString directory) {
+bool AbstractStereoCamera::loadCalibration(QString directory) {
   if (directory == "") return false;
 
   directory = QDir::cleanPath(directory);
@@ -397,9 +397,6 @@ void AbstractStereoCamera::captureAndProcess(void) {
       right_raw.copyTo(right_remapped);
     }
 
-    // cv::GaussianBlur(left_remapped, left_remapped, cv::Size(3,3),0);
-    // cv::GaussianBlur(right_remapped, right_remapped, cv::Size(3,3),0);
-
     left_remapped.copyTo(left_output);
     right_remapped.copyTo(right_output);
 
@@ -489,7 +486,7 @@ bool AbstractStereoCamera::videoStreamInit(cv::VideoWriter *writer,
 
 void AbstractStereoCamera::videoStreamStop(void) {
   this->acquiring_video = false;
-   stereo_video.release();
+  stereo_video.release();
 }
 
 bool write_parallel(std::string fname, cv::Mat src) {

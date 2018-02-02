@@ -14,6 +14,7 @@ TEMPLATE = app vcapp
 
 #CONFIG += console
 CONFIG += warn_on
+#CONFIG += doc
 
 RESOURCES += $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc
 
@@ -148,4 +149,8 @@ CONFIG( debug, debug|release ) {
 #  warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
 
 # Use += instead of = if you use multiple QMAKE_POST_LINKs
-QMAKE_POST_LINK = $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+
+CONFIG( doc ){
+    QMAKE_POST_LINK += "&&" doxygen $$_PRO_FILE_PWD_
+}

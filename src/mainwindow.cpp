@@ -159,7 +159,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   connect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
   connect(stereo_cam, SIGNAL(framecount(qint64)), this,
           SLOT(updateFrameCount(qint64)));
-  connect(stereo_cam, SIGNAL(temperature(double)), this, SLOT(updateTemperature(double)));
+  connect(stereo_cam, SIGNAL(temperature_C(double)), this, SLOT(updateTemperature(double)));
   connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(requestSingle()));
   connect(stereo_cam, SIGNAL(savedImage(QString)), this,
           SLOT(displaySaved(QString)));
@@ -173,7 +173,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   connect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(toggleHDR(bool)));
 
   /* Point cloud */
-  connect(stereo_cam, SIGNAL(gotPointCloud()), this, SLOT(updateCloud()));
+  connect(stereo_cam, SIGNAL(reprojected()), this, SLOT(updateCloud()));
   connect(ui->minZSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
           SLOT(setVisualZmin(double)));
   connect(ui->maxZSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
@@ -281,7 +281,7 @@ void MainWindow::stereoCameraInit() {
       stereo_cam->setSavelocation(save_directory);
     }
 
-    bool res = stereo_cam->setCalibration(calibration_directory);
+    bool res = stereo_cam->loadCalibration(calibration_directory);
     if(res){
         qDebug() << "Calibration folder: " << calibration_directory;
     }else{
@@ -524,7 +524,7 @@ void MainWindow::setCalibrationFolder(QString dir) {
   }
 
   if (dir != "") {
-    if (!stereo_cam->setCalibration(dir)) {
+    if (!stereo_cam->loadCalibration(dir)) {
       QMessageBox msg;
       msg.setText("Unable to load calibration files");
       msg.exec();
@@ -551,7 +551,7 @@ void MainWindow::singleShotClicked(void) {
   ui->pauseButton->setIcon(awesome->icon(fa::play, icon_options));
 }
 
-void MainWindow::saveSingle(void) { stereo_cam->requestSingle(); }
+void MainWindow::saveSingle(void) { stereo_cam->saveImageTimestamped(); }
 
 void MainWindow::toggleAcquire(void) {
   if (stereo_cam->isAcquiring()) {
