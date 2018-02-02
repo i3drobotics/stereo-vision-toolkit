@@ -9,7 +9,6 @@
 #include <QtAwesome.h>
 #include <QDebug>
 #include <QDir>
-#include <QDomDocument>
 #include <QFileDialog>
 #include <QLabel>
 #include <QMainWindow>
@@ -37,6 +36,8 @@
 #include "calibrationdialog.h"
 #include "stereocalibrate.h"
 
+#include "paramfile.h"
+
 using namespace std;
 using namespace cv;
 
@@ -55,10 +56,11 @@ class MainWindow : public QMainWindow {
   Ui::MainWindow* ui;
 
   QPixmap pmap_left;
-  QFile* paramFile;
   QPixmap pmap_right;
   QPixmap pmap_disparity;
   QTimer* status_bar_timer;
+
+  ParamFile* parameters;
 
   QLabel* frame_counter;
   QLabel* fps_counter;
@@ -97,7 +99,6 @@ class MainWindow : public QMainWindow {
 
   void stereoCameraInitConnections(void);
 
-
  public slots:
   void updateDisplay(void);
   void updateFPS(qint64);
@@ -122,12 +123,6 @@ class MainWindow : public QMainWindow {
 
   void startCalibrationFromImages(void);
   void runCalibrationFromImages(void);
-
-  void checkParamFile(void);
-  void loadParamFile(void);
-  void updateParamFile(QString tag, QString value);
-  QString getParamFromFile(QString tagName);
-  void updatePreviousDirectory(QString dir);
 
   void startVideoCapture(void);
   void stopVideoCapture(void);

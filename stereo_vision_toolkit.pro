@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     matcheropencvsgbm.cpp \
     matcherwidget.cpp \
     matcherwidgetopencvsgbm.cpp \
-    disparityviewer.cpp
+    disparityviewer.cpp \
+    paramfile.cpp
 
 HEADERS  += mainwindow.h \
     calibrationdialog.h \
@@ -59,7 +60,8 @@ HEADERS  += mainwindow.h \
     matcheropencvsgbm.h \
     matcherwidget.h \
     matcherwidgetopencvsgbm.h \
-    disparityviewer.h
+    disparityviewer.h \
+    paramfile.h
 
 FORMS    += mainwindow.ui \
     calibrationdialog.ui \

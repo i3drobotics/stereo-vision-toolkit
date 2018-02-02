@@ -26,9 +26,14 @@ MainWindow::MainWindow(QWidget* parent)
   awesome = new QtAwesome(qApp);
   awesome->initFontAwesome();
 
+  parameters = new ParamFile();
+  parameters->load();
+
+  save_directory = parameters->get("saveDir");
+  calibration_directory = parameters->get("calDir");
+
   controlsInit();
   statusBarInit();
-  loadParamFile();
   stereoCameraLoad();
   pointCloudInit();
 }
@@ -54,6 +59,8 @@ void MainWindow::statusBarInit(void) {
 
   connect(status_bar_timer, SIGNAL(timeout()), this,
           SLOT(statusMessageTimeout()));
+
+  ui->saveDirLabel->setText(save_directory);
 }
 
 void MainWindow::controlsInit(void) {
@@ -328,8 +335,6 @@ void MainWindow::videoStreamLoad(void) {
   }
 }
 
-
-
 void MainWindow::updateCloud() {
 
   auto cloud = stereo_cam->getPointCloud();
@@ -527,9 +532,8 @@ void MainWindow::setCalibrationFolder(QString dir) {
       // Calibration valid
       stereo_cam->enableRectify(true);
       ui->toggleRectifyCheckBox->setEnabled(true);
+      parameters->update("calDir", dir);
     }
-
-    updateParamFile("calDir", dir);
   }
 }
 
@@ -565,10 +569,6 @@ void MainWindow::displaySaved(QString fname) {
   ui->statusBar->showMessage(QString("Saved to: %1").arg(fname));
   status_bar_timer->setSingleShot(true);
   status_bar_timer->start(1500);
-}
-
-void MainWindow::updateFrameCount(qint64 count) {
-  frame_counter->setText(QString("Frame count: %1").arg(count));
 }
 
 void MainWindow::updateDisplay(void) {
@@ -609,162 +609,12 @@ void MainWindow::setSaveDirectory(QString dir) {
     if(stereo_cam)
         stereo_cam->setSavelocation(dir);
 
-    updatePreviousDirectory(dir);
+    parameters->updatePreviousDirectory(dir);
   }
 }
 
-void MainWindow::checkParamFile(void) {
-  QDomDocument doc("deimosParameters");
-
-  if (!paramFile->exists()) {
-    qDebug() << "Making parameter file.";
-
-    auto dir = QDir(QCoreApplication::applicationDirPath() + "/params/");
-    dir.mkpath(".");
-
-    QDomElement root = doc.createElement("deimosParameters");
-    doc.appendChild(root);
-
-    save_directory = QDir::homePath() + "/deimos/";
-
-    QDomElement tag = doc.createElement("saveDir");
-    tag.appendChild(doc.createTextNode(save_directory));
-    root.appendChild(tag);
-
-    if(!QDir(save_directory).exists()){
-        auto saved = QDir(save_directory);
-        saved.mkpath(".");
-    }
-
-    tag = doc.createElement("exposure");
-    tag.appendChild(doc.createTextNode("5"));
-    root.appendChild(tag);
-
-    tag = doc.createElement("calDir");
-    tag.appendChild(doc.createTextNode(QCoreApplication::applicationDirPath() + "/params/"));
-    root.appendChild(tag);
-
-    QString xml = doc.toString();
-
-    if (!paramFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
-      qDebug() << "Failed to write file";
-      return;
-    }
-
-    QTextStream out(paramFile);
-    out << xml;
-
-    paramFile->close();
-  }
-}
-
-void MainWindow::loadParamFile(void) {
-  paramFile = new QFile(QCoreApplication::applicationDirPath() + "/params/params.xml", this);
-
-  qDebug() << "Looking for param file: "
-           << QCoreApplication::applicationDirPath() + "/params/params.xml";
-
-  checkParamFile();
-
-  if (paramFile->exists()) {
-    QString dir = getParamFromFile("saveDir");
-
-    if (dir != "") {
-      save_directory = dir;
-      ui->saveDirLabel->setText(save_directory);
-    }
-
-    dir = getParamFromFile("calDir");
-
-    if (dir != "") {
-      calibration_directory = dir;
-    }
-  }
-
-  return;
-}
-
-QString MainWindow::getParamFromFile(QString tagName) {
-  QDomDocument doc("deimosParameters");
-  QString text = "";
-
-  if (!paramFile->open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug() << "Failed to open file";
-  } else {
-    if (!doc.setContent(paramFile)) {
-      qDebug() << "Failed to set XML Content";
-    } else {
-      auto node = doc.elementsByTagName(tagName);
-
-      if (node.count() > 0) {
-        auto el = node.at(0).firstChild().toText();
-
-        if (!el.isNull()) {
-          text = el.data();
-        }
-      }
-    }
-
-    paramFile->close();
-  }
-
-  return text;
-}
-
-void MainWindow::updateParamFile(QString tagName, QString value) {
-  checkParamFile();
-
-  QDomDocument doc("deimosParameters");
-
-  if (!paramFile->open(QIODevice::ReadWrite | QIODevice::Text)) {
-    qDebug() << "Failed to open param file";
-    return;
-  }
-
-  if (!doc.setContent(paramFile)) {
-    qDebug() << "Failed to load XML";
-  } else {
-    auto node = doc.elementsByTagName(tagName);
-
-    if (node.count() > 0) {
-      auto el = node.at(0).firstChild().toText();
-
-      if (!el.isNull()) {
-        el.setData(value);
-      }
-    } else {
-      auto tag = doc.createElement(tagName);
-      tag.appendChild(doc.createTextNode(value));
-      auto root = doc.firstChild();
-      root.appendChild(tag);
-    }
-  }
-
-  paramFile->close();
-
-  QFile file(QCoreApplication::applicationDirPath() + "/params/~params_temp.xml");
-  QDir outdir(QCoreApplication::applicationDirPath() + "/params/");
-
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    return;
-  }
-  QByteArray xml = doc.toByteArray();
-  auto bytes = file.write(xml);
-  file.close();
-
-  if (bytes == xml.count()) {
-    outdir.remove(QCoreApplication::applicationDirPath() + "/params/params.xml");
-    outdir.rename(QCoreApplication::applicationDirPath() + "/params/~params_temp.xml",
-                  QCoreApplication::applicationDirPath() + "/params/params.xml");
-  } else {
-    qDebug() << xml.count() << bytes;
-  }
-
-  return;
-}
-
-void MainWindow::updatePreviousDirectory(QString dir) {
-  updateParamFile("saveDir", dir);
+void MainWindow::updateFrameCount(qint64 count) {
+  frame_counter->setText(QString("Frame count: %1").arg(count));
 }
 
 void MainWindow::updateFPS(qint64 time) {
