@@ -29,6 +29,12 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
+//!  Stereo camera base class
+/*!
+  An abstract class to process stereo images from arbitrary cameras. This class should not be used directly,
+  instead you should subclass it (e.g. StereoCameraDeimos()). The bare minimum is to implment a capture function
+  that will capture a stereo pair from your camera.
+*/
 class AbstractStereoCamera : public QObject {
   Q_OBJECT
 
@@ -75,6 +81,66 @@ class AbstractStereoCamera : public QObject {
     @param[in] thread Pointer to thread
   */
   void assignThread(QThread *thread);
+
+  //! Returns whether the camera is currently capturing or processing a frame
+  bool isCapturing();
+
+  //! Returns whether the camera is currently acquiring images (in general)
+  bool isAcquiring();
+
+  //! Returns whether matching is enabled
+  bool isMatching();
+
+  //! Returns whether rectification is being performed
+  bool isRectifying();
+
+  //! Get the left stereo image
+  /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+  void getLeftImage(cv::Mat &dst);
+
+  //! Get the right stereo image
+  /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+  void getRightImage(cv::Mat &dst);
+
+  //! Get the left stereo image
+  /*!
+  * @return OpenCV matrix containing left image
+  */
+  cv::Mat getLeftImage();
+
+  //! Get the right stereo image
+  /*!
+  * @return OpenCV matrix containing right image
+  */
+  cv::Mat getRightImage();
+
+  //! Get a pointer to the current point cloud
+  /*!
+  * @return Pointer to the current point cloud
+  */
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr getPointCloud();
+
+  //! Get the image width
+  /*!
+  * @return Image width
+  */
+  int getWidth(void){ return image_width; }
+
+  //! Get the image height
+  /*!
+  * @return Image height
+  */
+  int getHeight(void){ return image_height; }
+
+  //! Get the image size
+  /*!
+  * @return Image size
+  */
+  cv::Size getSize(void){ return image_size; }
 
   virtual ~AbstractStereoCamera(void) = 0;
 
@@ -152,42 +218,6 @@ class AbstractStereoCamera : public QObject {
   //! Emable or disable disparity map reprojection to 3D
   void enableReproject(bool reproject);
 
-  //! Returns whether the camera is currently capturing or processing a frame
-  bool isCapturing();
-
-  //! Returns whether the camera is currently acquiring images (in general)
-  bool isAcquiring();
-
-  //! Returns whether matching is enabled
-  bool isMatching();
-
-  //! Returns whether rectification is being performed
-  bool isRectifying();
-
-  //! Get the left stereo image
-  /*!
-  * @param[out] dst OpenCV matrix to store image into
-  */
-  void getLeftImage(cv::Mat &dst);
-
-  //! Get the right stereo image
-  /*!
-  * @param[out] dst OpenCV matrix to store image into
-  */
-  void getRightImage(cv::Mat &dst);
-
-  //! Get the left stereo image
-  /*!
-  * @return OpenCV matrix containing left image
-  */
-  cv::Mat getLeftImage();
-
-  //! Get the right stereo image
-  /*!
-  * @return OpenCV matrix containing right image
-  */
-  cv::Mat getRightImage();
-
   //! Set the point cloud clipping distance closest to the camera (i.e. specify the closest distance to display)
   /*!
   * @param[in] zmin Distance to the camera in metres
@@ -202,30 +232,6 @@ class AbstractStereoCamera : public QObject {
 
   //! Save the current 3D reconstruction to a .PLY file
   void savePointCloud();
-
-  //! Get a pointer to the current point cloud
-  /*!
-  * @return Pointer to the current point cloud
-  */
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr getPointCloud();
-
-  //! Get the image width
-  /*!
-  * @return Image width
-  */
-  int getWidth(void){ return image_width; }
-
-  //! Get the image height
-  /*!
-  * @return Image height
-  */
-  int getHeight(void){ return image_height; }
-
-  //! Get the image size
-  /*!
-  * @return Image size
-  */
-  cv::Size getSize(void){ return image_size; }
 
   //! Set the save directory
   /*!
@@ -330,7 +336,6 @@ class AbstractStereoCamera : public QObject {
   */
   void reproject3D();
 
-
   cv::Mat rectmapx_l;
   cv::Mat rectmapy_l;
   cv::Mat rectmapx_r;
@@ -347,7 +352,6 @@ class AbstractStereoCamera : public QObject {
 
   double visualisation_min_z = 0.2;
   double visualisation_max_z = 2;
-
 
  protected:
 

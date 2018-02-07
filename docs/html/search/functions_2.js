@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['enableacquire',['enableAcquire',['../class_abstract_stereo_camera.html#aa8bd29dcb39ee696e675087d0c119339',1,'AbstractStereoCamera']]],
-  ['enablecapture',['enableCapture',['../class_abstract_stereo_camera.html#a1b8bc87de9f73731b0ca1c9b293b57ac',1,'AbstractStereoCamera']]],
-  ['enablematching',['enableMatching',['../class_abstract_stereo_camera.html#a0d63f01457d134b1f83d7c6c11e42010',1,'AbstractStereoCamera']]],
-  ['enablerectify',['enableRectify',['../class_abstract_stereo_camera.html#a16cb90b828f6f4d4e32a8df9d8b8be0f',1,'AbstractStereoCamera']]],
-  ['enablereproject',['enableReproject',['../class_abstract_stereo_camera.html#ae3dec6f756ff3b6d3702ff3d85e95272',1,'AbstractStereoCamera']]]
+  ['capture',['capture',['../class_abstract_stereo_camera.html#a01d0ecf3cf4bb8e9a6b9e34292483d14',1,'AbstractStereoCamera::capture()'],['../class_stereo_camera_deimos.html#a7526953f7562acc07841ebd6a49dc043',1,'StereoCameraDeimos::capture()'],['../class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d',1,'StereoCameraFromVideo::capture()'],['../class_stereo_camera_open_c_v.html#ac669e811da12df2bfd76f783c0550100',1,'StereoCameraOpenCV::capture()']]],
+  ['captured',['captured',['../class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375',1,'AbstractStereoCamera']]],
+  ['checklrconsistencyfull',['checkLRConsistencyFull',['../class_abstract_stereo_matcher.html#ac89bdb7ff8010eb3cffc22ae73dd5436',1,'AbstractStereoMatcher']]]
 ];

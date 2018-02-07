@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.8"/>
-<title>Stereo Vision toolkit: src/abstractstereocamera.cpp Source File</title>
+<title>Stereo Vision Toolkit: src/abstractstereocamera.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Stereo Vision toolkit
+   <div id="projectname">Stereo Vision Toolkit
    </div>
   </td>
  </tr>
@@ -142,7 +142,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  }</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordflow">if</span>(matching){</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      matcher-&gt;saveDisparity(fname + <span class="stringliteral">&quot;_ldisp.png&quot;</span>);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      matcher-&gt;<a class="code" href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">saveDisparity</a>(fname + <span class="stringliteral">&quot;_ldisp.png&quot;</span>);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  emit <a class="code" href="class_abstract_stereo_camera.html#a6eb388b6b235a928d5792d01db3e0654">savedImage</a>(fname);</div>
@@ -165,7 +165,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  cv::Mat disparity_downscale;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  matcher-&gt;getDisparity(disparity_downscale);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  matcher-&gt;<a class="code" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a>(disparity_downscale);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  cv::abs(disparity_downscale);</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
@@ -460,7 +460,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <a class="code" href="class_abstract_stereo_camera.html#a1b8bc87de9f73731b0ca1c9b293b57ac">enableCapture</a>(<span class="keyword">false</span>);</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  this-&gt;matcher = matcher;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  this-&gt;matcher-&gt;setImages(&amp;left_remapped, &amp;right_remapped);</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;  this-&gt;matcher-&gt;<a class="code" href="class_abstract_stereo_matcher.html#a9d1270578e9ea21b31db33a8e9956675">setImages</a>(&amp;left_remapped, &amp;right_remapped);</div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;  <a class="code" href="class_abstract_stereo_camera.html#a1b8bc87de9f73731b0ca1c9b293b57ac">enableCapture</a>(<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;  qDebug() &lt;&lt; <span class="stringliteral">&quot;Changed matcher&quot;</span>;</div>
@@ -489,7 +489,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    right_remapped.copyTo(right_output);</div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordflow">if</span> (matching) {</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      matcher-&gt;match();</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      matcher-&gt;<a class="code" href="class_abstract_stereo_matcher.html#a49f42fbfee8266b81fbe17e8af07d73b">match</a>();</div>
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;      <span class="keywordflow">if</span> (reprojecting) {</div>
 <div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;        reproject3D();</div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;      }</div>
@@ -595,8 +595,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_abstract_stereo_camera_html_a01c48565e18ae2ac7ea4f3322c2e5059"><div class="ttname"><a href="class_abstract_stereo_camera.html#a01c48565e18ae2ac7ea4f3322c2e5059">AbstractStereoCamera::isCapturing</a></div><div class="ttdeci">bool isCapturing()</div><div class="ttdoc">Returns whether the camera is currently capturing or processing a frame. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00194">abstractstereocamera.cpp:194</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_ab4a1141a26a7ba82b6e1b133df41b670"><div class="ttname"><a href="class_abstract_stereo_camera.html#ab4a1141a26a7ba82b6e1b133df41b670">AbstractStereoCamera::loadCalibration</a></div><div class="ttdeci">bool loadCalibration(QString directory)</div><div class="ttdoc">Load calibration files from a directory and check them for validity. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00241">abstractstereocamera.cpp:241</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_af58b04dd9c17e4d5cc139eb99d738cc6"><div class="ttname"><a href="class_abstract_stereo_camera.html#af58b04dd9c17e4d5cc139eb99d738cc6">AbstractStereoCamera::videoStreamStart</a></div><div class="ttdeci">void videoStreamStart(QString fname=&quot;&quot;)</div><div class="ttdoc">Start writing a video stream to a file. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00431">abstractstereocamera.cpp:431</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a9d1270578e9ea21b31db33a8e9956675"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a9d1270578e9ea21b31db33a8e9956675">AbstractStereoMatcher::setImages</a></div><div class="ttdeci">void setImages(cv::Mat *left, cv::Mat *right)</div><div class="ttdoc">Assign images to the matcher. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00023">abstractstereomatcher.cpp:23</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a16cb90b828f6f4d4e32a8df9d8b8be0f"><div class="ttname"><a href="class_abstract_stereo_camera.html#a16cb90b828f6f4d4e32a8df9d8b8be0f">AbstractStereoCamera::enableRectify</a></div><div class="ttdeci">void enableRectify(bool rectify)</div><div class="ttdoc">Enable or disable image rectification. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00190">abstractstereocamera.cpp:190</a></div></div>
-<div class="ttc" id="class_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00017">abstractstereomatcher.h:17</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdoc">Stereo matcher base class. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00022">abstractstereomatcher.h:22</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_abafa9c808e5b2d32cc8e2c9e89fdbb09"><div class="ttname"><a href="class_abstract_stereo_camera.html#abafa9c808e5b2d32cc8e2c9e89fdbb09">AbstractStereoCamera::getLeftImage</a></div><div class="ttdeci">cv::Mat getLeftImage()</div><div class="ttdoc">Get the left stereo image. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00210">abstractstereocamera.cpp:210</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a0096fcc42b50aa7fa4236f6bddcd81f7"><div class="ttname"><a href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">AbstractStereoCamera::isMatching</a></div><div class="ttdeci">bool isMatching()</div><div class="ttdoc">Returns whether matching is enabled. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00198">abstractstereocamera.cpp:198</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_ac24eaa1c0c62dae96a176f0eac053414"><div class="ttname"><a href="class_abstract_stereo_camera.html#ac24eaa1c0c62dae96a176f0eac053414">AbstractStereoCamera::matched</a></div><div class="ttdeci">void matched()</div><div class="ttdoc">Emitted when an image has been matched. </div></div>
@@ -610,17 +611,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_abstract_stereo_camera_html_a6eb388b6b235a928d5792d01db3e0654"><div class="ttname"><a href="class_abstract_stereo_camera.html#a6eb388b6b235a928d5792d01db3e0654">AbstractStereoCamera::savedImage</a></div><div class="ttdeci">void savedImage()</div><div class="ttdoc">Emitted when an image has been saved. </div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_ae39e6f45c68b4bbd4442fdac161051bd"><div class="ttname"><a href="class_abstract_stereo_camera.html#ae39e6f45c68b4bbd4442fdac161051bd">AbstractStereoCamera::videoStreamStop</a></div><div class="ttdeci">void videoStreamStop(void)</div><div class="ttdoc">Stop writing a video stream. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00487">abstractstereocamera.cpp:487</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a5496f7e9e10c2892d62091dd56709e7a"><div class="ttname"><a href="class_abstract_stereo_camera.html#a5496f7e9e10c2892d62091dd56709e7a">AbstractStereoCamera::assignThread</a></div><div class="ttdeci">void assignThread(QThread *thread)</div><div class="ttdoc">Assign the stereo camera object to a thread so as not to block the GUI. Typically called just after i...</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00017">abstractstereocamera.cpp:17</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a49f42fbfee8266b81fbe17e8af07d73b"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a49f42fbfee8266b81fbe17e8af07d73b">AbstractStereoMatcher::match</a></div><div class="ttdeci">virtual void match()</div><div class="ttdoc">Perform a forward stereo match. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00057">abstractstereomatcher.cpp:57</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a176f96b1e0cadc210b4a4b73bd51069e"><div class="ttname"><a href="class_abstract_stereo_camera.html#a176f96b1e0cadc210b4a4b73bd51069e">AbstractStereoCamera::setVisualZmin</a></div><div class="ttdeci">void setVisualZmin(double zmin)</div><div class="ttdoc">Set the point cloud clipping distance closest to the camera (i.e. specify the closest distance to dis...</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00063">abstractstereocamera.cpp:63</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a1b8bc87de9f73731b0ca1c9b293b57ac"><div class="ttname"><a href="class_abstract_stereo_camera.html#a1b8bc87de9f73731b0ca1c9b293b57ac">AbstractStereoCamera::enableCapture</a></div><div class="ttdeci">void enableCapture(bool capture)</div><div class="ttdoc">Start or stop capturing an image. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00184">abstractstereocamera.cpp:184</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a490db3572c901f51f49d90016f856805"><div class="ttname"><a href="class_abstract_stereo_camera.html#a490db3572c901f51f49d90016f856805">AbstractStereoCamera::isAcquiring</a></div><div class="ttdeci">bool isAcquiring()</div><div class="ttdoc">Returns whether the camera is currently acquiring images (in general) </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00196">abstractstereocamera.cpp:196</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a955561b40fdaeaf218e32fb117b6aa9b"><div class="ttname"><a href="class_abstract_stereo_camera.html#a955561b40fdaeaf218e32fb117b6aa9b">AbstractStereoCamera::reprojected</a></div><div class="ttdeci">void reprojected()</div><div class="ttdoc">Emitted when a disparity map has been reprojected to a point cloud. </div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a80c14c977bd44695d1142eaef8abdcb3"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">AbstractStereoMatcher::saveDisparity</a></div><div class="ttdeci">void saveDisparity(QString filename)</div><div class="ttdoc">Save the disparity map (16-bit) </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00033">abstractstereomatcher.cpp:33</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_ac299030bbbc8a7445140ca419c94a558"><div class="ttname"><a href="class_abstract_stereo_camera.html#ac299030bbbc8a7445140ca419c94a558">AbstractStereoCamera::saveImageTimestamped</a></div><div class="ttdeci">void saveImageTimestamped()</div><div class="ttdoc">Save an image from the camera with a timestamped filename. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00025">abstractstereocamera.cpp:25</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a5376ae9c07bdc8e048cbb83a3f11d520"><div class="ttname"><a href="class_abstract_stereo_camera.html#a5376ae9c07bdc8e048cbb83a3f11d520">AbstractStereoCamera::isRectifying</a></div><div class="ttdeci">bool isRectifying()</div><div class="ttdoc">Returns whether rectification is being performed. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00200">abstractstereocamera.cpp:200</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a2b1a5e9841f39988686450b1f1721032"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">AbstractStereoMatcher::getDisparity</a></div><div class="ttdeci">void getDisparity(cv::Mat &amp;dst)</div><div class="ttdoc">Get the disparity map. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00028">abstractstereomatcher.cpp:28</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a0d63f01457d134b1f83d7c6c11e42010"><div class="ttname"><a href="class_abstract_stereo_camera.html#a0d63f01457d134b1f83d7c6c11e42010">AbstractStereoCamera::enableMatching</a></div><div class="ttdeci">void enableMatching(bool match)</div><div class="ttdoc">Enable or disable stereo matching. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00188">abstractstereocamera.cpp:188</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 2 2018 11:50:15 for Stereo Vision toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 7 2018 11:29:26 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
