@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.8"/>
-<title>Stereo Vision toolkit: src/abstractstereomatcher.h Source File</title>
+<title>Stereo Vision Toolkit: src/abstractstereomatcher.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Stereo Vision toolkit
+   <div id="projectname">Stereo Vision Toolkit
    </div>
   </td>
  </tr>
@@ -102,54 +102,78 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;opencv2/opencv.hpp&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;opencv2/ximgproc.hpp&gt;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html">   17</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a> : <span class="keyword">public</span> QObject {</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  Q_OBJECT</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">explicit</span> <a class="code" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a>(QObject* parent = 0, cv::Size image_size = cv::Size(0,0));</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  ~<a class="code" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;   cv::Mat disparity_lr;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; signals:</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;   <span class="keywordtype">void</span> finished();</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; <span class="keyword">public</span> slots:</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordtype">void</span> setImages(cv::Mat* left, cv::Mat* right);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> forwardMatch() = 0;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> backwardMatch() = 0;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> init(<span class="keywordtype">void</span>) = 0;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> getErrorDisparity(<span class="keywordtype">void</span>) = 0;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keywordtype">void</span> assignThread(QThread *thread);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordtype">void</span> getDisparity(cv::Mat &amp;dst);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keywordtype">void</span> saveDisparity(QString filename);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keywordtype">void</span> checkLRConsistencyFull(<span class="keywordtype">double</span> threshold);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  cv::Mat *getLeftImage(<span class="keywordtype">void</span>){<span class="keywordflow">return</span> left;}</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  cv::Mat *getRighttImage(<span class="keywordtype">void</span>){<span class="keywordflow">return</span> right;}</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> match();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  cv::Mat *left;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  cv::Mat *right;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  cv::Mat disparity_buffer;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  cv::Mat disparity_rl;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  cv::Mat disparity_scale;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  cv::Size image_size;</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html">   22</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a> : <span class="keyword">public</span> QObject {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  Q_OBJECT</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keyword">explicit</span> <a class="code" href="class_abstract_stereo_matcher.html#a17362bf0ea979b621a6e71178930b4b0">AbstractStereoMatcher</a>(QObject* parent = 0, cv::Size image_size = cv::Size(0,0));</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  ~<a class="code" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;   cv::Mat disparity_lr;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; signals:</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;   <span class="keywordtype">void</span> finished();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; <span class="keyword">public</span> slots:</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a9d1270578e9ea21b31db33a8e9956675">setImages</a>(cv::Mat* left, cv::Mat* right);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a49f42fbfee8266b81fbe17e8af07d73b">match</a>();</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordtype">int</span> min_disparity = 0;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordtype">int</span> disparity_range = 64;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordtype">int</span> block_size = 9;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;};</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#endif  // ABSTRACTSTEREOMATCHER_H</span></div>
-<div class="ttc" id="class_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00017">abstractstereomatcher.h:17</a></div></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#aaccfe2a4402687f8a51349976b49c94a">forwardMatch</a>() = 0;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0">backwardMatch</a>() = 0;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#afb869f34062416ce17246598e2b77090">init</a>(<span class="keywordtype">void</span>) = 0;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="class_abstract_stereo_matcher.html#a87525ed38b36c37d2eda34c0e2d321d7">getErrorDisparity</a>(<span class="keywordtype">void</span>) = 0;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a124604c16466bac10a308436dd2f07db">assignThread</a>(QThread *thread);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a>(cv::Mat &amp;dst);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">saveDisparity</a>(QString filename);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#ac89bdb7ff8010eb3cffc22ae73dd5436">checkLRConsistencyFull</a>(<span class="keywordtype">double</span> threshold);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">  103</a></span>&#160;  cv::Mat *<a class="code" href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">getLeftImage</a>(<span class="keywordtype">void</span>){<span class="keywordflow">return</span> left;}</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">  109</a></span>&#160;  cv::Mat *<a class="code" href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">getRighttImage</a>(<span class="keywordtype">void</span>){<span class="keywordflow">return</span> right;}</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  cv::Mat *left;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  cv::Mat *right;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  cv::Mat disparity_buffer;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  cv::Mat disparity_rl;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  cv::Mat disparity_scale;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  cv::Size image_size;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <span class="keywordtype">int</span> min_disparity = 0;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="keywordtype">int</span> disparity_range = 64;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordtype">int</span> block_size = 9;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;};</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#endif  // ABSTRACTSTEREOMATCHER_H</span></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a3e1d35e2aed668657aa9441c5b563d2d"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">AbstractStereoMatcher::getRighttImage</a></div><div class="ttdeci">cv::Mat * getRighttImage(void)</div><div class="ttdoc">Get the right input image. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00109">abstractstereomatcher.h:109</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a23d41c7aa8ee75b83c0f86028854e92c"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">AbstractStereoMatcher::getLeftImage</a></div><div class="ttdeci">cv::Mat * getLeftImage(void)</div><div class="ttdoc">Get the left input image. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00103">abstractstereomatcher.h:103</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a9d1270578e9ea21b31db33a8e9956675"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a9d1270578e9ea21b31db33a8e9956675">AbstractStereoMatcher::setImages</a></div><div class="ttdeci">void setImages(cv::Mat *left, cv::Mat *right)</div><div class="ttdoc">Assign images to the matcher. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00023">abstractstereomatcher.cpp:23</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a87525ed38b36c37d2eda34c0e2d321d7"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a87525ed38b36c37d2eda34c0e2d321d7">AbstractStereoMatcher::getErrorDisparity</a></div><div class="ttdeci">virtual int getErrorDisparity(void)=0</div><div class="ttdoc">Returns what disparity value corresponds to an error or no-match. </div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdoc">Stereo matcher base class. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00022">abstractstereomatcher.h:22</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a4e2bc164538e6dab3d31dcee275031b0"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0">AbstractStereoMatcher::backwardMatch</a></div><div class="ttdeci">virtual void backwardMatch()=0</div><div class="ttdoc">Perform a backward stereo match (relative to right image) </div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_afb869f34062416ce17246598e2b77090"><div class="ttname"><a href="class_abstract_stereo_matcher.html#afb869f34062416ce17246598e2b77090">AbstractStereoMatcher::init</a></div><div class="ttdeci">virtual void init(void)=0</div><div class="ttdoc">Initialise the matcher (implementation specific) </div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a124604c16466bac10a308436dd2f07db"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a124604c16466bac10a308436dd2f07db">AbstractStereoMatcher::assignThread</a></div><div class="ttdeci">void assignThread(QThread *thread)</div><div class="ttdoc">Assign the stereo matcher to a thread. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00015">abstractstereomatcher.cpp:15</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a49f42fbfee8266b81fbe17e8af07d73b"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a49f42fbfee8266b81fbe17e8af07d73b">AbstractStereoMatcher::match</a></div><div class="ttdeci">virtual void match()</div><div class="ttdoc">Perform a forward stereo match. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00057">abstractstereomatcher.cpp:57</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a80c14c977bd44695d1142eaef8abdcb3"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">AbstractStereoMatcher::saveDisparity</a></div><div class="ttdeci">void saveDisparity(QString filename)</div><div class="ttdoc">Save the disparity map (16-bit) </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00033">abstractstereomatcher.cpp:33</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_aaccfe2a4402687f8a51349976b49c94a"><div class="ttname"><a href="class_abstract_stereo_matcher.html#aaccfe2a4402687f8a51349976b49c94a">AbstractStereoMatcher::forwardMatch</a></div><div class="ttdeci">virtual void forwardMatch()=0</div><div class="ttdoc">Perform a forward stereo match (relative to left image) </div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a17362bf0ea979b621a6e71178930b4b0"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a17362bf0ea979b621a6e71178930b4b0">AbstractStereoMatcher::AbstractStereoMatcher</a></div><div class="ttdeci">AbstractStereoMatcher(QObject *parent=0, cv::Size image_size=cv::Size(0, 0))</div><div class="ttdoc">AbstractStereoMatcher Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00008">abstractstereomatcher.cpp:8</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a2b1a5e9841f39988686450b1f1721032"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">AbstractStereoMatcher::getDisparity</a></div><div class="ttdeci">void getDisparity(cv::Mat &amp;dst)</div><div class="ttdoc">Get the disparity map. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00028">abstractstereomatcher.cpp:28</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_ac89bdb7ff8010eb3cffc22ae73dd5436"><div class="ttname"><a href="class_abstract_stereo_matcher.html#ac89bdb7ff8010eb3cffc22ae73dd5436">AbstractStereoMatcher::checkLRConsistencyFull</a></div><div class="ttdeci">void checkLRConsistencyFull(double threshold)</div><div class="ttdoc">Perform a left-right consistency check. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00045">abstractstereomatcher.cpp:45</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 2 2018 11:50:15 for Stereo Vision toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 7 2018 11:29:26 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

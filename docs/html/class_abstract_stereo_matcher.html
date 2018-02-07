@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.8"/>
-<title>Stereo Vision toolkit: AbstractStereoMatcher Class Reference</title>
+<title>Stereo Vision Toolkit: AbstractStereoMatcher Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Stereo Vision toolkit
+   <div id="projectname">Stereo Vision Toolkit
    </div>
   </td>
  </tr>
@@ -92,6 +92,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">AbstractStereoMatcher Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Stereo matcher base class.  
+ <a href="class_abstract_stereo_matcher.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="abstractstereomatcher_8h_source.html">abstractstereomatcher.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for AbstractStereoMatcher:</div>
 <div class="dyncontent">
@@ -105,42 +110,44 @@ Inheritance diagram for AbstractStereoMatcher:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
-<tr class="memitem:a9d1270578e9ea21b31db33a8e9956675"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d1270578e9ea21b31db33a8e9956675"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setImages</b> (cv::Mat *left, cv::Mat *right)</td></tr>
+<tr class="memitem:a9d1270578e9ea21b31db33a8e9956675"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a9d1270578e9ea21b31db33a8e9956675">setImages</a> (cv::Mat *left, cv::Mat *right)</td></tr>
+<tr class="memdesc:a9d1270578e9ea21b31db33a8e9956675"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign images to the matcher.  <a href="#a9d1270578e9ea21b31db33a8e9956675">More...</a><br /></td></tr>
 <tr class="separator:a9d1270578e9ea21b31db33a8e9956675"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaccfe2a4402687f8a51349976b49c94a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaccfe2a4402687f8a51349976b49c94a"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>forwardMatch</b> ()=0</td></tr>
+<tr class="memitem:a49f42fbfee8266b81fbe17e8af07d73b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a49f42fbfee8266b81fbe17e8af07d73b">match</a> ()</td></tr>
+<tr class="memdesc:a49f42fbfee8266b81fbe17e8af07d73b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a forward stereo match.  <a href="#a49f42fbfee8266b81fbe17e8af07d73b">More...</a><br /></td></tr>
+<tr class="separator:a49f42fbfee8266b81fbe17e8af07d73b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaccfe2a4402687f8a51349976b49c94a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#aaccfe2a4402687f8a51349976b49c94a">forwardMatch</a> ()=0</td></tr>
+<tr class="memdesc:aaccfe2a4402687f8a51349976b49c94a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a forward stereo match (relative to left image)  <a href="#aaccfe2a4402687f8a51349976b49c94a">More...</a><br /></td></tr>
 <tr class="separator:aaccfe2a4402687f8a51349976b49c94a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e2bc164538e6dab3d31dcee275031b0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e2bc164538e6dab3d31dcee275031b0"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>backwardMatch</b> ()=0</td></tr>
+<tr class="memitem:a4e2bc164538e6dab3d31dcee275031b0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0">backwardMatch</a> ()=0</td></tr>
+<tr class="memdesc:a4e2bc164538e6dab3d31dcee275031b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a backward stereo match (relative to right image)  <a href="#a4e2bc164538e6dab3d31dcee275031b0">More...</a><br /></td></tr>
 <tr class="separator:a4e2bc164538e6dab3d31dcee275031b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb869f34062416ce17246598e2b77090"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb869f34062416ce17246598e2b77090"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (void)=0</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#afb869f34062416ce17246598e2b77090">init</a> (void)=0</td></tr>
+<tr class="memdesc:afb869f34062416ce17246598e2b77090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the matcher (implementation specific) <br /></td></tr>
 <tr class="separator:afb869f34062416ce17246598e2b77090"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87525ed38b36c37d2eda34c0e2d321d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87525ed38b36c37d2eda34c0e2d321d7"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>getErrorDisparity</b> (void)=0</td></tr>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a87525ed38b36c37d2eda34c0e2d321d7">getErrorDisparity</a> (void)=0</td></tr>
+<tr class="memdesc:a87525ed38b36c37d2eda34c0e2d321d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns what disparity value corresponds to an error or no-match. <br /></td></tr>
 <tr class="separator:a87525ed38b36c37d2eda34c0e2d321d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a124604c16466bac10a308436dd2f07db"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a124604c16466bac10a308436dd2f07db"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>assignThread</b> (QThread *thread)</td></tr>
+<tr class="memitem:a124604c16466bac10a308436dd2f07db"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a124604c16466bac10a308436dd2f07db">assignThread</a> (QThread *thread)</td></tr>
+<tr class="memdesc:a124604c16466bac10a308436dd2f07db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign the stereo matcher to a thread.  <a href="#a124604c16466bac10a308436dd2f07db">More...</a><br /></td></tr>
 <tr class="separator:a124604c16466bac10a308436dd2f07db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b1a5e9841f39988686450b1f1721032"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b1a5e9841f39988686450b1f1721032"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>getDisparity</b> (cv::Mat &amp;dst)</td></tr>
+<tr class="memitem:a2b1a5e9841f39988686450b1f1721032"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a> (cv::Mat &amp;dst)</td></tr>
+<tr class="memdesc:a2b1a5e9841f39988686450b1f1721032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the disparity map.  <a href="#a2b1a5e9841f39988686450b1f1721032">More...</a><br /></td></tr>
 <tr class="separator:a2b1a5e9841f39988686450b1f1721032"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80c14c977bd44695d1142eaef8abdcb3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>saveDisparity</b> (QString filename)</td></tr>
+<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">saveDisparity</a> (QString filename)</td></tr>
+<tr class="memdesc:a80c14c977bd44695d1142eaef8abdcb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the disparity map (16-bit)  <a href="#a80c14c977bd44695d1142eaef8abdcb3">More...</a><br /></td></tr>
 <tr class="separator:a80c14c977bd44695d1142eaef8abdcb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac89bdb7ff8010eb3cffc22ae73dd5436"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>checkLRConsistencyFull</b> (double threshold)</td></tr>
+<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#ac89bdb7ff8010eb3cffc22ae73dd5436">checkLRConsistencyFull</a> (double threshold)</td></tr>
+<tr class="memdesc:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a left-right consistency check.  <a href="#ac89bdb7ff8010eb3cffc22ae73dd5436">More...</a><br /></td></tr>
 <tr class="separator:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23d41c7aa8ee75b83c0f86028854e92c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23d41c7aa8ee75b83c0f86028854e92c"></a>
-cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftImage</b> (void)</td></tr>
+<tr class="memitem:a23d41c7aa8ee75b83c0f86028854e92c"><td class="memItemLeft" align="right" valign="top">cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">getLeftImage</a> (void)</td></tr>
+<tr class="memdesc:a23d41c7aa8ee75b83c0f86028854e92c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the left input image.  <a href="#a23d41c7aa8ee75b83c0f86028854e92c">More...</a><br /></td></tr>
 <tr class="separator:a23d41c7aa8ee75b83c0f86028854e92c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e1d35e2aed668657aa9441c5b563d2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3e1d35e2aed668657aa9441c5b563d2d"></a>
-cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getRighttImage</b> (void)</td></tr>
+<tr class="memitem:a3e1d35e2aed668657aa9441c5b563d2d"><td class="memItemLeft" align="right" valign="top">cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">getRighttImage</a> (void)</td></tr>
+<tr class="memdesc:a3e1d35e2aed668657aa9441c5b563d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the right input image.  <a href="#a3e1d35e2aed668657aa9441c5b563d2d">More...</a><br /></td></tr>
 <tr class="separator:a3e1d35e2aed668657aa9441c5b563d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49f42fbfee8266b81fbe17e8af07d73b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a49f42fbfee8266b81fbe17e8af07d73b"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>match</b> ()</td></tr>
-<tr class="separator:a49f42fbfee8266b81fbe17e8af07d73b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
@@ -150,8 +157,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>finished</b> ()</td><
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a17362bf0ea979b621a6e71178930b4b0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17362bf0ea979b621a6e71178930b4b0"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>AbstractStereoMatcher</b> (QObject *parent=0, cv::Size image_size=cv::Size(0, 0))</td></tr>
+<tr class="memitem:a17362bf0ea979b621a6e71178930b4b0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a17362bf0ea979b621a6e71178930b4b0">AbstractStereoMatcher</a> (QObject *parent=0, cv::Size image_size=cv::Size(0, 0))</td></tr>
+<tr class="memdesc:a17362bf0ea979b621a6e71178930b4b0"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_abstract_stereo_matcher.html" title="Stereo matcher base class. ">AbstractStereoMatcher</a> Constructor.  <a href="#a17362bf0ea979b621a6e71178930b4b0">More...</a><br /></td></tr>
 <tr class="separator:a17362bf0ea979b621a6e71178930b4b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
@@ -191,16 +198,385 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>block_size</b> = 9</td
 <tr class="separator:a120960da2f7cb8f7549f359c6ff7e86d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="abstractstereomatcher_8h_source.html#l00017">17</a> of file <a class="el" href="abstractstereomatcher_8h_source.html">abstractstereomatcher.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+<div class="textblock"><p>Stereo matcher base class. </p>
+<p>An abstract class for stereo matching. It offers a standard interface to an arbitary matcher, e.g. <a class="el" href="class_abstract_stereo_matcher.html#aaccfe2a4402687f8a51349976b49c94a" title="Perform a forward stereo match (relative to left image) ">forwardMatch()</a> and <a class="el" href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0" title="Perform a backward stereo match (relative to right image) ">backwardMatch()</a>, which is then used by an (subclass of) <a class="el" href="class_abstract_stereo_camera.html" title="Stereo camera base class. ">AbstractStereoCamera()</a>. </p>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8h_source.html#l00022">22</a> of file <a class="el" href="abstractstereomatcher_8h_source.html">abstractstereomatcher.h</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a17362bf0ea979b621a6e71178930b4b0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">AbstractStereoMatcher::AbstractStereoMatcher </td>
+          <td>(</td>
+          <td class="paramtype">QObject *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cv::Size&#160;</td>
+          <td class="paramname"><em>image_size</em> = <code>cv::Size(0,0)</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><a class="el" href="class_abstract_stereo_matcher.html" title="Stereo matcher base class. ">AbstractStereoMatcher</a> Constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">parent</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">image_size</td><td>Image size </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00008">8</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a124604c16466bac10a308436dd2f07db"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::assignThread </td>
+          <td>(</td>
+          <td class="paramtype">QThread *&#160;</td>
+          <td class="paramname"><em>thread</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assign the stereo matcher to a thread. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thread</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00015">15</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4e2bc164538e6dab3d31dcee275031b0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void AbstractStereoMatcher::backwardMatch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Perform a backward stereo match (relative to right image) </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0" title="Perform a backward stereo match (relative to right image) ">backwardMatch()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac89bdb7ff8010eb3cffc22ae73dd5436"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::checkLRConsistencyFull </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>threshold</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Perform a left-right consistency check. </p>
+<p>OpenCV does offer this as a parameter, but it's an approximation. Calling this function will initiate a backward match.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">threshold</td><td>Maximum allowed difference in disparity between forward and backward maps </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00045">45</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaccfe2a4402687f8a51349976b49c94a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void AbstractStereoMatcher::forwardMatch </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Perform a forward stereo match (relative to left image) </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0" title="Perform a backward stereo match (relative to right image) ">backwardMatch()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2b1a5e9841f39988686450b1f1721032"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::getDisparity </td>
+          <td>(</td>
+          <td class="paramtype">cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>dst</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the disparity map. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">dst</td><td>Matrix to store the disparity map in </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00028">28</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a23d41c7aa8ee75b83c0f86028854e92c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">cv::Mat* AbstractStereoMatcher::getLeftImage </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the left input image. </p>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to left image </dd></dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8h_source.html#l00103">103</a> of file <a class="el" href="abstractstereomatcher_8h_source.html">abstractstereomatcher.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3e1d35e2aed668657aa9441c5b563d2d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">cv::Mat* AbstractStereoMatcher::getRighttImage </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the right input image. </p>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to right image </dd></dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8h_source.html#l00109">109</a> of file <a class="el" href="abstractstereomatcher_8h_source.html">abstractstereomatcher.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a49f42fbfee8266b81fbe17e8af07d73b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::match </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Perform a forward stereo match. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_matcher.html#aaccfe2a4402687f8a51349976b49c94a" title="Perform a forward stereo match (relative to left image) ">forwardMatch()</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00057">57</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a80c14c977bd44695d1142eaef8abdcb3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::saveDisparity </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Save the disparity map (16-bit) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">filename</td><td>Ouput filename, typically png or tiff </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00033">33</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9d1270578e9ea21b31db33a8e9956675"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::setImages </td>
+          <td>(</td>
+          <td class="paramtype">cv::Mat *&#160;</td>
+          <td class="paramname"><em>left</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">cv::Mat *&#160;</td>
+          <td class="paramname"><em>right</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assign images to the matcher. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">left</td><td>Left image </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Right image </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00023">23</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="abstractstereomatcher_8h_source.html">abstractstereomatcher.h</a></li>
 <li>src/<a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 2 2018 11:50:16 for Stereo Vision toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 7 2018 11:29:27 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

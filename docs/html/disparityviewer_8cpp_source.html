@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.8"/>
-<title>Stereo Vision toolkit: src/disparityviewer.cpp Source File</title>
+<title>Stereo Vision Toolkit: src/disparityviewer.cpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">Stereo Vision toolkit
+   <div id="projectname">Stereo Vision Toolkit
    </div>
   </td>
  </tr>
@@ -221,7 +221,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;}</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keywordtype">void</span> DisparityViewer::updateDisparity() {</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  matcher-&gt;getDisparity(disparity);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  matcher-&gt;<a class="code" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a>(disparity);</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  cv::Mat temp;</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  disparity.convertTo(temp, CV_32F);</div>
@@ -247,13 +247,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    cv::cvtColor(disparity_vis, disparity_vis, CV_BGR2RGB);</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keyword">auto</span> left_ptr = matcher-&gt;getLeftImage();</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keyword">auto</span> left_ptr = matcher-&gt;<a class="code" href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">getLeftImage</a>();</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> x = 0; x &lt; disparity_scale.cols; x++) {</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> y = 0; y &lt; disparity_scale.rows; y++) {</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <span class="keywordflow">if</span> (disparity_scale.at&lt;uchar&gt;(y, x) == 255 ||</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;            disparity_scale.at&lt;uchar&gt;(y, x) == 0 ||</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;            disparity.at&lt;<span class="keywordtype">float</span>&gt;(y, x) == 16 * matcher-&gt;getErrorDisparity()) {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;            disparity.at&lt;<span class="keywordtype">float</span>&gt;(y, x) == 16 * matcher-&gt;<a class="code" href="class_abstract_stereo_matcher.html#a87525ed38b36c37d2eda34c0e2d321d7">getErrorDisparity</a>()) {</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;          disparity_vis.at&lt;cv::Vec3b&gt;(y, x)[0] = 0;</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;          disparity_vis.at&lt;cv::Vec3b&gt;(y, x)[1] = 0;</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;          disparity_vis.at&lt;cv::Vec3b&gt;(y, x)[2] = 0;</div>
@@ -293,11 +293,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;}</div>
 <div class="ttc" id="class_disparity_viewer_html"><div class="ttname"><a href="class_disparity_viewer.html">DisparityViewer</a></div><div class="ttdef"><b>Definition:</b> <a href="disparityviewer_8h_source.html#l00020">disparityviewer.h:20</a></div></div>
 <div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8h_source.html#l00012">calibrateconfirmdialog.h:12</a></div></div>
-<div class="ttc" id="class_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00017">abstractstereomatcher.h:17</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a23d41c7aa8ee75b83c0f86028854e92c"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">AbstractStereoMatcher::getLeftImage</a></div><div class="ttdeci">cv::Mat * getLeftImage(void)</div><div class="ttdoc">Get the left input image. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00103">abstractstereomatcher.h:103</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a87525ed38b36c37d2eda34c0e2d321d7"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a87525ed38b36c37d2eda34c0e2d321d7">AbstractStereoMatcher::getErrorDisparity</a></div><div class="ttdeci">virtual int getErrorDisparity(void)=0</div><div class="ttdoc">Returns what disparity value corresponds to an error or no-match. </div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdoc">Stereo matcher base class. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00022">abstractstereomatcher.h:22</a></div></div>
+<div class="ttc" id="class_abstract_stereo_matcher_html_a2b1a5e9841f39988686450b1f1721032"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">AbstractStereoMatcher::getDisparity</a></div><div class="ttdeci">void getDisparity(cv::Mat &amp;dst)</div><div class="ttdoc">Get the disparity map. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00028">abstractstereomatcher.cpp:28</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 2 2018 11:50:15 for Stereo Vision toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 7 2018 11:29:26 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
