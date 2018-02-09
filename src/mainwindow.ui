@@ -232,7 +232,7 @@
         <item row="0" column="1">
          <widget class="QComboBox" name="matcherSelectBox">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="minimumSize">
            <size>
