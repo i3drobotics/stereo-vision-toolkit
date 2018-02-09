@@ -76,6 +76,8 @@ void CalibrateFromImagesDialog::setLeftImages() {
     QString path = left_file_model->data(childIndex).toString();
     left_image_list.append(left_path + "/" + path);
   }
+
+   checkImageCount();
 }
 
 void CalibrateFromImagesDialog::setRightImages() {
@@ -87,6 +89,8 @@ void CalibrateFromImagesDialog::setRightImages() {
     QString path = right_file_model->data(childIndex).toString();
     right_image_list.append(right_path + "/" + path);
   }
+
+   checkImageCount();
 }
 
 void CalibrateFromImagesDialog::findImages() {
@@ -176,11 +180,6 @@ void CalibrateFromImagesDialog::updateLeftPath(void) {
   QString dir = ui->leftPath->text();
   if (QDir(dir).exists()) {
     left_path = dir;
-    if(right_path == ""){
-        ui->rightPath->setText(left_path);
-        updateRightPath();
-    }
-
   }
 }
 
@@ -188,9 +187,6 @@ void CalibrateFromImagesDialog::updateRightPath(void) {
   QString dir = ui->rightPath->text();
   if (QDir(dir).exists()) {
     right_path = dir;
-    if(left_path == ""){
-        ui->leftPath->setText(right_path);
-    }
   }
 }
 
