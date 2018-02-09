@@ -28,7 +28,7 @@ ArchitecturesInstallIn64BitMode=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "../build/release/*"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "../build/release/*"; Excludes: "*.xml"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "../build/release/vcredist_x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../licenses/*"; DestDir: "{app}/licenses"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "../LICENSE"; DestDir: "{app}/licenses"

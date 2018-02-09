@@ -16,6 +16,8 @@ TEMPLATE = app vcapp
 CONFIG += warn_on
 CONFIG += doc
 
+RC_FILE = icon.rc
+
 RESOURCES += $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc
 
 include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
