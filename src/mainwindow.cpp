@@ -27,10 +27,9 @@ MainWindow::MainWindow(QWidget* parent)
   awesome->initFontAwesome();
 
   parameters = new ParamFile();
-  parameters->load();
 
-  save_directory = parameters->get("saveDir");
-  calibration_directory = parameters->get("calDir");
+  save_directory = parameters->get_string("saveDir");
+  calibration_directory = parameters->get_string("calDir");
 
   controlsInit();
   statusBarInit();
@@ -146,6 +145,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   ui->exposureSpinBox->setEnabled(true);
   ui->autoExposeCheck->setEnabled(true);
   ui->enableHDRCheckbox->setEnabled(true);
+  ui->matcherSelectBox->setEnabled(true);
 
   ui->pauseButton->setEnabled(true);
   ui->singleShotButton->setEnabled(true);
@@ -160,7 +160,7 @@ void MainWindow::stereoCameraInitConnections(void) {
   connect(stereo_cam, SIGNAL(framecount(qint64)), this,
           SLOT(updateFrameCount(qint64)));
   connect(stereo_cam, SIGNAL(temperature_C(double)), this, SLOT(updateTemperature(double)));
-  connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(requestSingle()));
+  connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(saveImageTimestamped()));
   connect(stereo_cam, SIGNAL(savedImage(QString)), this,
           SLOT(displaySaved(QString)));
   connect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
@@ -186,6 +186,7 @@ void MainWindow::stereoCameraRelease(void) {
   ui->exposureSpinBox->setDisabled(true);
   ui->autoExposeCheck->setDisabled(true);
   ui->enableHDRCheckbox->setDisabled(true);
+  ui->matcherSelectBox->setDisabled(true);
 
   ui->pauseButton->setDisabled(true);
   ui->singleShotButton->setDisabled(true);
@@ -199,12 +200,12 @@ void MainWindow::stereoCameraRelease(void) {
     disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
     disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
                SLOT(updateDisparityAsync(void)));
-    disconnect(stereo_cam, SIGNAL(temperature(double)), this, SLOT(updateTemperature(double)));
+    disconnect(stereo_cam, SIGNAL(temperature_C(double)), this, SLOT(updateTemperature(double)));
     disconnect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
     disconnect(stereo_cam, SIGNAL(framecount(qint64)), this,
                SLOT(updateFrameCount(qint64)));
     disconnect(ui->saveButton, SIGNAL(clicked()), stereo_cam,
-               SLOT(requestSingle()));
+               SLOT(saveImageTimestamped()));
     disconnect(stereo_cam, SIGNAL(savedImage(QString)), this,
                SLOT(displaySaved(QString)));
     disconnect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
@@ -215,7 +216,7 @@ void MainWindow::stereoCameraRelease(void) {
     disconnect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(toggleHDR(bool)));
 
     /* Point cloud */
-    disconnect(stereo_cam, SIGNAL(gotPointCloud()), this, SLOT(updateCloud()));
+    disconnect(stereo_cam, SIGNAL(reprojected()), this, SLOT(updateCloud()));
     disconnect(ui->minZSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
                SLOT(setVisualZmin(double)));
     disconnect(ui->maxZSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
@@ -273,6 +274,9 @@ void MainWindow::stereoCameraLoad(void) {
 
 void MainWindow::stereoCameraInit() {
   if (cameras_connected) {
+    save_directory = parameters->get_string("saveDir");
+    calibration_directory = parameters->get_string("calDir");
+
     stereoCameraInitConnections();
     setupMatchers();
     setMatcher(0);
@@ -532,7 +536,7 @@ void MainWindow::setCalibrationFolder(QString dir) {
       // Calibration valid
       stereo_cam->enableRectify(true);
       ui->toggleRectifyCheckBox->setEnabled(true);
-      parameters->update("calDir", dir);
+      parameters->update_string("calDir", dir);
     }
   }
 }
@@ -606,10 +610,11 @@ void MainWindow::setSaveDirectory(QString dir) {
   if (dir != "") {
     ui->saveDirLabel->setText(dir);
 
-    if(stereo_cam)
-        stereo_cam->setSavelocation(dir);
-
     parameters->updatePreviousDirectory(dir);
+    save_directory = parameters->get_string("saveDir");
+    if(stereo_cam)
+        stereo_cam->setSavelocation(save_directory);
+
   }
 }
 
