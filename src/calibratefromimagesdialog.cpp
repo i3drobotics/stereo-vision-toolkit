@@ -10,6 +10,8 @@ CalibrateFromImagesDialog::CalibrateFromImagesDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::CalibrateFromImagesDialog) {
   ui->setupUi(this);
 
+  connect(ui->calibrationPathButton, SIGNAL(clicked(bool)), this,
+          SLOT(selectCalibrationOutputPath()));
   connect(ui->leftPathButton, SIGNAL(clicked(bool)), this,
           SLOT(selectLeftImageRoot()));
   connect(ui->rightPathButton, SIGNAL(clicked(bool)), this,
@@ -19,6 +21,8 @@ CalibrateFromImagesDialog::CalibrateFromImagesDialog(QWidget *parent)
           SLOT(updateLeftPath()));
   connect(ui->rightPath, SIGNAL(editingFinished()), this,
           SLOT(updateRightPath()));
+  connect(ui->outputPath, SIGNAL(editingFinished()), this,
+          SLOT(updateOutputPath()));
   connect(ui->leftMask, SIGNAL(editingFinished()), this,
           SLOT(updateLeftMask()));
   connect(ui->rightMask, SIGNAL(editingFinished()), this,
@@ -31,6 +35,15 @@ CalibrateFromImagesDialog::CalibrateFromImagesDialog(QWidget *parent)
   left_file_model = new QFileSystemModel(this);
   right_file_model = new QFileSystemModel(this);
 
+  settings = new QSettings("I3Dr", "Stereo Vision Toolkit", this);
+
+  ui->leftPath->setText(settings->value("calLeftDir").toString());
+  ui->rightPath->setText(settings->value("calRightDir").toString());
+  ui->outputPath->setText(settings->value("calDir").toString());
+
+  updateLeftPath();
+  updateRightPath();
+  updateOutputPath();
   updateLeftMask();
   updateRightMask();
 
@@ -152,6 +165,19 @@ void CalibrateFromImagesDialog::checkImageCount(void){
     }
 }
 
+void CalibrateFromImagesDialog::selectOutputPath(void){
+    QFileDialog dialog;
+    QString startPath = QStandardPaths::displayName(QStandardPaths::HomeLocation);
+    output_path = dialog.getExistingDirectory(
+        this, tr("Calibration output path"), startPath,
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+    if (output_path != "") {
+      ui->outputPath->setText(QDir::cleanPath(output_path));
+      settings->setValue("calDir", output_path);
+    }
+}
+
 void CalibrateFromImagesDialog::selectLeftImageRoot(void) {
   QFileDialog dialog;
   QString startPath = QStandardPaths::displayName(QStandardPaths::HomeLocation);
@@ -161,6 +187,7 @@ void CalibrateFromImagesDialog::selectLeftImageRoot(void) {
 
   if (left_path != "") {
     ui->leftPath->setText(QDir::cleanPath(left_path));
+    settings->setValue("calLeftDir", left_path);
   }
 }
 
@@ -173,6 +200,7 @@ void CalibrateFromImagesDialog::selectRightImageRoot(void) {
 
   if (right_path != "") {
     ui->rightPath->setText(QDir::cleanPath(right_path));
+    settings->setValue("calRightDir", right_path);
   }
 }
 
@@ -187,6 +215,13 @@ void CalibrateFromImagesDialog::updateRightPath(void) {
   QString dir = ui->rightPath->text();
   if (QDir(dir).exists()) {
     right_path = dir;
+  }
+}
+
+void CalibrateFromImagesDialog::updateOutputPath(void) {
+  QString dir = ui->outputPath->text();
+  if (QDir(dir).exists()) {
+    output_path = dir;
   }
 }
 

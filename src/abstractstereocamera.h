@@ -269,7 +269,7 @@ class AbstractStereoCamera : public QObject {
   * @param[in] fps Framerate
   * @param[in] codec FOURCC video codec to use
   */
-  bool videoStreamInit(cv::VideoWriter* writer, QString filename, cv::Size imsize, double fps = 60.0, int codec = CV_FOURCC('D', 'I', 'B', ' ') );
+  bool videoStreamInit(cv::VideoWriter* writer, QString filename, cv::Size imsize, double fps = 60.0, int codec = CV_FOURCC('H', '2', '6', '4') );
 
   //! Block until a capture has finished
   void finishCapture(void);

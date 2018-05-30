@@ -7,7 +7,7 @@
 
 void MatcherOpenCVSGBM::init(void) {
 
-  QString matcher_parameters = QCoreApplication::applicationDirPath() + "/params/stereo_sgbm_params.xml";
+  QString matcher_parameters = QStandardPaths::AppConfigLocation+"/stereo_bm_params.xml";
   if(QFile(matcher_parameters).exists()){
       try {
         matcher =

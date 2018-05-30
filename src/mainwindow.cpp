@@ -423,6 +423,8 @@ void MainWindow::runCalibrationFromImages(void){
 
     calibrator = new StereoCalibrate(this, NULL);
     cv::Size pattern(cols, rows);
+
+    calibrator->setOutputPath(calibration_images_dialog->getOutputPath());
     calibrator->setPattern(pattern, square_size_mm);
     calibrator->setImages(left_images, right_images);
     calibrator->jointCalibration();

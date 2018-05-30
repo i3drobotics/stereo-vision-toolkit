@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QFileSystemModel>
+#include <QSettings>
 
 #include <stereocalibrate.h>
 
@@ -38,10 +39,12 @@ public:
     int getPatternCols();
     int getPatternRows();
     double getSquareSizeMm();
+    QString getOutputPath(void){return output_path;}
 
 private:
     Ui::CalibrateFromImagesDialog *ui;
 
+    QString output_path = "";
     QString left_path = "";
     QString right_path = "";
     QString left_mask = "";
@@ -53,11 +56,15 @@ private:
     QList<QString> left_image_list;
     QList<QString> right_image_list;
 
+    QSettings *settings;
+
     void checkImageCount(void);
 
 private slots:
     void selectLeftImageRoot(void);
     void selectRightImageRoot(void);
+    void selectOutputPath();
+
     void updateLeftMask(void);
     void updateRightMask(void);
 
@@ -65,6 +72,7 @@ private slots:
 
     void updateLeftPath(void);
     void updateRightPath(void);
+    void updateOutputPath(void);
 
     void setLeftImages(void);
     void setRightImages(void);

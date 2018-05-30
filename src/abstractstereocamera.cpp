@@ -99,7 +99,7 @@ void AbstractStereoCamera::reproject3D() {
 
   point.x = 0;
   point.y = 0;
-  point.z = 0;
+  point.z = 0;  
 
   rgb = ((int)255) << 16 | ((int)255) << 8 | ((int)255);
   point.rgb = *reinterpret_cast<float *>(&rgb);
@@ -174,6 +174,10 @@ void AbstractStereoCamera::savePointCloud(){
 
     fname = QString("%1/%2_point_cloud.ply").arg(save_directory).arg(date_string);
 
+    ptCloud->sensor_orientation_ = Eigen::Quaternionf::Identity();
+    ptCloud->sensor_origin_ = Eigen::Vector4f::Zero();
+
+    //TODO Figure out how to disable outputting camera information in the PLY file
     pcl::io::savePLYFile(fname.toStdString(), *ptCloud);
 }
 
@@ -436,7 +440,7 @@ void AbstractStereoCamera::videoStreamStart(QString fname) {
   if (fname == "") {
     QDateTime dateTime = dateTime.currentDateTime();
     QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-    fname = QString("%1/stereo_video_%2.avi").arg(save_directory, date_string);
+    fname = QString("%1/stereo_video_%2.mp4").arg(save_directory, date_string);
   }
 
   qDebug() << "Saving to: " << fname;
@@ -449,9 +453,10 @@ void AbstractStereoCamera::videoStreamStart(QString fname) {
                           frame_rate);
 
   if (!ready) {
-    QMessageBox msgBox;
-    msgBox.setText("Unable to set up video streams.");
-    msgBox.exec();
+    //QMessageBox msgBox;
+    //msgBox.setText("Unable to set up video streams.");
+    //msgBox.exec();
+    qDebug() << "Failed to set up stream.";
   } else {
     acquiring_video = true;
     acquiring = false;
@@ -463,7 +468,7 @@ void AbstractStereoCamera::videoStreamStart(QString fname) {
       stereo_video->write(output_frame);
     } while (this->acquiring_video);
 
-    stereo_video->release();
+    videoStreamStop();
   }
 
   return;
@@ -472,12 +477,16 @@ void AbstractStereoCamera::videoStreamStart(QString fname) {
 bool AbstractStereoCamera::videoStreamInit(cv::VideoWriter *writer,
                                            QString filename, cv::Size imsize,
                                            double fps, int codec) {
-  writer->open(filename.toStdString(), codec, fps, imsize, false);
+  bool is_color = false;
+  writer->open(filename.toStdString(), codec, fps, imsize, is_color);
   // check if we succeeded
   if (!writer->isOpened()) {
-    QMessageBox msgBox;
-    msgBox.setText("Failed to open output video file.");
-    msgBox.exec();
+    //QMessageBox msgBox;
+    //msgBox.setText("Failed to open output video file.");
+    //msgBox.exec();
+
+    qDebug() << "Failed to open output video file.";
+    videoStreamStop();
     return false;
   }
 

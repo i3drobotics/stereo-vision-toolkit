@@ -1,7 +1,6 @@
 var searchData=
 [
   ['savedimage',['savedImage',['../class_abstract_stereo_camera.html#a6eb388b6b235a928d5792d01db3e0654',1,'AbstractStereoCamera::savedImage()'],['../class_abstract_stereo_camera.html#a1e8a9c0d394e1efe15ab8189ec3e2597',1,'AbstractStereoCamera::savedImage()']]],
-  ['savedisparity',['saveDisparity',['../class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3',1,'AbstractStereoMatcher']]],
   ['saveimagetimestamped',['saveImageTimestamped',['../class_abstract_stereo_camera.html#ac299030bbbc8a7445140ca419c94a558',1,'AbstractStereoCamera']]],
   ['savepointcloud',['savePointCloud',['../class_abstract_stereo_camera.html#a895b0205fd95e9cd59598d95da7e4b8a',1,'AbstractStereoCamera']]],
   ['setimages',['setImages',['../class_abstract_stereo_matcher.html#a9d1270578e9ea21b31db33a8e9956675',1,'AbstractStereoMatcher']]],
