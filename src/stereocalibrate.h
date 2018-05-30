@@ -11,6 +11,7 @@
 #include <calibrateconfirmdialog.h>
 #include <QLabel>
 #include <QtCore>
+#include <QDir>
 #include <QProgressDialog>
 #include <algorithm>
 #include <fstream>
@@ -66,6 +67,8 @@ class StereoCalibrate : public QObject {
   std::vector<bool> left_valid;
   std::vector<bool> right_valid;
 
+  QDir output_folder = QCoreApplication::applicationDirPath() + "/params/";
+
   std::vector<cv::Point3f> pattern_points;
 
   int total_poses = 0;
@@ -104,6 +107,7 @@ class StereoCalibrate : public QObject {
   void setImages(QList<QString> left, QList<QString> right);
   void setPattern(cv::Size size, double squareSize);
   void setImageSize(cv::Size size);
+  void setOutputPath(QString path);
   void overlayArrow(cv::Mat& image, std::vector<cv::Point2f>& points,
                     cv::Point2f offset, CvScalar colour, int thickness = 3);
   bool jointCalibration(void);

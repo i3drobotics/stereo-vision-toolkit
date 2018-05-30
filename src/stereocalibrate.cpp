@@ -16,6 +16,10 @@ StereoCalibrate::StereoCalibrate(QObject* parent,
   }
 }
 
+void StereoCalibrate::setOutputPath(QString path){
+    output_folder = QDir::cleanPath(path);
+}
+
 void StereoCalibrate::setPattern(cv::Size size, double squareSize) {
   pattern_size = size;
 
@@ -177,22 +181,21 @@ bool StereoCalibrate::jointCalibration(void) {
 
       cal_dialog->updateStereo(stereo_q, stereo_rms_error);
 
-
-      cv::FileStorage leftIntrinsicFS("left_calibration.xml",
+      cv::FileStorage leftIntrinsicFS(output_folder.absoluteFilePath("left_calibration.xml").toStdString(),
                                       cv::FileStorage::WRITE);
       leftIntrinsicFS << "cameraMatrix" << left_camera_matrix;
       leftIntrinsicFS << "distCoeffs" << left_distortion;
       leftIntrinsicFS << "rms_error" << left_rms_error;
       leftIntrinsicFS.release();
 
-      cv::FileStorage rightIntrinsicFS("right_calibration.xml",
+      cv::FileStorage rightIntrinsicFS(output_folder.absoluteFilePath("right_calibration.xml").toStdString(),
                                        cv::FileStorage::WRITE);
       rightIntrinsicFS << "cameraMatrix" << right_camera_matrix;
       rightIntrinsicFS << "distCoeffs" << right_distortion;
       rightIntrinsicFS << "rms_error" << right_rms_error;
       rightIntrinsicFS.release();
 
-      cv::FileStorage stereoFS("stereo_calibration.xml", cv::FileStorage::WRITE);
+      cv::FileStorage stereoFS(output_folder.absoluteFilePath("stereo_calibration.xml").toStdString(), cv::FileStorage::WRITE);
       stereoFS << "R" << stereo_r;
       stereoFS << "T" << stereo_t;
       stereoFS << "Q" << stereo_q;
@@ -201,21 +204,19 @@ bool StereoCalibrate::jointCalibration(void) {
       stereoFS << "rms_error" << stereo_rms_error;
       stereoFS.release();
 
-      cv::FileStorage leftRectFs("left_rectification.xml", cv::FileStorage::WRITE);
+      cv::FileStorage leftRectFs(output_folder.absoluteFilePath("left_rectification.xml").toStdString(), cv::FileStorage::WRITE);
       leftRectFs << "x" << left_rectification_x;
       leftRectFs << "y" << left_rectification_y;
       leftRectFs.release();
 
-      cv::FileStorage rightRectFS("right_rectification.xml",
+      cv::FileStorage rightRectFS(output_folder.absoluteFilePath("right_rectification.xml").toStdString(),
                                   cv::FileStorage::WRITE);
       rightRectFS << "x" << right_rectification_x;
       rightRectFS << "y" << right_rectification_y;
       rightRectFS.release();
 
-      alert.setText(QString("Written calibration files to: %1").arg(QDir::currentPath()));
+      alert.setText(QString("Written calibration files to: %1").arg(output_folder.absolutePath()));
       alert.exec();
-
-
 
       finishedCalibration();
 

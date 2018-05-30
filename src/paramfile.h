@@ -18,7 +18,7 @@ public:
 private:
     QSettings *settings;
     QDir default_save_dir = QDir::homePath() + "/deimos/";
-    QDir default_cal_dir = QCoreApplication::applicationDirPath() + "/params/";
+    QDir default_cal_dir = QDir::homePath() + "/deimos/";
 };
 
 #endif // PARAMFILE_H

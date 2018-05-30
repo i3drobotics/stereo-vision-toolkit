@@ -40,8 +40,8 @@
 //
 //M*/
 
-#ifndef __OPENCV_CUDASTEREO_HPP__
-#define __OPENCV_CUDASTEREO_HPP__
+#ifndef OPENCV_CUDASTEREO_HPP
+#define OPENCV_CUDASTEREO_HPP
 
 #ifndef __cplusplus
 #  error cudastereo.hpp header must be compiled as C++
@@ -303,17 +303,12 @@ fractional bits.
 xyzw(x,y) contains 3D coordinates (x,y,z) or (x,y,z,1) of the point (x,y) , computed from the
 disparity map.
 @param Q \f$4 \times 4\f$ perspective transformation matrix that can be obtained via stereoRectify .
-@param handleMissingValues Indicates, whether the function should handle missing values (i.e.
-points where the disparity was not computed). If handleMissingValues=true, then pixels with the
-minimal disparity that corresponds to the outliers (see StereoMatcher::compute ) are transformed
-to 3D points with a very large Z value (currently set to 10000).
 @param dst_cn The number of channels for output image. Can be 3 or 4.
 @param stream Stream for the asynchronous version.
 
 @sa reprojectImageTo3D
  */
 CV_EXPORTS void reprojectImageTo3D(InputArray disp, OutputArray xyzw, InputArray Q, int dst_cn = 4, Stream& stream = Stream::Null());
-CV_EXPORTS void reprojectImageTo3D(InputArray disp, OutputArray xyzw, InputArray Q, bool handleMissingValues = false, int dst_cn = 4, Stream& stream = Stream::Null());
 
 /** @brief Colors a disparity image.
 
@@ -335,4 +330,4 @@ CV_EXPORTS void drawColorDisp(InputArray src_disp, OutputArray dst_disp, int ndi
 
 }} // namespace cv { namespace cuda {
 
-#endif /* __OPENCV_CUDASTEREO_HPP__ */
+#endif /* OPENCV_CUDASTEREO_HPP */

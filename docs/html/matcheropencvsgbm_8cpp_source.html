@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keywordtype">void</span> MatcherOpenCVSGBM::init(<span class="keywordtype">void</span>) {</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  QString matcher_parameters = QCoreApplication::applicationDirPath() + <span class="stringliteral">&quot;/params/stereo_sgbm_params.xml&quot;</span>;</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  QString matcher_parameters = QStandardPaths::AppConfigLocation+<span class="stringliteral">&quot;/stereo_bm_params.xml&quot;</span>;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keywordflow">if</span>(QFile(matcher_parameters).exists()){</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;      <span class="keywordflow">try</span> {</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;        matcher =</div>
@@ -199,7 +199,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 7 2018 11:29:27 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 30 2018 14:20:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

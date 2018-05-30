@@ -39,15 +39,14 @@
 //
 //M*/
 
-#ifndef __OPENCV_DNN_DNN_INL_HPP__
-#define __OPENCV_DNN_DNN_INL_HPP__
+#ifndef OPENCV_DNN_DNN_INL_HPP
+#define OPENCV_DNN_DNN_INL_HPP
 
 #include <opencv2/dnn.hpp>
 
-namespace cv
-{
-namespace dnn
-{
+namespace cv {
+namespace dnn {
+CV__DNN_EXPERIMENTAL_NS_BEGIN
 
 template<typename TypeIter>
 DictValue DictValue::arrayInt(TypeIter begin, int size)
@@ -116,6 +115,11 @@ inline int DictValue::get<int>(int idx) const
     return (int)get<int64>(idx);
 }
 
+inline int DictValue::getIntValue(int idx) const
+{
+    return (int)get<int64>(idx);
+}
+
 template<>
 inline unsigned DictValue::get<unsigned>(int idx) const
 {
@@ -149,6 +153,11 @@ inline double DictValue::get<double>(int idx) const
     }
 }
 
+inline double DictValue::getRealValue(int idx) const
+{
+    return get<double>(idx);
+}
+
 template<>
 inline float DictValue::get<float>(int idx) const
 {
@@ -161,6 +170,12 @@ inline String DictValue::get<String>(int idx) const
     CV_Assert(isString());
     CV_Assert((idx == -1 && ps->size() == 1) || (idx >= 0 && idx < (int)ps->size()));
     return (*ps)[(idx == -1) ? 0 : idx];
+}
+
+
+inline String DictValue::getStringValue(int idx) const
+{
+    return get<String>(idx);
 }
 
 inline void DictValue::release()
@@ -298,6 +313,12 @@ inline DictValue *Dict::ptr(const String &key)
     return (i == dict.end()) ? NULL : &i->second;
 }
 
+inline const DictValue *Dict::ptr(const String &key) const
+{
+    _Dict::const_iterator i = dict.find(key);
+    return (i == dict.end()) ? NULL : &i->second;
+}
+
 inline const DictValue &Dict::get(const String &key) const
 {
     _Dict::const_iterator i = dict.find(key);
@@ -345,6 +366,7 @@ inline std::ostream &operator<<(std::ostream &stream, const Dict &dict)
     return stream;
 }
 
+CV__DNN_EXPERIMENTAL_NS_END
 }
 }
 

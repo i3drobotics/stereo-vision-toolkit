@@ -160,39 +160,42 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>getSpeckleFilterRange<
 <tr class="separator:a1de219c9420b8549fc3b5a67d491128b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_slots_class_abstract_stereo_matcher"><td colspan="2" onclick="javascript:toggleInherit('pub_slots_class_abstract_stereo_matcher')"><img src="closed.png" alt="-"/>&#160;Public Slots inherited from <a class="el" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></td></tr>
 <tr class="memitem:a9d1270578e9ea21b31db33a8e9956675 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a9d1270578e9ea21b31db33a8e9956675">setImages</a> (cv::Mat *left, cv::Mat *right)</td></tr>
-<tr class="memdesc:a9d1270578e9ea21b31db33a8e9956675 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign images to the matcher.  <a href="#a9d1270578e9ea21b31db33a8e9956675">More...</a><br /></td></tr>
+<tr class="memdesc:a9d1270578e9ea21b31db33a8e9956675 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set images for matching.  <a href="#a9d1270578e9ea21b31db33a8e9956675">More...</a><br /></td></tr>
 <tr class="separator:a9d1270578e9ea21b31db33a8e9956675 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49f42fbfee8266b81fbe17e8af07d73b inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a49f42fbfee8266b81fbe17e8af07d73b">match</a> ()</td></tr>
-<tr class="memdesc:a49f42fbfee8266b81fbe17e8af07d73b inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a forward stereo match.  <a href="#a49f42fbfee8266b81fbe17e8af07d73b">More...</a><br /></td></tr>
-<tr class="separator:a49f42fbfee8266b81fbe17e8af07d73b inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaccfe2a4402687f8a51349976b49c94a inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#aaccfe2a4402687f8a51349976b49c94a">forwardMatch</a> ()=0</td></tr>
-<tr class="memdesc:aaccfe2a4402687f8a51349976b49c94a inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a forward stereo match (relative to left image)  <a href="#aaccfe2a4402687f8a51349976b49c94a">More...</a><br /></td></tr>
+<tr class="memitem:aaccfe2a4402687f8a51349976b49c94a inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaccfe2a4402687f8a51349976b49c94a"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#aaccfe2a4402687f8a51349976b49c94a">forwardMatch</a> ()=0</td></tr>
+<tr class="memdesc:aaccfe2a4402687f8a51349976b49c94a inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a match with the left image as the reference. This is normally what you want. <br /></td></tr>
 <tr class="separator:aaccfe2a4402687f8a51349976b49c94a inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e2bc164538e6dab3d31dcee275031b0 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0">backwardMatch</a> ()=0</td></tr>
-<tr class="memdesc:a4e2bc164538e6dab3d31dcee275031b0 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a backward stereo match (relative to right image)  <a href="#a4e2bc164538e6dab3d31dcee275031b0">More...</a><br /></td></tr>
+<tr class="memitem:a4e2bc164538e6dab3d31dcee275031b0 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e2bc164538e6dab3d31dcee275031b0"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0">backwardMatch</a> ()=0</td></tr>
+<tr class="memdesc:a4e2bc164538e6dab3d31dcee275031b0 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a match with the right image as the reference. <br /></td></tr>
 <tr class="separator:a4e2bc164538e6dab3d31dcee275031b0 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87525ed38b36c37d2eda34c0e2d321d7 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87525ed38b36c37d2eda34c0e2d321d7"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a87525ed38b36c37d2eda34c0e2d321d7">getErrorDisparity</a> (void)=0</td></tr>
-<tr class="memdesc:a87525ed38b36c37d2eda34c0e2d321d7 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns what disparity value corresponds to an error or no-match. <br /></td></tr>
+<tr class="memdesc:a87525ed38b36c37d2eda34c0e2d321d7 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns what value is assigned to pixels with invalid disparities (e.g. -10000) <br /></td></tr>
 <tr class="separator:a87525ed38b36c37d2eda34c0e2d321d7 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a124604c16466bac10a308436dd2f07db">assignThread</a> (QThread *thread)</td></tr>
-<tr class="memdesc:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign the stereo matcher to a thread.  <a href="#a124604c16466bac10a308436dd2f07db">More...</a><br /></td></tr>
+<tr class="memdesc:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">! Move matcher to a new thread  <a href="#a124604c16466bac10a308436dd2f07db">More...</a><br /></td></tr>
 <tr class="separator:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a> (cv::Mat &amp;dst)</td></tr>
-<tr class="memdesc:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the disparity map.  <a href="#a2b1a5e9841f39988686450b1f1721032">More...</a><br /></td></tr>
+<tr class="memitem:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b1a5e9841f39988686450b1f1721032"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a> (cv::Mat &amp;dst)</td></tr>
+<tr class="memdesc:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the disparity map into = new image. <br /></td></tr>
 <tr class="separator:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">saveDisparity</a> (QString filename)</td></tr>
-<tr class="memdesc:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the disparity map (16-bit)  <a href="#a80c14c977bd44695d1142eaef8abdcb3">More...</a><br /></td></tr>
+<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80c14c977bd44695d1142eaef8abdcb3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>saveDisparity</b> (QString filename)</td></tr>
 <tr class="separator:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#ac89bdb7ff8010eb3cffc22ae73dd5436">checkLRConsistencyFull</a> (double threshold)</td></tr>
-<tr class="memdesc:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a left-right consistency check.  <a href="#ac89bdb7ff8010eb3cffc22ae73dd5436">More...</a><br /></td></tr>
+<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac89bdb7ff8010eb3cffc22ae73dd5436"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>checkLRConsistencyFull</b> (double threshold)</td></tr>
 <tr class="separator:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23d41c7aa8ee75b83c0f86028854e92c inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">getLeftImage</a> (void)</td></tr>
-<tr class="memdesc:a23d41c7aa8ee75b83c0f86028854e92c inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the left input image.  <a href="#a23d41c7aa8ee75b83c0f86028854e92c">More...</a><br /></td></tr>
+<tr class="memitem:a23d41c7aa8ee75b83c0f86028854e92c inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23d41c7aa8ee75b83c0f86028854e92c"></a>
+cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftImage</b> (void)</td></tr>
 <tr class="separator:a23d41c7aa8ee75b83c0f86028854e92c inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e1d35e2aed668657aa9441c5b563d2d inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">getRighttImage</a> (void)</td></tr>
-<tr class="memdesc:a3e1d35e2aed668657aa9441c5b563d2d inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the right input image.  <a href="#a3e1d35e2aed668657aa9441c5b563d2d">More...</a><br /></td></tr>
+<tr class="memitem:a3e1d35e2aed668657aa9441c5b563d2d inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3e1d35e2aed668657aa9441c5b563d2d"></a>
+cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getRighttImage</b> (void)</td></tr>
 <tr class="separator:a3e1d35e2aed668657aa9441c5b563d2d inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49f42fbfee8266b81fbe17e8af07d73b inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a49f42fbfee8266b81fbe17e8af07d73b"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>match</b> ()</td></tr>
+<tr class="separator:a49f42fbfee8266b81fbe17e8af07d73b inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -200,15 +203,16 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>MatcherOpenCVSGBM</b> (QObject *parent=0, cv::Size image_size=cv::Size(0, 0))</td></tr>
 <tr class="separator:ac6e50ab709cd3a87bde9b47dca8f92f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_abstract_stereo_matcher"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_abstract_stereo_matcher')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></td></tr>
-<tr class="memitem:a17362bf0ea979b621a6e71178930b4b0 inherit pub_methods_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a17362bf0ea979b621a6e71178930b4b0">AbstractStereoMatcher</a> (QObject *parent=0, cv::Size image_size=cv::Size(0, 0))</td></tr>
-<tr class="memdesc:a17362bf0ea979b621a6e71178930b4b0 inherit pub_methods_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_abstract_stereo_matcher.html" title="Stereo matcher base class. ">AbstractStereoMatcher</a> Constructor.  <a href="#a17362bf0ea979b621a6e71178930b4b0">More...</a><br /></td></tr>
+<tr class="memitem:a17362bf0ea979b621a6e71178930b4b0 inherit pub_methods_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17362bf0ea979b621a6e71178930b4b0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>AbstractStereoMatcher</b> (QObject *parent=0, cv::Size image_size=cv::Size(0, 0))</td></tr>
 <tr class="separator:a17362bf0ea979b621a6e71178930b4b0 inherit pub_methods_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header signals_class_abstract_stereo_matcher"><td colspan="2" onclick="javascript:toggleInherit('signals_class_abstract_stereo_matcher')"><img src="closed.png" alt="-"/>&#160;Signals inherited from <a class="el" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></td></tr>
 <tr class="memitem:ab28ce957fa500cd23cf8cfc474294a19 inherit signals_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab28ce957fa500cd23cf8cfc474294a19"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>finished</b> ()</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#ab28ce957fa500cd23cf8cfc474294a19">finished</a> ()</td></tr>
+<tr class="memdesc:ab28ce957fa500cd23cf8cfc474294a19 inherit signals_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emitted when a stereo pair has been matched. <br /></td></tr>
 <tr class="separator:ab28ce957fa500cd23cf8cfc474294a19 inherit signals_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_class_abstract_stereo_matcher"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_class_abstract_stereo_matcher')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></td></tr>
 <tr class="memitem:aec41d8677f57e6db0f1851f4067e17dc inherit pub_attribs_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec41d8677f57e6db0f1851f4067e17dc"></a>
@@ -253,7 +257,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>block_size</b> = 9</td
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 7 2018 11:29:27 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 30 2018 14:20:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

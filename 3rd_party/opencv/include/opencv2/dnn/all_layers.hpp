@@ -39,14 +39,13 @@
 //
 //M*/
 
-#ifndef __OPENCV_DNN_DNN_ALL_LAYERS_HPP__
-#define __OPENCV_DNN_DNN_ALL_LAYERS_HPP__
+#ifndef OPENCV_DNN_DNN_ALL_LAYERS_HPP
+#define OPENCV_DNN_DNN_ALL_LAYERS_HPP
 #include <opencv2/dnn.hpp>
 
-namespace cv
-{
-namespace dnn
-{
+namespace cv {
+namespace dnn {
+CV__DNN_EXPERIMENTAL_NS_BEGIN
 //! @addtogroup dnn
 //! @{
 
@@ -56,7 +55,7 @@ namespace dnn
 
   Classes listed here, in fact, provides C++ API for creating intances of bult-in layers.
   In addition to this way of layers instantiation, there is a more common factory API (see @ref dnnLayerFactory), it allows to create layers dynamically (by name) and register new ones.
-  You can use both API, but factory API is less convinient for native C++ programming and basically designed for use inside importers (see @ref Importer, @ref createCaffeImporter(), @ref createTorchImporter()).
+  You can use both API, but factory API is less convinient for native C++ programming and basically designed for use inside importers (see @ref readNetFromCaffe(), @ref readNetFromTorch(), @ref readNetFromTensorflow()).
 
   Bult-in layers partially reproduce functionality of corresponding Caffe and Torch7 layers.
   In partuclar, the following layers and Caffe @ref Importer were tested to reproduce <a href="http://caffe.berkeleyvision.org/tutorial/layers.html">Caffe</a> functionality:
@@ -72,14 +71,22 @@ namespace dnn
   - Dropout (since it does nothing on forward pass -))
 */
 
+    class CV_EXPORTS BlankLayer : public Layer
+    {
+    public:
+        static Ptr<BlankLayer> create(const LayerParams &params);
+    };
+
     //! LSTM recurrent layer
-    class CV_EXPORTS_W LSTMLayer : public Layer
+    class CV_EXPORTS LSTMLayer : public Layer
     {
     public:
         /** Creates instance of LSTM layer */
-        static CV_WRAP Ptr<LSTMLayer> create();
+        static Ptr<LSTMLayer> create(const LayerParams& params);
 
-        /** Set trained weights for LSTM layer.
+        /** @deprecated Use LayerParams::blobs instead.
+        @brief Set trained weights for LSTM layer.
+
         LSTM behavior on each step is defined by current input, previous output, previous cell state and learned weights.
 
         Let @f$x_t@f$ be current input, @f$h_t@f$ be current output, @f$c_t@f$ be current state.
@@ -109,29 +116,16 @@ namespace dnn
         @param Wx is matrix defining how current input is transformed to internal gates (i.e. according to abovemtioned notation is @f$ W_x @f$)
         @param b  is bias vector (i.e. according to abovemtioned notation is @f$ b @f$)
         */
-        CV_WRAP virtual void setWeights(const Blob &Wh, const Blob &Wx, const Blob &b) = 0;
+        CV_DEPRECATED virtual void setWeights(const Mat &Wh, const Mat &Wx, const Mat &b) = 0;
 
         /** @brief Specifies shape of output blob which will be [[`T`], `N`] + @p outTailShape.
           * @details If this parameter is empty or unset then @p outTailShape = [`Wh`.size(0)] will be used,
           * where `Wh` is parameter from setWeights().
           */
-        CV_WRAP virtual void setOutShape(const BlobShape &outTailShape = BlobShape::empty()) = 0;
+        virtual void setOutShape(const MatShape &outTailShape = MatShape()) = 0;
 
-        /** @brief Set @f$ h_{t-1} @f$ value that will be used in next forward() calls.
-          * @details By-default @f$ h_{t-1} @f$ is inited by zeros and updated after each forward() call.
-          */
-        CV_WRAP virtual void setH(const Blob &H) = 0;
-        /** @brief Returns current @f$ h_{t-1} @f$ value (deep copy). */
-        CV_WRAP virtual Blob getH() const = 0;
-
-        /** @brief Set @f$ c_{t-1} @f$ value that will be used in next forward() calls.
-          * @details By-default @f$ c_{t-1} @f$ is inited by zeros and updated after each forward() call.
-          */
-        CV_WRAP virtual void setC(const Blob &C) = 0;
-        /** @brief Returns current @f$ c_{t-1} @f$ value (deep copy). */
-        CV_WRAP virtual Blob getC() const = 0;
-
-        /** @brief Specifies either interpet first dimension of input blob as timestamp dimenion either as sample.
+        /** @deprecated Use flag `produce_cell_output` in LayerParams.
+          * @brief Specifies either interpet first dimension of input blob as timestamp dimenion either as sample.
           *
           * If flag is set to true then shape of input blob will be interpeted as [`T`, `N`, `[data dims]`] where `T` specifies number of timpestamps, `N` is number of independent streams.
           * In this case each forward() call will iterate through `T` timestamps and update layer's state `T` times.
@@ -139,14 +133,15 @@ namespace dnn
           * If flag is set to false then shape of input blob will be interpeted as [`N`, `[data dims]`].
           * In this case each forward() call will make one iteration and produce one timestamp with shape [`N`, `[out dims]`].
           */
-        CV_WRAP virtual void setUseTimstampsDim(bool use = true) = 0;
+        CV_DEPRECATED virtual void setUseTimstampsDim(bool use = true) = 0;
 
-        /** @brief If this flag is set to true then layer will produce @f$ c_t @f$ as second output.
+        /** @deprecated Use flag `use_timestamp_dim` in LayerParams.
+         * @brief If this flag is set to true then layer will produce @f$ c_t @f$ as second output.
          * @details Shape of the second output is the same as first output.
          */
-        CV_WRAP virtual void setProduceCellOutput(bool produce = false) = 0;
+        CV_DEPRECATED virtual void setProduceCellOutput(bool produce = false) = 0;
 
-        /** In common case it use single input with @f$x_t@f$ values to compute output(s) @f$h_t@f$ (and @f$c_t@f$).
+        /* In common case it use single input with @f$x_t@f$ values to compute output(s) @f$h_t@f$ (and @f$c_t@f$).
          * @param input should contain packed values @f$x_t@f$
          * @param output contains computed outputs: @f$h_t@f$ (and @f$c_t@f$ if setProduceCellOutput() flag was set to true).
          *
@@ -156,19 +151,29 @@ namespace dnn
          * If setUseTimstampsDim() is set to fase then @p input[0] should contain single timestamp, its shape should has form [`N`, `[data dims]`] with at least one dimension.
          * (i.e. @f$ x_{t}^{stream} @f$ is stored inside @p input[0][stream, ...]).
         */
-        void forward(std::vector<Blob*> &input, std::vector<Blob> &output);
 
         int inputNameToIndex(String inputName);
-
         int outputNameToIndex(String outputName);
     };
 
-    //! Classical recurrent layer
-    class CV_EXPORTS_W RNNLayer : public Layer
+    /** @brief Classical recurrent layer
+
+    Accepts two inputs @f$x_t@f$ and @f$h_{t-1}@f$ and compute two outputs @f$o_t@f$ and @f$h_t@f$.
+
+    - input: should contain packed input @f$x_t@f$.
+    - output: should contain output @f$o_t@f$ (and @f$h_t@f$ if setProduceHiddenOutput() is set to true).
+
+    input[0] should have shape [`T`, `N`, `data_dims`] where `T` and `N` is number of timestamps and number of independent samples of @f$x_t@f$ respectively.
+
+    output[0] will have shape [`T`, `N`, @f$N_o@f$], where @f$N_o@f$ is number of rows in @f$ W_{xo} @f$ matrix.
+
+    If setProduceHiddenOutput() is set to true then @p output[1] will contain a Mat with shape [`T`, `N`, @f$N_h@f$], where @f$N_h@f$ is number of rows in @f$ W_{hh} @f$ matrix.
+    */
+    class CV_EXPORTS RNNLayer : public Layer
     {
     public:
         /** Creates instance of RNNLayer */
-        static CV_WRAP Ptr<RNNLayer> create();
+        static Ptr<RNNLayer> create(const LayerParams& params);
 
         /** Setups learned weights.
 
@@ -184,69 +189,55 @@ namespace dnn
         @param Who is @f$ W_{xo} @f$ matrix
         @param bo  is @f$ b_{o}  @f$ vector
         */
-        CV_WRAP virtual void setWeights(const Blob &Wxh, const Blob &bh, const Blob &Whh, const Blob &Who, const Blob &bo) = 0;
+        virtual void setWeights(const Mat &Wxh, const Mat &bh, const Mat &Whh, const Mat &Who, const Mat &bo) = 0;
 
         /** @brief If this flag is set to true then layer will produce @f$ h_t @f$ as second output.
          * @details Shape of the second output is the same as first output.
          */
-        CV_WRAP virtual void setProduceHiddenOutput(bool produce = false) = 0;
+        virtual void setProduceHiddenOutput(bool produce = false) = 0;
 
-        /** Accepts two inputs @f$x_t@f$ and @f$h_{t-1}@f$ and compute two outputs @f$o_t@f$ and @f$h_t@f$.
-
-        @param input should contain packed input @f$x_t@f$.
-        @param output should contain output @f$o_t@f$ (and @f$h_t@f$ if setProduceHiddenOutput() is set to true).
-
-        @p input[0] should have shape [`T`, `N`, `data_dims`] where `T` and `N` is number of timestamps and number of independent samples of @f$x_t@f$ respectively.
-
-        @p output[0] will have shape [`T`, `N`, @f$N_o@f$], where @f$N_o@f$ is number of rows in @f$ W_{xo} @f$ matrix.
-
-        If setProduceHiddenOutput() is set to true then @p output[1] will contain a Blob with shape [`T`, `N`, @f$N_h@f$], where @f$N_h@f$ is number of rows in @f$ W_{hh} @f$ matrix.
-        */
-        void forward(std::vector<Blob*> &input, std::vector<Blob> &output);
     };
 
-    class CV_EXPORTS_W BaseConvolutionLayer : public Layer
+    class CV_EXPORTS BaseConvolutionLayer : public Layer
     {
     public:
-
-        CV_PROP_RW Size kernel, stride, pad, dilation;
+        Size kernel, stride, pad, dilation, adjustPad;
+        String padMode;
+        int numOutput;
     };
 
-    class CV_EXPORTS_W ConvolutionLayer : public BaseConvolutionLayer
+    class CV_EXPORTS ConvolutionLayer : public BaseConvolutionLayer
     {
     public:
-
-        static CV_WRAP Ptr<BaseConvolutionLayer> create(Size kernel = Size(3, 3), Size stride = Size(1, 1), Size pad = Size(0, 0), Size dilation = Size(1, 1));
+        static Ptr<BaseConvolutionLayer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W DeconvolutionLayer : public BaseConvolutionLayer
+    class CV_EXPORTS DeconvolutionLayer : public BaseConvolutionLayer
     {
     public:
-
-        static CV_WRAP Ptr<BaseConvolutionLayer> create(Size kernel = Size(3, 3), Size stride = Size(1, 1), Size pad = Size(0, 0), Size dilation = Size(1, 1));
+        static Ptr<BaseConvolutionLayer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W LRNLayer : public Layer
+    class CV_EXPORTS LRNLayer : public Layer
     {
     public:
-
         enum Type
         {
             CHANNEL_NRM,
             SPATIAL_NRM
         };
-        CV_PROP_RW int type;
+        int type;
 
-        CV_PROP_RW int size;
-        CV_PROP_RW double alpha, beta;
+        int size;
+        float alpha, beta, bias;
+        bool normBySize;
 
-        static CV_WRAP Ptr<LRNLayer> create(int type = LRNLayer::CHANNEL_NRM, int size = 5, double alpha = 1, double beta = 0.75);
+        static Ptr<LRNLayer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W PoolingLayer : public Layer
+    class CV_EXPORTS PoolingLayer : public Layer
     {
     public:
-
         enum Type
         {
             MAX,
@@ -254,129 +245,228 @@ namespace dnn
             STOCHASTIC
         };
 
-        CV_PROP_RW int type;
-        CV_PROP_RW Size kernel, stride, pad;
-        CV_PROP_RW bool globalPooling;
+        int type;
+        Size kernel, stride, pad;
+        bool globalPooling;
+        bool computeMaxIdx;
+        String padMode;
+        bool ceilMode;
 
-        static CV_WRAP Ptr<PoolingLayer> create(int type = PoolingLayer::MAX, Size kernel = Size(2, 2), Size stride = Size(1, 1), Size pad = Size(0, 0));
-        static CV_WRAP Ptr<PoolingLayer> createGlobal(int type = PoolingLayer::MAX);
+        static Ptr<PoolingLayer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W SoftmaxLayer : public Layer
+    class CV_EXPORTS SoftmaxLayer : public Layer
     {
     public:
+        bool logSoftMax;
 
-        static CV_WRAP Ptr<SoftmaxLayer> create(int axis = 1);
+        static Ptr<SoftmaxLayer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W InnerProductLayer : public Layer
+    class CV_EXPORTS InnerProductLayer : public Layer
     {
     public:
-        CV_PROP_RW int axis;
-
-        static CV_WRAP Ptr<InnerProductLayer> create(int axis = 1);
+        int axis;
+        static Ptr<InnerProductLayer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W MVNLayer : public Layer
+    class CV_EXPORTS MVNLayer : public Layer
     {
     public:
-        CV_PROP_RW double eps;
-        CV_PROP_RW bool normVariance, acrossChannels;
+        float eps;
+        bool normVariance, acrossChannels;
 
-        static CV_WRAP Ptr<MVNLayer> create(bool normVariance = true, bool acrossChannels = false, double eps = 1e-9);
+        static Ptr<MVNLayer> create(const LayerParams& params);
     };
 
     /* Reshaping */
 
-    class CV_EXPORTS_W ReshapeLayer : public Layer
+    class CV_EXPORTS ReshapeLayer : public Layer
     {
     public:
-        CV_PROP_RW BlobShape newShapeDesc;
-        CV_PROP_RW Range newShapeRange;
+        MatShape newShapeDesc;
+        Range newShapeRange;
 
-        static CV_WRAP Ptr<ReshapeLayer> create(const BlobShape &newShape, Range applyingRange = Range::all());
+        static Ptr<ReshapeLayer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W ConcatLayer : public Layer
+    class CV_EXPORTS FlattenLayer : public Layer
+    {
+    public:
+        static Ptr<FlattenLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS ConcatLayer : public Layer
     {
     public:
         int axis;
+        /**
+         * @brief Add zero padding in case of concatenation of blobs with different
+         * spatial sizes.
+         *
+         * Details: https://github.com/torch/nn/blob/master/doc/containers.md#depthconcat
+         */
+        bool padding;
 
-        static CV_WRAP Ptr<ConcatLayer> create(int axis = 1);
+        static Ptr<ConcatLayer> create(const LayerParams &params);
     };
 
-    class CV_EXPORTS_W SplitLayer : public Layer
+    class CV_EXPORTS SplitLayer : public Layer
     {
     public:
         int outputsCount; //!< Number of copies that will be produced (is ignored when negative).
 
-        static CV_WRAP Ptr<SplitLayer> create(int outputsCount = -1);
+        static Ptr<SplitLayer> create(const LayerParams &params);
     };
 
-    class CV_EXPORTS_W SliceLayer : public Layer
+    /**
+     * Slice layer has several modes:
+     * 1. Caffe mode
+     * @param[in] axis Axis of split operation
+     * @param[in] slice_point Array of split points
+     *
+     * Number of output blobs equals to number of split points plus one. The
+     * first blob is a slice on input from 0 to @p slice_point[0] - 1 by @p axis,
+     * the second output blob is a slice of input from @p slice_point[0] to
+     * @p slice_point[1] - 1 by @p axis and the last output blob is a slice of
+     * input from @p slice_point[-1] up to the end of @p axis size.
+     *
+     * 2. TensorFlow mode
+     * @param begin Vector of start indices
+     * @param size Vector of sizes
+     *
+     * More convinient numpy-like slice. One and only output blob
+     * is a slice `input[begin[0]:begin[0]+size[0], begin[1]:begin[1]+size[1], ...]`
+     *
+     * 3. Torch mode
+     * @param axis Axis of split operation
+     *
+     * Split input blob on the equal parts by @p axis.
+     */
+    class CV_EXPORTS SliceLayer : public Layer
     {
     public:
-        CV_PROP_RW int axis;
-        CV_PROP std::vector<int> sliceIndices;
+        /**
+         * @brief Vector of slice ranges.
+         *
+         * The first dimension equals number of output blobs.
+         * Inner vector has slice ranges for the first number of input dimensions.
+         */
+        std::vector<std::vector<Range> > sliceRanges;
+        int axis;
 
-        static CV_WRAP Ptr<SliceLayer> create(int axis);
-        static CV_WRAP Ptr<SliceLayer> create(int axis, const std::vector<int> &sliceIndices);
+        static Ptr<SliceLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS PermuteLayer : public Layer
+    {
+    public:
+        static Ptr<PermuteLayer> create(const LayerParams& params);
+    };
+
+    /**
+     * @brief Adds extra values for specific axes.
+     * @param paddings Vector of paddings in format
+     *                 @code
+     *                 [ pad_before, pad_after,  // [0]th dimension
+     *                   pad_before, pad_after,  // [1]st dimension
+     *                   ...
+     *                   pad_before, pad_after ] // [n]th dimension
+     *                 @endcode
+     *                 that represents number of padded values at every dimension
+     *                 starting from the first one. The rest of dimensions won't
+     *                 be padded.
+     * @param value Value to be padded. Defaults to zero.
+     * @param input_dims Torch's parameter. If @p input_dims is not equal to the
+     *                   actual input dimensionality then the `[0]th` dimension
+     *                   is considered as a batch dimension and @p paddings are shifted
+     *                   to a one dimension. Defaults to `-1` that means padding
+     *                   corresponding to @p paddings.
+     */
+    class CV_EXPORTS PaddingLayer : public Layer
+    {
+    public:
+        static Ptr<PaddingLayer> create(const LayerParams& params);
     };
 
     /* Activations */
-
-    class CV_EXPORTS_W ReLULayer : public Layer
+    class CV_EXPORTS ActivationLayer : public Layer
     {
     public:
-        CV_PROP_RW double negativeSlope;
-
-        static CV_WRAP Ptr<ReLULayer> create(double negativeSlope = 0);
+        virtual void forwardSlice(const float* src, float* dst, int len,
+                                  size_t outPlaneSize, int cn0, int cn1) const = 0;
     };
 
-    class CV_EXPORTS_W TanHLayer : public Layer
+    class CV_EXPORTS ReLULayer : public ActivationLayer
     {
     public:
-        static CV_WRAP Ptr<TanHLayer> create();
+        float negativeSlope;
+
+        static Ptr<ReLULayer> create(const LayerParams &params);
     };
 
-    class CV_EXPORTS_W SigmoidLayer : public Layer
+    class CV_EXPORTS ReLU6Layer : public ActivationLayer
     {
     public:
-        static CV_WRAP Ptr<SigmoidLayer> create();
+        static Ptr<ReLU6Layer> create(const LayerParams &params);
     };
 
-    class CV_EXPORTS_W BNLLLayer : public Layer
+    class CV_EXPORTS ChannelsPReLULayer : public ActivationLayer
     {
     public:
-        static CV_WRAP Ptr<BNLLLayer> create();
+        static Ptr<Layer> create(const LayerParams& params);
     };
 
-    class CV_EXPORTS_W AbsLayer : public Layer
+    class CV_EXPORTS ELULayer : public ActivationLayer
     {
     public:
-        static CV_WRAP Ptr<AbsLayer> create();
+        static Ptr<ELULayer> create(const LayerParams &params);
     };
 
-    class CV_EXPORTS_W PowerLayer : public Layer
+    class CV_EXPORTS TanHLayer : public ActivationLayer
     {
     public:
-        CV_PROP_RW double power, scale, shift;
-
-        static CV_WRAP Ptr<PowerLayer> create(double power = 1, double scale = 1, double shift = 0);
+        static Ptr<TanHLayer> create(const LayerParams &params);
     };
 
-    /* Layers using in semantic segmentation */
-
-    class CV_EXPORTS_W CropLayer : public Layer
+    class CV_EXPORTS SigmoidLayer : public ActivationLayer
     {
     public:
-        CV_PROP int startAxis;
-        CV_PROP std::vector<int> offset;
-
-        static Ptr<CropLayer> create(int start_axis, const std::vector<int> &offset);
+        static Ptr<SigmoidLayer> create(const LayerParams &params);
     };
 
-    class CV_EXPORTS_W EltwiseLayer : public Layer
+    class CV_EXPORTS BNLLLayer : public ActivationLayer
+    {
+    public:
+        static Ptr<BNLLLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS AbsLayer : public ActivationLayer
+    {
+    public:
+        static Ptr<AbsLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS PowerLayer : public ActivationLayer
+    {
+    public:
+        float power, scale, shift;
+
+        static Ptr<PowerLayer> create(const LayerParams &params);
+    };
+
+    /* Layers used in semantic segmentation */
+
+    class CV_EXPORTS CropLayer : public Layer
+    {
+    public:
+        int startAxis;
+        std::vector<int> offset;
+
+        static Ptr<CropLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS EltwiseLayer : public Layer
     {
     public:
         enum EltwiseOp
@@ -386,12 +476,115 @@ namespace dnn
             MAX = 2,
         };
 
-        static Ptr<EltwiseLayer> create(EltwiseOp op, const std::vector<int> &coeffs);
+        static Ptr<EltwiseLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS BatchNormLayer : public Layer
+    {
+    public:
+        bool hasWeights, hasBias;
+        float epsilon;
+
+        virtual void getScaleShift(Mat& scale, Mat& shift) const = 0;
+        static Ptr<BatchNormLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS MaxUnpoolLayer : public Layer
+    {
+    public:
+        Size poolKernel;
+        Size poolPad;
+        Size poolStride;
+
+        static Ptr<MaxUnpoolLayer> create(const LayerParams &params);
+    };
+
+    class CV_EXPORTS ScaleLayer : public Layer
+    {
+    public:
+        bool hasBias;
+
+        static Ptr<ScaleLayer> create(const LayerParams& params);
+    };
+
+    class CV_EXPORTS ShiftLayer : public Layer
+    {
+    public:
+        static Ptr<ShiftLayer> create(const LayerParams& params);
+    };
+
+    class CV_EXPORTS PriorBoxLayer : public Layer
+    {
+    public:
+        static Ptr<PriorBoxLayer> create(const LayerParams& params);
+    };
+
+    class CV_EXPORTS ReorgLayer : public Layer
+    {
+    public:
+        static Ptr<ReorgLayer> create(const LayerParams& params);
+    };
+
+    class CV_EXPORTS RegionLayer : public Layer
+    {
+    public:
+        static Ptr<RegionLayer> create(const LayerParams& params);
+    };
+
+    class CV_EXPORTS DetectionOutputLayer : public Layer
+    {
+    public:
+        static Ptr<DetectionOutputLayer> create(const LayerParams& params);
+    };
+
+    /**
+     * @brief \f$ L_p \f$ - normalization layer.
+     * @param p Normalization factor. The most common `p = 1` for \f$ L_1 \f$ -
+     *          normalization or `p = 2` for \f$ L_2 \f$ - normalization or a custom one.
+     * @param eps Parameter \f$ \epsilon \f$ to prevent a division by zero.
+     * @param across_spatial If true, normalize an input across all non-batch dimensions.
+     *                       Otherwise normalize an every channel separately.
+     *
+     * Across spatial:
+     * @f[
+     * norm = \sqrt[p]{\epsilon + \sum_{x, y, c} |src(x, y, c)|^p } \\
+     * dst(x, y, c) = \frac{ src(x, y, c) }{norm}
+     * @f]
+     *
+     * Channel wise normalization:
+     * @f[
+     * norm(c) = \sqrt[p]{\epsilon + \sum_{x, y} |src(x, y, c)|^p } \\
+     * dst(x, y, c) = \frac{ src(x, y, c) }{norm(c)}
+     * @f]
+     *
+     * Where `x, y` - spatial cooridnates, `c` - channel.
+     *
+     * An every sample in the batch is normalized separately. Optionally,
+     * output is scaled by the trained parameters.
+     */
+    class NormalizeBBoxLayer : public Layer
+    {
+    public:
+        float pnorm, epsilon;
+        bool acrossSpatial;
+
+        static Ptr<NormalizeBBoxLayer> create(const LayerParams& params);
+    };
+
+    /**
+     * @brief Resize input 4-dimensional blob by nearest neghbor strategy.
+     *
+     * Layer is used to support TensorFlow's resize_nearest_neighbor op.
+     */
+    class CV_EXPORTS ResizeNearestNeighborLayer : public Layer
+    {
+    public:
+        static Ptr<ResizeNearestNeighborLayer> create(const LayerParams& params);
     };
 
 //! @}
 //! @}
-
+CV__DNN_EXPERIMENTAL_NS_END
 }
 }
 #endif

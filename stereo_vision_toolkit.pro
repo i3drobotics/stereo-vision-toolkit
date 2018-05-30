@@ -97,7 +97,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/debug" -lhidapi
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
-    LIBS += -lopencv_ximgproc310d -lopencv_core310d -lopencv_highgui310d -lopencv_calib3d310d -lopencv_videoio310d -lopencv_imgproc310d -lopencv_imgcodecs310d -lopencv_cudastereo310d -lopencv_cudawarping310d
+    LIBS += -lopencv_ximgproc341d -lopencv_core341d -lopencv_highgui341d -lopencv_calib3d341d -lopencv_videoio341d -lopencv_imgproc341d -lopencv_imgcodecs341d -lopencv_cudastereo341d -lopencv_cudawarping341d
 }else {
     message("Release mode")
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
@@ -105,7 +105,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/release" -lhidapi
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
-    LIBS += -lopencv_ximgproc310 -lopencv_core310 -lopencv_highgui310 -lopencv_calib3d310 -lopencv_videoio310 -lopencv_imgproc310 -lopencv_imgcodecs310 -lopencv_cudastereo310 -lopencv_cudawarping310
+    LIBS += -lopencv_ximgproc341 -lopencv_core341 -lopencv_highgui341 -lopencv_calib3d341 -lopencv_videoio341 -lopencv_imgproc341 -lopencv_imgcodecs341 -lopencv_cudastereo341 -lopencv_cudawarping341
 }
 
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
