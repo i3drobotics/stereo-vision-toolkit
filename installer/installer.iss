@@ -9,7 +9,7 @@
 [Setup]
 AppId={{4A16961A-FA66-4C80-A04E-D5370D76763B}}
 AppName=Stereo Vision Toolkit
-AppVersion=1.0.0
+AppVersion=1.1.0
 AppPublisher=i3D Robotics Ltd.
 AppPublisherURL=http://www.i3drobotics.com/
 AppSupportURL=https://github.com/i3drobotics/stereo-vision-toolkit
@@ -38,5 +38,5 @@ Filename: {tmp}\vcredist_x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q 
 
 [Icons]
 Name: "{group}\{cm:UninstallProgram,Stereo Vision Toolkit}"; Filename: "{uninstallexe}"
-Name: "{group}\i3DR Stereo Vision Toolkit"; Filename: "{app}\stereo-vision-toolkit.exe"; IconFilename: "{app}\i3dr_logo.ico"
+Name: "{group}\i3DR Stereo Vision Toolkit"; Filename: "{app}\stereo_vision_toolkit.exe"; IconFilename: "{app}\i3dr_logo.ico"
 Name: "{commondesktop}\i3DR Stereo Vision Toolkit"; Filename: "{app}\stereo_vision_toolkit.exe"; IconFilename: "{app}\i3dr_logo.ico"
