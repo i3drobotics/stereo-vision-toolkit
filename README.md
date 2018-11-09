@@ -1,18 +1,18 @@
 About
 ---
 
-I3DR's stereo vision toolkit is a demonstration application provided for use with the Deimos stereo camera.
+I3DR's stereo vision toolkit is a demonstration application provided for use with the Deimos and Phobos stereo camera units.
 
 We expect that most people will write their own software to control the camera, but we've also provided this useful toolkit to get you going quickly. You can calibrate the camera, acquire images and perform matching and 3D reconstruction. You can save raw stereo video to capture a scene and then replay it in the software to fine tune matching parameters.
 
 ![SVK image acquisition tab](./docs/images/svk_screenshot.png "SVK Screenshot showing acquisition tab.")
 
-SVK is under active development. At the moment the software only officially supports the i3DR Deimos camera, but in principle any pre-rectified stereo video of the correct format (side-by-side) will work for evaluation.
+SVK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any pre-rectified stereo video of the correct format (side-by-side) will work for evaluation.
 
 Roadmap
 ---
 
-Currently SVK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your Deimos camera quickly. There are a number of features/improvements in development including:
+Currently SVK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your Deimos or Phobos camera quickly. There are a number of features/improvements in development including:
 
 - More options for video handling
 - Support for other stereo matchers
@@ -34,7 +34,7 @@ Installation
 
 The software is currently Windows-only, but we are likely to add support for Linux in the future. Currently the only component that is reliant on Windows is camera discovery, which uses DirectShow.
 
-This repository contains everything you need to build the software using MSVC 2015 (including pre-built dependencies.) You will also need an up to date installation of Qt 5 and the NVIDIA Cuda SDK. Building with MinGW should be possible, but you will need to build the dependencies yourself. You may also need the Windows SDK.
+This repository contains everything you need to build the software using MSVC 2017 (including pre-built dependencies.) You will also need an up to date installation of Qt 5 and the NVIDIA Cuda SDK. Building with MinGW should be possible, but you will need to build the dependencies yourself. You may also need the Windows SDK.
 
 Of course you can also link to your own pre-compiled versions of the dependencies, in this case you'll need to edit the `.pro` file with the appropriate `LIB` and `INCLUDEPATH`'s.
 
