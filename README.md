@@ -1,21 +1,20 @@
 About
 ---
 
-I3DR's stereo vision toolkit is a demonstration application provided for use with the Deimos stereo camera.
+I3DR's stereo vision toolkit is an application provided for testing of stereo cameras and gathering of 3D data.
 
-We expect that most people will write their own software to control the camera, but we've also provided this useful toolkit to get you going quickly. You can calibrate the camera, acquire images and perform matching and 3D reconstruction. You can save raw stereo video to capture a scene and then replay it in the software to fine tune matching parameters.
+You can calibrate stereo cameras, acquire images and perform matching and 3D reconstruction. You can save raw stereo video to capture a scene and then replay it in the software to fine tune matching parameters.
 
 ![SVK image acquisition tab](./docs/images/svk_screenshot.png "SVK Screenshot showing acquisition tab.")
 
-SVK is under active development. At the moment the software only officially supports the i3DR Deimos camera, but in principle any pre-rectified stereo video of the correct format (side-by-side) will work for evaluation.
+SVTK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any pre-rectified stereo video of the correct format (side-by-side) will work.
 
 Roadmap
 ---
 
-Currently SVK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your Deimos camera quickly. There are a number of features/improvements in development including:
+Currently SVK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your I3DR stereo camera quickly. There are a number of features/improvements in development including:
 
 - More options for video handling
-- Support for other stereo matchers
 - Assisted camera calibration and more detailed feedback
 - Support for sequential capture (e.g. file naming options)
 - Unit tests and other deployment issues
@@ -25,8 +24,9 @@ Stereo matching support
 ---
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
-![SVK matching an outdoor scene using SGM](./docs/images/svk_screenshot_match.png "SVK used to process an outdoor scene from a stereo video.")
-
+![SVTK matching an outdoor scene using SGM](./docs/images/svk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
+I3DR's own 3D matching algorithm can be built into this application however the files required are not included in this repository. This because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in a seperate private git repository. However, the 'pro' version of the software with these tool included will be included in 'Releases' but a license will be required from I3DR for this to run. 
+Please contact bknight@i3drobotics.com for more information. 
 
 Installation
 ---
@@ -37,7 +37,7 @@ This repository contains everything you need to build the software using MSVC 20
 
 Of course you can also link to your own pre-compiled versions of the dependencies, in this case you'll need to edit the `.pro` file with the appropriate `LIB` and `INCLUDEPATH`'s.
 
-Installation should be as simple as importing the `.pro` file into Qt Creator and building. You will need to copy the required DLLs (in the 3rd party folders) to your output folder, unless you happen to have things in your PATH already. If the program immediately crashes in Qt Creator, suspect a missing DLL (try running directly from the build folder.)
+Installation should be as simple as importing the `.pro` file into Qt Creator and building. The required dlls should copy automatically to the build folder. If the program immediately crashes in Qt Creator, suspect a missing DLL (try running directly from the build folder.)
 
 Usage
 ---
