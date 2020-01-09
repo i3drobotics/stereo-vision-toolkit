@@ -6,12 +6,23 @@
 #include "abstractstereocamera.h"
 
 AbstractStereoCamera::AbstractStereoCamera(QObject *parent) : QObject(parent) {
+
+#ifdef CUDA
   if (cv::cuda::getCudaEnabledDeviceCount() > 0) {
     has_cuda = true;
     emit haveCuda();
   }
+#endif
 
   ptCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>);
+
+  connect(this, SIGNAL(stereopair_captured()), this, SLOT(process_stereo()));
+  connect(this, SIGNAL(left_captured()), this, SLOT(register_left_capture()));
+  connect(this, SIGNAL(right_captured()), this, SLOT(register_right_capture()));
+}
+
+void AbstractStereoCamera::try_capture(){
+    capture();
 }
 
 void AbstractStereoCamera::assignThread(QThread *thread) {
@@ -84,6 +95,12 @@ void AbstractStereoCamera::reproject3D() {
   // By default the disparity maps are scaled by a factor of 16.0
   disparity_downscale /= 16.0;
 
+  int row = (disparity_downscale.rows-1)/2;
+  int column = (disparity_downscale.cols-1)/2;
+  float disp_val_f =  disparity_downscale.at<float>(row, column);
+  qDebug() << "IMAGE CENTER: " << column+1 << "," << row+1;
+  qDebug() << "DISPARITY AT CENTER: " << disp_val_f;
+
   if (Q.empty() || disparity_downscale.empty()) {
     return;
   }
@@ -118,12 +135,20 @@ void AbstractStereoCamera::reproject3D() {
       if (disp_ptr[j] == 0) continue;
       if (rgb_ptr[j] == 0) continue;
 
-      point.x = reconst_ptr[3 * j];
+      if (j == column){
+          if (i == row){
+              float reproj_val_2 =  reconst_ptr[3 * j + 2];
+              qDebug() << "REPROJECT3D AT CENTER 2: " << reproj_val_2;
+          }
+      }
+
+      point.x = -reconst_ptr[3 * j];
       point.y = -reconst_ptr[3 * j + 1];
-      point.z = -reconst_ptr[3 * j + 2];
+      point.z = reconst_ptr[3 * j + 2];
 
       if(abs(point.x) > 10) continue;
       if(abs(point.y) > 10) continue;
+      if(point.z == 10000) continue;
       if(point.z == -10000) continue;
       col = rgb_ptr[j];
 
@@ -140,7 +165,7 @@ void AbstractStereoCamera::reproject3D() {
   pcl::PassThrough<pcl::PointXYZRGB> pass;
   pass.setInputCloud (ptCloudTemp);
   pass.setFilterFieldName ("z");
-  pass.setFilterLimits(-visualisation_max_z, -visualisation_min_z);
+  pass.setFilterLimits(visualisation_min_z, visualisation_max_z);
   pass.filter(*ptCloudTemp);
 
   /*
@@ -166,19 +191,44 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr AbstractStereoCamera::getPointCloud(){
     return ptCloud;
 }
 
+void AbstractStereoCamera::toggleDateInFilename(int state){
+    if (state == Qt::Checked){
+        includeDateInFilename = true;
+    } else if (state == Qt::Unchecked){
+        includeDateInFilename = false;
+    }
+}
+
 void AbstractStereoCamera::savePointCloud(){
 
     QString fname;
-    QDateTime dateTime = dateTime.currentDateTime();
-    QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
 
-    fname = QString("%1/%2_point_cloud.ply").arg(save_directory).arg(date_string);
+    if (includeDateInFilename){
+        //Point cloud file name includes date to avoid overwritting and differentiate
+        QDateTime dateTime = dateTime.currentDateTime();
+        QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
+        fname = QString("%1/%2_point_cloud.ply").arg(save_directory).arg(date_string);
+    } else {
+        //Point cloud file name fixed to allow overwritting
+        fname = QString("%1/point_cloud.ply").arg(save_directory);
+    }
 
+    qDebug() << "Point cloud saving to... " << fname;
     ptCloud->sensor_orientation_ = Eigen::Quaternionf::Identity();
     ptCloud->sensor_origin_ = Eigen::Vector4f::Zero();
 
     //TODO Figure out how to disable outputting camera information in the PLY file
-    pcl::io::savePLYFile(fname.toStdString(), *ptCloud);
+    int exit_code = pcl::io::savePLYFile(fname.toStdString(), *ptCloud);
+
+    QString msgBoxMessage;
+    if (exit_code == 0){ //Point cloud saved successfully
+        msgBoxMessage = QString("Point cloud saved to...\n%1").arg(fname);
+    } else if (exit_code == -1){ //Empty point cloud
+        msgBoxMessage = QString("Unable to save as point cloud is empty. Check calibration has been completed and 3D visual shows data before saving.");
+    } else { //Unknown error code
+        msgBoxMessage = QString("Failed to save point cloud. Unknown error occured.");
+    }
+    pointCloudSaveStatus(msgBoxMessage);
 }
 
 void AbstractStereoCamera::enableReproject(bool reproject) {
@@ -195,6 +245,10 @@ void AbstractStereoCamera::enableRectify(bool rectify) {
   rectifying = rectify && rectification_valid;
 }
 
+void AbstractStereoCamera::enableSwapLeftRight(bool swap){
+    swappingLeftRight = swap;
+}
+
 bool AbstractStereoCamera::isCapturing() { return capturing; }
 
 bool AbstractStereoCamera::isAcquiring() { return acquiring; }
@@ -203,17 +257,37 @@ bool AbstractStereoCamera::isMatching() { return matching; }
 
 bool AbstractStereoCamera::isRectifying() { return rectifying; }
 
+bool AbstractStereoCamera::isSwappingLeftRight() { return swappingLeftRight; }
+
+bool AbstractStereoCamera::isConnected() { return connected; }
+
 void AbstractStereoCamera::getLeftImage(cv::Mat &dst) {
-  left_output.copyTo(dst);
+    if (connected){
+        left_output.copyTo(dst);
+    }
 }
 
 void AbstractStereoCamera::getRightImage(cv::Mat &dst) {
-  right_output.copyTo(dst);
+    if (connected){
+        right_output.copyTo(dst);
+    }
 }
 
-cv::Mat AbstractStereoCamera::getLeftImage(void) { return left_raw.clone(); }
+cv::Mat AbstractStereoCamera::getLeftImage(void) {
+    if (connected){
+        return left_raw.clone();
+    } else {
+        return cv::Mat();
+    }
+}
 
-cv::Mat AbstractStereoCamera::getRightImage(void) { return right_raw.clone(); }
+cv::Mat AbstractStereoCamera::getRightImage(void) {
+    if (connected){
+        return right_raw.clone();
+    } else {
+        return cv::Mat();
+    }
+}
 
 bool AbstractStereoCamera::loadRectificationMaps(QString src_l, QString src_r) {
   int flags = cv::FileStorage::READ;
@@ -319,6 +393,7 @@ bool AbstractStereoCamera::loadCalibration(QString left_cal, QString right_cal,
 }
 
 void AbstractStereoCamera::rectifyImages(void) {
+  #ifdef CUDA
   if (has_cuda) {
     cv::cuda::GpuMat d_left, d_right, d_left_remap, d_right_remap;
 
@@ -341,6 +416,7 @@ void AbstractStereoCamera::rectifyImages(void) {
     d_right_remap.download(right_remapped);
 
   } else {
+  #endif
     QFuture<void> res_l =
         QtConcurrent::run(this, &AbstractStereoCamera::remap_parallel, left_raw,
                           std::ref(left_remapped), rectmapx_l, rectmapy_l);
@@ -350,7 +426,9 @@ void AbstractStereoCamera::rectifyImages(void) {
 
     res_l.waitForFinished();
     res_r.waitForFinished();
+  #ifdef CUDA
   }
+  #endif
 }
 
 void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
@@ -358,41 +436,29 @@ void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
   cv::remap(src, dst, rmapx, rmapy, cv::INTER_CUBIC);
 }
 
-void AbstractStereoCamera::singleShot(void) {
-  acquiring = false;
-
-  finishCapture();
-
-  captureAndProcess();
-}
-
-void AbstractStereoCamera::finishCapture(void) {
-  while (capturing) {
-    QCoreApplication::processEvents();
-  }
-}
 
 void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 
-  enableCapture(false);
+  enableAcquire(false);
   this->matcher = matcher;
   this->matcher->setImages(&left_remapped, &right_remapped);
-  enableCapture(true);
+  enableAcquire(true);
 
   qDebug() << "Changed matcher";
 }
 
-void AbstractStereoCamera::pause(void) { acquiring = false; }
+void AbstractStereoCamera::process_stereo(void) {
 
-void AbstractStereoCamera::captureAndProcess(void) {
-  QElapsedTimer frametimer;
-  frametimer.restart();
-
-  capturing = true;
-
-  if (capture()) {
-    frames++;
+  frames++;
     emit framecount(frames);
+
+    if (isSwappingLeftRight()){
+        cv::Mat right_tmp;
+        right_raw.copyTo(right_tmp);
+
+        left_raw.copyTo(right_raw);
+        right_tmp.copyTo(left_raw);
+    }
 
     if (rectifying) {
       rectifyImages();
@@ -412,24 +478,72 @@ void AbstractStereoCamera::captureAndProcess(void) {
       emit matched();
     }
 
-    emit acquired();
+    if (connected){
+        emit stereopair_processed();
+    }
     emit fps(frametimer.elapsed());
     frametimer.restart();
-  }
 
-  capturing = false;
+}
+
+void AbstractStereoCamera::register_left_capture(void){
+    captured_left = true;
+    register_stereo_capture();
+}
+
+void AbstractStereoCamera::register_right_capture(void){
+    captured_right = true;
+    register_stereo_capture();
+}
+
+void AbstractStereoCamera::register_stereo_capture(){
+    if(captured_left && captured_right){
+        emit stereopair_captured();
+
+        captured_stereo = true;
+
+        captured_left = false;
+        captured_right = false;
+    }
+
+}
+
+void AbstractStereoCamera::pause(void) {
+    acquiring = false;
+    finishCapture();
+
+}
+
+void AbstractStereoCamera::singleShot(void) {
+    pause();
+    capture_and_process();
+}
+
+void AbstractStereoCamera::finishCapture(void) {
+  while (capturing) {
+    QCoreApplication::processEvents();
+  }
 }
 
 void AbstractStereoCamera::freerun(void) {
   acquiring = true;
 
-  do {
-    captureAndProcess();
-    QCoreApplication::processEvents();
+  while(acquiring && connected){
+      QCoreApplication::processEvents();
+      capture_and_process();
+  }
+}
 
-  } while (acquiring && connected);
+void AbstractStereoCamera::capture_and_process(void){
+    captured_stereo = false;
 
-  return;
+    // Capture, process_stereo is called via signal/slot
+    capture();
+
+    while(!captured_stereo){
+      /* Check for events, e.g. pause/quit */
+      QCoreApplication::processEvents();
+    }
 }
 
 void AbstractStereoCamera::videoStreamStart(QString fname) {
@@ -462,7 +576,7 @@ void AbstractStereoCamera::videoStreamStart(QString fname) {
     acquiring = false;
 
     do {
-      captureAndProcess();
+      process_stereo();
       QCoreApplication::processEvents();
       cv::hconcat(left_output, right_output, output_frame);
       stereo_video->write(output_frame);

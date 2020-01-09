@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -99,39 +100,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;calibrateconfirmdialog.h&quot;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;chessboard.h&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespace_ui.html">Ui</a> {</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">class </span><a class="code" href="class_calibration_dialog.html">CalibrationDialog</a>;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;}</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="class_calibration_dialog.html">   18</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_calibration_dialog.html">CalibrationDialog</a> : <span class="keyword">public</span> QDialog</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    Q_OBJECT</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_calibration_dialog.html">CalibrationDialog</a>(QWidget *parent = 0, <a class="code" href="class_stereo_calibrate.html">StereoCalibrate</a>* calibrator = 0);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    ~<a class="code" href="class_calibration_dialog.html">CalibrationDialog</a>();</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    Ui::CalibrationDialog *ui;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="class_stereo_calibrate.html">StereoCalibrate</a> *calibrator;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">public</span> slots:</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">void</span> setImageProgress(<span class="keywordtype">int</span> current, <span class="keywordtype">int</span> total);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordtype">void</span> updateLabels(<a class="code" href="class_chessboard.html">Chessboard</a>* board);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;signals:</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">void</span> stopCalibration();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif // CALIBRATIONDIALOG_H</span></div>
-<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8h_source.html#l00012">calibrateconfirmdialog.h:12</a></div></div>
-<div class="ttc" id="class_calibration_dialog_html"><div class="ttname"><a href="class_calibration_dialog.html">CalibrationDialog</a></div><div class="ttdef"><b>Definition:</b> <a href="calibrationdialog_8h_source.html#l00018">calibrationdialog.h:18</a></div></div>
-<div class="ttc" id="class_stereo_calibrate_html"><div class="ttname"><a href="class_stereo_calibrate.html">StereoCalibrate</a></div><div class="ttdef"><b>Definition:</b> <a href="stereocalibrate_8h_source.html#l00024">stereocalibrate.h:24</a></div></div>
-<div class="ttc" id="class_chessboard_html"><div class="ttname"><a href="class_chessboard.html">Chessboard</a></div><div class="ttdef"><b>Definition:</b> <a href="chessboard_8h_source.html#l00013">chessboard.h:13</a></div></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespace_ui.html">Ui</a> {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">class </span><a class="code" href="class_calibration_dialog.html">CalibrationDialog</a>;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;}</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="class_calibration_dialog.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_calibration_dialog.html">CalibrationDialog</a> : <span class="keyword">public</span> QDialog</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;{</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    Q_OBJECT</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_calibration_dialog.html">CalibrationDialog</a>(QWidget *parent = 0, <a class="code" href="class_stereo_calibrate.html">StereoCalibrate</a>* calibrator = 0);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    ~<a class="code" href="class_calibration_dialog.html">CalibrationDialog</a>();</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    Ui::CalibrationDialog *ui;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="class_stereo_calibrate.html">StereoCalibrate</a> *calibrator;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">public</span> slots:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">void</span> setImageProgress(<span class="keywordtype">int</span> current, <span class="keywordtype">int</span> total);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">void</span> updateLabels(<a class="code" href="class_chessboard.html">Chessboard</a>* board);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;signals:</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">void</span> stopCalibration();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;};</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#endif // CALIBRATIONDIALOG_H</span></div>
+<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdoc">Calibrate from images dialog. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8h_source.html#l00012">calibrateconfirmdialog.h:12</a></div></div>
+<div class="ttc" id="class_calibration_dialog_html"><div class="ttname"><a href="class_calibration_dialog.html">CalibrationDialog</a></div><div class="ttdef"><b>Definition:</b> <a href="calibrationdialog_8h_source.html#l00023">calibrationdialog.h:23</a></div></div>
+<div class="ttc" id="class_stereo_calibrate_html"><div class="ttname"><a href="class_stereo_calibrate.html">StereoCalibrate</a></div><div class="ttdoc">Stereo calibration. </div><div class="ttdef"><b>Definition:</b> <a href="stereocalibrate_8h_source.html#l00029">stereocalibrate.h:29</a></div></div>
+<div class="ttc" id="class_chessboard_html"><div class="ttname"><a href="class_chessboard.html">Chessboard</a></div><div class="ttdoc">Class for chessboard detection. </div><div class="ttdef"><b>Definition:</b> <a href="chessboard_8h_source.html#l00018">chessboard.h:18</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 30 2018 14:20:39 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

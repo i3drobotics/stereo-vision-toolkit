@@ -60,141 +60,18 @@
     <bool>false</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_10">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetMinimumSize</enum>
+    <item row="3" column="0">
+     <layout class="QHBoxLayout" name="hLayoutBottom">
+      <property name="spacing">
+       <number>6</number>
       </property>
       <item>
-       <widget class="QPushButton" name="pauseButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Start/pause acquisition</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgb(255, 255, 255)</string>
+       <widget class="QCheckBox" name="toggleRectifyCheckBox">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
         <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="saveButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Save current frame</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgb(255, 255, 255)</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="singleShotButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Single shot acquisition</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgb(255, 255, 255)</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="enableStereo">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Stereo matching</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgb(255, 255, 255)</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
+         <string>Rectify Images</string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -202,20 +79,47 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="toggleVideoButton">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>25</width>
-          <height>25</height>
-         </size>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_3">
+       <widget class="QCheckBox" name="toggleSwapLeftRight">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Swap LR</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="frameCountSlider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Frame count</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -228,96 +132,25 @@
        </spacer>
       </item>
       <item>
-       <layout class="QGridLayout" name="matcherSelectorLayout">
-        <item row="0" column="1">
-         <widget class="QComboBox" name="matcherSelectBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="frame">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_15">
-          <property name="text">
-           <string>Matcher:</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Saving to:</string>
+        </property>
+       </widget>
       </item>
       <item>
-       <layout class="QGridLayout" name="exposureLayout">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetMinimumSize</enum>
+       <widget class="QLabel" name="saveDirLabel">
+        <property name="text">
+         <string>./</string>
         </property>
-        <item row="1" column="1">
-         <widget class="QDoubleSpinBox" name="exposureSpinBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>30</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="minimum">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>1000.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.250000000000000</double>
-          </property>
-          <property name="value">
-           <double>5.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label">
-          <property name="maximumSize">
-           <size>
-            <width>75</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Exposure (ms) </string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QCheckBox" name="autoExposeCheck">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Auto</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QCheckBox" name="enableHDRCheckbox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>HDR</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="setSaveDirButton">
+        <property name="text">
+         <string>Change</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -333,7 +166,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="imageViewTab">
        <attribute name="title">
@@ -348,83 +181,6 @@
           <property name="bottomMargin">
            <number>5</number>
           </property>
-          <item>
-           <widget class="QLabel" name="left_image_view">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>376</width>
-              <height>240</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>1280</width>
-              <height>960</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: black;</string>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string>Left Image View</string>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="right_image_view">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>376</width>
-              <height>240</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>1280</width>
-              <height>960</height>
-             </size>
-            </property>
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: black;</string>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="text">
-             <string>Right Image View</string>
-            </property>
-            <property name="scaledContents">
-             <bool>false</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
        </layout>
@@ -684,6 +440,13 @@
            </spacer>
           </item>
           <item>
+           <widget class="QCheckBox" name="dateInFilenameCheckbox">
+            <property name="text">
+             <string>Include date in filename</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="savePointCloudButton">
             <property name="text">
              <string>Save point cloud</string>
@@ -696,15 +459,141 @@
       </widget>
      </widget>
     </item>
-    <item row="3" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
       <item>
-       <widget class="QCheckBox" name="toggleRectifyCheckBox">
-        <property name="enabled">
-         <bool>false</bool>
+       <widget class="QPushButton" name="pauseButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Start/pause acquisition</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255)</string>
         </property>
         <property name="text">
-         <string>Rectify Images</string>
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="saveButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Save current frame</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255)</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="singleShotButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Single shot acquisition</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255)</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="enableStereo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Stereo matching</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255)</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>30</width>
+          <height>25</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -712,34 +601,20 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSlider" name="frameCountSlider">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_4">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
+       <widget class="QPushButton" name="toggleVideoButton">
         <property name="text">
-         <string>Frame count</string>
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>25</width>
+          <height>25</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -752,25 +627,96 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Saving to:</string>
-        </property>
-       </widget>
+       <layout class="QGridLayout" name="matcherSelectorLayout">
+        <item row="0" column="1">
+         <widget class="QComboBox" name="matcherSelectBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="frame">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>Matcher:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QLabel" name="saveDirLabel">
-        <property name="text">
-         <string>./</string>
+       <layout class="QGridLayout" name="exposureLayout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="setSaveDirButton">
-        <property name="text">
-         <string>Change</string>
-        </property>
-       </widget>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="exposureSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.250000000000000</double>
+          </property>
+          <property name="value">
+           <double>5.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>75</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Exposure (ms) </string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QCheckBox" name="autoExposeCheck">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Auto</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QCheckBox" name="enableHDRCheckbox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>HDR</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>

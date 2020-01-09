@@ -10,6 +10,11 @@
 #include <abstractstereocamera.h>
 #include "cameraopencv.h"
 
+//!  Stereo OpenCV camera control
+/*!
+  Control of stereo pair of OpenCV cameras and 3D generation
+*/
+
 class StereoCameraOpenCV : public AbstractStereoCamera
 {
 Q_OBJECT

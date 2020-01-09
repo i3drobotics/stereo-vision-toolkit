@@ -38,6 +38,12 @@ bool StereoCameraFromVideo::enableAutoExpose(bool enable) {
   return enable;
 }
 
+void StereoCameraFromVideo::disconnectCamera(){
+    connected = false;
+    emit disconnected();
+    emit finished();
+}
+
 bool StereoCameraFromVideo::capture() {
   bool res = stream.read(image_buffer);
 

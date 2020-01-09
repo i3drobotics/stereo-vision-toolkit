@@ -1,6 +1,6 @@
 *.pro.user*
 build/
-3rd_party/cuda
 Doxyfile.bak
-installer/Output/
 *.tmp
+.vscode/
+installer/Output/*

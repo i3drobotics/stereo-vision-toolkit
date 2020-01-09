@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -102,7 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;calibrateconfirmdialog::~calibrateconfirmdialog() { <span class="keyword">delete</span> ui; }</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keywordtype">void</span> calibrateconfirmdialog::updateLeft(<span class="keyword">const</span> cv::Mat &amp;camera_matrix, <span class="keyword">const</span> cv::Mat &amp;distortion,</div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classcalibrateconfirmdialog.html#a1ff7049a8a9fd467ab524fa29034ce5f">   17</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcalibrateconfirmdialog.html#a1ff7049a8a9fd467ab524fa29034ce5f">calibrateconfirmdialog::updateLeft</a>(<span class="keyword">const</span> cv::Mat &amp;camera_matrix, <span class="keyword">const</span> cv::Mat &amp;distortion,</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                                   <span class="keyword">const</span> <span class="keywordtype">double</span> &amp;rms) {</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;   <span class="keywordtype">double</span> focal_x = camera_matrix.at&lt;<span class="keywordtype">double</span>&gt;(0, 0);</div>
@@ -115,7 +116,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;   QString distortion_label;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;   <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i &lt; distortion.total(); i++){</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;   <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> i=0; i &lt; distortion.total(); i++){</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;       distortion_label += QString(<span class="stringliteral">&quot;%1 &quot;</span>).arg(QString::number(distortion.at&lt;<span class="keywordtype">double</span>&gt;(i), <span class="charliteral">&#39;f&#39;</span>, 2));</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;   }</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;   ui-&gt;left_distortion-&gt;setText(distortion_label);</div>
@@ -125,7 +126,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;   ui-&gt;left_intrinsic-&gt;setEnabled(<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keywordtype">void</span> calibrateconfirmdialog::updateRight(<span class="keyword">const</span> cv::Mat &amp;camera_matrix, <span class="keyword">const</span> cv::Mat &amp;distortion,</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classcalibrateconfirmdialog.html#a8bd5859b51d6196ee042e7c6212a3a37">   40</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcalibrateconfirmdialog.html#a8bd5859b51d6196ee042e7c6212a3a37">calibrateconfirmdialog::updateRight</a>(<span class="keyword">const</span> cv::Mat &amp;camera_matrix, <span class="keyword">const</span> cv::Mat &amp;distortion,</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                                    <span class="keyword">const</span> <span class="keywordtype">double</span> &amp;rms) {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">double</span> focal_x = camera_matrix.at&lt;<span class="keywordtype">double</span>&gt;(0, 0);</div>
@@ -138,7 +139,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;   QString distortion_label;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;   <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0; i &lt; distortion.total(); i++){</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;   <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> i=0; i &lt; distortion.total(); i++){</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;       distortion_label += QString(<span class="stringliteral">&quot;%1 &quot;</span>).arg(QString::number(distortion.at&lt;<span class="keywordtype">double</span>&gt;(i), <span class="charliteral">&#39;f&#39;</span>, 2));</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;   }</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
@@ -149,7 +150,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;   ui-&gt;right_intrinsic-&gt;setEnabled(<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keywordtype">void</span> calibrateconfirmdialog::updateStereo(<span class="keyword">const</span> cv::Mat Q, <span class="keyword">const</span> <span class="keywordtype">double</span> &amp;rms) {</div>
+<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="classcalibrateconfirmdialog.html#a57e87da51c71e7e247520ae53ff3ac4f">   64</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcalibrateconfirmdialog.html#a57e87da51c71e7e247520ae53ff3ac4f">calibrateconfirmdialog::updateStereo</a>(<span class="keyword">const</span> cv::Mat Q, <span class="keyword">const</span> <span class="keywordtype">double</span> &amp;rms) {</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;   <span class="keyword">auto</span> cx = QString::number(-Q.at&lt;<span class="keywordtype">double</span>&gt;(0,3), <span class="charliteral">&#39;f&#39;</span>, 2);</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;   <span class="keyword">auto</span> cy = QString::number(-Q.at&lt;<span class="keywordtype">double</span>&gt;(1,3), <span class="charliteral">&#39;f&#39;</span>, 2);</div>
@@ -157,34 +158,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;   ui-&gt;stereo_focal-&gt;setText(QString::number(Q.at&lt;<span class="keywordtype">double</span>&gt;(2,3), <span class="charliteral">&#39;f&#39;</span>, 2));</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;   ui-&gt;stereo_principle-&gt;setText(QString(<span class="stringliteral">&quot;%1 %2 px&quot;</span>).arg(cx).arg(cy));</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;   ui-&gt;stereo_baseline-&gt;setText(QString::number(1000*baseline, <span class="charliteral">&#39;f&#39;</span>, 2));</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;   ui-&gt;stereo_baseline-&gt;setText(QString(<span class="stringliteral">&quot;%1 mm&quot;</span>).arg(QString::number(1000*baseline, <span class="charliteral">&#39;f&#39;</span>, 2)));</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;   ui-&gt;stereo_rms-&gt;setText(QString(<span class="stringliteral">&quot;%1 px&quot;</span>).arg(QString::number(rms, <span class="charliteral">&#39;f&#39;</span>, 3)));</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;   ui-&gt;stereo_parameters-&gt;setEnabled(<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keywordtype">void</span> calibrateconfirmdialog::setNumberImages(<span class="keywordtype">int</span> number_images){</div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="classcalibrateconfirmdialog.html#ab5482a638c5af7c0d1a6ebfb57972d76">   78</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcalibrateconfirmdialog.html#ab5482a638c5af7c0d1a6ebfb57972d76">calibrateconfirmdialog::setNumberImages</a>(<span class="keywordtype">int</span> number_images){</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    ui-&gt;left_progress-&gt;setMaximum(number_images);</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    ui-&gt;right_progress-&gt;setMaximum(number_images);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;}</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keywordtype">void</span> calibrateconfirmdialog::updateLeftProgress(<span class="keywordtype">int</span> number_done) {</div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="classcalibrateconfirmdialog.html#a8579c47f6d8634ddb6acde470894aa7d">   84</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcalibrateconfirmdialog.html#a8579c47f6d8634ddb6acde470894aa7d">calibrateconfirmdialog::updateLeftProgress</a>(<span class="keywordtype">int</span> number_done) {</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    ui-&gt;left_progress-&gt;setValue(number_done);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    update();</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keywordtype">void</span> calibrateconfirmdialog::updateRightProgress(<span class="keywordtype">int</span> number_done) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="classcalibrateconfirmdialog.html#a1f5748596aa11125e1ce010df142aa2c">   89</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classcalibrateconfirmdialog.html#a1f5748596aa11125e1ce010df142aa2c">calibrateconfirmdialog::updateRightProgress</a>(<span class="keywordtype">int</span> number_done) {</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    ui-&gt;right_progress-&gt;setValue(number_done);</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    update();</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;}</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
-<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8h_source.html#l00012">calibrateconfirmdialog.h:12</a></div></div>
-<div class="ttc" id="classcalibrateconfirmdialog_html"><div class="ttname"><a href="classcalibrateconfirmdialog.html">calibrateconfirmdialog</a></div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8h_source.html#l00016">calibrateconfirmdialog.h:16</a></div></div>
+<div class="ttc" id="namespace_ui_html"><div class="ttname"><a href="namespace_ui.html">Ui</a></div><div class="ttdoc">Calibrate from images dialog. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8h_source.html#l00012">calibrateconfirmdialog.h:12</a></div></div>
+<div class="ttc" id="classcalibrateconfirmdialog_html_a1f5748596aa11125e1ce010df142aa2c"><div class="ttname"><a href="classcalibrateconfirmdialog.html#a1f5748596aa11125e1ce010df142aa2c">calibrateconfirmdialog::updateRightProgress</a></div><div class="ttdeci">void updateRightProgress(int number_done)</div><div class="ttdoc">Update the number of right images processed. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8cpp_source.html#l00089">calibrateconfirmdialog.cpp:89</a></div></div>
+<div class="ttc" id="classcalibrateconfirmdialog_html_ab5482a638c5af7c0d1a6ebfb57972d76"><div class="ttname"><a href="classcalibrateconfirmdialog.html#ab5482a638c5af7c0d1a6ebfb57972d76">calibrateconfirmdialog::setNumberImages</a></div><div class="ttdeci">void setNumberImages(int number_images)</div><div class="ttdoc">Display/update the number of images used. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8cpp_source.html#l00078">calibrateconfirmdialog.cpp:78</a></div></div>
+<div class="ttc" id="classcalibrateconfirmdialog_html_a1ff7049a8a9fd467ab524fa29034ce5f"><div class="ttname"><a href="classcalibrateconfirmdialog.html#a1ff7049a8a9fd467ab524fa29034ce5f">calibrateconfirmdialog::updateLeft</a></div><div class="ttdeci">void updateLeft(const cv::Mat &amp;camera_matrix, const cv::Mat &amp;distortion, const double &amp;rms)</div><div class="ttdoc">Display/update the calibration parameters for the left camera. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8cpp_source.html#l00017">calibrateconfirmdialog.cpp:17</a></div></div>
+<div class="ttc" id="classcalibrateconfirmdialog_html_a8579c47f6d8634ddb6acde470894aa7d"><div class="ttname"><a href="classcalibrateconfirmdialog.html#a8579c47f6d8634ddb6acde470894aa7d">calibrateconfirmdialog::updateLeftProgress</a></div><div class="ttdeci">void updateLeftProgress(int number_done)</div><div class="ttdoc">Update the number of left images processed. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8cpp_source.html#l00084">calibrateconfirmdialog.cpp:84</a></div></div>
+<div class="ttc" id="classcalibrateconfirmdialog_html"><div class="ttname"><a href="classcalibrateconfirmdialog.html">calibrateconfirmdialog</a></div><div class="ttdoc">Calibration confirmation dialog. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8h_source.html#l00020">calibrateconfirmdialog.h:20</a></div></div>
+<div class="ttc" id="classcalibrateconfirmdialog_html_a57e87da51c71e7e247520ae53ff3ac4f"><div class="ttname"><a href="classcalibrateconfirmdialog.html#a57e87da51c71e7e247520ae53ff3ac4f">calibrateconfirmdialog::updateStereo</a></div><div class="ttdeci">void updateStereo(const cv::Mat Q, const double &amp;rms)</div><div class="ttdoc">Display/update the calibration parameters for the stereo system. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8cpp_source.html#l00064">calibrateconfirmdialog.cpp:64</a></div></div>
+<div class="ttc" id="classcalibrateconfirmdialog_html_a8bd5859b51d6196ee042e7c6212a3a37"><div class="ttname"><a href="classcalibrateconfirmdialog.html#a8bd5859b51d6196ee042e7c6212a3a37">calibrateconfirmdialog::updateRight</a></div><div class="ttdeci">void updateRight(const cv::Mat &amp;camera_matrix, const cv::Mat &amp;distortion, const double &amp;rms)</div><div class="ttdoc">Display/update the calibration parameters for the right camera. </div><div class="ttdef"><b>Definition:</b> <a href="calibrateconfirmdialog_8cpp_source.html#l00040">calibrateconfirmdialog.cpp:40</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 30 2018 14:20:39 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

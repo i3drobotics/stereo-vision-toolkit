@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -103,8 +104,8 @@ Inheritance diagram for AbstractStereoMatcher:</div>
  <div class="center">
   <img src="class_abstract_stereo_matcher.png" usemap="#AbstractStereoMatcher_map" alt=""/>
   <map id="AbstractStereoMatcher_map" name="AbstractStereoMatcher_map">
-<area href="class_matcher_open_c_v_block.html" alt="MatcherOpenCVBlock" shape="rect" coords="0,112,144,136"/>
-<area href="class_matcher_open_c_v_s_g_b_m.html" alt="MatcherOpenCVSGBM" shape="rect" coords="154,112,298,136"/>
+<area href="class_matcher_open_c_v_block.html" title="Matcher OpenCV Block. " alt="MatcherOpenCVBlock" shape="rect" coords="0,112,144,136"/>
+<area href="class_matcher_open_c_v_s_g_b_m.html" title="Matcher OpenCV SGBM. " alt="MatcherOpenCVSGBM" shape="rect" coords="154,112,298,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -130,23 +131,24 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memdesc:a87525ed38b36c37d2eda34c0e2d321d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns what value is assigned to pixels with invalid disparities (e.g. -10000) <br /></td></tr>
 <tr class="separator:a87525ed38b36c37d2eda34c0e2d321d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a124604c16466bac10a308436dd2f07db"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a124604c16466bac10a308436dd2f07db">assignThread</a> (QThread *thread)</td></tr>
-<tr class="memdesc:a124604c16466bac10a308436dd2f07db"><td class="mdescLeft">&#160;</td><td class="mdescRight">! Move matcher to a new thread  <a href="#a124604c16466bac10a308436dd2f07db">More...</a><br /></td></tr>
+<tr class="memdesc:a124604c16466bac10a308436dd2f07db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move matcher to a new thread.  <a href="#a124604c16466bac10a308436dd2f07db">More...</a><br /></td></tr>
 <tr class="separator:a124604c16466bac10a308436dd2f07db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b1a5e9841f39988686450b1f1721032"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b1a5e9841f39988686450b1f1721032"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a> (cv::Mat &amp;dst)</td></tr>
-<tr class="memdesc:a2b1a5e9841f39988686450b1f1721032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the disparity map into = new image. <br /></td></tr>
+<tr class="memitem:a2b1a5e9841f39988686450b1f1721032"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a> (cv::Mat &amp;dst)</td></tr>
+<tr class="memdesc:a2b1a5e9841f39988686450b1f1721032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the disparity map.  <a href="#a2b1a5e9841f39988686450b1f1721032">More...</a><br /></td></tr>
 <tr class="separator:a2b1a5e9841f39988686450b1f1721032"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80c14c977bd44695d1142eaef8abdcb3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>saveDisparity</b> (QString filename)</td></tr>
+<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">saveDisparity</a> (QString filename)</td></tr>
+<tr class="memdesc:a80c14c977bd44695d1142eaef8abdcb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the disparity map.  <a href="#a80c14c977bd44695d1142eaef8abdcb3">More...</a><br /></td></tr>
 <tr class="separator:a80c14c977bd44695d1142eaef8abdcb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac89bdb7ff8010eb3cffc22ae73dd5436"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>checkLRConsistencyFull</b> (double threshold)</td></tr>
+<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#ac89bdb7ff8010eb3cffc22ae73dd5436">checkLRConsistencyFull</a> (double threshold)</td></tr>
+<tr class="memdesc:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a full left-right consistency check (experimental)  <a href="#ac89bdb7ff8010eb3cffc22ae73dd5436">More...</a><br /></td></tr>
 <tr class="separator:ac89bdb7ff8010eb3cffc22ae73dd5436"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23d41c7aa8ee75b83c0f86028854e92c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23d41c7aa8ee75b83c0f86028854e92c"></a>
-cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftImage</b> (void)</td></tr>
+cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">getLeftImage</a> (void)</td></tr>
+<tr class="memdesc:a23d41c7aa8ee75b83c0f86028854e92c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to the left image. <br /></td></tr>
 <tr class="separator:a23d41c7aa8ee75b83c0f86028854e92c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e1d35e2aed668657aa9441c5b563d2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3e1d35e2aed668657aa9441c5b563d2d"></a>
-cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getRighttImage</b> (void)</td></tr>
+cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">getRighttImage</a> (void)</td></tr>
+<tr class="memdesc:a3e1d35e2aed668657aa9441c5b563d2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to the right image. <br /></td></tr>
 <tr class="separator:a3e1d35e2aed668657aa9441c5b563d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49f42fbfee8266b81fbe17e8af07d73b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a49f42fbfee8266b81fbe17e8af07d73b"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>match</b> ()</td></tr>
@@ -229,16 +231,117 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>block_size</b> = 9</td
 </table>
 </div><div class="memdoc">
 
-<p>! Move matcher to a new thread </p>
+<p>Move matcher to a new thread. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">Left</td><td>image </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">Right</td><td>image </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">thread</td><td>Pointer to thread </td></tr>
   </table>
   </dd>
 </dl>
 
 <p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00015">15</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac89bdb7ff8010eb3cffc22ae73dd5436"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::checkLRConsistencyFull </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>threshold</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Perform a full left-right consistency check (experimental) </p>
+<p>checkLRConsistencyFull </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">threshold</td><td>Disparity threshold </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00045">45</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2b1a5e9841f39988686450b1f1721032"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::getDisparity </td>
+          <td>(</td>
+          <td class="paramtype">cv::Mat &amp;&#160;</td>
+          <td class="paramname"><em>dst</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the disparity map. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">dst</td><td>Output Mat </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00028">28</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a80c14c977bd44695d1142eaef8abdcb3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AbstractStereoMatcher::saveDisparity </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Save the disparity map. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">filename</td><td>Output filename </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="abstractstereomatcher_8cpp_source.html#l00033">33</a> of file <a class="el" href="abstractstereomatcher_8cpp_source.html">abstractstereomatcher.cpp</a>.</p>
 
 </div>
 </div>
@@ -277,8 +380,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>block_size</b> = 9</td
 <p>Set images for matching. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">Left</td><td>image </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">Right</td><td>image </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">left</td><td>Left image </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>Right image </td></tr>
   </table>
   </dd>
 </dl>
@@ -294,7 +397,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>block_size</b> = 9</td
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 30 2018 14:20:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

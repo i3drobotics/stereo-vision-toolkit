@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -89,6 +90,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">MatcherOpenCVSGBM Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Matcher OpenCV SGBM.  
+ <a href="class_matcher_open_c_v_s_g_b_m.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="matcheropencvsgbm_8h_source.html">matcheropencvsgbm.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for MatcherOpenCVSGBM:</div>
 <div class="dyncontent">
@@ -175,23 +181,24 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memdesc:a87525ed38b36c37d2eda34c0e2d321d7 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns what value is assigned to pixels with invalid disparities (e.g. -10000) <br /></td></tr>
 <tr class="separator:a87525ed38b36c37d2eda34c0e2d321d7 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a124604c16466bac10a308436dd2f07db">assignThread</a> (QThread *thread)</td></tr>
-<tr class="memdesc:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">! Move matcher to a new thread  <a href="#a124604c16466bac10a308436dd2f07db">More...</a><br /></td></tr>
+<tr class="memdesc:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move matcher to a new thread.  <a href="#a124604c16466bac10a308436dd2f07db">More...</a><br /></td></tr>
 <tr class="separator:a124604c16466bac10a308436dd2f07db inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b1a5e9841f39988686450b1f1721032"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a> (cv::Mat &amp;dst)</td></tr>
-<tr class="memdesc:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the disparity map into = new image. <br /></td></tr>
+<tr class="memitem:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032">getDisparity</a> (cv::Mat &amp;dst)</td></tr>
+<tr class="memdesc:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the disparity map.  <a href="#a2b1a5e9841f39988686450b1f1721032">More...</a><br /></td></tr>
 <tr class="separator:a2b1a5e9841f39988686450b1f1721032 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80c14c977bd44695d1142eaef8abdcb3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>saveDisparity</b> (QString filename)</td></tr>
+<tr class="memitem:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">saveDisparity</a> (QString filename)</td></tr>
+<tr class="memdesc:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the disparity map.  <a href="#a80c14c977bd44695d1142eaef8abdcb3">More...</a><br /></td></tr>
 <tr class="separator:a80c14c977bd44695d1142eaef8abdcb3 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac89bdb7ff8010eb3cffc22ae73dd5436"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>checkLRConsistencyFull</b> (double threshold)</td></tr>
+<tr class="memitem:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#ac89bdb7ff8010eb3cffc22ae73dd5436">checkLRConsistencyFull</a> (double threshold)</td></tr>
+<tr class="memdesc:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a full left-right consistency check (experimental)  <a href="#ac89bdb7ff8010eb3cffc22ae73dd5436">More...</a><br /></td></tr>
 <tr class="separator:ac89bdb7ff8010eb3cffc22ae73dd5436 inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23d41c7aa8ee75b83c0f86028854e92c inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23d41c7aa8ee75b83c0f86028854e92c"></a>
-cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftImage</b> (void)</td></tr>
+cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a23d41c7aa8ee75b83c0f86028854e92c">getLeftImage</a> (void)</td></tr>
+<tr class="memdesc:a23d41c7aa8ee75b83c0f86028854e92c inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to the left image. <br /></td></tr>
 <tr class="separator:a23d41c7aa8ee75b83c0f86028854e92c inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e1d35e2aed668657aa9441c5b563d2d inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3e1d35e2aed668657aa9441c5b563d2d"></a>
-cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><b>getRighttImage</b> (void)</td></tr>
+cv::Mat *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">getRighttImage</a> (void)</td></tr>
+<tr class="memdesc:a3e1d35e2aed668657aa9441c5b563d2d inherit pub_slots_class_abstract_stereo_matcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pointer to the right image. <br /></td></tr>
 <tr class="separator:a3e1d35e2aed668657aa9441c5b563d2d inherit pub_slots_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49f42fbfee8266b81fbe17e8af07d73b inherit pub_slots_class_abstract_stereo_matcher"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a49f42fbfee8266b81fbe17e8af07d73b"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>match</b> ()</td></tr>
@@ -248,8 +255,10 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>block_size</b> = 9</td
 <tr class="separator:a120960da2f7cb8f7549f359c6ff7e86d inherit pro_attribs_class_abstract_stereo_matcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="matcheropencvsgbm_8h_source.html#l00012">12</a> of file <a class="el" href="matcheropencvsgbm_8h_source.html">matcheropencvsgbm.h</a>.</p>
+<div class="textblock"><p>Matcher OpenCV SGBM. </p>
+<p>Stereo matcher using OpenCV's SGBM algorithm </p>
+
+<p>Definition at line <a class="el" href="matcheropencvsgbm_8h_source.html#l00017">17</a> of file <a class="el" href="matcheropencvsgbm_8h_source.html">matcheropencvsgbm.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="matcheropencvsgbm_8h_source.html">matcheropencvsgbm.h</a></li>
 <li>src/<a class="el" href="matcheropencvsgbm_8cpp_source.html">matcheropencvsgbm.cpp</a></li>
@@ -257,7 +266,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>block_size</b> = 9</td
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 30 2018 14:20:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

@@ -1,0 +1,3 @@
+[submodule "svt-pro"]
+	path = pro
+	url = https://github.com/i3drobotics/svt-pro.git

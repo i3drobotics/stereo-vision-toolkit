@@ -21,6 +21,11 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
+//!  Stereo calibration
+/*!
+  Calibrate stereo cameras
+*/
+
 class StereoCalibrate : public QObject {
   Q_OBJECT
  public:
@@ -67,6 +72,10 @@ class StereoCalibrate : public QObject {
   std::vector<bool> left_valid;
   std::vector<bool> right_valid;
 
+  cv::Mat R1, R2, P1, P2;
+
+  bool save_ros = false;
+
   QDir output_folder = QCoreApplication::applicationDirPath() + "/params/";
 
   std::vector<cv::Point3f> pattern_points;
@@ -107,10 +116,12 @@ class StereoCalibrate : public QObject {
   void setImages(QList<QString> left, QList<QString> right);
   void setPattern(cv::Size size, double squareSize);
   void setImageSize(cv::Size size);
+  void setSaveROS(bool save){save_ros = save;}
   void setOutputPath(QString path);
   void overlayArrow(cv::Mat& image, std::vector<cv::Point2f>& points,
                     cv::Point2f offset, CvScalar colour, int thickness = 3);
   bool jointCalibration(void);
+  bool outputRosYaml(QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R);
 
  signals:
   void doneCalibration(bool);

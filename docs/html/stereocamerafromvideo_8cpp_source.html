@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -67,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -126,55 +127,64 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keywordflow">return</span> enable;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">   41</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">StereoCameraFromVideo::capture</a>() {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordtype">bool</span> res = stream.read(image_buffer);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordflow">if</span> (res) {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="comment">// Simulate frame rate</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="class_stereo_camera_from_video.html#a1156dab0196f1366e95f82b3d197eb34">   41</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_stereo_camera_from_video.html#a1156dab0196f1366e95f82b3d197eb34">StereoCameraFromVideo::disconnectCamera</a>(){</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    connected = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    emit <a class="code" href="class_abstract_stereo_camera.html#a3d09b66be2f4c53280d4328ff5409881">disconnected</a>();</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    emit <a class="code" href="class_abstract_stereo_camera.html#ae7cf0a8b94f4ee9bba33d8f6fc1d2be0">finished</a>();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;}</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">double</span> delay_needed = 1000.0/frame_rate - frame_timer.elapsed();</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordflow">if</span>(delay_needed &gt; 0){</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;       QThread::msleep(delay_needed);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">   47</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">StereoCameraFromVideo::capture</a>() {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordtype">bool</span> res = stream.read(image_buffer);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">if</span> (res) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// Simulate frame rate</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">isMatching</a>())</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        QThread::msleep(1000 / frame_rate);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    emit videoPosition(100*((<span class="keywordtype">float</span>) stream.get(CV_CAP_PROP_POS_FRAMES))/number_frames);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">if</span>(image_buffer.channels() == 3)</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        cv::cvtColor(image_buffer, image_buffer, CV_RGB2GRAY);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    emit <a class="code" href="class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375">captured</a>();</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    cv::Mat(image_buffer,</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            cv::Rect(0, 0, image_buffer.cols / 2, image_buffer.rows))</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        .copyTo(left_raw);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    cv::Mat(image_buffer, cv::Rect(image_buffer.cols / 2, 0,</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                                   image_buffer.cols / 2, image_buffer.rows))</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        .copyTo(right_raw);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    frame_timer.restart();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment">// Loop video</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">if</span> (stream_valid) {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      stream = cv::VideoCapture(stream_file);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      qDebug() &lt;&lt; <span class="stringliteral">&quot;Capture fail&quot;</span>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  }</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>
-<div class="ttc" id="class_abstract_stereo_camera_html_a0096fcc42b50aa7fa4236f6bddcd81f7"><div class="ttname"><a href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">AbstractStereoCamera::isMatching</a></div><div class="ttdeci">bool isMatching()</div><div class="ttdoc">Returns whether matching is enabled. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00202">abstractstereocamera.cpp:202</a></div></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">double</span> delay_needed = 1000.0/frame_rate - frame_timer.elapsed();</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordflow">if</span>(delay_needed &gt; 0){</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;       QThread::msleep(delay_needed);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">isMatching</a>())</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        QThread::msleep(1000 / frame_rate);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    emit videoPosition(100*((<span class="keywordtype">float</span>) stream.get(CV_CAP_PROP_POS_FRAMES))/number_frames);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordflow">if</span>(image_buffer.channels() == 3)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        cv::cvtColor(image_buffer, image_buffer, CV_RGB2GRAY);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    emit <a class="code" href="class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375">captured</a>();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    cv::Mat(image_buffer,</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            cv::Rect(0, 0, image_buffer.cols / 2, image_buffer.rows))</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        .copyTo(left_raw);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    cv::Mat(image_buffer, cv::Rect(image_buffer.cols / 2, 0,</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                                   image_buffer.cols / 2, image_buffer.rows))</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        .copyTo(right_raw);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    frame_timer.restart();</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="comment">// Loop video</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">if</span> (stream_valid) {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      stream = cv::VideoCapture(stream_file);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;      qDebug() &lt;&lt; <span class="stringliteral">&quot;Capture fail&quot;</span>;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
+<div class="ttc" id="class_abstract_stereo_camera_html_ae7cf0a8b94f4ee9bba33d8f6fc1d2be0"><div class="ttname"><a href="class_abstract_stereo_camera.html#ae7cf0a8b94f4ee9bba33d8f6fc1d2be0">AbstractStereoCamera::finished</a></div><div class="ttdeci">void finished()</div><div class="ttdoc">Indicates that the camera has finished acquiring. </div></div>
+<div class="ttc" id="class_stereo_camera_from_video_html_a1156dab0196f1366e95f82b3d197eb34"><div class="ttname"><a href="class_stereo_camera_from_video.html#a1156dab0196f1366e95f82b3d197eb34">StereoCameraFromVideo::disconnectCamera</a></div><div class="ttdeci">void disconnectCamera()</div><div class="ttdoc">Disconnect camera. </div><div class="ttdef"><b>Definition:</b> <a href="stereocamerafromvideo_8cpp_source.html#l00041">stereocamerafromvideo.cpp:41</a></div></div>
+<div class="ttc" id="class_abstract_stereo_camera_html_a0096fcc42b50aa7fa4236f6bddcd81f7"><div class="ttname"><a href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">AbstractStereoCamera::isMatching</a></div><div class="ttdeci">bool isMatching()</div><div class="ttdoc">Returns whether matching is enabled. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00256">abstractstereocamera.cpp:256</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a28c67fb287ceef7cac927595959f5375"><div class="ttname"><a href="class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375">AbstractStereoCamera::captured</a></div><div class="ttdeci">void captured()</div><div class="ttdoc">Emitted when a camera has captured an image, typically used in sub-classes. </div></div>
-<div class="ttc" id="class_stereo_camera_from_video_html_af53503df1755c0a9cf84718128ed0a5d"><div class="ttname"><a href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">StereoCameraFromVideo::capture</a></div><div class="ttdeci">bool capture()</div><div class="ttdoc">Capture an image. </div><div class="ttdef"><b>Definition:</b> <a href="stereocamerafromvideo_8cpp_source.html#l00041">stereocamerafromvideo.cpp:41</a></div></div>
+<div class="ttc" id="class_stereo_camera_from_video_html_af53503df1755c0a9cf84718128ed0a5d"><div class="ttname"><a href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">StereoCameraFromVideo::capture</a></div><div class="ttdeci">bool capture()</div><div class="ttdoc">Capture an image. </div><div class="ttdef"><b>Definition:</b> <a href="stereocamerafromvideo_8cpp_source.html#l00047">stereocamerafromvideo.cpp:47</a></div></div>
+<div class="ttc" id="class_abstract_stereo_camera_html_a3d09b66be2f4c53280d4328ff5409881"><div class="ttname"><a href="class_abstract_stereo_camera.html#a3d09b66be2f4c53280d4328ff5409881">AbstractStereoCamera::disconnected</a></div><div class="ttdeci">void disconnected()</div><div class="ttdoc">Indicates that the camera has disconnected. </div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 30 2018 14:20:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,18 +93,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr bgcolor="#f0f0f0"><td class="entry"><b>DisparityViewer</b>(QWidget *parent=0) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">explicit</span></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>finished</b>() (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">signal</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>newDisparity</b>(QPixmap) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">signal</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>setCalibration</b>(cv::Mat &amp;Q, double baseline=1.0, double focal=1.0) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>setColourmap</b>(int) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>setMatcher</b>(AbstractStereoMatcher *matcher) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_disparity_viewer.html#aba9e1dfa9eb48daf93e668508d900a5f">savedImage</a>()</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">signal</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_disparity_viewer.html#a01305141c9634b25196eb4158db5432a">savedImage</a>(QString filename)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">signal</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>saveImageTimestamped</b>(void) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>setCalibration</b>(cv::Mat &amp;Q, double baseline=1.0, double focal=1.0) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>setColourmap</b>(int) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>setMatcher</b>(AbstractStereoMatcher *matcher) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_disparity_viewer.html#a6e84718899a854d011aed372ecb87698">setSavelocation</a>(QString dir)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>setViewer</b>(QLabel *viewer) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>updateDisparity</b>(void) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>updateDisparityAsync</b>(void) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>updateDisparityRange_slide</b>(int val) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>updateDisparityRange_spin</b>(int val) (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>updatePixmapRange</b>() (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"><span class="mlabel">slot</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>~DisparityViewer</b>() (defined in <a class="el" href="class_disparity_viewer.html">DisparityViewer</a>)</td><td class="entry"><a class="el" href="class_disparity_viewer.html">DisparityViewer</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 30 2018 14:20:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

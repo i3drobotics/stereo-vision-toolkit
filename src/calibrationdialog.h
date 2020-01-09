@@ -11,6 +11,11 @@
 #include "calibrateconfirmdialog.h"
 #include "chessboard.h"
 
+//!  Stereo calibration dialog
+/*!
+  Dialog for performing stereo calibration
+*/
+
 namespace Ui {
 class CalibrationDialog;
 }
