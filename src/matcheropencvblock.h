@@ -9,6 +9,11 @@
 #include <abstractstereomatcher.h>
 #include <QFile>
 
+//!  Matcher OpenCV Block
+/*!
+  Stereo matcher using OpenCV's Block Matching algorithm
+*/
+
 class MatcherOpenCVBlock : public AbstractStereoMatcher {
   Q_OBJECT
  public:

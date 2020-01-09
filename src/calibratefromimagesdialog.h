@@ -20,6 +20,11 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+//!  Calibrate from images dialog
+/*!
+  Dialog for performing stereo calibration from images
+*/
+
 namespace Ui {
 class CalibrateFromImagesDialog;
 }
@@ -39,6 +44,7 @@ public:
     int getPatternCols();
     int getPatternRows();
     double getSquareSizeMm();
+    bool getSaveROS();
     QString getOutputPath(void){return output_path;}
 
 private:

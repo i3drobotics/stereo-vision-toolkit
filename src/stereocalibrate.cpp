@@ -218,6 +218,10 @@ bool StereoCalibrate::jointCalibration(void) {
       alert.setText(QString("Written calibration files to: %1").arg(output_folder.absolutePath()));
       alert.exec();
 
+      if(save_ros){
+        outputRosYaml(output_folder.absoluteFilePath("left.yaml"), "leftCamera", left_images.front().size(), left_camera_matrix, left_distortion, P1, R1);
+        outputRosYaml(output_folder.absoluteFilePath("right.yaml"), "rightCamera", right_images.front().size(), right_camera_matrix, right_distortion, P2, R2);
+      }
       finishedCalibration();
 
       return true;
@@ -252,8 +256,6 @@ double StereoCalibrate::stereoCameraCalibration(int stereoFlags) {
       left_camera_matrix, left_distortion, right_camera_matrix,
       right_distortion, image_size, stereo_r, stereo_t, stereo_e, stereo_f,
       stereoFlags);
-
-  cv::Mat R1, R2, P1, P2;
 
   cv::stereoRectify(left_camera_matrix, left_distortion, right_camera_matrix,
                     right_distortion, image_size, stereo_r, stereo_t, R1, R2,
@@ -525,3 +527,23 @@ void StereoCalibrate::updateViews(void) {
   this->right_view->setPixmap(
       pmap_right.scaled(this->right_view->size(), Qt::KeepAspectRatio));
 }
+
+bool StereoCalibrate::outputRosYaml(QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R){
+    cv::FileStorage fs(filename.toStdString(), cv::FileStorage::WRITE);
+
+    fs << "image_width" << image_size.width;
+    fs << "image_height" << image_size.height;
+    fs << "camera_name" << camera_name.toStdString();
+
+    fs << "camera_matrix" << camera_matrix;
+    fs << "distortion_model" << "plumb_bob";
+
+    fs << "distortion_coefficients" << dist_coeffs;
+    fs << "rectification_matrix" << R;
+    fs << "projection_matrix" << P;
+
+    fs.release();
+
+    return true;
+}
+

@@ -9,6 +9,11 @@
 #include <QWidget>
 #include <abstractstereomatcher.h>
 
+//!  Matcher QT Widget
+/*!
+  Base class for stereo matcher QT widgets
+*/
+
 class MatcherWidget : public QWidget
 {
     Q_OBJECT

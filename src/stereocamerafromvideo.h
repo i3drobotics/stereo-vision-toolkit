@@ -8,6 +8,11 @@
 
 #include <abstractstereocamera.h>
 
+//!  Stereo video feed
+/*!
+  Control of stereo video and generation of 3D
+*/
+
 class StereoCameraFromVideo : public AbstractStereoCamera
 {
 

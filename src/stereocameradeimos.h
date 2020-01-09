@@ -16,6 +16,11 @@
 #include <hidapi/hidapi.h>
 #include <QTimer>
 
+//!  Deimos camera control
+/*!
+  Control of deimos camera and generation of 3D
+*/
+
 enum DEIMOS_COMMAND{
     CAMERA_CONTROL_STEREO = 0x78,
     READFIRMWAREVERSION = 0x40,
@@ -41,8 +46,9 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(int devid = -1);
-    int findCamera(void);
+    std::vector<int> listSystems();
+    bool autoConnect();
+    bool initCamera(int usb_index);
     bool setFrameSize(int width, int height);
     bool setFrame16(void);
     void getFrameRate(void);
@@ -50,6 +56,9 @@ public:
     void openHID();
 
     int getExposure();
+
+    int usb_index_from_serial(std::string serial);
+    std::string serial_from_usb_index(int index);
 
     ~StereoCameraDeimos(void);
 
@@ -69,6 +78,7 @@ private:
     BSTR device_path;
     hid_device* deimos_device = NULL;
     bool send_hid(std::vector<unsigned char> &buffer, size_t command_len);
+    std::string serial_from_device_path(std::string usb_device_path);
 
     qint64 getSerial(void);
 

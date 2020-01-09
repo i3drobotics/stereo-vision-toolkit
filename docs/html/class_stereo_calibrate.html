@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -91,6 +92,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">StereoCalibrate Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Stereo calibration.  
+ <a href="class_stereo_calibrate.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="stereocalibrate_8h_source.html">stereocalibrate.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for StereoCalibrate:</div>
 <div class="dyncontent">
@@ -138,6 +144,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setPattern</b> (cv::S
 <tr class="memitem:ab7e823429a93bfc6b922b0250963a3f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab7e823429a93bfc6b922b0250963a3f5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setImageSize</b> (cv::Size size)</td></tr>
 <tr class="separator:ab7e823429a93bfc6b922b0250963a3f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03af888893c2db36b2bdec75a0868ee6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03af888893c2db36b2bdec75a0868ee6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setSaveROS</b> (bool save)</td></tr>
+<tr class="separator:a03af888893c2db36b2bdec75a0868ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa33803b031e292be0f9246847ef798d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa33803b031e292be0f9246847ef798d8"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setOutputPath</b> (QString path)</td></tr>
 <tr class="separator:aa33803b031e292be0f9246847ef798d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,6 +156,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>overlayArrow</b> (cv:
 <tr class="memitem:aac7cce8c777aff0eb5773804718c7f89"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac7cce8c777aff0eb5773804718c7f89"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>jointCalibration</b> (void)</td></tr>
 <tr class="separator:aac7cce8c777aff0eb5773804718c7f89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc010677c0a3bf02e164b61fd21c8f9c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afc010677c0a3bf02e164b61fd21c8f9c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>outputRosYaml</b> (QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R)</td></tr>
+<tr class="separator:afc010677c0a3bf02e164b61fd21c8f9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
@@ -236,8 +248,10 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><b>right_rectificatio
 <tr class="separator:ade96b91d120281da9e789d95f7f33902"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p>Definition at line <a class="el" href="stereocalibrate_8h_source.html#l00024">24</a> of file <a class="el" href="stereocalibrate_8h_source.html">stereocalibrate.h</a>.</p>
+<div class="textblock"><p>Stereo calibration. </p>
+<p>Calibrate stereo cameras </p>
+
+<p>Definition at line <a class="el" href="stereocalibrate_8h_source.html#l00029">29</a> of file <a class="el" href="stereocalibrate_8h_source.html">stereocalibrate.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="stereocalibrate_8h_source.html">stereocalibrate.h</a></li>
 <li>src/<a class="el" href="stereocalibrate_8cpp_source.html">stereocalibrate.cpp</a></li>
@@ -245,7 +259,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><b>right_rectificatio
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 30 2018 14:20:41 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

@@ -11,7 +11,7 @@ CalibrateFromImagesDialog::CalibrateFromImagesDialog(QWidget *parent)
   ui->setupUi(this);
 
   connect(ui->calibrationPathButton, SIGNAL(clicked(bool)), this,
-          SLOT(selectCalibrationOutputPath()));
+          SLOT(selectOutputPath()));
   connect(ui->leftPathButton, SIGNAL(clicked(bool)), this,
           SLOT(selectLeftImageRoot()));
   connect(ui->rightPathButton, SIGNAL(clicked(bool)), this,
@@ -76,6 +76,10 @@ int CalibrateFromImagesDialog::getPatternRows(){
 
 double CalibrateFromImagesDialog::getSquareSizeMm(){
     return ui->squareSizeBox->value() * 1e-3;
+}
+
+bool CalibrateFromImagesDialog::getSaveROS(){
+    return ui->rosOutputCheckBox->isChecked();
 }
 
 CalibrateFromImagesDialog::~CalibrateFromImagesDialog() { delete ui; }
@@ -208,21 +212,34 @@ void CalibrateFromImagesDialog::updateLeftPath(void) {
   QString dir = ui->leftPath->text();
   if (QDir(dir).exists()) {
     left_path = dir;
+  }else{
+      qDebug() << "Directory doesn't exist";
   }
+
+  qDebug() << "Left path set to: " << left_path;
+
 }
 
 void CalibrateFromImagesDialog::updateRightPath(void) {
   QString dir = ui->rightPath->text();
   if (QDir(dir).exists()) {
     right_path = dir;
+  }else{
+      qDebug() << "Directory doesn't exist";
   }
+
+  qDebug() << "Right path set to: " << right_path;
 }
 
 void CalibrateFromImagesDialog::updateOutputPath(void) {
   QString dir = ui->outputPath->text();
   if (QDir(dir).exists()) {
     output_path = dir;
+  }else{
+      qDebug() << "Directory doesn't exist";
   }
+
+  qDebug() << "Output path set to: " << output_path;
 }
 
 void CalibrateFromImagesDialog::updateLeftMask(void) {

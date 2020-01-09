@@ -6,6 +6,11 @@
 #include <QCoreApplication>
 #include <QSettings>
 
+//!  Parameter file class
+/*!
+  Updating and setting paramter files
+*/
+
 class ParamFile
 {
 public:
@@ -17,8 +22,8 @@ public:
     void update_double(QString tagName, double value);
 private:
     QSettings *settings;
-    QDir default_save_dir = QDir::homePath() + "/deimos/";
-    QDir default_cal_dir = QDir::homePath() + "/deimos/";
+    QDir default_save_dir = QDir::homePath() + "/i3dr_stereo_toolkit/save/";
+    QDir default_cal_dir = QDir::homePath() + "/i3dr_stereo_toolkit/cal/";
 };
 
 #endif // PARAMFILE_H

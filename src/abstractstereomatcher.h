@@ -37,8 +37,8 @@ class AbstractStereoMatcher : public QObject {
  public slots:
    //!  Set images for matching
    /*!
-   * @param[in] Left image
-   * @param[in] Right image
+   * @param[in] left Left image
+   * @param[in] right Right image
    */
   void setImages(cv::Mat* left, cv::Mat* right);
 
@@ -54,18 +54,35 @@ class AbstractStereoMatcher : public QObject {
   //! Returns what value is assigned to pixels with invalid disparities (e.g. -10000)
   virtual int getErrorDisparity(void) = 0;
 
-  ///!  Move matcher to a new thread
+  //!  Move matcher to a new thread
   /*!
-  * @param[in] Left image
-  * @param[in] Right image
+  * @param[in] thread Pointer to thread
   */
   void assignThread(QThread *thread);
 
-  //! Copy the disparity map into = new image
+  //!  Get the disparity map
+  /*!
+  * @param[out] dst Output Mat
+  */
   void getDisparity(cv::Mat &dst);
+
+  //!  Save the disparity map
+  /*!
+  * @param[in] filename Output filename
+  */
   void saveDisparity(QString filename);
+
+  //!  Perform a full left-right consistency check (experimental)
+  /*!
+   * \brief checkLRConsistencyFull
+   * @param[in] threshold Disparity threshold
+   */
   void checkLRConsistencyFull(double threshold);
+
+  //!  Get a pointer to the left image
   cv::Mat *getLeftImage(void){return left;}
+
+  //!  Get a pointer to the right image
   cv::Mat *getRighttImage(void){return right;}
 
   virtual void match();

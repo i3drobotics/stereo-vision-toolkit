@@ -10,27 +10,28 @@ DisparityViewer::DisparityViewer(QWidget *parent)
     : QWidget(parent), ui(new Ui::DisparityViewer) {
   ui->setupUi(this);
 
+  connect(ui->disparityRangeSpinbox, SIGNAL(valueChanged(int)),
+          this, SLOT(updateDisparityRange_spin(int)));
   connect(ui->disparityRangeSlider, SIGNAL(sliderMoved(int)),
-          ui->disparityRangeSpinbox, SLOT(setValue(int)));
+          this, SLOT(updateDisparityRange_slide(int)));
+
   connect(ui->minDisparitySlider, SIGNAL(sliderMoved(int)),
           ui->minDisparitySpinbox, SLOT(setValue(int)));
 
-  connect(ui->disparityRangeSpinbox, SIGNAL(valueChanged(int)),
-          ui->disparityRangeSlider, SLOT(setValue(int)));
   connect(ui->minDisparitySpinbox, SIGNAL(valueChanged(int)),
           ui->minDisparitySlider, SLOT(setValue(int)));
 
   connect(ui->minDisparitySlider, SIGNAL(sliderMoved(int)), this,
           SLOT(updatePixmapRange()));
-  connect(ui->disparityRangeSlider, SIGNAL(sliderMoved(int)), this,
-          SLOT(updatePixmapRange()));
-  connect(ui->disparityRangeSpinbox, SIGNAL(valueChanged(int)), this,
-          SLOT(updatePixmapRange()));
+
   connect(ui->minDisparitySpinbox, SIGNAL(valueChanged(int)), this,
           SLOT(updatePixmapRange()));
 
   connect(ui->colourmapComboBox, SIGNAL(currentIndexChanged(int)), this,
           SLOT(setColourmap(int)));
+
+  connect(ui->btnSaveDisparityView, SIGNAL(clicked(bool)), this,
+          SLOT(saveImageTimestamped()));
 
   ui->colourmapComboBox->setCurrentIndex(colourmap);
 
@@ -48,9 +49,41 @@ void DisparityViewer::assignThread(QThread *thread) {
   thread->start();
 }
 
+void DisparityViewer::saveImageTimestamped(void) {
+  ui->btnSaveDisparityView->setEnabled(false);
+  QString fname;
+  QDateTime dateTime = dateTime.currentDateTime();
+  QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
+
+  fname = QString("%1/%2").arg(save_directory).arg(date_string);
+
+  saveImage(fname);
+  ui->btnSaveDisparityView->setEnabled(true);
+}
+
+void DisparityViewer::saveImage(QString fname) {
+
+  QFuture<void> res_l = QtConcurrent::run(
+        write_parallel, fname.toStdString() + "_disp_colour.png", colour_disparity);
+
+    res_l.waitForFinished();
+
+  emit savedImage(fname);
+}
+
+void DisparityViewer::updateDisparityRange_spin(int range){
+    ui->disparityRangeSpinbox->setValue(range);
+    updatePixmapRange();
+}
+
+void DisparityViewer::updateDisparityRange_slide(int range){
+    ui->disparityRangeSpinbox->setValue(range * 16);
+    updatePixmapRange();
+}
+
 void DisparityViewer::updatePixmapRange(void) {
   min_disparity = ui->minDisparitySlider->value();
-  disparity_range = ui->disparityRangeSlider->value();
+  disparity_range = ui->disparityRangeSlider->value() * 16;
 
   ui->minDisparityLabel->setText(
       QString("%1 px").arg(QString::number(min_disparity)));
@@ -119,7 +152,7 @@ void DisparityViewer::setColourmap(int idx) {
                          colourbar_vis.rows, QImage::Format_RGB888);
   QPixmap colourbar_pmap = QPixmap::fromImage(colourbar_image);
 
-  ui->colourbar->setPixmap(colourbar_pmap.scaled(300, 30));
+  ui->colourbar->setPixmap(colourbar_pmap.scaled(400, 30));
 }
 
 void DisparityViewer::setCalibration(cv::Mat &Q, double baseline, double focal) {
@@ -156,8 +189,9 @@ void DisparityViewer::updateDisparity() {
 
     cv::applyColorMap(disparity_scale, disparity_vis, colourmap);
 
-    cv::cvtColor(disparity_vis, disparity_vis, CV_BGR2RGB);
+    //colour_disparity = disparity_vis;
 
+    cv::cvtColor(disparity_vis, disparity_vis, CV_BGR2RGB);
 
     auto left_ptr = matcher->getLeftImage();
 
@@ -185,6 +219,7 @@ void DisparityViewer::updateDisparity() {
       }
     }
 
+   colour_disparity = disparity_vis;
 
     QImage dmap(disparity_vis.data, disparity_vis.cols, disparity_vis.rows,
                 QImage::Format_RGB888);
@@ -198,6 +233,16 @@ void DisparityViewer::updateDisparity() {
 
   processing_disparity = false;
 }
+/*
+bool write_parallel(std::string fname, cv::Mat src) {
+  std::vector<int> params;
+  int compression_level = 9;
+  params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+  params.push_back(compression_level);
+
+  return cv::imwrite(fname, src, params);
+}
+*/
 
 DisparityViewer::~DisparityViewer() {
   delete ui;

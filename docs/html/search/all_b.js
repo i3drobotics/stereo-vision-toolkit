@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['paramfile',['ParamFile',['../class_param_file.html',1,'']]],
-  ['pause',['pause',['../class_abstract_stereo_camera.html#a0ae4bc133a396a7085b556a62aa9e6f1',1,'AbstractStereoCamera']]]
+  ['reprojected',['reprojected',['../class_abstract_stereo_camera.html#a955561b40fdaeaf218e32fb117b6aa9b',1,'AbstractStereoCamera']]],
+  ['right_5fcaptured',['right_captured',['../class_abstract_stereo_camera.html#a774283a69cd2b2b82d2823d220e4020f',1,'AbstractStereoCamera']]]
 ];

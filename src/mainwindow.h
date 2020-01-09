@@ -6,6 +6,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#define _USE_MATH_DEFINES
+
 #include <QtAwesome.h>
 #include <QDebug>
 #include <QDir>
@@ -27,16 +29,27 @@
 
 #include "matcherwidgetopencvblock.h"
 #include "matcherwidgetopencvsgbm.h"
+#ifdef BUILD_PRO
+    #include "matcherwidgetjrsgm.h"
+#endif
 #include "stereocameradeimos.h"
 #include "stereocamerafromvideo.h"
 #include "stereocameraopencv.h"
+#include "stereocameratis.h"
+#include "stereocamerabasler.h"
 
 #include <disparityviewer.h>
 #include "calibratefromimagesdialog.h"
 #include "calibrationdialog.h"
 #include "stereocalibrate.h"
+#include "cameradisplaywidget.h"
 
 #include "paramfile.h"
+
+//!  Main Window
+/*!
+  QT Main Window of application
+*/
 
 using namespace std;
 using namespace cv;
@@ -49,11 +62,13 @@ class MainWindow : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit MainWindow(QWidget* parent = 0);
+  explicit MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
 
  private:
   Ui::MainWindow* ui;
+
+  bool updatingDisplay = false;
 
   QPixmap pmap_left;
   QPixmap pmap_right;
@@ -70,6 +85,8 @@ class MainWindow : public QMainWindow {
   QVariantMap icon_options;
   QtAwesome* awesome;
   DisparityViewer* disparity_view;
+  CameraDisplayWidget *left_view;
+  CameraDisplayWidget *right_view;
 
   bool cameras_connected = false;
 
@@ -94,9 +111,8 @@ class MainWindow : public QMainWindow {
   void controlsInit();
   void pointCloudInit();
 
-  void stereoCameraRelease(void);
   void stereoCameraInit(void);
-
+  void stereoCameraRelease(void);
   void stereoCameraInitConnections(void);
 
  public slots:
@@ -111,7 +127,10 @@ class MainWindow : public QMainWindow {
   void statusMessageTimeout(void);
   void setMatcher(int matcher);
 
-  void stereoCameraLoad(void);
+  void disableWindow();
+  void enableWindow();
+
+  int stereoCameraLoad(void);
   void autoloadCameraTriggered();
   void videoStreamLoad(void);
 
@@ -130,6 +149,11 @@ class MainWindow : public QMainWindow {
   void updateCloud(void);
   void enable3DViz(int);
   void resetPointCloudView(void);
+
+  void pointCloudSaveStatus(QString);
+
+    protected:
+        void closeEvent(QCloseEvent *event);
 };
 
 #endif  // MAINWINDOW_H
