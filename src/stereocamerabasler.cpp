@@ -6,31 +6,31 @@
 #include "stereocamerabasler.h"
 
 bool StereoCameraBasler::initCamera(std::string left_camera_name, std::string right_camera_name, int binning) {
-  left_camera = new CameraBasler;
-  right_camera = new CameraBasler;
+    left_camera = new CameraBasler;
+    right_camera = new CameraBasler;
 
-  bool res = left_camera->initCamera(left_camera_name,binning);
-  res &= right_camera->initCamera(right_camera_name,binning);
+    bool res = left_camera->initCamera(left_camera_name,binning);
+    res &= right_camera->initCamera(right_camera_name,binning);
 
-  if (res) {
-    res &= left_camera->setMaximumResolution();
-    res &= right_camera->setMaximumResolution();
+    if (res) {
+        res &= left_camera->setMaximumResolution();
+        res &= right_camera->setMaximumResolution();
 
-    left_camera->setExposure(5);
-    right_camera->setExposure(5);
+        left_camera->setExposure(5);
+        right_camera->setExposure(5);
 
-    left_camera->setGain(0);
-    right_camera->setGain(0);
+        left_camera->setGain(0);
+        right_camera->setGain(0);
 
-    left_camera->getImageSize(image_width, image_height, image_size);
-  }else{
-      qDebug() << "Failed to setup cameras";
-      disconnectCamera();
-  }
+        left_camera->getImageSize(image_width, image_height, image_size);
+    }else{
+        qDebug() << "Failed to setup cameras";
+        disconnectCamera();
+    }
 
-  connected = res;
+    connected = res;
 
-  return res;
+    return res;
 }
 
 //No paramters sent to initCamera so use default
@@ -66,18 +66,20 @@ bool StereoCameraBasler::autoConnect(void){
     std::vector<std::string> camera_names = listSystems();
 
     if (camera_names.size() == 2){
-        initCamera(camera_names.at(0),camera_names.at(1), 2);
+        return initCamera(camera_names.at(0),camera_names.at(1), 2);
+    } else if (camera_names.size() == 0){
+        return false;
     } else {
         std::cerr << "More than 2 basler cameras found. Cannot auto connect." << std::endl;
+        return false;
     }
-    return true;
 }
 
 bool StereoCameraBasler::setExposure(double exposure) {
-  bool res = left_camera->setExposure(exposure);
-  res &= right_camera->setExposure(exposure);
+    bool res = left_camera->setExposure(exposure);
+    res &= right_camera->setExposure(exposure);
 
-  return res;
+    return res;
 }
 
 bool StereoCameraBasler::enableAutoExpose(bool enable){
@@ -88,39 +90,40 @@ bool StereoCameraBasler::enableAutoExpose(bool enable){
 }
 
 bool StereoCameraBasler::capture() {
-  QFuture<bool> left_result =
-      QtConcurrent::run(left_camera, &CameraBasler::capture);
-  QFuture<bool> right_result =
-      QtConcurrent::run(right_camera, &CameraBasler::capture);
+    QFuture<bool> left_result =
+            QtConcurrent::run(left_camera, &CameraBasler::capture);
+    QFuture<bool> right_result =
+            QtConcurrent::run(right_camera, &CameraBasler::capture);
 
-  left_result.waitForFinished();
-  right_result.waitForFinished();
+    left_result.waitForFinished();
+    right_result.waitForFinished();
 
-  if (left_result.result() && right_result.result()) {
-    cv::Mat *left_data = left_camera->getImage();
-    cv::Mat *right_data = right_camera->getImage();
-    left_data->copyTo(left_raw);
-    right_data->copyTo(right_raw);
+    if (left_result.result() && right_result.result()) {
+        cv::Mat *left_data = left_camera->getImage();
+        cv::Mat *right_data = right_camera->getImage();
+        left_data->copyTo(left_raw);
+        right_data->copyTo(right_raw);
 
-    emit left_captured();
-    emit right_captured();
+        emit left_captured();
+        emit right_captured();
 
-    return true;
-  }
+        return true;
+    }
 
-  return false;
+    return false;
 }
 
 void StereoCameraBasler::disconnectCamera() {
-  left_camera->close();
-  right_camera->close();
-  connected = false;
-  emit finished();
-  emit disconnected();
+    if (connected){
+        left_camera->close();
+        right_camera->close();
+    }
+    connected = false;
+    emit finished();
+    emit disconnected();
 }
 
 StereoCameraBasler::~StereoCameraBasler() {
-  disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-  disconnectCamera();
-  Pylon::PylonTerminate();
+    disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
+    disconnectCamera();
 }

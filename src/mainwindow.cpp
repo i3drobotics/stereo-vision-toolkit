@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->tabWidget->setCurrentIndex(0);
 
+    cameras_connected = false;
+
     /* Calibration */
     connect(ui->actionCalibration_wizard, SIGNAL(triggered(bool)), this,
             SLOT(startCalibration()));
@@ -22,6 +24,8 @@ MainWindow::MainWindow(QWidget* parent)
             SLOT(startCalibrationFromImages()));
     connect(ui->actionAutoload_Camera, SIGNAL(triggered(bool)), this,
             SLOT(autoloadCameraTriggered()));
+    connect(ui->actionDocumentation, SIGNAL(triggered(bool)), this,
+            SLOT(openHelp()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), QApplication::instance(),
             SLOT(quit()));
 
@@ -47,21 +51,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     controlsInit();
     statusBarInit();
-    int stereo_camera_exit_code = stereoCameraLoad();
-    if (stereo_camera_exit_code < 0){
-        //Display quit messagebox as program does not function correctly if no camera is connected
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this,
-                                      "Stereo Vision Toolkit",
-                                      "Couldn't find any camera connected. Some features will not work as expected. Are you sure you want to continue?",
-                                      QMessageBox::Yes|QMessageBox::No);
-        if (reply != QMessageBox::Yes) {
-            exit(EXIT_FAILURE);
-        }
-    } else {
-        //re-enable tabs as camera confirmed as connected
-        enableWindow();
-    }
+    autoloadCameraTriggered();
     pointCloudInit();
 }
 
@@ -544,7 +534,13 @@ void MainWindow::stereoCameraInit() {
 void MainWindow::autoloadCameraTriggered() {
     stereoCameraRelease();
     int stereo_camera_exit_code = stereoCameraLoad();
-    if (stereo_camera_exit_code == 0){
+    if (stereo_camera_exit_code < 0){
+        //Display quit messagebox as program does not function correctly if no camera is connected
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Stereo Vision Toolkit");
+        msgBox.setText("Couldn't find any camera connected. Some features will not work as expected.");
+        msgBox.exec();
+    } else {
         //re-enable tabs as camera confirmed as connected
         enableWindow();
     }
@@ -894,6 +890,11 @@ void MainWindow::updateFPS(qint64 time) {
 
 void MainWindow::updateTemperature(double temperature) {
     temp_label->setText(QString("Temp: %1 C").arg(QString::number(temperature, 'f', 2)));
+}
+
+void MainWindow::openHelp(){
+    QString link = QCoreApplication::applicationDirPath() + "/docs/help/index.html";
+    QDesktopServices::openUrl(QUrl(link));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

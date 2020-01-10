@@ -141,6 +141,8 @@ class CameraImagingSource : public QObject {
   void setVideoFormat16(int width, int height);
   void setVideoFormat(int width, int height);
 
+  bool connected = false;
+
  signals:
   void finished();
   void grabbed(short*);

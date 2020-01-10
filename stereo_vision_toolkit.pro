@@ -19,9 +19,9 @@ CONFIG += warn_on
 CONFIG += doc
 
 #Comment out if not using I3DR's pro matcher
-CONFIG += using_pro
+CONFIG += include_pro
 
-using_pro {
+include_pro {
     message("Pro enabled")
     DEFINES += BUILD_PRO
 }
@@ -35,7 +35,7 @@ include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
 VPATH = $$_PRO_FILE_PWD_/src
 INCLUDEPATH += $$_PRO_FILE_PWD_/src
 
-using_pro {
+include_pro {
     INCLUDEPATH += $$_PRO_FILE_PWD_/pro/src
 }
 
@@ -65,7 +65,7 @@ SOURCES += main.cpp\
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp
 
-using_pro {
+include_pro {
     SOURCES += \
         $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.cpp \
         $$_PRO_FILE_PWD_/pro/src/matcherjrsgm.cpp
@@ -98,7 +98,7 @@ HEADERS  += mainwindow.h \
     cameradisplaywidget.h \
     cameraimagingsource.h
 
-using_pro {
+include_pro {
     HEADERS += \
         $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.h \
         $$_PRO_FILE_PWD_/pro/src/matcherjrsgm.h
@@ -115,7 +115,7 @@ FORMS    += mainwindow.ui \
     disparityviewer.ui \
     cameradisplaywidget.ui
 
-using_pro {
+include_pro {
     FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.ui
 }
 
@@ -165,7 +165,7 @@ CONFIG(debug, debug|release) {
 
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
 
-using_pro {
+include_pro {
     # Required for JR
     LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/jr/lib" -lDigVTKIntegration
     INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/include"
@@ -184,6 +184,7 @@ INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
 
 # Required for Basler
 LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
+#LIBS += -lGCBase_MD_VC141_v3_1_Basler_pylon -lGenApi_MD_VC141_v3_1_Basler_pylon -lPylonBase_v6_0 -lPylonC -lPylonGUI_v6_0 -lPylonUtility_v6_0
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
 
 # Directshow class IDs
@@ -219,7 +220,7 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/*.dll, true)
 
-    using_pro {
+    include_pro {
         EXTRA_BINFILES += \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/bin/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/dep/*.DLL, true) \
@@ -233,7 +234,7 @@ win32 {
 
 CONFIG( debug, debug|release ) {
     # debug
-    DEPLOY_FOLDER = $${_PRO_FILE_PWD_}/build/debug
+    DEPLOY_FOLDER = $$OUT_PWD/debug
 
     # define dlls to copy to build folder
     win32 {
@@ -249,7 +250,7 @@ CONFIG( debug, debug|release ) {
     }
 } else {
     # release
-    DEPLOY_FOLDER = $${_PRO_FILE_PWD_}/build/release
+    DEPLOY_FOLDER = $$OUT_PWD/release
 
     # define dlls to copy to build folder
     win32 {
@@ -272,12 +273,18 @@ DEPLOY_TARGET = $$shell_quote($$shell_path($${DEPLOY_FOLDER}/$${TARGET}$${TARGET
 QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 
 win32 {
-    #copy 3rd party dlls
+    #copy 3rd party dlls to build folder
     CONFIG += file_copies
     COPIES += extraDlls
     extraDlls.files = $${EXTRA_BINFILES}
     extraDlls.path = $${DEPLOY_FOLDER}
 }
+
+#copy documentation to build folder
+COPIES += helpDocs
+helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/help/*.html, true)
+helpDocs.files += $$files($$_PRO_FILE_PWD_/docs/help/*.png, true)
+helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 
 CONFIG( doc ){
     QMAKE_POST_LINK += && cd $${_PRO_FILE_PWD_} && doxygen

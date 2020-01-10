@@ -53,6 +53,7 @@ private:
     cv::Mat image_buffer;
     enum format {Y800, Y16};
     format image_format;
+    bool connected = false;
 
 public slots:
     bool capture(void);

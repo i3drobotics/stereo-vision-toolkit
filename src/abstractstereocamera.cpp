@@ -509,14 +509,17 @@ void AbstractStereoCamera::register_stereo_capture(){
 }
 
 void AbstractStereoCamera::pause(void) {
-    acquiring = false;
+    if (connected){
+        acquiring = false;
+    }
     finishCapture();
-
 }
 
 void AbstractStereoCamera::singleShot(void) {
-    pause();
-    capture_and_process();
+    if (connected){
+        pause();
+        capture_and_process();
+    }
 }
 
 void AbstractStereoCamera::finishCapture(void) {

@@ -424,7 +424,6 @@ private:
 
   bool rectification_valid = false;
   bool calibration_valid = false;
-  //bool connected = false;
   bool captured_stereo = false;
   bool capturing = false;
 

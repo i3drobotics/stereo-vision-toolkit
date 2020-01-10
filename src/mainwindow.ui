@@ -728,7 +728,7 @@
      <x>0</x>
      <y>0</y>
      <width>1280</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -739,15 +739,11 @@
     <addaction name="actionLoad_Video"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuAcquisition">
-    <property name="title">
-     <string>Acquisition</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionDocumentation"/>
    </widget>
    <widget class="QMenu" name="menuCalibration">
     <property name="title">
@@ -759,7 +755,6 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCalibration"/>
-   <addaction name="menuAcquisition"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -794,6 +789,11 @@
   <action name="actionLoad_Video">
    <property name="text">
     <string>Load Video</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
    </property>
   </action>
  </widget>
