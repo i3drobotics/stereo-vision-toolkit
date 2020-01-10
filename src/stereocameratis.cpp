@@ -186,8 +186,10 @@ bool StereoCameraTIS::capture(){
 }
 
 void StereoCameraTIS::disconnectCamera(){
-    left_camera->close();
-    right_camera->close();
+    if (connected){
+        left_camera->close();
+        right_camera->close();
+    }
     connected = false;
     emit finished();
     emit disconnected();

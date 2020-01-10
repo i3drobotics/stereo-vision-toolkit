@@ -24,7 +24,7 @@ bool CameraBasler::isAvailable() { return camera->IsGrabbing(); }
 void CameraBasler::close() {
     try
     {
-        if (camera){
+        if (connected){
             camera->StopGrabbing();
             camera->Close();
         }
@@ -35,10 +35,12 @@ void CameraBasler::close() {
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
     }
+    connected = false;
 }
 
 bool CameraBasler::initCamera(std::string camera_name,int binning)
 {
+    connected = false;
     try
     {
         // Create an instant camera object with the camera device found first.
@@ -87,6 +89,8 @@ bool CameraBasler::initCamera(std::string camera_name,int binning)
         // The camera device is parameterized with a default configuration which
         // sets up free-running continuous acquisition.
         camera->StartGrabbing();
+
+        connected = true;
 
         return true;
     }
@@ -264,7 +268,7 @@ bool CameraBasler::capture(void)
     bool res = false;
     try
     {
-        if (camera){
+        if (connected){
             if (camera->IsGrabbing())
             {
                 Pylon::CGrabResultPtr ptrGrabResult;
@@ -343,8 +347,6 @@ cv::Mat *CameraBasler::getImage(void) {
 
 CameraBasler::~CameraBasler(void)
 {
-    camera->StopGrabbing();
-    camera->Close();
-    // Releases all pylon resources.
+    close();
     Pylon::PylonTerminate();
 }

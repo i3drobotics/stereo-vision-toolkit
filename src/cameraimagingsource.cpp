@@ -26,12 +26,15 @@ CameraImagingSource::CameraImagingSource(DShowLib::VideoCaptureDeviceItem device
     alert.setText(QString("Couldn't open camera with serial %1.").arg(serial));
     alert.exec();
     exit(1);
+    connected = false;
   }else{
       debugMessage("Opened camera");
+      connected = true;
   }
 }
 
 bool CameraImagingSource::open(qint64 serial){
+    connected = false;
     this->serial = serial;
     handle.closeDev();
     bool res = handle.openDev(serial);
@@ -43,6 +46,7 @@ bool CameraImagingSource::open(qint64 serial){
       alert.exec();
     }else{
         debugMessage("Opened camera");
+        connected = true;
     }
 
     return res;
@@ -254,10 +258,14 @@ void CameraImagingSource::setTrigger(bool trigger){
 }
 
 void CameraImagingSource::close(){
-    debugMessage("Freeing camera");
-    stopCapture();
-    while (handle.isLive());
-    handle.closeDev();
+    if (connected){
+        debugMessage("Freeing camera");
+        stopCapture();
+        while (handle.isLive());
+        handle.closeDev();
+        emit finished();
+    }
+    connected = false;
     emit finished();
 }
 
