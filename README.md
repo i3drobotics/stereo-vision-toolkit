@@ -5,14 +5,14 @@ I3DR's stereo vision toolkit is an application provided for testing of stereo ca
 
 You can calibrate stereo cameras, acquire images and perform matching and 3D reconstruction. You can save raw stereo video to capture a scene and then replay it in the software to fine tune matching parameters.
 
-![SVK image acquisition tab](./docs/images/svk_screenshot.png "SVK Screenshot showing acquisition tab.")
+![SVTK image acquisition tab](./docs/images/svtk_screenshot.png "SVTK Screenshot showing acquisition tab.")
 
 SVTK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any pre-rectified stereo video of the correct format (side-by-side) will work.
 
 Roadmap
 ---
 
-Currently SVK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your I3DR stereo camera quickly. There are a number of features/improvements in development including:
+Currently SVTK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your I3DR stereo camera quickly. There are a number of features/improvements in development including:
 
 - More options for video handling
 - Assisted camera calibration and more detailed feedback
@@ -24,7 +24,7 @@ Stereo matching support
 ---
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
-![SVTK matching an outdoor scene using SGM](./docs/images/svk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
+![SVTK matching an outdoor scene using SGM](./docs/images/svtk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
 I3DR's own 3D matching algorithm can be built into this application however the files required are not included in this repository. This because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in a seperate private git repository. However, the 'pro' version of the software with these tool included will be included in 'Releases' but a license will be required from I3DR for this to run. 
 Please contact bknight@i3drobotics.com for more information. 
 
@@ -33,7 +33,7 @@ Installation
 
 The software is currently Windows-only, but we are likely to add support for Linux in the future. Currently the only component that is reliant on Windows is camera discovery, which uses DirectShow.
 
-This repository contains everything you need to build the software using MSVC 2015 (including pre-built dependencies.) You will also need an up to date installation of Qt 5 and the NVIDIA Cuda SDK. Building with MinGW should be possible, but you will need to build the dependencies yourself. You may also need the Windows SDK.
+This repository contains everything you need to build the software using MSVC 2015 (including pre-built dependencies.) You will also need an up to date installation of Qt 5 (tested using Qt 5.12.5) and the NVIDIA Cuda SDK. Building with MinGW should be possible, but you will need to build the dependencies yourself. You may also need the Windows SDK.
 
 Of course you can also link to your own pre-compiled versions of the dependencies, in this case you'll need to edit the `.pro` file with the appropriate `LIB` and `INCLUDEPATH`'s.
 
