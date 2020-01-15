@@ -16,24 +16,7 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QPushButton" name="settingsButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="text">
-        <string>Settings</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="lblExposure">
-       <property name="text">
-        <string>Exposure</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -46,7 +29,7 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="0" colspan="4">
+     <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="imageDisplay">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -71,10 +54,13 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
-      <widget class="QLabel" name="exposureValueLabel">
+     <item row="1" column="0">
+      <widget class="QPushButton" name="settingsButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
-        <string>0s</string>
+        <string>Advanced Settings</string>
        </property>
       </widget>
      </item>

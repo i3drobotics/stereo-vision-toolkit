@@ -11,8 +11,6 @@ CameraDisplayWidget::CameraDisplayWidget(QWidget *parent) :
     for (int i = 0; i < 256; i++) colourMap.push_back(qRgb(i, i, i));
 
     ui->settingsButton->setHidden(true);
-    ui->exposureValueLabel->setHidden(true);
-    ui->lblExposure->setHidden(true);
 }
 
 CameraDisplayWidget::~CameraDisplayWidget()
@@ -34,8 +32,4 @@ void CameraDisplayWidget::setSize(int width, int height, int bit_depth) {
 void CameraDisplayWidget::setSettingsCallback(QObject *receiver, const char* slot){
     connect(ui->settingsButton, SIGNAL(clicked(bool)), receiver, slot);
     ui->settingsButton->setHidden(false);
-}
-
-void CameraDisplayWidget::setExposure(double value){
-    ui->exposureValueLabel->setText(QString("%1 s").arg(QString::number(value, 'f', 3)));
 }

@@ -33,6 +33,7 @@ public:
     bool setMaximumResolution();
     bool setExposure(double exposure);
     bool setGain(double gain);
+    bool setFPS(double fps);
     ~CameraOpenCV(void);
 
 signals:

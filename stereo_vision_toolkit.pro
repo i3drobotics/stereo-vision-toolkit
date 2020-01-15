@@ -1,26 +1,24 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-10-26T16:38:42
+# Stereo Vision Toolkit
 #
 # Copyright I3D Robotics Ltd, 2020
 # Authors: Josh Veitch-Michaelis, Ben Knight
 #
 #-------------------------------------------------
 
-VERSION = 1.1.1
+VERSION = 1.2.1
 
 QT += core gui concurrent widgets xml network
 
-TARGET = stereo_vision_toolkit
+TARGET = StereoVisionToolkit
 TEMPLATE = app vcapp
 
-#CONFIG += console
 CONFIG += warn_on
 CONFIG += doc
 
-#Comment out if not using I3DR's pro matcher
-CONFIG += include_pro
-
+# To use I3DR's pro stereo matcher
+# add 'CONFIG+=include_pro' to build arguments
 include_pro {
     message("Pro enabled")
     DEFINES += BUILD_PRO
@@ -28,7 +26,9 @@ include_pro {
 
 RC_FILE = icon.rc
 
-RESOURCES += $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc
+RESOURCES += \
+    $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc \
+    $$_PRO_FILE_PWD_/resources/window/window.qrc
 
 include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
 
@@ -39,9 +39,12 @@ include_pro {
     INCLUDEPATH += $$_PRO_FILE_PWD_/pro/src
 }
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
+SOURCES += \
+    main.cpp\
+    mainwindow.cpp \
     calibrationdialog.cpp \
+    qdevicedialog.cpp \
+    qdevicebutton.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -52,7 +55,6 @@ SOURCES += main.cpp\
     cameraopencv.cpp \
     stereocamerabasler.cpp \
     stereocameraopencv.cpp \
-    stereocameradeimos.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
     matcheropencvblock.cpp \
@@ -65,6 +67,10 @@ SOURCES += main.cpp\
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp
 
+win32 {
+    SOURCES += stereocameradeimos.cpp
+}
+
 include_pro {
     SOURCES += \
         $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.cpp \
@@ -73,8 +79,12 @@ include_pro {
         #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm3.cpp
 }
 
-HEADERS  += mainwindow.h \
+HEADERS += \
+    mainwindow.h \
     calibrationdialog.h \
+    qdevicedialog.h \
+    qdevicebutton.h \
+    asmopencv.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -85,7 +95,6 @@ HEADERS  += mainwindow.h \
     cameraopencv.h \
     stereocamerabasler.h \
     stereocameraopencv.h \
-    stereocameradeimos.h \
     stereocameratis.h \
     stereocamerafromvideo.h \
     matcheropencvblock.h \
@@ -98,6 +107,10 @@ HEADERS  += mainwindow.h \
     cameradisplaywidget.h \
     cameraimagingsource.h
 
+win32 {
+    HEADERS += stereocameradeimos.h
+}
+
 include_pro {
     HEADERS += \
         $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.h \
@@ -106,7 +119,8 @@ include_pro {
         #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm3.h
 }
 
-FORMS    += mainwindow.ui \
+FORMS += \
+    mainwindow.ui \
     calibrationdialog.ui \
     calibrateconfirmdialog.ui \
     calibratefromimagesdialog.ui \
@@ -119,7 +133,7 @@ include_pro {
     FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.ui
 }
 
-# For building in a single folder
+# For building in a release and debug in seperate folders
 CONFIG(debug, debug|release) {
     DESTDIR = debug
     OBJECTS_DIR = .obj_debug
@@ -128,6 +142,27 @@ CONFIG(debug, debug|release) {
     DESTDIR = release
     OBJECTS_DIR = .obj
     MOC_DIR     = .moc
+}
+
+# Error if running 32-bit system
+# not all depencies are currently built to run on 32-bit
+# remove this when you build the dependencies for 32-bit
+contains(QT_ARCH, i386) {
+    error(32-bit system detected. Cannot continue)
+}
+
+# Error if running unix system
+# not all depencies are currently built to run on unix
+# remove this when you build the dependencies for unix
+unix {
+    error(unix system detected. Cannot continue)
+}
+
+# Error if running mac system
+# not all depencies are currently built to run on mac
+# remove this when you build the dependencies for mac
+macx {
+    error(mac system detected. Cannot continue)
 }
 
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/opencv/include"
@@ -183,12 +218,19 @@ INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/eigen"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
 
 # Required for Basler
-LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
-#LIBS += -lGCBase_MD_VC141_v3_1_Basler_pylon -lGenApi_MD_VC141_v3_1_Basler_pylon -lPylonBase_v6_0 -lPylonC -lPylonGUI_v6_0 -lPylonUtility_v6_0
+contains(QT_ARCH, i386) {
+    #32-bit
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/Win32"
+} else {
+    #64-bit
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
+}
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
 
-# Directshow class IDs
-LIBS += -lstrmiids
+win32 {
+    # Directshow class IDs
+    LIBS += -lstrmiids
+}
 
 DISTFILES += $$_PRO_FILE_PWD_/resources/fonts/fontawesome-webfont.ttf
 
@@ -203,25 +245,37 @@ isEmpty(TARGET_EXT) {
     TARGET_CUSTOM_EXT = $${TARGET_EXT}
 }
 
-win32 {
-    DEPLOY_COMMAND = windeployqt
-}
-macx {
-    DEPLOY_COMMAND = macdeployqt
-}
+#TODO build 3rd party depencenies for 32-bit systems
 
 win32 {
-    # define dlls to copy to build folder
-    #$$files($$_PRO_FILE_PWD_/3rd_party/qt/*.dll, true) \
-    EXTRA_BINFILES += \
+    # Define dlls to copy to build folder
+    EXTRA_FILES += \
         $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/qt/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/*.dll, true)
+        $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true)
+
+    contains(QT_ARCH, i386) {
+        #32-bit
+        EXTRA_FILES += \
+            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x86/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/Win32/*.dll, true)
+    } else {
+        #64-bit
+        EXTRA_FILES += \
+            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true)
+    }
+
+    # Define drivers to copy to build folder
+    win32 {
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.msi, true)
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
+    }
+    #TODO add pylon drivers for linux and mac
 
     include_pro {
-        EXTRA_BINFILES += \
+        EXTRA_FILES += \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/bin/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/dep/*.DLL, true) \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/lic/*.lic, true)
@@ -232,13 +286,18 @@ win32 {
 
 }
 
-CONFIG( debug, debug|release ) {
-    # debug
-    DEPLOY_FOLDER = $$OUT_PWD/debug
+# Define additional files to copy to build folder
+EXTRA_FILES += \
+    $$_PRO_FILE_PWD_/resources/camera_serials.ini
 
-    # define dlls to copy to build folder
+# Get full output folder path
+DEPLOY_FOLDER = $$OUT_PWD/$$DESTDIR
+
+CONFIG( debug, debug|release ) {
+    # DEBUG
+    # Define debug only dlls to copy to build folder
     win32 {
-        EXTRA_BINFILES += \
+        EXTRA_FILES += \
             $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Debug/hidapi.dll \
             $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/debug/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/debug/*.dll, true) \
@@ -249,12 +308,10 @@ CONFIG( debug, debug|release ) {
             $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/debug/*.dll, true)
     }
 } else {
-    # release
-    DEPLOY_FOLDER = $$OUT_PWD/release
-
-    # define dlls to copy to build folder
+    # RELEASE
+    # Define release only dlls to copy to build folder
     win32 {
-        EXTRA_BINFILES += \
+        EXTRA_FILES += \
             $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
             $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/release/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/release/*.dll, true) \
@@ -267,25 +324,48 @@ CONFIG( debug, debug|release ) {
 }
 
 # Deploy qt
-## Uncomment the following line to help debug the deploy command when running qmake
-#warning($${DEPLOY_COMMAND} $${DEPLOY_TARGET})
+win32 {
+    DEPLOY_COMMAND = windeployqt
+}
+macx {
+    DEPLOY_COMMAND = macdeployqt
+}
 DEPLOY_TARGET = $$shell_quote($$shell_path($${DEPLOY_FOLDER}/$${TARGET}$${TARGET_CUSTOM_EXT}))
 QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 
+# Copy 3rd party files to build folder
+CONFIG += file_copies
+COPIES += extraFiles
 win32 {
-    #copy 3rd party dlls to build folder
-    CONFIG += file_copies
-    COPIES += extraDlls
-    extraDlls.files = $${EXTRA_BINFILES}
-    extraDlls.path = $${DEPLOY_FOLDER}
+    extraFiles.files = $${EXTRA_FILES}
+}
+extraFiles.path = $${DEPLOY_FOLDER}
+
+# Install drivers
+win32 {
+    QMAKE_POST_LINK += && cd /d $${DEPLOY_FOLDER}
+    QMAKE_POST_LINK += && install_drivers.bat
 }
 
-#copy documentation to build folder
+# Copy documentation to build folder
 COPIES += helpDocs
 helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/help/*.html, true)
 helpDocs.files += $$files($$_PRO_FILE_PWD_/docs/help/*.png, true)
 helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 
+# Auto generate code documenation using doxygen
 CONFIG( doc ){
-    QMAKE_POST_LINK += && cd $${_PRO_FILE_PWD_} && doxygen
+    QMAKE_POST_LINK += && cd /d $${_PRO_FILE_PWD_} && doxygen
 }
+
+# Add clean command to remove all files from build directory
+# use 'extraclean' in clean arguments to trigger this clean step
+win32 {
+    extraclean.commands = del /S /Q $$shell_quote($$shell_path($${DEPLOY_FOLDER})\*)
+    extraclean.commands += del /S /Q $$shell_quote($$shell_path($${DEPLOY_FOLDER})\..\*)
+}
+unix {
+    extraclean.commands = rm -r $$shell_quote($$shell_path($${DEPLOY_FOLDER})/*)
+}
+distclean.depends = extraclean
+QMAKE_EXTRA_TARGETS += distclean extraclean

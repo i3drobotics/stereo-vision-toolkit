@@ -134,9 +134,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>isAvailable</b> ()</t
 <tr class="memitem:a635aca20467dd3ca536b4a2f9b8ca4f8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a635aca20467dd3ca536b4a2f9b8ca4f8"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> ()</td></tr>
 <tr class="separator:a635aca20467dd3ca536b4a2f9b8ca4f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeafa5fc16d6b1c47962cb426986fae3d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeafa5fc16d6b1c47962cb426986fae3d"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>initCamera</b> (std::string camera_name, int binning=1)</td></tr>
-<tr class="separator:aeafa5fc16d6b1c47962cb426986fae3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ee8ede61cf5425e71931000bf167fc8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4ee8ede61cf5425e71931000bf167fc8"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>initCamera</b> (std::string camera_name, int binning=1, bool trigger=false, int fps=0)</td></tr>
+<tr class="separator:a4ee8ede61cf5425e71931000bf167fc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78a709488f98be0745f2463a09a9b977"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a78a709488f98be0745f2463a09a9b977"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>assignThread</b> (QThread *thread)</td></tr>
 <tr class="separator:a78a709488f98be0745f2463a09a9b977"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,9 +158,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>setExposure</b> (doub
 <tr class="memitem:a4268287b36e365d7da09af098f5f86dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4268287b36e365d7da09af098f5f86dd"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>setAutoExposure</b> (bool enable)</td></tr>
 <tr class="separator:a4268287b36e365d7da09af098f5f86dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab065ab83434a26b09807eb4be5750088"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab065ab83434a26b09807eb4be5750088"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>setGain</b> (double gain)</td></tr>
-<tr class="separator:ab065ab83434a26b09807eb4be5750088"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4327ddb57734d1d35877ed29c1fbe400"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4327ddb57734d1d35877ed29c1fbe400"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>setAutoGain</b> (bool enable)</td></tr>
+<tr class="separator:a4327ddb57734d1d35877ed29c1fbe400"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e9a22067d2e8b4a489682f49eec6477"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6e9a22067d2e8b4a489682f49eec6477"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>setGain</b> (int gain)</td></tr>
+<tr class="separator:a6e9a22067d2e8b4a489682f49eec6477"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2aa78714cc64484abeafc012d3884489"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2aa78714cc64484abeafc012d3884489"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>setPacketSize</b> (int packetSize)</td></tr>
 <tr class="separator:a2aa78714cc64484abeafc012d3884489"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,6 +173,24 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>setInterPacketDelay</
 <tr class="memitem:a8f4b5a7040cebe9a57443681cd970ffb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f4b5a7040cebe9a57443681cd970ffb"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>setBinning</b> (int binning)</td></tr>
 <tr class="separator:a8f4b5a7040cebe9a57443681cd970ffb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81adc7559bb59bbd00ef06216bea443c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a81adc7559bb59bbd00ef06216bea443c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>enableTrigger</b> (bool enable)</td></tr>
+<tr class="separator:a81adc7559bb59bbd00ef06216bea443c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90605c9336aee06a614072f261cd896f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a90605c9336aee06a614072f261cd896f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>setTrigger</b> (bool enable)</td></tr>
+<tr class="separator:a90605c9336aee06a614072f261cd896f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d63889a8d6b3f84a83fcfd9307cbf7a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d63889a8d6b3f84a83fcfd9307cbf7a"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>changeFPS</b> (int fps)</td></tr>
+<tr class="separator:a9d63889a8d6b3f84a83fcfd9307cbf7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a623f1e9b57f0df3157138b1a1ad9d0b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a623f1e9b57f0df3157138b1a1ad9d0b8"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>changeBinning</b> (int binning)</td></tr>
+<tr class="separator:a623f1e9b57f0df3157138b1a1ad9d0b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a839c67c23d76cbfef309e0fbae7939"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a839c67c23d76cbfef309e0fbae7939"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>setFPS</b> (int fps)</td></tr>
+<tr class="separator:a0a839c67c23d76cbfef309e0fbae7939"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a884e6ccaad612c0aa3cb3690609eff6c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a884e6ccaad612c0aa3cb3690609eff6c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>enableFPS</b> (bool enable)</td></tr>
+<tr class="separator:a884e6ccaad612c0aa3cb3690609eff6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Basler camera control. </p>
@@ -183,7 +204,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>setBinning</b> (int b
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 15 2020 20:50:20 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

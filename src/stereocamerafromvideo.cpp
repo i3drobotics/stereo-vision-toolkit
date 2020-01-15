@@ -5,12 +5,13 @@
 
 #include "stereocamerafromvideo.h"
 
-bool StereoCameraFromVideo::initCamera(QString fname) {
-  stream = cv::VideoCapture(fname.toStdString());
+bool StereoCameraFromVideo::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_info) {
+  std::string fname = camera_info.filename;
+  stream = cv::VideoCapture(fname);
 
   if (stream.isOpened()) {
     stream_valid = true;
-    stream_file = fname.toStdString();
+    stream_file = fname;
   }
 
   image_height = stream.get(CV_CAP_PROP_FRAME_HEIGHT);
@@ -27,6 +28,14 @@ bool StereoCameraFromVideo::initCamera(QString fname) {
   frame_timer.restart();
 
   return stream.isOpened();
+}
+
+std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraFromVideo::listSystems(){
+    return std::vector<AbstractStereoCamera::stereoCameraSerialInfo>();
+}
+
+bool StereoCameraFromVideo::autoConnect(){
+    return true;
 }
 
 void StereoCameraFromVideo::setPosition(int position){

@@ -91,11 +91,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Listener Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>The Imaging Source camera control.  
- <a href="class_listener.html#details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="cameraimagingsource_8h_source.html">cameraimagingsource.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for Listener:</div>
 <div class="dyncontent">
@@ -128,6 +123,12 @@ Signals</h2></td></tr>
 <tr class="memitem:a45ea76b4f44bc621a995f4b81f888c29"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45ea76b4f44bc621a995f4b81f888c29"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>grabbed</b> (void *)</td></tr>
 <tr class="separator:a45ea76b4f44bc621a995f4b81f888c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82fa7957f51dd94c3a7b4bff432dcc44"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a82fa7957f51dd94c3a7b4bff432dcc44"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>deviceDisconnected</b> ()</td></tr>
+<tr class="separator:a82fa7957f51dd94c3a7b4bff432dcc44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bfadbb539cdce04c41cd4eae2a414bd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6bfadbb539cdce04c41cd4eae2a414bd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>grabFailed</b> ()</td></tr>
+<tr class="separator:a6bfadbb539cdce04c41cd4eae2a414bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa35475b2e054a511cbf3dc77513eaa94"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa35475b2e054a511cbf3dc77513eaa94"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>done</b> ()</td></tr>
 <tr class="separator:aa35475b2e054a511cbf3dc77513eaa94"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -143,22 +144,23 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a87e14cfae0106aa4d3447892ab718248"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87e14cfae0106aa4d3447892ab718248"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Listener</b> (QObject *parent=0)</td></tr>
 <tr class="separator:a87e14cfae0106aa4d3447892ab718248"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0315d6bbbfd09c901597821c6a88b1c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0315d6bbbfd09c901597821c6a88b1c7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>deviceLost</b> (DShowLib::Grabber &amp;)</td></tr>
+<tr class="separator:a0315d6bbbfd09c901597821c6a88b1c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4655a1e0d7bc71f2b710ba8bbeecd80"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4655a1e0d7bc71f2b710ba8bbeecd80"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>frameReady</b> (DShowLib::Grabber &amp;, smart_ptr&lt; DShowLib::MemBuffer &gt; pBuffer, DWORD FrameNumber)</td></tr>
 <tr class="separator:ad4655a1e0d7bc71f2b710ba8bbeecd80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Imaging Source camera control. </p>
-<p>Connecting and controlling a TIS camera More info see: <a href="https://www.theimagingsource.com/products/software/software-development-kits-sdks/ic-imaging-control/">https://www.theimagingsource.com/products/software/software-development-kits-sdks/ic-imaging-control/</a> </p>
-
-<p>Definition at line <a class="el" href="cameraimagingsource_8h_source.html#l00024">24</a> of file <a class="el" href="cameraimagingsource_8h_source.html">cameraimagingsource.h</a>.</p>
+<div class="textblock">
+<p>Definition at line <a class="el" href="cameraimagingsource_8h_source.html#l00018">18</a> of file <a class="el" href="cameraimagingsource_8h_source.html">cameraimagingsource.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="cameraimagingsource_8h_source.html">cameraimagingsource.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 15 2020 20:50:20 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

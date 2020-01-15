@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QDebug>
 #include "ui_cameradisplaywidget.h"
+#include <opencv2/opencv.hpp>
+#include "asmopencv.h"
 
 //!  Camera display widget
 /*!
@@ -22,8 +24,29 @@ public:
     explicit CameraDisplayWidget(QWidget *parent = nullptr);
     ~CameraDisplayWidget();
 
-    template <typename T>
-    void updateView(T *new_image) {
+    void updateView(cv::Mat new_image){
+        //cv::Mat cvMat = ASM::QPixmapToCvMat( inPixmap, false );
+        pixmap = ASM::cvMatToQPixmap(new_image);
+        /*
+        new_image.copyTo(cv_display_image);
+        if (cv_display_image.empty()) return;
+        display_image = new QImage((unsigned char*) cv_display_image.data, cv_display_image.cols, cv_display_image.rows,QImage::Format_RGB888);
+
+        if (display_image->isNull()) return;
+
+        pixmap = QPixmap::fromImage(*display_image);
+        */
+
+        if(pixmap.isNull()) return;
+
+        ui->imageDisplay->setPixmap(pixmap.scaled(ui->imageDisplay->size(), Qt::KeepAspectRatio));
+    }
+
+    /*
+
+    void updateView(cv::Mat *new_image) {
+
+        if (new_image->empty()) return;
 
       if(sizeof(T) != 1){
           int scale = 256 << 8*(sizeof(T) - 1);
@@ -47,13 +70,13 @@ public:
       ui->imageDisplay->setPixmap(pixmap.scaled(ui->imageDisplay->size(), Qt::KeepAspectRatio));
 
     }
+    */
 
     void setSettingsCallback(QObject* receiver, const char* slot);
 
     QLabel* getImageDisplay(void){return ui->imageDisplay;}
 
 public slots:
-    void setExposure(double value);
     void setSize(int height, int width, int bit_depth);
 
 private:

@@ -40,6 +40,8 @@
 #include "stereocameraopencv.h"
 #include "stereocameratis.h"
 #include "stereocamerabasler.h"
+#include "qdevicebutton.h"
+#include "qdevicedialog.h"
 
 #include <disparityviewer.h>
 #include "calibratefromimagesdialog.h"
@@ -73,6 +75,8 @@ private:
 
     bool updatingDisplay = false;
 
+    bool showingSettings = false;
+
     QPixmap pmap_left;
     QPixmap pmap_right;
     QPixmap pmap_disparity;
@@ -92,6 +96,7 @@ private:
     CameraDisplayWidget *right_view;
 
     bool cameras_connected = false;
+    int calc_fps = 0;
 
     AbstractStereoCamera* stereo_cam;
     StereoCalibrate* calibrator;
@@ -118,6 +123,8 @@ private:
     void stereoCameraRelease(void);
     void stereoCameraInitConnections(void);
 
+    bool gigeWarning(int binning);
+
 public slots:
     void updateDisplay(void);
     void updateFPS(qint64);
@@ -135,6 +142,10 @@ public slots:
 
     int stereoCameraLoad(void);
     void autoloadCameraTriggered();
+    void toggleAutoExpose(bool);
+    void toggleAutoGain(bool);
+    void toggleEnableBinning(bool enable);
+    void changeBinning(int binning);
     void videoStreamLoad(void);
 
     void setSaveDirectory(QString dir = "");
@@ -159,6 +170,8 @@ public slots:
 
 protected:
     void closeEvent(QCloseEvent *event);
+private slots:
+    void on_btnCameraSettings_clicked();
 };
 
 #endif  // MAINWINDOW_H

@@ -25,6 +25,37 @@ void AbstractStereoCamera::try_capture(){
     capture();
 }
 
+std::vector<AbstractStereoCamera::stereoCameraSerialInfo> AbstractStereoCamera::loadSerials(std::string camera_type, std::string filename){
+    std::vector<stereoCameraSerialInfo> serials;
+    QString qFilname = QString::fromStdString(filename);
+    QFile inputFile(qFilname);
+    if (inputFile.open(QIODevice::ReadOnly)) {
+        QTextStream in(&inputFile);
+        while (!in.atEnd()) {
+            QStringList line = in.readLine().split(' ');
+
+            if(line.size() == 4 || line.size() == 5){ //TODO change this back to only 4 when excel that generates the serials is fixed
+                QString cam_type = line.at(0);
+                if (cam_type.toStdString() == camera_type){
+                    QString left_camera_serial = line.at(1);
+                    QString right_camera_serial = line.at(2);
+                    QString i3dr_serial = line.at(3);
+                    AbstractStereoCamera::stereoCameraSerialInfo csi;
+                    csi.camera_type = camera_type;
+                    csi.left_camera_serial = left_camera_serial.toStdString();
+                    csi.right_camera_serial = right_camera_serial.toStdString();
+                    csi.i3dr_serial = i3dr_serial.toStdString();
+                    serials.push_back(csi);
+                }
+            }
+        }
+        inputFile.close();
+    } else {
+        qDebug() << "Couldn't open i3dr camera serials file " << qFilname;
+    }
+    return serials;
+}
+
 void AbstractStereoCamera::assignThread(QThread *thread) {
   this->moveToThread(thread);
   connect(this, SIGNAL(finished()), thread, SLOT(quit()));
@@ -259,34 +290,25 @@ bool AbstractStereoCamera::isRectifying() { return rectifying; }
 
 bool AbstractStereoCamera::isSwappingLeftRight() { return swappingLeftRight; }
 
-bool AbstractStereoCamera::isConnected() { return connected; }
+bool AbstractStereoCamera::isConnected() {
+    bool connected_tmp = connected;
+    return connected_tmp;
+}
 
 void AbstractStereoCamera::getLeftImage(cv::Mat &dst) {
-    if (connected){
-        left_output.copyTo(dst);
-    }
+    left_output.copyTo(dst);
 }
 
 void AbstractStereoCamera::getRightImage(cv::Mat &dst) {
-    if (connected){
-        right_output.copyTo(dst);
-    }
+    right_output.copyTo(dst);
 }
 
 cv::Mat AbstractStereoCamera::getLeftImage(void) {
-    if (connected){
-        return left_raw.clone();
-    } else {
-        return cv::Mat();
-    }
+    return left_raw.clone();
 }
 
 cv::Mat AbstractStereoCamera::getRightImage(void) {
-    if (connected){
-        return right_raw.clone();
-    } else {
-        return cv::Mat();
-    }
+    return right_raw.clone();
 }
 
 bool AbstractStereoCamera::loadRectificationMaps(QString src_l, QString src_r) {
@@ -478,9 +500,7 @@ void AbstractStereoCamera::process_stereo(void) {
       emit matched();
     }
 
-    if (connected){
-        emit stereopair_processed();
-    }
+    emit stereopair_processed();
     emit fps(frametimer.elapsed());
     frametimer.restart();
 
@@ -509,17 +529,13 @@ void AbstractStereoCamera::register_stereo_capture(){
 }
 
 void AbstractStereoCamera::pause(void) {
-    if (connected){
-        acquiring = false;
-    }
+    acquiring = false;
     finishCapture();
 }
 
 void AbstractStereoCamera::singleShot(void) {
-    if (connected){
-        pause();
-        capture_and_process();
-    }
+    pause();
+    capture_and_process();
 }
 
 void AbstractStereoCamera::finishCapture(void) {

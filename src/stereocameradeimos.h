@@ -46,9 +46,9 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    std::vector<int> listSystems();
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
     bool autoConnect();
-    bool initCamera(int usb_index);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
     bool setFrameSize(int width, int height);
     bool setFrame16(void);
     void getFrameRate(void);
@@ -56,6 +56,11 @@ public:
     void openHID();
 
     int getExposure();
+    void toggleAutoExpose(bool enable);
+    void adjustExposure(double exposure);
+    void toggleAutoGain(bool enable){}; //TODO create auto gain setting function
+    void adjustGain(int gain){}; //TODO create gain setting function
+    void adjustBinning(int gain){}; //TODO create binning setting function
 
     int usb_index_from_serial(std::string serial);
     std::string serial_from_usb_index(int index);
@@ -67,6 +72,7 @@ public slots:
     bool toggleHDR(bool enable);
     bool enableAutoExpose(bool enable);
     double getTemperature(void);
+    void changeFPS(int fps);
 
 private:
     cv::VideoCapture camera;
@@ -79,6 +85,7 @@ private:
     hid_device* deimos_device = NULL;
     bool send_hid(std::vector<unsigned char> &buffer, size_t command_len);
     std::string serial_from_device_path(std::string usb_device_path);
+    std::string get_device_path_serial(IMoniker *pMoniker);
 
     qint64 getSerial(void);
 
