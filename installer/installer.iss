@@ -35,12 +35,18 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "../build/release/*"; Excludes: "\params\*.xml"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "../build/release/vcredist_x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/release/pylon_USB_Camera_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/release/pylon_GigE_Filter_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/release/pylon_GigE_Performance_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../licenses/*"; DestDir: "{app}/licenses"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "../LICENSE"; DestDir: "{app}/licenses"
 Source: "../{#IconName}"; DestDir: "{app}"
 
 [Run]
 Filename: {tmp}\vcredist_x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
+Filename: {tmp}\pylon_USB_Camera_Driver.msi; StatusMsg: Installing Pylon USB Camera Driver...;
+Filename: {tmp}\pylon_GigE_Filter_Driver.msi; StatusMsg: Installing Pylon GigE Filter Driver...;
+Filename: {tmp}\pylon_GigE_Performance_Driver.msi; StatusMsg: Installing Pylon GigE Performance Driver...;
 
 [Icons]
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"

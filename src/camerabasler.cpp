@@ -38,8 +38,12 @@ void CameraBasler::close() {
     connected = false;
 }
 
-bool CameraBasler::initCamera(std::string camera_name,int binning)
+bool CameraBasler::initCamera(std::string camera_name,int binning, bool trigger, int fps)
 {
+    this->camera_name = camera_name;
+    this->binning = binning;
+    this->trigger = trigger;
+    this->fps = fps;
     connected = false;
     try
     {
@@ -74,13 +78,15 @@ bool CameraBasler::initCamera(std::string camera_name,int binning)
         camera = new Pylon::CInstantCamera(camera_device);
 
         setBinning(binning);
+        setTrigger(trigger);
+        changeFPS(fps);
 
         // Print the model name of the camera.
         std::cout << "Using device " << camera->GetDeviceInfo().GetModelName() << std::endl;
 
         // The parameter MaxNumBuffer can be used to control the count of buffers
-        // allocated for grabbing. The default value of this parameter is 10.
-        camera->MaxNumBuffer = 5;
+        // allocated for grabbing. The default value of this parameter is 16.
+        camera->MaxNumBuffer = 16;
 
         formatConverter.OutputPixelFormat = Pylon::PixelType_Mono8;
         formatConverter.OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
@@ -90,9 +96,20 @@ bool CameraBasler::initCamera(std::string camera_name,int binning)
         // sets up free-running continuous acquisition.
         camera->StartGrabbing();
 
-        connected = true;
-
-        return true;
+        if (camera->IsGrabbing())
+        {
+            Pylon::CGrabResultPtr ptrGrabResult;
+            camera->RetrieveResult(3000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
+            if (ptrGrabResult != NULL){
+                if (ptrGrabResult->GrabSucceeded())
+                {
+                    connected = true;
+                    return true;
+                }
+            } else {
+                qDebug() << "Camera grab pointer is null";
+            }
+        }
     }
     catch (const Pylon::GenericException &e)
     {
@@ -101,6 +118,7 @@ bool CameraBasler::initCamera(std::string camera_name,int binning)
                   << e.GetDescription() << std::endl;
         return false;
     }
+    return false;
 }
 
 void CameraBasler::getImageSize(int &image_width, int &image_height,
@@ -140,14 +158,93 @@ bool CameraBasler::setFrame8(void)
     return true;
 }
 
+bool CameraBasler::changeFPS(int fps){
+    bool res = true;
+    // unlimited frame rate if set to 0
+    if (fps>0){
+        res &= setFPS(fps);
+        res &= enableFPS(true);
+        this->fps = fps;
+    } else {
+        res &= enableFPS(false);
+        this->fps = fps;
+    }
+    return res;
+}
+
+bool CameraBasler::setFPS(int fps){
+    try
+    {
+        float fps_f = (float)fps;
+        camera->Open();
+        Pylon::CFloatParameter(camera->GetNodeMap(), "AcquisitionFrameRateAbs").SetValue(fps_f);
+        return true;
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred." << std::endl
+                  << e.GetDescription() << std::endl;
+        return false;
+    }
+}
+
+bool CameraBasler::enableFPS(bool enable){
+    try
+    {
+        camera->Open();
+        Pylon::CBooleanParameter(camera->GetNodeMap(), "AcquisitionFrameRateEnable").SetValue(enable);
+        return true;
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred." << std::endl
+                  << e.GetDescription() << std::endl;
+        return false;
+    }
+}
+
+bool CameraBasler::enableTrigger(bool enable){
+    close();
+    return (initCamera(this->camera_name,this->binning,enable,this->fps));
+}
+
+bool CameraBasler::changeBinning(int binning){
+    close();
+    return (initCamera(this->camera_name,binning,this->trigger,this->fps));
+}
+
+bool CameraBasler::setTrigger(bool enable){
+    bool res = false;
+    try
+    {
+        std::string enable_str = "Off";
+        if (enable){
+            enable_str = "On";
+        }
+        camera->Open();
+        Pylon::CEnumParameter(camera->GetNodeMap(), "TriggerMode").FromString(enable_str.c_str());
+        //Pylon::CStringParameter(camera->GetNodeMap(), "ExposureAuto").SetValue(enable_str.c_str());
+        res = true;
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred." << std::endl
+                  << e.GetDescription() << std::endl;
+        res = false;
+    }
+
+    return res;
+}
+
 bool CameraBasler::setPacketSize(int packetSize)
 {
     try
     {
-        // convert from seconds to milliseconds
         camera->Open();
         Pylon::CIntegerParameter(camera->GetNodeMap(), "GevSCPSPacketSize").SetValue(packetSize);
-        //camera->Close();
         return true;
     }
     catch (const Pylon::GenericException &e)
@@ -166,7 +263,6 @@ bool CameraBasler::setInterPacketDelay(int interPacketDelay)
         // convert from seconds to milliseconds
         camera->Open();
         Pylon::CIntegerParameter(camera->GetNodeMap(), "GevSCPD").SetValue(interPacketDelay);
-        //camera->Close();
         return true;
     }
     catch (const Pylon::GenericException &e)
@@ -188,7 +284,6 @@ bool CameraBasler::setBinning(int binning)
         Pylon::CIntegerParameter(camera->GetNodeMap(), "BinningHorizontal").SetValue(binning);
         Pylon::CEnumParameter(camera->GetNodeMap(), "BinningVerticalMode").FromString("Average");
         Pylon::CIntegerParameter(camera->GetNodeMap(), "BinningVertical").SetValue(binning);
-        //camera->Close();
         return true;
     }
     catch (const Pylon::GenericException &e)
@@ -209,7 +304,6 @@ bool CameraBasler::setExposure(double exposure)
         qDebug() << "Setting exposure..." << exposure_i;
         camera->Open();
         Pylon::CIntegerParameter(camera->GetNodeMap(), "ExposureTimeRaw").SetValue(exposure_i);
-        //camera->Close();
         return true;
     }
     catch (const Pylon::GenericException &e)
@@ -231,8 +325,6 @@ bool CameraBasler::setAutoExposure(bool enable)
         }
         camera->Open();
         Pylon::CEnumParameter(camera->GetNodeMap(), "ExposureAuto").FromString(enable_str.c_str());
-        //Pylon::CStringParameter(camera->GetNodeMap(), "ExposureAuto").SetValue(enable_str.c_str());
-        //camera->Close();
         return true;
     }
     catch (const Pylon::GenericException &e)
@@ -244,14 +336,34 @@ bool CameraBasler::setAutoExposure(bool enable)
     }
 }
 
-bool CameraBasler::setGain(double gain)
+bool CameraBasler::setAutoGain(bool enable)
+{
+    try
+    {
+        std::string enable_str = "Off";
+        if (enable){
+            enable_str = "Continuous";
+        }
+        camera->Open();
+        Pylon::CEnumParameter(camera->GetNodeMap(), "GainAuto").FromString(enable_str.c_str());
+        return true;
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred." << std::endl
+                  << e.GetDescription() << std::endl;
+        return false;
+    }
+}
+
+bool CameraBasler::setGain(int gain)
 {
     try
     {
         int gain_i = gain;
         camera->Open();
         Pylon::CIntegerParameter(camera->GetNodeMap(), "GainRaw").SetValue(gain_i);
-        //camera->Close();
         return true;
     }
     catch (const Pylon::GenericException &e)
@@ -297,7 +409,7 @@ bool CameraBasler::capture(void)
                                 qDebug() << "cols: " << image.cols << " rows: " << image.rows;
                                 res = false;
                             } else {
-                                emit captured();
+                                //emit captured();
                                 res = true;
                             }
                             pylonImage.Release();
@@ -334,6 +446,7 @@ bool CameraBasler::capture(void)
                   << e.GetDescription() << std::endl;
         res = false;
     }
+    emit captured();
     return res;
 }
 

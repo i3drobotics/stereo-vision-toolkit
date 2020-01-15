@@ -24,7 +24,14 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(QString fname);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_info);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
+    bool autoConnect();
+    void toggleAutoExpose(bool enable){};
+    void adjustExposure(double exposure){};
+    void toggleAutoGain(bool enable){};
+    void adjustGain(int gain){};
+    void adjustBinning(int gain){};
 public slots:
     void setPosition(int position);
     bool enableAutoExpose(bool enable);

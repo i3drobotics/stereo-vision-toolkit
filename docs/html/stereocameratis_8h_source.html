@@ -108,44 +108,61 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">public</span> slots:</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordtype">void</span> loadLeftSettings();</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordtype">void</span> loadRightSettings();</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_stereo_camera_t_i_s.html">StereoCameraTIS</a>(QObject *parent = 0) :</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                <a class="code" href="class_abstract_stereo_camera.html">AbstractStereoCamera</a>(parent)</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                {}</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_stereo_camera_t_i_s.html#ac60bd4e4c7b29494fb5708d187e33bbb">capture</a>();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_stereo_camera_t_i_s.html#a83edee07bb9d40b9633f96164561942f">disconnectCamera</a>();</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">bool</span> setCameras(<a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *left, <a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *right);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordtype">bool</span> setExposure(<span class="keywordtype">double</span> exposure);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    std::vector&lt;qint64&gt; listSystems();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">bool</span> autoConnect();</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    ~<a class="code" href="class_stereo_camera_t_i_s.html">StereoCameraTIS</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *left_camera;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *right_camera;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    std::vector&lt;std::unique_ptr&lt;CameraImagingSource&gt;&gt; stereo_cameras;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    std::vector&lt;std::unique_ptr&lt;Listener&gt;&gt; stereo_listeners;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    QList&lt;qint64&gt; load_serials(QString filename);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    QList&lt;int&gt; widths;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    QList&lt;int&gt; heights;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordtype">void</span> enableTrigger(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> setExposure(<span class="keywordtype">double</span> exposure);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> setGain(<span class="keywordtype">int</span> gain);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> enableAutoExpose(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> enableAutoGain(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">void</span> changeFPS(<span class="keywordtype">int</span> <a class="code" href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">fps</a>);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_stereo_camera_t_i_s.html">StereoCameraTIS</a>(QObject *parent = 0) :</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                <a class="code" href="class_abstract_stereo_camera.html">AbstractStereoCamera</a>(parent)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                {}</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_stereo_camera_t_i_s.html#ac60bd4e4c7b29494fb5708d187e33bbb">capture</a>();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_stereo_camera_t_i_s.html#a83edee07bb9d40b9633f96164561942f">disconnectCamera</a>();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">bool</span> initCamera(<a class="code" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a> camera_serial_info);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">bool</span> setCameras(<a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *camera_left, <a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *camera_right, <a class="code" href="class_listener.html">Listener</a> *listener_left, <a class="code" href="class_listener.html">Listener</a> *listener_right);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::vector&lt;AbstractStereoCamera::stereoCameraSerialInfo&gt; listSystems();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span> toggleAutoExpose(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span> adjustExposure(<span class="keywordtype">double</span> exposure);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> toggleAutoGain(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> adjustGain(<span class="keywordtype">int</span> gain);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">void</span> adjustBinning(<span class="keywordtype">int</span> gain){}; <span class="comment">//TODO create binning setting function</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">bool</span> autoConnect();</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    ~<a class="code" href="class_stereo_camera_t_i_s.html">StereoCameraTIS</a>(<span class="keywordtype">void</span>);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">void</span> setup_cameras();</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;};</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif // STEREOCAMERATIS_H</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *left_camera;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="class_camera_imaging_source.html">CameraImagingSource</a> *right_camera;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    std::vector&lt;std::unique_ptr&lt;CameraImagingSource&gt;&gt; stereo_cameras;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    std::vector&lt;std::unique_ptr&lt;Listener&gt;&gt; stereo_listeners;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="code" href="class_listener.html">Listener</a> *left_listener;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="class_listener.html">Listener</a> *right_listener;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    QList&lt;qint64&gt; load_serials(QString filename);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    QList&lt;int&gt; widths;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    QList&lt;int&gt; heights;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">void</span> setup_cameras();</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif // STEREOCAMERATIS_H</span></div>
 <div class="ttc" id="class_stereo_camera_t_i_s_html"><div class="ttname"><a href="class_stereo_camera_t_i_s.html">StereoCameraTIS</a></div><div class="ttdoc">Stereo Imaging Source camera control. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameratis_8h_source.html#l00013">stereocameratis.h:13</a></div></div>
-<div class="ttc" id="class_stereo_camera_t_i_s_html_ac60bd4e4c7b29494fb5708d187e33bbb"><div class="ttname"><a href="class_stereo_camera_t_i_s.html#ac60bd4e4c7b29494fb5708d187e33bbb">StereoCameraTIS::capture</a></div><div class="ttdeci">bool capture()</div><div class="ttdoc">Capture an image. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameratis_8cpp_source.html#l00174">stereocameratis.cpp:174</a></div></div>
-<div class="ttc" id="class_stereo_camera_t_i_s_html_a83edee07bb9d40b9633f96164561942f"><div class="ttname"><a href="class_stereo_camera_t_i_s.html#a83edee07bb9d40b9633f96164561942f">StereoCameraTIS::disconnectCamera</a></div><div class="ttdeci">void disconnectCamera()</div><div class="ttdoc">Disconnect camera. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameratis_8cpp_source.html#l00188">stereocameratis.cpp:188</a></div></div>
+<div class="ttc" id="class_stereo_camera_t_i_s_html_ac60bd4e4c7b29494fb5708d187e33bbb"><div class="ttname"><a href="class_stereo_camera_t_i_s.html#ac60bd4e4c7b29494fb5708d187e33bbb">StereoCameraTIS::capture</a></div><div class="ttdeci">bool capture()</div><div class="ttdoc">Capture an image. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameratis_8cpp_source.html#l00239">stereocameratis.cpp:239</a></div></div>
+<div class="ttc" id="class_stereo_camera_t_i_s_html_a83edee07bb9d40b9633f96164561942f"><div class="ttname"><a href="class_stereo_camera_t_i_s.html#a83edee07bb9d40b9633f96164561942f">StereoCameraTIS::disconnectCamera</a></div><div class="ttdeci">void disconnectCamera()</div><div class="ttdoc">Disconnect camera. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameratis_8cpp_source.html#l00255">stereocameratis.cpp:255</a></div></div>
+<div class="ttc" id="class_abstract_stereo_camera_html_a2c94f041f379bea5a5d2b4e2e5ba0217"><div class="ttname"><a href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">AbstractStereoCamera::fps</a></div><div class="ttdeci">void fps(qint64)</div><div class="ttdoc">Emitted after a frame has been processed to indicate the current framerate. </div></div>
 <div class="ttc" id="class_camera_imaging_source_html"><div class="ttname"><a href="class_camera_imaging_source.html">CameraImagingSource</a></div><div class="ttdef"><b>Definition:</b> <a href="cameraimagingsource_8h_source.html#l00102">cameraimagingsource.h:102</a></div></div>
-<div class="ttc" id="class_abstract_stereo_camera_html"><div class="ttname"><a href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></div><div class="ttdoc">Stereo camera base class. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00042">abstractstereocamera.h:42</a></div></div>
+<div class="ttc" id="class_abstract_stereo_camera_html"><div class="ttname"><a href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></div><div class="ttdoc">Stereo camera base class. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00048">abstractstereocamera.h:48</a></div></div>
+<div class="ttc" id="class_listener_html"><div class="ttname"><a href="class_listener.html">Listener</a></div><div class="ttdef"><b>Definition:</b> <a href="cameraimagingsource_8h_source.html#l00018">cameraimagingsource.h:18</a></div></div>
+<div class="ttc" id="struct_abstract_stereo_camera_1_1stereo_camera_serial_info_html"><div class="ttname"><a href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a></div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00119">abstractstereocamera.h:119</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jan 9 2020 17:04:42 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jan 15 2020 20:50:20 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

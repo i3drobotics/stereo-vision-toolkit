@@ -1,6 +1,6 @@
 #include "cameraimagingsource.h"
 
-CameraImagingSource::CameraImagingSource(){
+CameraImagingSource::CameraImagingSource(void){
     saveFull = false;
     saveEncoded = false;
 
@@ -26,36 +26,37 @@ CameraImagingSource::CameraImagingSource(DShowLib::VideoCaptureDeviceItem device
     alert.setText(QString("Couldn't open camera with serial %1.").arg(serial));
     alert.exec();
     exit(1);
-    connected = false;
   }else{
       debugMessage("Opened camera");
-      connected = true;
   }
 }
 
-bool CameraImagingSource::open(qint64 serial){
-    connected = false;
-    this->serial = serial;
+bool CameraImagingSource::open(std::string serial){
+    qint64 qSerial = QString::fromStdString(serial).toInt();
+    this->serial = qSerial;
     handle.closeDev();
-    bool res = handle.openDev(serial);
+    bool res = handle.openDev(qSerial);
 
     if (!handle.isDevValid()) {
       debugMessage("Couldn't open camera");
       QMessageBox alert;
-      alert.setText(QString("Couldn't open camera with serial %1.").arg(serial));
+      alert.setText(QString("Couldn't open camera with serial %1.").arg(qSerial));
       alert.exec();
     }else{
+        this->width = handle.getVideoFormat().getSize().cx;
+        this->height = handle.getVideoFormat().getSize().cy;
+
         debugMessage("Opened camera");
-        connected = true;
     }
 
     return res;
 }
 
-qint64 CameraImagingSource::getSerial(void){
-    long long serial;
-    handle.getDev().getSerialNumber(serial);
-    return serial;
+std::string CameraImagingSource::getSerial(void){
+    qint64 serial_tmp;
+    handle.getDev().getSerialNumber(serial_tmp);
+    std::string serial_str = QString::number(serial_tmp).toStdString();
+    return serial_str;
 }
 
 void CameraImagingSource::setup(int width, int height, int fps) {
@@ -84,10 +85,10 @@ DShowLib::GrabberListener* CameraImagingSource::getListener() { return grabber_l
 
 void CameraImagingSource::setListener(DShowLib::GrabberListener* listener) {
   grabber_listener = listener;
-  handle.addListener((DShowLib::GrabberListener*)listener);
+  handle.addListener((DShowLib::GrabberListener*)listener, Listener::eFRAMEREADY);
 }
 
-void CameraImagingSource::showProperties() { handle.showVCDPropertyPage(nullptr, ""); }
+void CameraImagingSource::showProperties() { handle.showVCDPropertyPage(0, ""); }
 
 void CameraImagingSource::setVideoFormat(int width, int height) {
 
@@ -141,13 +142,16 @@ void CameraImagingSource::startCapture() {
   }
 
   handle.startLive(false);
+
+  return;
 }
 
 void CameraImagingSource::stopCapture() {
   handle.stopLive();
-  handle.setSinkType(nullptr);
+  handle.setSinkType(NULL);
 
   emit stopped();
+  return;
 }
 
 void CameraImagingSource::toggleCapture(bool capture) {
@@ -171,11 +175,128 @@ void CameraImagingSource::saveBitmap(QString fname) {
   frame_sink->getLastAcqMemBuffer()->save(fname.toStdString());
 }
 
+void CameraImagingSource::changeGain(int gain){
+    setGain(gain);
+}
+
+void CameraImagingSource::changeExposure(double exposure){
+    setExposure(exposure);
+}
+
+void CameraImagingSource::enableAutoExposure(bool enable){
+    DShowLib::tIVCDPropertyItemsPtr pItems = handle.getAvailableVCDProperties();
+    if( pItems != 0 )
+    {
+        // Try to find the exposure item
+        DShowLib::tIVCDPropertyItemPtr pExposureItem = pItems->findItem( DShowLib::VCDID_Exposure );
+
+        DShowLib::tIVCDSwitchPropertyPtr m_pExposureAuto;
+
+        DShowLib::tIVCDPropertyElementPtr pExposureAutoElement =  pExposureItem->findElement( DShowLib::VCDElement_Auto );
+
+        // If an auto element exists, try to acquire a switch interface
+        if( pExposureAutoElement != 0 )
+        {
+            pExposureAutoElement->getInterfacePtr( m_pExposureAuto );
+
+            // If successful, disable automation
+            if( m_pExposureAuto != 0 )
+                m_pExposureAuto->setSwitch( enable );
+        }
+    }
+}
+
+void CameraImagingSource::enableAutoGain(bool enable){
+    DShowLib::tIVCDPropertyItemsPtr pItems = handle.getAvailableVCDProperties();
+    if( pItems != 0 )
+    {
+        // Try to find the exposure item
+        DShowLib::tIVCDPropertyItemPtr pGainItem = pItems->findItem( DShowLib::VCDID_Gain );
+
+        DShowLib::tIVCDSwitchPropertyPtr m_pGainAuto;
+
+        DShowLib::tIVCDPropertyElementPtr pGainAutoElement =  pGainItem->findElement( DShowLib::VCDElement_Auto );
+
+        // If an auto element exists, try to acquire a switch interface
+        if( pGainAutoElement != 0 )
+        {
+            pGainAutoElement->getInterfacePtr( m_pGainAuto );
+
+            // If successful, disable automation
+            if( m_pGainAuto != 0 )
+                m_pGainAuto->setSwitch( enable );
+        }
+    }
+}
+
+
+void CameraImagingSource::setExposure(double exposure) {
+    DShowLib::tIVCDPropertyItemsPtr pItems = handle.getAvailableVCDProperties();
+    if( pItems != 0 )
+    {
+        // Try to find the exposure item
+        DShowLib::tIVCDPropertyItemPtr pExposureItem = pItems->findItem( DShowLib::VCDID_Exposure );
+
+        DShowLib::tIVCDAbsoluteValuePropertyPtr m_pExposureValue;
+
+        DShowLib::tIVCDPropertyElementPtr pExposureValueElement = pExposureItem->findElement( DShowLib::VCDElement_Value );
+
+        // If a value element exists, try to acquire a range interface
+        if( pExposureValueElement != 0 )
+        {
+            pExposureValueElement->getInterfacePtr( m_pExposureValue );
+
+            double current_exposure = m_pExposureValue->getValue();
+            double exposure_d = exposure/100;
+
+            qDebug() << "current exposure: " << current_exposure;
+            qDebug() << "new exposure: " << exposure_d;
+
+            m_pExposureValue->setValue( exposure_d );
+        }
+    }
+}
+
+void CameraImagingSource::setGain(int gain) {
+    DShowLib::tIVCDPropertyItemsPtr pItems = handle.getAvailableVCDProperties();
+    if( pItems != 0 )
+    {
+        // Try to find the exposure item
+        DShowLib::tIVCDPropertyItemPtr pGainItem = pItems->findItem( DShowLib::VCDID_Gain );
+
+        DShowLib::tIVCDAbsoluteValuePropertyPtr m_pGainValue;
+
+        DShowLib::tIVCDPropertyElementPtr pGainValueElement = pGainItem->findElement( DShowLib::VCDElement_Value );
+
+        // If a value element exists, try to acquire a range interface
+        if( pGainValueElement != 0 )
+        {
+            pGainValueElement->getInterfacePtr( m_pGainValue );
+
+            double current_gain = m_pGainValue->getValue();
+            int gain_i = gain;
+
+            qDebug() << "current gain: " << current_gain;
+            qDebug() << "new gain: " << gain_i;
+
+            m_pGainValue->setValue( gain_i );
+        }
+    }
+}
+
+/*
+void CameraImagingSource::setGain(int gain) {
+  if (handle.setProperty(VideoProcAmp_Gain, (long)gain)) {
+    debugMessage("Couldn't set gain");
+  }
+}
+*/
+
 double CameraImagingSource::getExposure() {
   auto camera_properties = handle.getAvailableVCDProperties();
 
   // Retrieve the absolute value interface for exposure.
-  DShowLib::tIVCDAbsoluteValuePropertyPtr pAbsVal = nullptr;
+  DShowLib::tIVCDAbsoluteValuePropertyPtr pAbsVal = 0;
   camera_properties->findInterfacePtr(DShowLib::VCDID_Exposure,
                                       DShowLib::VCDElement_Value, pAbsVal);
 
@@ -183,13 +304,17 @@ double CameraImagingSource::getExposure() {
 }
 
 void CameraImagingSource::grabImage() {
-  if (!handle.isLive()) debugMessage("Not live");
 
-  DShowLib::Error result = frame_sink->snapImagesAsync(1);
+  if (!handle.isLive()){
+      qDebug() << "Not live";
+      emit grabError();
+  }
+
+  auto result = frame_sink->snapImagesAsync(1);
 
   if (result.isError()) {
-    debugMessage("Failed to capture image");
-    qDebug() << result.toString().c_str();
+    qDebug() << "Failed to capture image";
+    qDebug() << result.c_str();
     emit grabError();
   }
 
@@ -207,6 +332,9 @@ void CameraImagingSource::setFrameRate(double setRate) {
   while (handle.isLive())
     ;
 
+  if (setRate == 0){
+      setRate = handle.getCurrentMaxAvailableFPS();
+  }
   if (!handle.setFPS(setRate)) {
     debugMessage("Failed to change frame rate");
   } else {
@@ -223,12 +351,6 @@ void CameraImagingSource::setFrameRate(double setRate) {
 }
 
 double CameraImagingSource::getFrameRate(void) { return handle.getFPS(); }
-
-void CameraImagingSource::setGain(int gain) {
-  if (handle.setProperty(VideoProcAmp_Gain, (long)gain)) {
-    debugMessage("Couldn't set gain");
-  }
-}
 
 int CameraImagingSource::getGain(void) {
   return (int)handle.getProperty(VideoProcAmp_Gain);
@@ -258,17 +380,14 @@ void CameraImagingSource::setTrigger(bool trigger){
 }
 
 void CameraImagingSource::close(){
-    if (connected){
-        debugMessage("Freeing camera");
-        stopCapture();
-        while (handle.isLive());
-        handle.closeDev();
-        emit finished();
-    }
-    connected = false;
+    debugMessage("Freeing camera");
+    stopCapture();
+    while (handle.isLive())
+      ;
+    handle.closeDev();
     emit finished();
 }
 
 CameraImagingSource::~CameraImagingSource() {
-    close();
+  close();
 }

@@ -25,17 +25,24 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(std::string left_camera_name, std::string right_camera_name, int binning = 1);
-    bool initCamera(void);
-    //bool setExposure(double exposure);
-    //bool enableAutoExpose(bool enable);
-    std::vector<std::string> listSystems();
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
     bool autoConnect();
+    void toggleAutoExpose(bool enable);
+    void adjustExposure(double exposure);
+    void toggleAutoGain(bool enable);
+    void adjustGain(int gain);
+    void adjustBinning(int gain);
     ~StereoCameraBasler(void);
 
 public slots:
     bool setExposure(double exposure);
+    bool setGain(int gain);
+    void setBinning(int val);
+    void changeFPS(int fps);
+    void enableTrigger(bool enable);
     bool enableAutoExpose(bool enable);
+    bool enableAutoGain(bool enable);
 
 private:
     CameraBasler *left_camera;

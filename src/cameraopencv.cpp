@@ -78,6 +78,10 @@ bool CameraOpenCV::setGain(double gain) {
   return camera.set(CV_CAP_PROP_GAIN, gain);
 }
 
+bool CameraOpenCV::setFPS(double fps){
+    return camera.set(CV_CAP_PROP_FPS, fps);
+}
+
 bool CameraOpenCV::capture(void) {
   bool res = camera.read(image_buffer);
 

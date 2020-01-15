@@ -152,7 +152,7 @@ namespace Pylon
         
 
         // Implements IEnumParameterT<EnumT>
-        virtual IEnumParameterT<EnumT>& operator=(EnumT value)
+        virtual CEnumParameterT<EnumT>& operator=(EnumT value)
         {
             SetValue(value);
             return *this;

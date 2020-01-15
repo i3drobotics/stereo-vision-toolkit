@@ -5,7 +5,9 @@
 
 #include "stereocameradeimos.h"
 
-bool StereoCameraDeimos::initCamera(int usb_index){
+bool StereoCameraDeimos::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info){
+    this->camera_serial_info = camera_serial_info;
+    int usb_index = usb_index_from_serial(camera_serial_info.left_camera_serial);
     if (usb_index >= 0) {
         openHID();
 
@@ -33,8 +35,50 @@ bool StereoCameraDeimos::initCamera(int usb_index){
     return connected;
 }
 
-std::vector<int> StereoCameraDeimos::listSystems(){
-    std::vector<int> devids;
+std::string StereoCameraDeimos::get_device_path_serial(IMoniker *pMoniker){
+    std::string device_path_serial;
+    IPropertyBag *pPropBag;
+    HRESULT hr = pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPropBag));
+    if (FAILED(hr)) {
+        pMoniker->Release();
+        return "";
+    }
+
+    VARIANT var;
+    VariantInit(&var);
+
+    // Get description or friendly name.
+    hr = pPropBag->Read(L"Description", &var, 0);
+    if (FAILED(hr)) {
+        hr = pPropBag->Read(L"FriendlyName", &var, 0);
+    }
+
+    if (SUCCEEDED(hr)) {
+        std::wstring str(var.bstrVal);
+
+        if (std::string(str.begin(), str.end()) == "See3CAM_Stereo") {
+            qDebug() << "Found Deimos at device";
+
+            hr = pPropBag->Read(L"DevicePath", &var, 0);
+
+            device_path = var.bstrVal;
+            std::wstring device_path_wstr(device_path);
+            std::string device_path_str = std::string(device_path_wstr.begin(), device_path_wstr.end());
+            device_path_serial = serial_from_device_path(device_path_str);
+        }
+        VariantClear(&var);
+    }
+
+    hr = pPropBag->Write(L"FriendlyName", &var);
+
+    pPropBag->Release();
+    pMoniker->Release();
+    return device_path_serial;
+}
+
+std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraDeimos::listSystems(){
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials("usb");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
 
     // Create the System Device Enumerator.
     ICreateDevEnum *pDevEnum;
@@ -52,61 +96,27 @@ std::vector<int> StereoCameraDeimos::listSystems(){
             pDevEnum->Release();
 
             IMoniker *pMoniker = NULL;
-            int i = 0;
             while (pEnum->Next(1, &pMoniker, NULL) == S_OK) {
-                IPropertyBag *pPropBag;
-                HRESULT hr = pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPropBag));
-                if (FAILED(hr)) {
-                    pMoniker->Release();
-                    continue;
-                }
-
-                VARIANT var;
-                VariantInit(&var);
-
-                // Get description or friendly name.
-                hr = pPropBag->Read(L"Description", &var, 0);
-                if (FAILED(hr)) {
-                    hr = pPropBag->Read(L"FriendlyName", &var, 0);
-                }
-
-                if (SUCCEEDED(hr)) {
-                    std::wstring str(var.bstrVal);
-
-                    if (std::string(str.begin(), str.end()) == "See3CAM_Stereo") {
-                        qDebug() << "Found Deimos at device " << i;
-
-                        hr = pPropBag->Read(L"DevicePath", &var, 0);
-
-                        device_path = var.bstrVal;
-                        std::wstring device_path_wstr(device_path);
-                        std::string device_path_str = std::string(device_path_wstr.begin(), device_path_wstr.end());
-                        std::string usb_device_serial = serial_from_device_path(device_path_str);
-                        devids.push_back(i);
+                std::string device_path_serial = get_device_path_serial(pMoniker);
+                for (auto& known_serial_info : known_serial_infos) {
+                    if (device_path_serial == known_serial_info.left_camera_serial){
+                        connected_serial_infos.push_back(known_serial_info);
+                        break;
                     }
-                    VariantClear(&var);
                 }
-
-                hr = pPropBag->Write(L"FriendlyName", &var);
-
-                pPropBag->Release();
-                pMoniker->Release();
-                i++;
             }
         }
     }
-
-    return devids;
+    return connected_serial_infos;
 }
 
 bool StereoCameraDeimos::autoConnect() {
-    std::vector<int> devids = listSystems();
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> camera_serials = listSystems();
 
     bool res = false;
 
-    if (devids.size() > 0){
-        int devid = devids.at(0);
-        res = initCamera(devid);
+    if (camera_serials.size() > 0){
+        res = initCamera(camera_serials.at(0));
     } else {
         std::cerr << "Failed to find deimos system" << std::endl;
     }
@@ -288,7 +298,7 @@ std::string StereoCameraDeimos::serial_from_device_path(std::string usb_device_p
     std::istringstream tokenStream(usb_device_path);
     while (std::getline(tokenStream, token, '#'))
     {
-       device_path_delim.push_back(token);
+        device_path_delim.push_back(token);
     }
     if (device_path_delim.size() == 4) {
         camera_serial = device_path_delim.at(2);
@@ -350,6 +360,14 @@ double StereoCameraDeimos::getTemperature(void){
 
 }
 
+void StereoCameraDeimos::toggleAutoExpose(bool enable){
+    enableAutoExpose(enable);
+}
+
+void StereoCameraDeimos::adjustExposure(double exposure){
+    setExposure(exposure);
+}
+
 bool StereoCameraDeimos::enableAutoExpose(bool enable) {
     if (enable)
         return setExposure(0.001);
@@ -389,6 +407,16 @@ bool StereoCameraDeimos::setExposure(double exposure_milliseconds) {
     }
 
     return false;
+}
+
+void StereoCameraDeimos::changeFPS(int fps){
+    double fps_d;
+    if (fps == 30){
+        fps_d = 1;
+    } else {
+        fps_d = 0;
+    }
+    camera.set(CV_CAP_PROP_FPS, (double)fps_d);
 }
 
 bool StereoCameraDeimos::toggleHDR(bool enable){

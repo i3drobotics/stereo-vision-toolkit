@@ -15,16 +15,12 @@
 #include <iostream>
 #include <string>
 
-//!  The Imaging Source camera control
-/*!
-  Connecting and controlling a TIS camera
-  More info see: https://www.theimagingsource.com/products/software/software-development-kits-sdks/ic-imaging-control/
-*/
-
 class Listener : public QObject, public DShowLib::GrabberListener {
   Q_OBJECT
  signals:
   void grabbed(void*);
+  void deviceDisconnected();
+  void grabFailed();
   void done();
   void frame_number(int);
   void frameTime(uint);
@@ -52,6 +48,10 @@ class Listener : public QObject, public DShowLib::GrabberListener {
  public:
   explicit Listener(QObject* parent = 0) : QObject(parent) {}
   ~Listener(void) {}
+
+  void deviceLost(DShowLib::Grabber& /* caller */){
+    emit deviceDisconnected();
+  }
 
   void frameReady(DShowLib::Grabber& /* caller */,
                   smart_ptr<DShowLib::MemBuffer> pBuffer, DWORD FrameNumber) {
@@ -106,9 +106,9 @@ class CameraImagingSource : public QObject {
   explicit CameraImagingSource(void);
   void assignThread(QThread* thread);
   void setListener(DShowLib::GrabberListener* listener);
-  bool open(qint64 serial);
+  bool open(std::string serial);
   void close();
-  qint64 getSerial(void);
+  std::string getSerial(void);
   ~CameraImagingSource(void);
   int height = -1;
   int width = -1;
@@ -122,9 +122,14 @@ class CameraImagingSource : public QObject {
   bool saveFull = false;
   bool saveEncoded = false;
 
+  void enableAutoExposure(bool enable);
+  void enableAutoGain(bool enable);
+  void changeExposure(double exposure);
+  void changeGain(int gain);
+
  private:
   DShowLib::GrabberListener* grabber_listener;
-  //int result = -1;
+  int result = -1;
   int bitDepth = -1;
   int colourMode = -1;
   bool capturing = false;
@@ -140,8 +145,7 @@ class CameraImagingSource : public QObject {
 
   void setVideoFormat16(int width, int height);
   void setVideoFormat(int width, int height);
-
-  bool connected = false;
+  void setExposure(double exposure);
 
  signals:
   void finished();

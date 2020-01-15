@@ -23,6 +23,12 @@ signals:
 public slots:
     void loadLeftSettings();
     void loadRightSettings();
+    void enableTrigger(bool enable);
+    void setExposure(double exposure);
+    void setGain(int gain);
+    void enableAutoExpose(bool enable);
+    void enableAutoGain(bool enable);
+    void changeFPS(int fps);
 
 public:
     explicit StereoCameraTIS(QObject *parent = 0) :
@@ -30,9 +36,14 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool setCameras(CameraImagingSource *left, CameraImagingSource *right);
-    bool setExposure(double exposure);
-    std::vector<qint64> listSystems();
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
+    bool setCameras(CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
+    void toggleAutoExpose(bool enable);
+    void adjustExposure(double exposure);
+    void toggleAutoGain(bool enable);
+    void adjustGain(int gain);
+    void adjustBinning(int gain){}; //TODO create binning setting function
     bool autoConnect();
 
     ~StereoCameraTIS(void);
@@ -43,6 +54,9 @@ private:
 
     std::vector<std::unique_ptr<CameraImagingSource>> stereo_cameras;
     std::vector<std::unique_ptr<Listener>> stereo_listeners;
+
+    Listener *left_listener;
+    Listener *right_listener;
 
     QList<qint64> load_serials(QString filename);
     QList<int> widths;
