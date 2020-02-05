@@ -3,9 +3,9 @@
 ; MUST be installed on x64 bit machine
 
 #define AppName "Stereo Vision Toolkit"
-#define AppVersion "1.1.1"
+#define AppVersion "1.2.1"
 #define InstallerName "Stereo Vision Toolkit Installer"
-#define ExeName "stereo_vision_toolkit.exe"
+#define ExeName "StereoVisionToolkit.exe"
 #define IconName "i3dr_logo.ico"
 
 [Setup]
@@ -33,7 +33,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "../build/release/*"; Excludes: "\params\*.xml"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "../build/release/*"; Excludes: "\params\*.xml,*.lic,install_drivers.bat"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "../build/release/vcredist_x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_USB_Camera_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_GigE_Filter_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
@@ -44,9 +44,9 @@ Source: "../{#IconName}"; DestDir: "{app}"
 
 [Run]
 Filename: {tmp}\vcredist_x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
-Filename: {tmp}\pylon_USB_Camera_Driver.msi; StatusMsg: Installing Pylon USB Camera Driver...;
-Filename: {tmp}\pylon_GigE_Filter_Driver.msi; StatusMsg: Installing Pylon GigE Filter Driver...;
-Filename: {tmp}\pylon_GigE_Performance_Driver.msi; StatusMsg: Installing Pylon GigE Performance Driver...;
+Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_USB_Camera_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon USB Camera Driver...;
+Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Filter_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Filter Driver...;
+Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Performance_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Performance Driver...;
 
 [Icons]
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"

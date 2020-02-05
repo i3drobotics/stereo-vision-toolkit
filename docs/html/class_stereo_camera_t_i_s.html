@@ -154,12 +154,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:ac299030bbbc8a7445140ca419c94a558 inherit pub_slots_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#ac299030bbbc8a7445140ca419c94a558">saveImageTimestamped</a> ()</td></tr>
 <tr class="memdesc:ac299030bbbc8a7445140ca419c94a558 inherit pub_slots_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save an image from the camera with a timestamped filename.  <a href="#ac299030bbbc8a7445140ca419c94a558">More...</a><br /></td></tr>
 <tr class="separator:ac299030bbbc8a7445140ca419c94a558 inherit pub_slots_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af58b04dd9c17e4d5cc139eb99d738cc6 inherit pub_slots_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#af58b04dd9c17e4d5cc139eb99d738cc6">videoStreamStart</a> (QString fname=&quot;&quot;)</td></tr>
-<tr class="memdesc:af58b04dd9c17e4d5cc139eb99d738cc6 inherit pub_slots_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start writing a video stream to a file.  <a href="#af58b04dd9c17e4d5cc139eb99d738cc6">More...</a><br /></td></tr>
-<tr class="separator:af58b04dd9c17e4d5cc139eb99d738cc6 inherit pub_slots_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae39e6f45c68b4bbd4442fdac161051bd inherit pub_slots_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#ae39e6f45c68b4bbd4442fdac161051bd">videoStreamStop</a> (void)</td></tr>
-<tr class="memdesc:ae39e6f45c68b4bbd4442fdac161051bd inherit pub_slots_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop writing a video stream.  <a href="#ae39e6f45c68b4bbd4442fdac161051bd">More...</a><br /></td></tr>
-<tr class="separator:ae39e6f45c68b4bbd4442fdac161051bd inherit pub_slots_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20884206b38ce743e9b302d4b8a84f18 inherit pub_slots_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20884206b38ce743e9b302d4b8a84f18"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>videoStreamProcess</b> (void)</td></tr>
+<tr class="separator:a20884206b38ce743e9b302d4b8a84f18 inherit pub_slots_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b8bc87de9f73731b0ca1c9b293b57ac inherit pub_slots_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b8bc87de9f73731b0ca1c9b293b57ac"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a1b8bc87de9f73731b0ca1c9b293b57ac">enableCapture</a> (bool <a class="el" href="class_abstract_stereo_camera.html#a01d0ecf3cf4bb8e9a6b9e34292483d14">capture</a>)</td></tr>
 <tr class="memdesc:a1b8bc87de9f73731b0ca1c9b293b57ac inherit pub_slots_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start or stop capturing an image. <br /></td></tr>
@@ -295,12 +292,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a83edee07bb9d40b9633f96164561942f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stereo_camera_t_i_s.html#a83edee07bb9d40b9633f96164561942f">disconnectCamera</a> ()</td></tr>
 <tr class="memdesc:a83edee07bb9d40b9633f96164561942f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnect camera.  <a href="#a83edee07bb9d40b9633f96164561942f">More...</a><br /></td></tr>
 <tr class="separator:a83edee07bb9d40b9633f96164561942f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc44da8b21402e553e469a0261a9befe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acc44da8b21402e553e469a0261a9befe"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>initCamera</b> (<a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a> camera_serial_info)</td></tr>
-<tr class="separator:acc44da8b21402e553e469a0261a9befe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bc6919cb4143ce7aa72f1d7ce4e09ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7bc6919cb4143ce7aa72f1d7ce4e09ab"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>setCameras</b> (<a class="el" href="class_camera_imaging_source.html">CameraImagingSource</a> *camera_left, <a class="el" href="class_camera_imaging_source.html">CameraImagingSource</a> *camera_right, <a class="el" href="class_listener.html">Listener</a> *listener_left, <a class="el" href="class_listener.html">Listener</a> *listener_right)</td></tr>
-<tr class="separator:a7bc6919cb4143ce7aa72f1d7ce4e09ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a029277bc3032fa412a3e94b1712d7a38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a029277bc3032fa412a3e94b1712d7a38"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>initCamera</b> (<a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a> camera_serial_info, <a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_settings.html">AbstractStereoCamera::stereoCameraSettings</a> inital_camera_settings)</td></tr>
+<tr class="separator:a029277bc3032fa412a3e94b1712d7a38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3882a93fea544fe07c0f0c987c118cf3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3882a93fea544fe07c0f0c987c118cf3"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>setCameras</b> (<a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_settings.html">AbstractStereoCamera::stereoCameraSettings</a> inital_camera_settings, <a class="el" href="class_camera_imaging_source.html">CameraImagingSource</a> *camera_left, <a class="el" href="class_camera_imaging_source.html">CameraImagingSource</a> *camera_right, <a class="el" href="class_listener.html">Listener</a> *listener_left, <a class="el" href="class_listener.html">Listener</a> *listener_right)</td></tr>
+<tr class="separator:a3882a93fea544fe07c0f0c987c118cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabed25bbef2d69614d2b5e9208736089"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aabed25bbef2d69614d2b5e9208736089"></a>
 std::vector<br class="typebreak" />
 &lt; <a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>listSystems</b> ()</td></tr>
@@ -317,12 +314,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>toggleAutoGain</b> (b
 <tr class="memitem:a5b5170e72788dc87766df3d73ca5276b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5b5170e72788dc87766df3d73ca5276b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustGain</b> (int gain)</td></tr>
 <tr class="separator:a5b5170e72788dc87766df3d73ca5276b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec2162c4c4af4f7890c99ec2051d139b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec2162c4c4af4f7890c99ec2051d139b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustBinning</b> (int gain)</td></tr>
-<tr class="separator:aec2162c4c4af4f7890c99ec2051d139b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad338ef0bd0db066313972e6d2636829a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad338ef0bd0db066313972e6d2636829a"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>autoConnect</b> ()</td></tr>
-<tr class="separator:ad338ef0bd0db066313972e6d2636829a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba34cc43a0d926dee0f33b37f312894e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba34cc43a0d926dee0f33b37f312894e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustBinning</b> (int)</td></tr>
+<tr class="separator:aba34cc43a0d926dee0f33b37f312894e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9d892839562f568afd3c75533c995d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9d892839562f568afd3c75533c995d8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>toggleTrigger</b> (bool enable)</td></tr>
+<tr class="separator:ae9d892839562f568afd3c75533c995d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d39cb86091ff6806bad572c9a6ef0e0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6d39cb86091ff6806bad572c9a6ef0e0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustFPS</b> (int <a class="el" href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">fps</a>)</td></tr>
+<tr class="separator:a6d39cb86091ff6806bad572c9a6ef0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4ef0639f9342b342ffcf3c51390bce6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4ef0639f9342b342ffcf3c51390bce6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustPacketSize</b> (int)</td></tr>
+<tr class="separator:ad4ef0639f9342b342ffcf3c51390bce6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_abstract_stereo_camera"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_abstract_stereo_camera')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></td></tr>
 <tr class="memitem:af28506e8333e203bea7149353ad26d31 inherit pub_methods_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af28506e8333e203bea7149353ad26d31"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>AbstractStereoCamera</b> (QObject *parent=nullptr)</td></tr>
@@ -342,6 +345,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a490db3572c901f51f49d90016f856805">isAcquiring</a> ()</td></tr>
 <tr class="memdesc:a490db3572c901f51f49d90016f856805 inherit pub_methods_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the camera is currently acquiring images (in general) <br /></td></tr>
 <tr class="separator:a490db3572c901f51f49d90016f856805 inherit pub_methods_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aead672b93cc71df538e0cc9b6f764879 inherit pub_methods_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aead672b93cc71df538e0cc9b6f764879"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#aead672b93cc71df538e0cc9b6f764879">isCapturingVideo</a> ()</td></tr>
+<tr class="memdesc:aead672b93cc71df538e0cc9b6f764879 inherit pub_methods_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the video is currently storing frames. Can be used to check if video has closed. <br /></td></tr>
+<tr class="separator:aead672b93cc71df538e0cc9b6f764879 inherit pub_methods_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0096fcc42b50aa7fa4236f6bddcd81f7 inherit pub_methods_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0096fcc42b50aa7fa4236f6bddcd81f7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">isMatching</a> ()</td></tr>
 <tr class="memdesc:a0096fcc42b50aa7fa4236f6bddcd81f7 inherit pub_methods_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether matching is enabled. <br /></td></tr>
@@ -383,6 +390,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a1f35feaeb739af86eb89a25ad58870e4 inherit pub_methods_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top">cv::Size&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a1f35feaeb739af86eb89a25ad58870e4">getSize</a> (void)</td></tr>
 <tr class="memdesc:a1f35feaeb739af86eb89a25ad58870e4 inherit pub_methods_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the image size.  <a href="#a1f35feaeb739af86eb89a25ad58870e4">More...</a><br /></td></tr>
 <tr class="separator:a1f35feaeb739af86eb89a25ad58870e4 inherit pub_methods_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2143a45f9ff0d1f33f1d88770b81ab6 inherit pub_methods_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#aa2143a45f9ff0d1f33f1d88770b81ab6">videoStreamInit</a> (QString filename=&quot;&quot;, int <a class="el" href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">fps</a>=0)</td></tr>
+<tr class="memdesc:aa2143a45f9ff0d1f33f1d88770b81ab6 inherit pub_methods_class_abstract_stereo_camera"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initalise video stream for writing a video stream to a file.  <a href="#aa2143a45f9ff0d1f33f1d88770b81ab6">More...</a><br /></td></tr>
+<tr class="separator:aa2143a45f9ff0d1f33f1d88770b81ab6 inherit pub_methods_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accba7a6aa436ee1da58d664bfb04c3c3 inherit pub_methods_class_abstract_stereo_camera"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="accba7a6aa436ee1da58d664bfb04c3c3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>videoStreamStop</b> ()</td></tr>
+<tr class="separator:accba7a6aa436ee1da58d664bfb04c3c3 inherit pub_methods_class_abstract_stereo_camera"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -480,7 +493,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 
 <p>Implements <a class="el" href="class_abstract_stereo_camera.html#a01d0ecf3cf4bb8e9a6b9e34292483d14">AbstractStereoCamera</a>.</p>
 
-<p>Definition at line <a class="el" href="stereocameratis_8cpp_source.html#l00239">239</a> of file <a class="el" href="stereocameratis_8cpp_source.html">stereocameratis.cpp</a>.</p>
+<p>Definition at line <a class="el" href="stereocameratis_8cpp_source.html#l00270">270</a> of file <a class="el" href="stereocameratis_8cpp_source.html">stereocameratis.cpp</a>.</p>
 
 </div>
 </div>
@@ -510,7 +523,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 
 <p>Implements <a class="el" href="class_abstract_stereo_camera.html#a305a2d1ef4900e28251601ccac0f365f">AbstractStereoCamera</a>.</p>
 
-<p>Definition at line <a class="el" href="stereocameratis_8cpp_source.html#l00255">255</a> of file <a class="el" href="stereocameratis_8cpp_source.html">stereocameratis.cpp</a>.</p>
+<p>Definition at line <a class="el" href="stereocameratis_8cpp_source.html#l00286">286</a> of file <a class="el" href="stereocameratis_8cpp_source.html">stereocameratis.cpp</a>.</p>
 
 </div>
 </div>
@@ -521,7 +534,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 15 2020 20:50:20 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 5 2020 16:34:56 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

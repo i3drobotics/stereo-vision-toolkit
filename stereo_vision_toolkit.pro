@@ -54,6 +54,7 @@ SOURCES += \
     camerabasler.cpp \
     cameraopencv.cpp \
     stereocamerabasler.cpp \
+    stereocamerabasler2.cpp \
     stereocameraopencv.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
@@ -94,6 +95,7 @@ HEADERS += \
     camerabasler.h \
     cameraopencv.h \
     stereocamerabasler.h \
+    stereocamerabasler2.h \
     stereocameraopencv.h \
     stereocameratis.h \
     stereocamerafromvideo.h \

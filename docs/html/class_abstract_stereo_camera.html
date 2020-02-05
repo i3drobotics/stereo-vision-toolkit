@@ -107,16 +107,19 @@ Inheritance diagram for AbstractStereoCamera:</div>
   <img src="class_abstract_stereo_camera.png" usemap="#AbstractStereoCamera_map" alt=""/>
   <map id="AbstractStereoCamera_map" name="AbstractStereoCamera_map">
 <area href="class_stereo_camera_basler.html" title="Stereo balser cameras. " alt="StereoCameraBasler" shape="rect" coords="0,112,155,136"/>
-<area href="class_stereo_camera_deimos.html" alt="StereoCameraDeimos" shape="rect" coords="165,112,320,136"/>
-<area href="class_stereo_camera_from_video.html" title="Stereo video feed. " alt="StereoCameraFromVideo" shape="rect" coords="330,112,485,136"/>
-<area href="class_stereo_camera_open_c_v.html" title="Stereo OpenCV camera control. " alt="StereoCameraOpenCV" shape="rect" coords="495,112,650,136"/>
-<area href="class_stereo_camera_t_i_s.html" title="Stereo Imaging Source camera control. " alt="StereoCameraTIS" shape="rect" coords="660,112,815,136"/>
+<area href="class_stereo_camera_basler2.html" title="Stereo balser cameras. " alt="StereoCameraBasler2" shape="rect" coords="165,112,320,136"/>
+<area href="class_stereo_camera_deimos.html" alt="StereoCameraDeimos" shape="rect" coords="330,112,485,136"/>
+<area href="class_stereo_camera_from_video.html" title="Stereo video feed. " alt="StereoCameraFromVideo" shape="rect" coords="495,112,650,136"/>
+<area href="class_stereo_camera_open_c_v.html" title="Stereo OpenCV camera control. " alt="StereoCameraOpenCV" shape="rect" coords="660,112,815,136"/>
+<area href="class_stereo_camera_t_i_s.html" title="Stereo Imaging Source camera control. " alt="StereoCameraTIS" shape="rect" coords="825,112,980,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">stereoCameraSerialInfo</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_settings.html">stereoCameraSettings</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
@@ -148,12 +151,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:ac299030bbbc8a7445140ca419c94a558"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#ac299030bbbc8a7445140ca419c94a558">saveImageTimestamped</a> ()</td></tr>
 <tr class="memdesc:ac299030bbbc8a7445140ca419c94a558"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save an image from the camera with a timestamped filename.  <a href="#ac299030bbbc8a7445140ca419c94a558">More...</a><br /></td></tr>
 <tr class="separator:ac299030bbbc8a7445140ca419c94a558"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af58b04dd9c17e4d5cc139eb99d738cc6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#af58b04dd9c17e4d5cc139eb99d738cc6">videoStreamStart</a> (QString fname=&quot;&quot;)</td></tr>
-<tr class="memdesc:af58b04dd9c17e4d5cc139eb99d738cc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start writing a video stream to a file.  <a href="#af58b04dd9c17e4d5cc139eb99d738cc6">More...</a><br /></td></tr>
-<tr class="separator:af58b04dd9c17e4d5cc139eb99d738cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae39e6f45c68b4bbd4442fdac161051bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#ae39e6f45c68b4bbd4442fdac161051bd">videoStreamStop</a> (void)</td></tr>
-<tr class="memdesc:ae39e6f45c68b4bbd4442fdac161051bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop writing a video stream.  <a href="#ae39e6f45c68b4bbd4442fdac161051bd">More...</a><br /></td></tr>
-<tr class="separator:ae39e6f45c68b4bbd4442fdac161051bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20884206b38ce743e9b302d4b8a84f18"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20884206b38ce743e9b302d4b8a84f18"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>videoStreamProcess</b> (void)</td></tr>
+<tr class="separator:a20884206b38ce743e9b302d4b8a84f18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b8bc87de9f73731b0ca1c9b293b57ac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b8bc87de9f73731b0ca1c9b293b57ac"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a1b8bc87de9f73731b0ca1c9b293b57ac">enableCapture</a> (bool <a class="el" href="class_abstract_stereo_camera.html#a01d0ecf3cf4bb8e9a6b9e34292483d14">capture</a>)</td></tr>
 <tr class="memdesc:a1b8bc87de9f73731b0ca1c9b293b57ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start or stop capturing an image. <br /></td></tr>
@@ -288,13 +288,22 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustGain</b
 <tr class="memitem:aa953ccae62b1ab6c39434391cbff2f5f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa953ccae62b1ab6c39434391cbff2f5f"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustBinning</b> (int)=0</td></tr>
 <tr class="separator:aa953ccae62b1ab6c39434391cbff2f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83d6a11dbabb10c592be52f676b66f41"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a83d6a11dbabb10c592be52f676b66f41"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>toggleTrigger</b> (bool)=0</td></tr>
+<tr class="separator:a83d6a11dbabb10c592be52f676b66f41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec5cf58905a16e01ac759485a2c4be63"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec5cf58905a16e01ac759485a2c4be63"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustFPS</b> (int)=0</td></tr>
+<tr class="separator:aec5cf58905a16e01ac759485a2c4be63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add66ef588d18c62985355ffd3a5619b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="add66ef588d18c62985355ffd3a5619b8"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustPacketSize</b> (int)=0</td></tr>
+<tr class="separator:add66ef588d18c62985355ffd3a5619b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac45f018e3b2f3035ea45d90b38b1a609"><td class="memItemLeft" align="right" valign="top">std::vector<br class="typebreak" />
 &lt; <a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">stereoCameraSerialInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#ac45f018e3b2f3035ea45d90b38b1a609">loadSerials</a> (std::string camera_type, std::string filename=qApp-&gt;applicationDirPath().toStdString()+&quot;/camera_serials.ini&quot;)</td></tr>
 <tr class="memdesc:ac45f018e3b2f3035ea45d90b38b1a609"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load known camera serials.  <a href="#ac45f018e3b2f3035ea45d90b38b1a609">More...</a><br /></td></tr>
 <tr class="separator:ac45f018e3b2f3035ea45d90b38b1a609"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d2d93da4e462124a8f6583247a2bba5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d2d93da4e462124a8f6583247a2bba5"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>initCamera</b> (<a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">stereoCameraSerialInfo</a>)=0</td></tr>
-<tr class="separator:a3d2d93da4e462124a8f6583247a2bba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2f3fb746af17d8c0412a684a51de303"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2f3fb746af17d8c0412a684a51de303"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>initCamera</b> (<a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">stereoCameraSerialInfo</a>, <a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_settings.html">stereoCameraSettings</a>)=0</td></tr>
+<tr class="separator:ae2f3fb746af17d8c0412a684a51de303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5496f7e9e10c2892d62091dd56709e7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a5496f7e9e10c2892d62091dd56709e7a">assignThread</a> (QThread *thread)</td></tr>
 <tr class="memdesc:a5496f7e9e10c2892d62091dd56709e7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign the stereo camera object to a thread so as not to block the GUI. Typically called just after instantiation.  <a href="#a5496f7e9e10c2892d62091dd56709e7a">More...</a><br /></td></tr>
 <tr class="separator:a5496f7e9e10c2892d62091dd56709e7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -306,6 +315,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a490db3572c901f51f49d90016f856805">isAcquiring</a> ()</td></tr>
 <tr class="memdesc:a490db3572c901f51f49d90016f856805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the camera is currently acquiring images (in general) <br /></td></tr>
 <tr class="separator:a490db3572c901f51f49d90016f856805"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aead672b93cc71df538e0cc9b6f764879"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aead672b93cc71df538e0cc9b6f764879"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#aead672b93cc71df538e0cc9b6f764879">isCapturingVideo</a> ()</td></tr>
+<tr class="memdesc:aead672b93cc71df538e0cc9b6f764879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the video is currently storing frames. Can be used to check if video has closed. <br /></td></tr>
+<tr class="separator:aead672b93cc71df538e0cc9b6f764879"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0096fcc42b50aa7fa4236f6bddcd81f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0096fcc42b50aa7fa4236f6bddcd81f7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">isMatching</a> ()</td></tr>
 <tr class="memdesc:a0096fcc42b50aa7fa4236f6bddcd81f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether matching is enabled. <br /></td></tr>
@@ -347,13 +360,16 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a1f35feaeb739af86eb89a25ad58870e4"><td class="memItemLeft" align="right" valign="top">cv::Size&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#a1f35feaeb739af86eb89a25ad58870e4">getSize</a> (void)</td></tr>
 <tr class="memdesc:a1f35feaeb739af86eb89a25ad58870e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the image size.  <a href="#a1f35feaeb739af86eb89a25ad58870e4">More...</a><br /></td></tr>
 <tr class="separator:a1f35feaeb739af86eb89a25ad58870e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2143a45f9ff0d1f33f1d88770b81ab6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#aa2143a45f9ff0d1f33f1d88770b81ab6">videoStreamInit</a> (QString filename=&quot;&quot;, int <a class="el" href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">fps</a>=0)</td></tr>
+<tr class="memdesc:aa2143a45f9ff0d1f33f1d88770b81ab6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initalise video stream for writing a video stream to a file.  <a href="#aa2143a45f9ff0d1f33f1d88770b81ab6">More...</a><br /></td></tr>
+<tr class="separator:aa2143a45f9ff0d1f33f1d88770b81ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accba7a6aa436ee1da58d664bfb04c3c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="accba7a6aa436ee1da58d664bfb04c3c3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>videoStreamStop</b> ()</td></tr>
+<tr class="separator:accba7a6aa436ee1da58d664bfb04c3c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a13cd7c2396895039dec6654905d11c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a13cd7c2396895039dec6654905d11c"></a>
 virtual std::vector<br class="typebreak" />
 &lt; <a class="el" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>listSystems</b> (void)=0</td></tr>
 <tr class="separator:a0a13cd7c2396895039dec6654905d11c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa91d2fe4370c953f89655c10f0ce65a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa91d2fe4370c953f89655c10f0ce65a"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>autoConnect</b> (void)=0</td></tr>
-<tr class="separator:aaa91d2fe4370c953f89655c10f0ce65a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -425,7 +441,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <div class="textblock"><p>Stereo camera base class. </p>
 <p>An abstract class to process stereo images from arbitrary cameras. This class should not be used directly, instead you should subclass it (e.g. <a class="el" href="class_stereo_camera_deimos.html">StereoCameraDeimos()</a>). The bare minimum is to implment a capture function that will capture a stereo pair from your camera. </p>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00048">48</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00049">49</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a5496f7e9e10c2892d62091dd56709e7a"></a>
 <div class="memitem">
@@ -449,7 +465,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00059">59</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00061">61</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -479,7 +495,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>This is a virtual function which should be implmented by a particular camera driver.</p>
 <dl class="section return"><dt>Returns</dt><dd>True if an image was captured successfully, false otherwise </dd></dl>
 
-<p>Implemented in <a class="el" href="class_stereo_camera_deimos.html#a7526953f7562acc07841ebd6a49dc043">StereoCameraDeimos</a>, <a class="el" href="class_stereo_camera_t_i_s.html#ac60bd4e4c7b29494fb5708d187e33bbb">StereoCameraTIS</a>, <a class="el" href="class_stereo_camera_open_c_v.html#ac669e811da12df2bfd76f783c0550100">StereoCameraOpenCV</a>, <a class="el" href="class_stereo_camera_basler.html#a4c8ea8e1c2266fd39bdae1c057e54b55">StereoCameraBasler</a>, and <a class="el" href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">StereoCameraFromVideo</a>.</p>
+<p>Implemented in <a class="el" href="class_stereo_camera_deimos.html#a7526953f7562acc07841ebd6a49dc043">StereoCameraDeimos</a>, <a class="el" href="class_stereo_camera_t_i_s.html#ac60bd4e4c7b29494fb5708d187e33bbb">StereoCameraTIS</a>, <a class="el" href="class_stereo_camera_basler2.html#a8e1b3cf7fa52de146d8c6e6f224398f5">StereoCameraBasler2</a>, <a class="el" href="class_stereo_camera_open_c_v.html#ac669e811da12df2bfd76f783c0550100">StereoCameraOpenCV</a>, <a class="el" href="class_stereo_camera_basler.html#a4c8ea8e1c2266fd39bdae1c057e54b55">StereoCameraBasler</a>, and <a class="el" href="class_stereo_camera_from_video.html#af53503df1755c0a9cf84718128ed0a5d">StereoCameraFromVideo</a>.</p>
 
 </div>
 </div>
@@ -508,7 +524,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>Disconnect camera. </p>
 <p>This is a virtual function which should be implmented by a particular camera driver to close the connection to the camera/s </p>
 
-<p>Implemented in <a class="el" href="class_stereo_camera_deimos.html#a60c865353deac27471bbdc0316099c1b">StereoCameraDeimos</a>, <a class="el" href="class_stereo_camera_t_i_s.html#a83edee07bb9d40b9633f96164561942f">StereoCameraTIS</a>, <a class="el" href="class_stereo_camera_open_c_v.html#ac09a94c2131ce8b0aa2e4dc743276121">StereoCameraOpenCV</a>, <a class="el" href="class_stereo_camera_basler.html#ab1a48041696f1cce7872e84da7eb9a6b">StereoCameraBasler</a>, and <a class="el" href="class_stereo_camera_from_video.html#a1156dab0196f1366e95f82b3d197eb34">StereoCameraFromVideo</a>.</p>
+<p>Implemented in <a class="el" href="class_stereo_camera_deimos.html#a60c865353deac27471bbdc0316099c1b">StereoCameraDeimos</a>, <a class="el" href="class_stereo_camera_t_i_s.html#a83edee07bb9d40b9633f96164561942f">StereoCameraTIS</a>, <a class="el" href="class_stereo_camera_basler2.html#abd5a768042a67f3dc69287f64aa454b7">StereoCameraBasler2</a>, <a class="el" href="class_stereo_camera_open_c_v.html#ac09a94c2131ce8b0aa2e4dc743276121">StereoCameraOpenCV</a>, <a class="el" href="class_stereo_camera_basler.html#ab1a48041696f1cce7872e84da7eb9a6b">StereoCameraBasler</a>, and <a class="el" href="class_stereo_camera_from_video.html#a1156dab0196f1366e95f82b3d197eb34">StereoCameraFromVideo</a>.</p>
 
 </div>
 </div>
@@ -537,7 +553,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>Get the image height. </p>
 <dl class="section return"><dt>Returns</dt><dd>Image height </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00204">204</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00227">227</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
 
 </div>
 </div>
@@ -563,7 +579,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00298">298</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00300">300</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -584,7 +600,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>Get the left stereo image. </p>
 <dl class="section return"><dt>Returns</dt><dd>OpenCV matrix containing left image </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00306">306</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00308">308</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -604,7 +620,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>Get a pointer to the current point cloud. </p>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the current point cloud </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00221">221</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00223">223</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -630,7 +646,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00302">302</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00304">304</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -651,7 +667,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>Get the right stereo image. </p>
 <dl class="section return"><dt>Returns</dt><dd>OpenCV matrix containing right image </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00310">310</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00312">312</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -680,7 +696,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>Get the image size. </p>
 <dl class="section return"><dt>Returns</dt><dd>Image size </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00210">210</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00233">233</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
 
 </div>
 </div>
@@ -709,7 +725,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>Get the image width. </p>
 <dl class="section return"><dt>Returns</dt><dd>Image width </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00198">198</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00221">221</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
 
 </div>
 </div>
@@ -744,7 +760,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True or false, depending on whether the parameters are valid. </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00341">341</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00343">343</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -781,7 +797,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00028">28</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00030">30</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -811,7 +827,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 <p>The timestamp format is: yyyyMMdd_hhmmss_zzz (year, month, day, hour, minute, second, millisecond)</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991" title="Set the save directory. ">setSavelocation()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00067">67</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00069">69</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -845,7 +861,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00322">322</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00342">342</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
 
 </div>
 </div>
@@ -879,7 +895,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00112">112</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00114">114</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -913,72 +929,51 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00105">105</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00107">107</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="af58b04dd9c17e4d5cc139eb99d738cc6"></a>
+<a class="anchor" id="aa2143a45f9ff0d1f33f1d88770b81ab6"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void AbstractStereoCamera::videoStreamStart </td>
+          <td class="memname">bool AbstractStereoCamera::videoStreamInit </td>
           <td>(</td>
           <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>fname</em> = <code>&quot;&quot;</code></td><td>)</td>
+          <td class="paramname"><em>filename</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>fps</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Start writing a video stream to a file. </p>
+<p>Initalise video stream for writing a video stream to a file. </p>
 <p>If no filename is supplied, a timestamped video will be stored in the current selected save folder.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">fname</td><td>The output filename </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">filename</td><td>The output filename </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991" title="Set the save directory. ">setSavelocation()</a>, <a class="el" href="class_abstract_stereo_camera.html#ae39e6f45c68b4bbd4442fdac161051bd" title="Stop writing a video stream. ">videoStreamStop()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991" title="Set the save directory. ">setSavelocation()</a>, videoStreamStop() </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">fps</td><td>The frame rate of the video recording </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00568">568</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae39e6f45c68b4bbd4442fdac161051bd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void AbstractStereoCamera::videoStreamStop </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Stop writing a video stream. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_camera.html#af58b04dd9c17e4d5cc139eb99d738cc6" title="Start writing a video stream to a file. ">videoStreamStart()</a> </dd></dl>
-
-<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00629">629</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
+<p>Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00583">583</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
 </div>
 </div>
@@ -989,7 +984,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>capturing</b> = false
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 15 2020 20:50:20 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 5 2020 16:34:56 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

@@ -25,24 +25,38 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    bool autoConnect();
     void toggleAutoExpose(bool enable);
     void adjustExposure(double exposure);
     void toggleAutoGain(bool enable);
     void adjustGain(int gain);
     void adjustBinning(int gain);
+    void toggleTrigger(bool enable);
+    void adjustFPS(int fps);
+    void adjustPacketSize(int);
+
+    QFuture<bool> qfuture_left;
+    QFuture<bool> qfuture_right;
+
+    QFutureWatcher<bool> qfutureWatcher_left;
+    QFutureWatcher<bool> qfutureWatcher_right;
+
     ~StereoCameraBasler(void);
 
 public slots:
     bool setExposure(double exposure);
     bool setGain(int gain);
     void setBinning(int val);
+    void setPacketSize(int val);
+    //TODO add packet delay
+
     void changeFPS(int fps);
     void enableTrigger(bool enable);
     bool enableAutoExpose(bool enable);
     bool enableAutoGain(bool enable);
+    void left_finished();
+    void right_finished();
 
 private:
     CameraBasler *left_camera;

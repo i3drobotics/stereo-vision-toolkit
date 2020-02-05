@@ -1,5 +1,22 @@
 #include "stereocameratis.h"
 
+bool StereoCameraTIS::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings){
+    //TODO use inital camera settings input
+
+    this->camera_serial_info = camera_serial_info;
+    auto left_camera_tmp = new CameraImagingSource();
+    auto right_camera_tmp = new CameraImagingSource();
+
+    std::string left_serial = camera_serial_info.left_camera_serial;
+    std::string right_serial = camera_serial_info.right_camera_serial;
+
+    if (left_camera_tmp->open(left_serial) && right_camera_tmp->open(right_serial)) {
+        return setCameras(inital_camera_settings,left_camera_tmp,right_camera_tmp,new Listener(), new Listener());
+    } else {
+        return false;
+    }
+}
+
 std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraTIS::listSystems(){
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials("tis");
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
@@ -40,6 +57,7 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraTIS::listS
     return connected_serial_infos;
 }
 
+/*
 bool StereoCameraTIS::autoConnect(){
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> camera_serials = listSystems();
 
@@ -61,6 +79,7 @@ bool StereoCameraTIS::autoConnect(){
     }
     return false;
 }
+*/
 
 QList<qint64> StereoCameraTIS::load_serials(QString filename) {
     QList<qint64> serials;
@@ -92,33 +111,18 @@ QList<qint64> StereoCameraTIS::load_serials(QString filename) {
     return serials;
 }
 
-bool StereoCameraTIS::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info){
-    this->camera_serial_info = camera_serial_info;
-    auto left_camera_tmp = new CameraImagingSource();
-    auto right_camera_tmp = new CameraImagingSource();
-
-    std::string left_serial = camera_serial_info.left_camera_serial;
-    std::string right_serial = camera_serial_info.right_camera_serial;
-
-    if (left_camera_tmp->open(left_serial) && right_camera_tmp->open(right_serial)) {
-        return setCameras(left_camera_tmp,right_camera_tmp,new Listener(), new Listener());
-    } else {
-        return false;
-    }
-}
-
-bool StereoCameraTIS::setCameras(CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right){
+bool StereoCameraTIS::setCameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings, CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right){
     this->left_camera = camera_left;
     this->right_camera = camera_right;
     this->left_listener = listener_left;
     this->right_listener = listener_right;
 
-    setup_cameras();
+    setup_cameras(inital_camera_settings);
 
     return true;
 }
 
-void StereoCameraTIS::setup_cameras(){
+void StereoCameraTIS::setup_cameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings){
 
     QThread* left_camera_thread = new QThread();
     left_camera->assignThread(left_camera_thread);
@@ -128,14 +132,34 @@ void StereoCameraTIS::setup_cameras(){
 
     image_height = left_camera->height;
     image_width = left_camera->width;
-    //image_height = 2048;
-    //image_width = 2448;
 
     image_size = cv::Size(image_width, image_height);
     emit update_size(image_width, image_height, 1);
 
-    left_camera->setup(image_width, image_height, 5);
-    right_camera->setup(image_width, image_height, 5);
+    double exposure = inital_camera_settings.exposure;
+    int gain = inital_camera_settings.gain;
+    int fps = inital_camera_settings.fps;
+    bool trigger;
+    if (inital_camera_settings.trigger == 1){
+        trigger = true;
+    } else {
+        trigger = false;
+    }
+    bool autoExpose;
+    if (inital_camera_settings.autoExpose == 1){
+        autoExpose = true;
+    } else {
+        autoExpose = false;
+    }
+    bool autoGain;
+    if (inital_camera_settings.autoGain == 1){
+        autoGain = true;
+    } else {
+        autoGain = false;
+    }
+
+    left_camera->setup(image_width, image_height, fps);
+    right_camera->setup(image_width, image_height, fps);
 
     left_raw.create(image_size, CV_8UC1);
     right_raw.create(image_size, CV_8UC1);
@@ -160,20 +184,20 @@ void StereoCameraTIS::setup_cameras(){
     connect(this, SIGNAL(stereo_grab(void)), left_camera, SLOT(grabImage(void)));
     connect(this, SIGNAL(stereo_grab(void)), right_camera, SLOT(grabImage(void)));
 
-    left_camera->setTrigger(false);
-    right_camera->setTrigger(false);
+    left_camera->setTrigger(trigger);
+    right_camera->setTrigger(trigger);
 
-    left_camera->enableAutoExposure(false);
-    right_camera->enableAutoExposure(false);
+    left_camera->enableAutoExposure(autoExpose);
+    right_camera->enableAutoExposure(autoExpose);
 
-    left_camera->changeExposure(5);
-    right_camera->changeExposure(5);
+    left_camera->changeExposure(exposure);
+    right_camera->changeExposure(exposure);
 
-    left_camera->enableAutoGain(false);
-    right_camera->enableAutoGain(false);
+    left_camera->enableAutoGain(autoGain);
+    right_camera->enableAutoGain(autoGain);
 
-    left_camera->changeGain(0);
-    right_camera->changeGain(0);
+    left_camera->changeGain(gain);
+    right_camera->changeGain(gain);
 
     connected = true;
 
@@ -198,6 +222,13 @@ void StereoCameraTIS::enableTrigger(bool enable){
 void StereoCameraTIS::changeFPS(int fps){
     left_camera->setFrameRate((double)fps);
     right_camera->setFrameRate((double)fps);
+}
+
+void StereoCameraTIS::toggleTrigger(bool enable){
+    enableTrigger(enable);
+}
+void StereoCameraTIS::adjustFPS(int fps){
+    changeFPS(fps);
 }
 
 void StereoCameraTIS::toggleAutoExpose(bool enable){

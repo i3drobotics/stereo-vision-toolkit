@@ -39,8 +39,8 @@ signals:
 public:
     explicit CalibrateFromImagesDialog(QWidget *parent = 0);
     ~CalibrateFromImagesDialog();
-    QList<QString> getLeftImages(){return left_image_list;}
-    QList<QString> getRightImages(){return right_image_list;}
+    QList<cv::Mat> getLeftImages(){return left_image_list;}
+    QList<cv::Mat> getRightImages(){return right_image_list;}
     int getPatternCols();
     int getPatternRows();
     double getSquareSizeMm();
@@ -59,8 +59,8 @@ private:
     QFileSystemModel *left_file_model;
     QFileSystemModel *right_file_model;
 
-    QList<QString> left_image_list;
-    QList<QString> right_image_list;
+    QList<cv::Mat> left_image_list;
+    QList<cv::Mat> right_image_list;
 
     QSettings *settings;
 

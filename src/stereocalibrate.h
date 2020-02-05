@@ -113,7 +113,7 @@ class StereoCalibrate : public QObject {
   void loadBoardPoses(std::string fname);
   bool imageValid(void);
   void overlayImage(cv::Mat& image, Chessboard* board = 0, bool found = false, bool valid = false);
-  void setImages(QList<QString> left, QList<QString> right);
+  void setImages(QList<cv::Mat> left, QList<cv::Mat> right);
   void setPattern(cv::Size size, double squareSize);
   void setImageSize(cv::Size size);
   void setSaveROS(bool save){save_ros = save;}
