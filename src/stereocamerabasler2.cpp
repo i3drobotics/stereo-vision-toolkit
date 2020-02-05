@@ -256,10 +256,12 @@ void StereoCameraBasler2::setPacketSize(int packetSize)
 {
     try
     {
-        for (size_t i = 0; i < cameras->GetSize(); ++i)
-        {
-            cameras->operator[](i).Open();
-            Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "GevSCPSPacketSize").SetValue(packetSize);
+        if (packetSize >= 220){
+            for (size_t i = 0; i < cameras->GetSize(); ++i)
+            {
+                cameras->operator[](i).Open();
+                Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "GevSCPSPacketSize").SetValue(packetSize);
+            }
         }
         this->m_packet_size = packetSize;
     }
@@ -275,8 +277,10 @@ void StereoCameraBasler2::setPacketDelay(int interPacketDelay)
 {
     try
     {
-        cameras->operator[](0).Open();
-        Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "GevSCPD").SetValue(interPacketDelay);
+        if (interPacketDelay >= 0){
+            cameras->operator[](0).Open();
+            Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "GevSCPD").SetValue(interPacketDelay);
+        }
     }
     catch (const Pylon::GenericException &e)
     {
@@ -358,13 +362,15 @@ bool StereoCameraBasler2::setExposure(double val) {
 void StereoCameraBasler2::setBinning(int val){
     try
     {
-        for (size_t i = 0; i < cameras->GetSize(); ++i)
-        {
-            cameras->operator[](i).Open();
-            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "BinningHorizontalMode").FromString("Average");
-            Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "BinningHorizontal").SetValue(val);
-            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "BinningVerticalMode").FromString("Average");
-            Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "BinningVertical").SetValue(val);
+        if (val >= 1){
+            for (size_t i = 0; i < cameras->GetSize(); ++i)
+            {
+                cameras->operator[](i).Open();
+                Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "BinningHorizontalMode").FromString("Average");
+                Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "BinningHorizontal").SetValue(val);
+                Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "BinningVerticalMode").FromString("Average");
+                Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "BinningVertical").SetValue(val);
+            }
         }
 
         this->m_binning = val;

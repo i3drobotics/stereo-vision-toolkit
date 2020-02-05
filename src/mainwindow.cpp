@@ -26,14 +26,14 @@ MainWindow::MainWindow(QWidget* parent)
     default_basler_init_settings.exposure = 5;
     default_basler_init_settings.gain = 0;
     default_basler_init_settings.fps = 0;
-    default_basler_init_settings.binning = 2;
+    default_basler_init_settings.binning = -1;
     default_basler_init_settings.trigger = false;
     default_basler_init_settings.hdr = -1;
     default_basler_init_settings.autoExpose = false;
     default_basler_init_settings.autoGain = false;
     default_basler_init_settings.isGige = -1;
-    default_basler_init_settings.packetDelay = 0;
-    default_basler_init_settings.packetSize = 3000; //TODO fix packet size problems
+    default_basler_init_settings.packetDelay = -1;
+    default_basler_init_settings.packetSize = -1; //TODO fix packet size problems
 
     default_tis_init_settings.exposure = 5;
     default_tis_init_settings.gain = 0;
@@ -373,11 +373,11 @@ void MainWindow::stereoCameraInitConnections(void) {
     double step_exposure = 1;
 
     int max_packetDelay = 10000;
-    int min_packetDelay = 0;
+    int min_packetDelay = -1;
     int step_packetDelay = 1;
 
     int max_packetSize = 16404;
-    int min_packetSize = 220;
+    int min_packetSize = -1;
     int step_packetSize = 1;
 
     if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_DEIMOS){
