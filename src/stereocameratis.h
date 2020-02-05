@@ -36,15 +36,17 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
-    bool setCameras(CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
+    bool setCameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings, CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
     void toggleAutoExpose(bool enable);
     void adjustExposure(double exposure);
     void toggleAutoGain(bool enable);
     void adjustGain(int gain);
-    void adjustBinning(int gain){}; //TODO create binning setting function
-    bool autoConnect();
+    void adjustBinning(int){}; //TODO create binning setting function
+    void toggleTrigger(bool enable);
+    void adjustFPS(int fps);
+    void adjustPacketSize(int){}
 
     ~StereoCameraTIS(void);
 
@@ -62,7 +64,7 @@ private:
     QList<int> widths;
     QList<int> heights;
 
-    void setup_cameras();
+    void setup_cameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
 };
 
 #endif // STEREOCAMERATIS_H

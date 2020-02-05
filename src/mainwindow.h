@@ -6,7 +6,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#define _USE_MATH_DEFINES
+//#define _USE_MATH_DEFINES
 
 #include <QtAwesome.h>
 #include <QDebug>
@@ -40,6 +40,7 @@
 #include "stereocameraopencv.h"
 #include "stereocameratis.h"
 #include "stereocamerabasler.h"
+#include "stereocamerabasler2.h"
 #include "qdevicebutton.h"
 #include "qdevicedialog.h"
 
@@ -74,13 +75,25 @@ private:
     Ui::MainWindow* ui;
 
     bool updatingDisplay = false;
-
     bool showingSettings = false;
+
+    int CAMERA_CONNECTION_SUCCESS_EXIT_CODE = 0;
+    int CAMERA_CONNECTION_FAILED_EXIT_CODE = -1;
+    int CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE = -2;
+    int CAMERA_CONNECTION_CANCEL_EXIT_CODE = -3;
+
+    AbstractStereoCamera::stereoCameraSettings camera_default_init_settings;
+    AbstractStereoCamera::stereoCameraSettings default_basler_init_settings;
+    AbstractStereoCamera::stereoCameraSettings default_tis_init_settings;
+    AbstractStereoCamera::stereoCameraSettings default_deimos_init_settings;
+    AbstractStereoCamera::stereoCameraSettings current_camera_settings;
 
     QPixmap pmap_left;
     QPixmap pmap_right;
     QPixmap pmap_disparity;
     QTimer* status_bar_timer;
+
+    QTimer* frame_timer;
 
     ParamFile* parameters;
 
@@ -96,7 +109,13 @@ private:
     CameraDisplayWidget *right_view;
 
     bool cameras_connected = false;
-    int calc_fps = 0;
+    int measured_fps = 0;
+    int current_fps = 0;
+    int current_binning = 0;
+    bool using_gige = false;
+
+    bool calibration_dialog_used = false;
+    bool calibration_from_images_dialog_used = false;
 
     AbstractStereoCamera* stereo_cam;
     StereoCalibrate* calibrator;
@@ -123,7 +142,7 @@ private:
     void stereoCameraRelease(void);
     void stereoCameraInitConnections(void);
 
-    bool gigeWarning(int binning);
+    bool gigeWarning(int binning,int new_fps=-1);
 
 public slots:
     void updateDisplay(void);
@@ -146,16 +165,22 @@ public slots:
     void toggleAutoGain(bool);
     void toggleEnableBinning(bool enable);
     void changeBinning(int binning);
+    void toggleFPS(bool enable);
+    void changeFPS(int fps);
+    void changePacketSize();
+
     void videoStreamLoad(void);
 
     void setSaveDirectory(QString dir = "");
     void setCalibrationFolder(QString dir = "");
 
-    void startCalibration(void);
-    void doneCalibration(bool);
+    void startAutoCalibration(void);
+    void runAutoCalibration(void);
 
     void startCalibrationFromImages(void);
     void runCalibrationFromImages(void);
+
+    void doneCalibration(bool);
 
     void startVideoCapture(void);
     void stopVideoCapture(void);

@@ -5,7 +5,17 @@
 
 #include "stereocameradeimos.h"
 
-bool StereoCameraDeimos::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info){
+bool StereoCameraDeimos::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings){
+
+    double exposure = inital_camera_settings.exposure;
+    int fps = inital_camera_settings.fps;
+    bool hdr = inital_camera_settings.hdr;
+    bool autoExpose;
+    if (inital_camera_settings.autoExpose == 1){
+        autoExpose = true;
+    } else {
+        autoExpose = false;
+    }
     this->camera_serial_info = camera_serial_info;
     int usb_index = usb_index_from_serial(camera_serial_info.left_camera_serial);
     if (usb_index >= 0) {
@@ -15,9 +25,13 @@ bool StereoCameraDeimos::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
 
         if (camera.isOpened()) {
             bool res = setFrameSize(752, 480);
+
+            toggleHDR(hdr);
+            enableAutoExpose(autoExpose);
+            setExposure(exposure);
+            changeFPS(fps);
             getFrameRate();
             getTemperature();
-            setExposure(5);
 
             temperature_timer = new QTimer(parent());
             temperature_timer->setInterval(1000);
@@ -108,19 +122,6 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraDeimos::li
         }
     }
     return connected_serial_infos;
-}
-
-bool StereoCameraDeimos::autoConnect() {
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> camera_serials = listSystems();
-
-    bool res = false;
-
-    if (camera_serials.size() > 0){
-        res = initCamera(camera_serials.at(0));
-    } else {
-        std::cerr << "Failed to find deimos system" << std::endl;
-    }
-    return res;
 }
 
 void StereoCameraDeimos::openHID(void) {
@@ -360,6 +361,10 @@ double StereoCameraDeimos::getTemperature(void){
 
 }
 
+void StereoCameraDeimos::adjustFPS(int fps){
+    changeFPS(fps);
+}
+
 void StereoCameraDeimos::toggleAutoExpose(bool enable){
     enableAutoExpose(enable);
 }
@@ -530,9 +535,6 @@ bool StereoCameraDeimos::capture() {
             left_raw = channels[1].clone();
             right_raw = channels[2].clone();
 
-            emit left_captured();
-            emit right_captured();
-
             res = true;
 
         }else{
@@ -544,9 +546,11 @@ bool StereoCameraDeimos::capture() {
         res = false;
     }
 
-    if(!res){
-        disconnectCamera();
-    }
+    //if(!res){
+    //    disconnectCamera();
+    //}
+    emit left_captured();
+    emit right_captured();
 
     capturing = false;
 

@@ -26,12 +26,13 @@ public:
     explicit CameraBasler(QObject *parent = 0);
     bool isAvailable();
     void close();
-    bool initCamera(std::string camera_name, int binning=1, bool trigger=false, int fps=0);
+    bool initCamera(std::string camera_serial, int binning, bool trigger, int fps, int packet_size);
     void assignThread(QThread *thread);
     void getImageSize(int &image_width, int &image_height, cv::Size &image_size);
     bool setFrame16();
     bool setFrame8();
     bool setMaximumResolution();
+    bool setPTP(bool enable);
     bool setExposure(double exposure);
     bool setAutoExposure(bool enable);
     bool setAutoGain(bool enable);
@@ -44,6 +45,7 @@ public:
 
     bool changeFPS(int fps);
     bool changeBinning(int binning);
+    bool changePacketSize(int packet_size);
     bool setFPS(int fps);
     bool enableFPS(bool enable);
 
@@ -68,7 +70,9 @@ private:
     int binning;
     bool trigger;
     int fps;
-    std::string camera_name;
+    int packet_size;
+    std::string camera_serial;
+    int max_timeout = 2000;
 
 public slots:
     bool capture(void);

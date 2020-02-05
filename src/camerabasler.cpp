@@ -38,12 +38,13 @@ void CameraBasler::close() {
     connected = false;
 }
 
-bool CameraBasler::initCamera(std::string camera_name,int binning, bool trigger, int fps)
+bool CameraBasler::initCamera(std::string camera_serial,int binning, bool trigger, int fps, int packet_size)
 {
-    this->camera_name = camera_name;
+    this->camera_serial = camera_serial;
     this->binning = binning;
     this->trigger = trigger;
     this->fps = fps;
+    this->packet_size = packet_size;
     connected = false;
     try
     {
@@ -61,7 +62,7 @@ bool CameraBasler::initCamera(std::string camera_name,int binning, bool trigger,
         {
             cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
 
-            if (cameras[i].GetDeviceInfo().GetSerialNumber() == camera_name.c_str())
+            if (cameras[i].GetDeviceInfo().GetSerialNumber() == camera_serial.c_str())
             {
                 info = cameras[i].GetDeviceInfo();
                 cameraFind = true;
@@ -70,7 +71,7 @@ bool CameraBasler::initCamera(std::string camera_name,int binning, bool trigger,
         }
 
         if (!cameraFind){
-            std::cerr << "Failed to find camera with name: " << camera_name << std::endl;
+            std::cerr << "Failed to find camera with name: " << camera_serial << std::endl;
             return false;
         }
 
@@ -79,6 +80,7 @@ bool CameraBasler::initCamera(std::string camera_name,int binning, bool trigger,
 
         setBinning(binning);
         setTrigger(trigger);
+        setPacketSize(packet_size);
         changeFPS(fps);
 
         // Print the model name of the camera.
@@ -86,7 +88,10 @@ bool CameraBasler::initCamera(std::string camera_name,int binning, bool trigger,
 
         // The parameter MaxNumBuffer can be used to control the count of buffers
         // allocated for grabbing. The default value of this parameter is 16.
-        camera->MaxNumBuffer = 16;
+        camera->MaxNumBuffer = 1;
+        // The size of the output queue can be adjusted.
+        // When using this strategy the OutputQueueSize parameter can be changed during grabbing.
+        camera->OutputQueueSize = camera->MaxNumBuffer.GetValue();
 
         formatConverter.OutputPixelFormat = Pylon::PixelType_Mono8;
         formatConverter.OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
@@ -99,7 +104,7 @@ bool CameraBasler::initCamera(std::string camera_name,int binning, bool trigger,
         if (camera->IsGrabbing())
         {
             Pylon::CGrabResultPtr ptrGrabResult;
-            camera->RetrieveResult(3000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
+            camera->RetrieveResult(max_timeout, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
             if (ptrGrabResult != NULL){
                 if (ptrGrabResult->GrabSucceeded())
                 {
@@ -137,6 +142,22 @@ void CameraBasler::getImageSize(int &image_width, int &image_height,
         // Error handling.
         std::cerr << "An exception occurred whilst getting camera image size." << std::endl
                   << e.GetDescription() << std::endl;
+    }
+}
+
+bool CameraBasler::setPTP(bool enable){
+    try
+    {
+        camera->Open();
+        Pylon::CFloatParameter(camera->GetNodeMap(), "GevIEEE1588").SetValue(enable);
+        return true;
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred." << std::endl
+                  << e.GetDescription() << std::endl;
+        return false;
     }
 }
 
@@ -207,12 +228,17 @@ bool CameraBasler::enableFPS(bool enable){
 
 bool CameraBasler::enableTrigger(bool enable){
     close();
-    return (initCamera(this->camera_name,this->binning,enable,this->fps));
+    return (initCamera(this->camera_serial,this->binning,enable,this->fps,this->packet_size));
 }
 
 bool CameraBasler::changeBinning(int binning){
     close();
-    return (initCamera(this->camera_name,binning,this->trigger,this->fps));
+    return (initCamera(this->camera_serial,binning,this->trigger,this->fps,this->packet_size));
+}
+
+bool CameraBasler::changePacketSize(int packetSize){
+    close();
+    return (initCamera(this->camera_serial,binning,this->trigger,this->fps,packetSize));
 }
 
 bool CameraBasler::setTrigger(bool enable){
@@ -225,7 +251,6 @@ bool CameraBasler::setTrigger(bool enable){
         }
         camera->Open();
         Pylon::CEnumParameter(camera->GetNodeMap(), "TriggerMode").FromString(enable_str.c_str());
-        //Pylon::CStringParameter(camera->GetNodeMap(), "ExposureAuto").SetValue(enable_str.c_str());
         res = true;
     }
     catch (const Pylon::GenericException &e)
@@ -384,7 +409,7 @@ bool CameraBasler::capture(void)
             if (camera->IsGrabbing())
             {
                 Pylon::CGrabResultPtr ptrGrabResult;
-                camera->RetrieveResult(5000, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
+                camera->RetrieveResult(max_timeout, ptrGrabResult, Pylon::TimeoutHandling_ThrowException);
                 if (ptrGrabResult == NULL){
                     qDebug() << "Camera grab pointer is null";
                     res = false;
@@ -401,7 +426,6 @@ bool CameraBasler::capture(void)
                         } else {
                             Pylon::CPylonImage pylonImage;
                             formatConverter.Convert(pylonImage, ptrGrabResult);
-                            //cv::Mat image_temp = cv::Mat(frameRows, frameCols, CV_8UC1, (uchar *) pylonImage.GetBuffer());
                             cv::Mat image_temp = cv::Mat(frameRows, frameCols, CV_8UC1, static_cast<uchar *>(pylonImage.GetBuffer()));
                             image_temp.copyTo(image);
                             if (image.cols == 0 || image.rows == 0){

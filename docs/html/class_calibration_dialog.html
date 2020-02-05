@@ -102,28 +102,61 @@ Inheritance diagram for CalibrationDialog:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
-<tr class="memitem:aa93f4f8df0d73fe6a9c005ee0fe6bb24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa93f4f8df0d73fe6a9c005ee0fe6bb24"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setImageProgress</b> (int current, int total)</td></tr>
-<tr class="separator:aa93f4f8df0d73fe6a9c005ee0fe6bb24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7325731e673238cdaa9c8292fc8188e9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7325731e673238cdaa9c8292fc8188e9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>updateLabels</b> (<a class="el" href="class_chessboard.html">Chessboard</a> *board)</td></tr>
-<tr class="separator:a7325731e673238cdaa9c8292fc8188e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0df93c631bd98db5756f51dd7fca9354"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0df93c631bd98db5756f51dd7fca9354"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>calibrate</b> ()</td></tr>
+<tr class="separator:a0df93c631bd98db5756f51dd7fca9354"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cc0dc8cdc0e7939383aa9ea9989ffa8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6cc0dc8cdc0e7939383aa9ea9989ffa8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>toggleRun</b> ()</td></tr>
+<tr class="separator:a6cc0dc8cdc0e7939383aa9ea9989ffa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2c9d191a3b2a09b89a823ab695358f8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad2c9d191a3b2a09b89a823ab695358f8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>processImages</b> ()</td></tr>
+<tr class="separator:ad2c9d191a3b2a09b89a823ab695358f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a948a07a91bf0903b2667948150a11aaf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a948a07a91bf0903b2667948150a11aaf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>selectOutputPath</b> ()</td></tr>
+<tr class="separator:a948a07a91bf0903b2667948150a11aaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4fb5a197ec5ff65de3ee8a56e7f4c1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4fb5a197ec5ff65de3ee8a56e7f4c1f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>updateOutputPath</b> (void)</td></tr>
+<tr class="separator:ab4fb5a197ec5ff65de3ee8a56e7f4c1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
+<tr class="memitem:ade4fa82df74d4d60f387ba064d17ebd4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade4fa82df74d4d60f387ba064d17ebd4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>startCalibration</b> ()</td></tr>
+<tr class="separator:ade4fa82df74d4d60f387ba064d17ebd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0dbbfdbd304e257105e807fc40d494cf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0dbbfdbd304e257105e807fc40d494cf"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>stopCalibration</b> ()</td></tr>
 <tr class="separator:a0dbbfdbd304e257105e807fc40d494cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aacf17330c3788d302c7e83fd2e9dbef6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aacf17330c3788d302c7e83fd2e9dbef6"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>CalibrationDialog</b> (QWidget *parent=0, <a class="el" href="class_stereo_calibrate.html">StereoCalibrate</a> *calibrator=0)</td></tr>
-<tr class="separator:aacf17330c3788d302c7e83fd2e9dbef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a529b15cac57b479a7e7cf41269311041"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a529b15cac57b479a7e7cf41269311041"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>CalibrationDialog</b> (<a class="el" href="class_abstract_stereo_camera.html">AbstractStereoCamera</a> *stereo_cam, QWidget *parent=0)</td></tr>
+<tr class="separator:a529b15cac57b479a7e7cf41269311041"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a732e18db1b41f260f6c1bf3ae1f7ef69"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a732e18db1b41f260f6c1bf3ae1f7ef69"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getPatternCols</b> ()</td></tr>
+<tr class="separator:a732e18db1b41f260f6c1bf3ae1f7ef69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7cc485ac76cdb9e0e5352641cfc74b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa7cc485ac76cdb9e0e5352641cfc74b6"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getPatternRows</b> ()</td></tr>
+<tr class="separator:aa7cc485ac76cdb9e0e5352641cfc74b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0640a00f028d812a2c493336c0759924"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0640a00f028d812a2c493336c0759924"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>getSquareSizeMm</b> ()</td></tr>
+<tr class="separator:a0640a00f028d812a2c493336c0759924"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0e372469d9a374c41b9871b4db46904"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac0e372469d9a374c41b9871b4db46904"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>getSaveROS</b> ()</td></tr>
+<tr class="separator:ac0e372469d9a374c41b9871b4db46904"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb66f27633a61945c009ce26efa06fd8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb66f27633a61945c009ce26efa06fd8"></a>
+QList&lt; cv::Mat &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftImages</b> ()</td></tr>
+<tr class="separator:afb66f27633a61945c009ce26efa06fd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab592ce3cf3dcf74038134cf463cf87c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab592ce3cf3dcf74038134cf463cf87c7"></a>
+QList&lt; cv::Mat &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getRightImages</b> ()</td></tr>
+<tr class="separator:ab592ce3cf3dcf74038134cf463cf87c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd30abd704d8555de903b9c3785d1872"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abd30abd704d8555de903b9c3785d1872"></a>
+QString&#160;</td><td class="memItemRight" valign="bottom"><b>getOutputPath</b> (void)</td></tr>
+<tr class="separator:abd30abd704d8555de903b9c3785d1872"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="calibrationdialog_8h_source.html#l00023">23</a> of file <a class="el" href="calibrationdialog_8h_source.html">calibrationdialog.h</a>.</p>
+<p>Definition at line <a class="el" href="calibrationdialog_8h_source.html#l00027">27</a> of file <a class="el" href="calibrationdialog_8h_source.html">calibrationdialog.h</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="calibrationdialog_8h_source.html">calibrationdialog.h</a></li>
 <li>src/<a class="el" href="calibrationdialog_8cpp_source.html">calibrationdialog.cpp</a></li>
@@ -131,7 +164,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 15 2020 20:50:20 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 5 2020 16:34:56 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

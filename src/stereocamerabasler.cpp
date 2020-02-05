@@ -5,22 +5,52 @@
 
 #include "stereocamerabasler.h"
 
-bool StereoCameraBasler::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info) {
+bool StereoCameraBasler::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings) {
+
     this->camera_serial_info = camera_serial_info;
     this->left_camera = new CameraBasler;
     this->right_camera = new CameraBasler;
 
-    int binning = 2;
+    int m_binning = inital_camera_settings.binning;
+    int m_fps = inital_camera_settings.fps;
+    bool m_trigger;
+    if (inital_camera_settings.trigger == 1){
+        m_trigger = true;
+    } else {
+        m_trigger = false;
+    }
 
-    bool res = this->left_camera->initCamera(camera_serial_info.left_camera_serial,binning,false,0);
-    res &= this->right_camera->initCamera(camera_serial_info.right_camera_serial,binning,false,0);
+    double exposure = inital_camera_settings.exposure;
+    int gain = inital_camera_settings.gain;
+    int packetDelay = inital_camera_settings.packetDelay;
+    int packetSize = inital_camera_settings.packetSize;
+    bool autoExpose;
+    if (inital_camera_settings.autoExpose == 1){
+        autoExpose = true;
+    } else {
+        autoExpose = false;
+    }
+    bool autoGain;
+    if (inital_camera_settings.autoGain == 1){
+        autoGain = true;
+    } else {
+        autoGain = false;
+    }
+
+    bool res = this->left_camera->initCamera(camera_serial_info.left_camera_serial,m_binning,m_trigger,m_fps,packetSize);
+    res &= this->right_camera->initCamera(camera_serial_info.right_camera_serial,m_binning,m_trigger,m_fps,packetSize);
 
     if (res) {
-        this->left_camera->setExposure(5);
-        this->right_camera->setExposure(5);
-
-        this->left_camera->setGain(0);
-        this->right_camera->setGain(0);
+        this->left_camera->setAutoExposure(autoExpose);
+        this->right_camera->setAutoExposure(autoExpose);
+        this->left_camera->setExposure(exposure);
+        this->right_camera->setExposure(exposure);
+        this->left_camera->setAutoGain(autoGain);
+        this->right_camera->setAutoGain(autoGain);
+        this->left_camera->setGain(gain);
+        this->right_camera->setGain(gain);
+        this->left_camera->setInterPacketDelay(packetDelay);
+        this->right_camera->setInterPacketDelay(0);
 
         this->left_camera->getImageSize(image_width, image_height, image_size);
         emit update_size(image_width, image_height, 1);
@@ -29,13 +59,21 @@ bool StereoCameraBasler::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
         disconnectCamera();
     }
 
+    connect(&qfutureWatcher_left, SIGNAL(finished()), SLOT(left_finished()));
+    connect(&qfutureWatcher_right, SIGNAL(finished()), SLOT(right_finished()));
+
     this->connected = res;
 
     return res;
 }
 
 std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::listSystems(void){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials("basler");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_gige = loadSerials("baslergige");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_usb = loadSerials("baslerusb");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos;
+    known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_gige.begin(), known_serial_infos_gige.end() );
+    known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_usb.begin(), known_serial_infos_usb.end() );
+
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
     // find basler systems connected
     // Initialise Basler Pylon
@@ -49,12 +87,21 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
     Pylon::CInstantCameraArray cameras(devices.size());
     Pylon::CDeviceInfo info;
 
+    std::string DEVICE_CLASS_GIGE = "BaslerGigE";
+    std::string DEVICE_CLASS_USB = "BaslerUsb";
+
     std::vector<std::string> camera_names;
     std::vector<std::string> connected_serials;
     for (size_t i = 0; i < cameras.GetSize(); ++i)
     {
         cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
-        connected_serials.push_back(std::string(cameras[i].GetDeviceInfo().GetSerialNumber()));
+        std::string device_class = std::string(cameras[i].GetDeviceInfo().GetDeviceClass());
+        std::string device_serial = std::string(cameras[i].GetDeviceInfo().GetSerialNumber()); //TODO needs testing with usb
+        if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
+            connected_serials.push_back(device_serial);
+        } else {
+            qDebug() << "Unsupported basler class: " << device_class.c_str();
+        }
     }
 
     for (auto& known_serial_info : known_serial_infos) {
@@ -90,17 +137,6 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
     return connected_serial_infos;
 }
 
-bool StereoCameraBasler::autoConnect(void){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> camera_serials = listSystems();
-
-    if (camera_serials.size() >= 1){
-        // pick first avaiable camera
-        return initCamera(camera_serials.at(0));
-    } else {
-        return false;
-    }
-}
-
 void StereoCameraBasler::enableTrigger(bool enable){
     bool res = left_camera->enableTrigger(enable);
     res &= right_camera->enableTrigger(enable);
@@ -125,6 +161,24 @@ void StereoCameraBasler::setBinning(int val){
     this->left_camera->getImageSize(image_width, image_height, image_size);
     emit update_size(image_width, image_height, 1);
     qDebug() << "Binning updated";
+}
+
+void StereoCameraBasler::toggleTrigger(bool enable){
+    enableTrigger(enable);
+}
+void StereoCameraBasler::adjustFPS(int fps){
+    changeFPS(fps);
+}
+
+void StereoCameraBasler::adjustPacketSize(int packetSize){
+    setPacketSize(packetSize);
+}
+
+void StereoCameraBasler::setPacketSize(int val){
+    qDebug() << "Setting packet size";
+    bool res = left_camera->changePacketSize(val);
+    res &= right_camera->changePacketSize(val);
+    qDebug() << "Packet size updated";
 }
 
 void StereoCameraBasler::toggleAutoExpose(bool enable){
@@ -168,36 +222,37 @@ void StereoCameraBasler::adjustBinning(int binning){
     setBinning(binning);
 }
 
-bool StereoCameraBasler::capture() {
-    //capturing = true;
-
-    QFuture<bool> left_result =
-            QtConcurrent::run(left_camera, &CameraBasler::capture);
-    QFuture<bool> right_result =
-            QtConcurrent::run(right_camera, &CameraBasler::capture);
-
-    left_result.waitForFinished();
-    right_result.waitForFinished();
-
-    if (left_result.result() && right_result.result()) {
-        cv::Mat *left_data = left_camera->getImage();
-        cv::Mat *right_data = right_camera->getImage();
-        left_data->copyTo(left_raw);
-        right_data->copyTo(right_raw);
-
-        emit left_captured();
-        emit right_captured();
-
-        return true;
+void StereoCameraBasler::left_finished(){
+    cv::Mat left;
+    if (qfuture_left.result()){
+        (left_camera->getImage())->copyTo(left);
     } else {
-        qDebug() << "Failed to capture stereo pair";
-        emit left_captured();
-        emit right_captured();
+        qDebug() << "Failed to capture left image";
     }
+    left.copyTo(left_raw);
+    emit left_captured();
+}
 
-    //capturing = false;
+void StereoCameraBasler::right_finished(){
+    cv::Mat right;
+    if (qfuture_right.result()){
+        (right_camera->getImage())->copyTo(right);
+    } else {
+        qDebug() << "Failed to capture rigt image";
+    }
+    right.copyTo(right_raw);
+    emit right_captured();
+}
 
-    return false;
+bool StereoCameraBasler::capture() {
+
+    qfuture_left = QtConcurrent::run(left_camera, &CameraBasler::capture);
+    qfuture_right = QtConcurrent::run(right_camera, &CameraBasler::capture);
+
+    qfutureWatcher_left.setFuture(qfuture_left);
+    qfutureWatcher_right.setFuture(qfuture_right);
+
+    return true;
 }
 
 void StereoCameraBasler::disconnectCamera() {
@@ -206,6 +261,7 @@ void StereoCameraBasler::disconnectCamera() {
         right_camera->close();
     }
     connected = false;
+    //TODO disconnect future watcher
     emit finished();
     emit disconnected();
 }

@@ -10,7 +10,7 @@
 
 // Correct for math.h warnings
 #define NOMINMAX
-#define _MATH_DEFINES_DEFINED
+//#define _MATH_DEFINES_DEFINED
 #include <windows.h>
 #include <dshow.h>
 #include <hidapi/hidapi.h>
@@ -47,8 +47,7 @@ public:
     bool capture();
     void disconnectCamera();
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    bool autoConnect();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
     bool setFrameSize(int width, int height);
     bool setFrame16(void);
     void getFrameRate(void);
@@ -58,9 +57,12 @@ public:
     int getExposure();
     void toggleAutoExpose(bool enable);
     void adjustExposure(double exposure);
-    void toggleAutoGain(bool enable){}; //TODO create auto gain setting function
-    void adjustGain(int gain){}; //TODO create gain setting function
-    void adjustBinning(int gain){}; //TODO create binning setting function
+    void adjustPacketSize(int){}
+    void toggleAutoGain(bool){} //TODO create auto gain setting function
+    void adjustGain(int){} //TODO create gain setting function
+    void adjustBinning(int){} //TODO create binning setting function
+    void toggleTrigger(bool){} //NA
+    void adjustFPS(int fps);
 
     int usb_index_from_serial(std::string serial);
     std::string serial_from_usb_index(int index);

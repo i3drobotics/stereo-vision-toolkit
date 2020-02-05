@@ -6,19 +6,9 @@
 #ifndef ABSTRACTSTEREOCAMERA_H
 #define ABSTRACTSTEREOCAMERA_H
 
-#define _USE_MATH_DEFINES
+//#define _USE_MATH_DEFINES
 
 #include <abstractstereomatcher.h>
-
-#include <QCoreApplication>
-#include <QObject>
-#include <QThread>
-#include <QMessageBox>
-#include <QtConcurrent/QtConcurrent>
-#include <QDir>
-#include <QDebug>
-#include <QFile>
-#include <QProgressDialog>
 
 #include<memory>
 
@@ -35,9 +25,20 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
-static std::string CAMERA_TYPE_DEIMOS = "usb";
-static std::string CAMERA_TYPE_BASLER = "basler";
-static std::string CAMERA_TYPE_TIS = "tis";
+#include <QCoreApplication>
+#include <QObject>
+#include <QThread>
+#include <QMessageBox>
+#include <QtConcurrent/QtConcurrent>
+#include <QDir>
+#include <QDebug>
+#include <QFile>
+#include <QProgressDialog>
+
+const static std::string CAMERA_TYPE_DEIMOS = "usb";
+const static std::string CAMERA_TYPE_BASLER_GIGE = "baslergige";
+const static std::string CAMERA_TYPE_BASLER_USB = "baslerusb";
+const static std::string CAMERA_TYPE_TIS = "tis";
 
 //!  Stereo camera base class
 /*!
@@ -116,12 +117,31 @@ public:
 
     virtual void adjustBinning(int) = 0;
 
+    virtual void toggleTrigger(bool) = 0;
+    virtual void adjustFPS(int) = 0;
+
+    virtual void adjustPacketSize(int) = 0;
+
     struct stereoCameraSerialInfo {
         std::string left_camera_serial;
         std::string right_camera_serial;
         std::string camera_type; // type of camera: CAMERA_TYPE_DEIMOS/CAMERA_TYPE_BASLER/CAMERA_TYPE_TIS
         std::string i3dr_serial; // defined i3dr serial for camera pair
         std::string filename; // filename for video [only used for stereoCameraFromVideo]
+    };
+
+    struct stereoCameraSettings {
+        double exposure;
+        int gain;
+        int fps;
+        int trigger;
+        int hdr;
+        int binning;
+        int autoExpose;
+        int autoGain;
+        int isGige;
+        int packetDelay;
+        int packetSize;
     };
 
     stereoCameraSerialInfo camera_serial_info;
@@ -135,7 +155,7 @@ public:
 
     bool connected = false;
 
-    virtual bool initCamera(stereoCameraSerialInfo) = 0;
+    virtual bool initCamera(stereoCameraSerialInfo,stereoCameraSettings) = 0;
 
     //! Assign the stereo camera object to a thread so as not to block the GUI. Typically called just after instantiation.
     /*!
@@ -148,6 +168,9 @@ public:
 
     //! Returns whether the camera is currently acquiring images (in general)
     bool isAcquiring();
+
+    //! Returns whether the video is currently storing frames. Can be used to check if video has closed
+    bool isCapturingVideo();
 
     //! Returns whether matching is enabled
     bool isMatching();
@@ -209,9 +232,19 @@ public:
   */
     cv::Size getSize(void){ return image_size; }
 
+    //! Initalise video stream for writing a video stream to a file
+    /*!
+   * If no filename is supplied, a timestamped video will be stored in the current selected save folder.
+   *
+   * @param[out] filename The output filename
+   * @sa setSavelocation(), videoStreamStop()
+   * @param[out] fps The frame rate of the video recording
+  */
+    bool videoStreamInit(QString filename = "", int fps = 0);
+    void videoStreamStop();
+
     virtual ~AbstractStereoCamera(void) = 0;
     virtual std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems(void) = 0;
-    virtual bool autoConnect(void) = 0;
 
     cv::Mat left_remapped;
     cv::Mat right_remapped;
@@ -264,20 +297,7 @@ public slots:
   */
     void saveImageTimestamped();
 
-    //! Start writing a video stream to a file
-    /*!
-   * If no filename is supplied, a timestamped video will be stored in the current selected save folder.
-   *
-   * @param[out] fname The output filename
-   * @sa setSavelocation(), videoStreamStop()
-  */
-    void videoStreamStart(QString fname = "");
-
-    //! Stop writing a video stream
-    /*!
-   * @sa videoStreamStart()
-  */
-    void videoStreamStop(void);
+    void videoStreamProcess(void);
 
     //! Start or stop capturing an image
     void enableCapture(bool capture);
@@ -357,18 +377,9 @@ private:
     bool captured_left = false;
     bool captured_right = false;
 
-    cv::VideoCapture stereo_video;
-    bool acquiring_video = false;
+    cv::Mat video_frame;
 
-    //! Initialise a video stream
-    /*!
-  * @param[in] writer OpenCV VideoWriter pointer to use
-  * @param[in] filename Output filename
-  * @param[in] imsize Image size
-  * @param[in] fps Framerate
-  * @param[in] codec FOURCC video codec to use
-  */
-    bool videoStreamInit(cv::VideoWriter* writer, QString filename, cv::Size imsize, double fps = 60.0, int codec = CV_FOURCC('H', '2', '6', '4') );
+    cv::VideoWriter *cv_video_writer;
 
     //! Block until a capture has finished
     void finishCapture(void);

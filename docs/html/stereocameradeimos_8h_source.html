@@ -99,7 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// Correct for math.h warnings</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#define NOMINMAX</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#define _MATH_DEFINES_DEFINED</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">//#define _MATH_DEFINES_DEFINED</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;windows.h&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;dshow.h&gt;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;hidapi/hidapi.h&gt;</span></div>
@@ -132,61 +132,64 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_stereo_camera_deimos.html#a7526953f7562acc07841ebd6a49dc043">capture</a>();</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_stereo_camera_deimos.html#a60c865353deac27471bbdc0316099c1b">disconnectCamera</a>();</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    std::vector&lt;AbstractStereoCamera::stereoCameraSerialInfo&gt; listSystems();</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">bool</span> autoConnect();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">bool</span> initCamera(<a class="code" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a> camera_serial_info);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">bool</span> setFrameSize(<span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">bool</span> setFrame16(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordtype">void</span> getFrameRate(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">void</span> openHID();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">int</span> getExposure();</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">void</span> toggleAutoExpose(<span class="keywordtype">bool</span> enable);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">void</span> adjustExposure(<span class="keywordtype">double</span> exposure);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">void</span> toggleAutoGain(<span class="keywordtype">bool</span> enable){}; <span class="comment">//TODO create auto gain setting function</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">void</span> adjustGain(<span class="keywordtype">int</span> gain){}; <span class="comment">//TODO create gain setting function</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">void</span> adjustBinning(<span class="keywordtype">int</span> gain){}; <span class="comment">//TODO create binning setting function</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">int</span> usb_index_from_serial(std::string serial);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    std::string serial_from_usb_index(<span class="keywordtype">int</span> index);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    ~<a class="code" href="class_stereo_camera_deimos.html">StereoCameraDeimos</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">bool</span> initCamera(<a class="code" href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a> camera_serial_info,<a class="code" href="struct_abstract_stereo_camera_1_1stereo_camera_settings.html">AbstractStereoCamera::stereoCameraSettings</a> inital_camera_settings);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">bool</span> setFrameSize(<span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">bool</span> setFrame16(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">void</span> getFrameRate(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">void</span> openHID();</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">int</span> getExposure();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">void</span> toggleAutoExpose(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">void</span> adjustExposure(<span class="keywordtype">double</span> exposure);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">void</span> adjustPacketSize(<span class="keywordtype">int</span>){}</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">void</span> toggleAutoGain(<span class="keywordtype">bool</span>){} <span class="comment">//TODO create auto gain setting function</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">void</span> adjustGain(<span class="keywordtype">int</span>){} <span class="comment">//TODO create gain setting function</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">void</span> adjustBinning(<span class="keywordtype">int</span>){} <span class="comment">//TODO create binning setting function</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">void</span> toggleTrigger(<span class="keywordtype">bool</span>){} <span class="comment">//NA</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">void</span> adjustFPS(<span class="keywordtype">int</span> <a class="code" href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">fps</a>);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">int</span> usb_index_from_serial(std::string serial);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    std::string serial_from_usb_index(<span class="keywordtype">int</span> index);</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">public</span> slots:</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">bool</span> setExposure(<span class="keywordtype">double</span> exposure_time);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">bool</span> toggleHDR(<span class="keywordtype">bool</span> enable);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">bool</span> enableAutoExpose(<span class="keywordtype">bool</span> enable);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">double</span> getTemperature(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordtype">void</span> changeFPS(<span class="keywordtype">int</span> <a class="code" href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">fps</a>);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    cv::VideoCapture camera;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    cv::Mat image_buffer;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    cv::Mat channels[3];</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">double</span> exposure;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    QTimer *temperature_timer;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    BSTR device_path;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    hid_device* deimos_device = NULL;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">bool</span> send_hid(std::vector&lt;unsigned char&gt; &amp;buffer, <span class="keywordtype">size_t</span> command_len);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    std::string serial_from_device_path(std::string usb_device_path);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    std::string get_device_path_serial(IMoniker *pMoniker);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    qint64 getSerial(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    ~<a class="code" href="class_stereo_camera_deimos.html">StereoCameraDeimos</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="keyword">public</span> slots:</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">bool</span> setExposure(<span class="keywordtype">double</span> exposure_time);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">bool</span> toggleHDR(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordtype">bool</span> enableAutoExpose(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordtype">double</span> getTemperature(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">void</span> changeFPS(<span class="keywordtype">int</span> fps);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    cv::VideoCapture camera;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    cv::Mat image_buffer;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    cv::Mat channels[3];</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordtype">double</span> exposure;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    QTimer *temperature_timer;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    BSTR device_path;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    hid_device* deimos_device = NULL;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordtype">bool</span> send_hid(std::vector&lt;unsigned char&gt; &amp;buffer, <span class="keywordtype">size_t</span> command_len);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    std::string serial_from_device_path(std::string usb_device_path);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    std::string get_device_path_serial(IMoniker *pMoniker);</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;};</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    qint64 getSerial(<span class="keywordtype">void</span>);</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif // STEREOCAMERADEIMOS_H</span></div>
-<div class="ttc" id="class_stereo_camera_deimos_html_a7526953f7562acc07841ebd6a49dc043"><div class="ttname"><a href="class_stereo_camera_deimos.html#a7526953f7562acc07841ebd6a49dc043">StereoCameraDeimos::capture</a></div><div class="ttdeci">bool capture()</div><div class="ttdoc">Capture an image. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameradeimos_8cpp_source.html#l00513">stereocameradeimos.cpp:513</a></div></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;};</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">#endif // STEREOCAMERADEIMOS_H</span></div>
+<div class="ttc" id="class_stereo_camera_deimos_html_a7526953f7562acc07841ebd6a49dc043"><div class="ttname"><a href="class_stereo_camera_deimos.html#a7526953f7562acc07841ebd6a49dc043">StereoCameraDeimos::capture</a></div><div class="ttdeci">bool capture()</div><div class="ttdoc">Capture an image. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameradeimos_8cpp_source.html#l00518">stereocameradeimos.cpp:518</a></div></div>
 <div class="ttc" id="class_abstract_stereo_camera_html_a2c94f041f379bea5a5d2b4e2e5ba0217"><div class="ttname"><a href="class_abstract_stereo_camera.html#a2c94f041f379bea5a5d2b4e2e5ba0217">AbstractStereoCamera::fps</a></div><div class="ttdeci">void fps(qint64)</div><div class="ttdoc">Emitted after a frame has been processed to indicate the current framerate. </div></div>
-<div class="ttc" id="class_stereo_camera_deimos_html_a60c865353deac27471bbdc0316099c1b"><div class="ttname"><a href="class_stereo_camera_deimos.html#a60c865353deac27471bbdc0316099c1b">StereoCameraDeimos::disconnectCamera</a></div><div class="ttdeci">void disconnectCamera()</div><div class="ttdoc">Disconnect camera. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameradeimos_8cpp_source.html#l00501">stereocameradeimos.cpp:501</a></div></div>
-<div class="ttc" id="class_abstract_stereo_camera_html"><div class="ttname"><a href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></div><div class="ttdoc">Stereo camera base class. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00048">abstractstereocamera.h:48</a></div></div>
+<div class="ttc" id="class_stereo_camera_deimos_html_a60c865353deac27471bbdc0316099c1b"><div class="ttname"><a href="class_stereo_camera_deimos.html#a60c865353deac27471bbdc0316099c1b">StereoCameraDeimos::disconnectCamera</a></div><div class="ttdeci">void disconnectCamera()</div><div class="ttdoc">Disconnect camera. </div><div class="ttdef"><b>Definition:</b> <a href="stereocameradeimos_8cpp_source.html#l00506">stereocameradeimos.cpp:506</a></div></div>
+<div class="ttc" id="class_abstract_stereo_camera_html"><div class="ttname"><a href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></div><div class="ttdoc">Stereo camera base class. </div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00049">abstractstereocamera.h:49</a></div></div>
 <div class="ttc" id="class_stereo_camera_deimos_html"><div class="ttname"><a href="class_stereo_camera_deimos.html">StereoCameraDeimos</a></div><div class="ttdef"><b>Definition:</b> <a href="stereocameradeimos_8h_source.html#l00039">stereocameradeimos.h:39</a></div></div>
-<div class="ttc" id="struct_abstract_stereo_camera_1_1stereo_camera_serial_info_html"><div class="ttname"><a href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a></div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00119">abstractstereocamera.h:119</a></div></div>
+<div class="ttc" id="struct_abstract_stereo_camera_1_1stereo_camera_settings_html"><div class="ttname"><a href="struct_abstract_stereo_camera_1_1stereo_camera_settings.html">AbstractStereoCamera::stereoCameraSettings</a></div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00133">abstractstereocamera.h:133</a></div></div>
+<div class="ttc" id="struct_abstract_stereo_camera_1_1stereo_camera_serial_info_html"><div class="ttname"><a href="struct_abstract_stereo_camera_1_1stereo_camera_serial_info.html">AbstractStereoCamera::stereoCameraSerialInfo</a></div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00125">abstractstereocamera.h:125</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jan 15 2020 20:50:20 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 5 2020 16:34:56 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

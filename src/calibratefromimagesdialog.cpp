@@ -91,7 +91,10 @@ void CalibrateFromImagesDialog::setLeftImages() {
   for (int row = 0; row < numRows; ++row) {
     QModelIndex childIndex = left_file_model->index(row, 0, parentIndex);
     QString path = left_file_model->data(childIndex).toString();
-    left_image_list.append(left_path + "/" + path);
+    QString fname = left_path + "/" + path;
+    cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
+    //left_image_list.append(left_path + "/" + path);
+    left_image_list.append(im);
   }
 
    checkImageCount();
@@ -104,7 +107,10 @@ void CalibrateFromImagesDialog::setRightImages() {
   for (int row = 0; row < numRows; ++row) {
     QModelIndex childIndex = right_file_model->index(row, 0, parentIndex);
     QString path = right_file_model->data(childIndex).toString();
-    right_image_list.append(right_path + "/" + path);
+    //right_image_list.append(right_path + "/" + path);
+    QString fname = right_path + "/" + path;
+    cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
+    right_image_list.append(im);
   }
 
    checkImageCount();
@@ -162,7 +168,7 @@ void CalibrateFromImagesDialog::checkImageCount(void){
     int n_left_images = left_image_list.size();
     int n_right_images = right_image_list.size();
 
-    if(n_left_images >= 6 && n_right_images >= 6 && n_left_images == n_right_images){
+    if(n_left_images >= 1 && n_right_images >= 1 && n_left_images == n_right_images){
         ui->okPushButton->setEnabled(true);
     }else{
         ui->okPushButton->setEnabled(false);

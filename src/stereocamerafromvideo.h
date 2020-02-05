@@ -24,14 +24,16 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_info);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    bool autoConnect();
-    void toggleAutoExpose(bool enable){};
-    void adjustExposure(double exposure){};
-    void toggleAutoGain(bool enable){};
-    void adjustGain(int gain){};
-    void adjustBinning(int gain){};
+    void toggleAutoExpose(bool){} //NA
+    void adjustExposure(double){} //NA
+    void toggleAutoGain(bool){} //NA
+    void adjustGain(int){} //NA
+    void adjustBinning(int){} //NA
+    void toggleTrigger(bool){} //NA
+    void adjustFPS(int){} //NA
+    void adjustPacketSize(int){}
 public slots:
     void setPosition(int position);
     bool enableAutoExpose(bool enable);

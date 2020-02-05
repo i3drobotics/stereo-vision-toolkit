@@ -18,10 +18,52 @@ MainWindow::MainWindow(QWidget* parent)
     ui->tabWidget->setCurrentIndex(0);
 
     cameras_connected = false;
+    calibration_dialog_used = false;
+    calibration_from_images_dialog_used = false;
+
+    // define default settings for cameras
+    // if the camera does not use the setting then should be set to -1
+    default_basler_init_settings.exposure = 5;
+    default_basler_init_settings.gain = 0;
+    default_basler_init_settings.fps = 0;
+    default_basler_init_settings.binning = 2;
+    default_basler_init_settings.trigger = false;
+    default_basler_init_settings.hdr = -1;
+    default_basler_init_settings.autoExpose = false;
+    default_basler_init_settings.autoGain = false;
+    default_basler_init_settings.isGige = -1;
+    default_basler_init_settings.packetDelay = 0;
+    default_basler_init_settings.packetSize = 3000; //TODO fix packet size problems
+
+    default_tis_init_settings.exposure = 5;
+    default_tis_init_settings.gain = 0;
+    default_tis_init_settings.fps = 5;
+    default_tis_init_settings.binning = -1;
+    default_tis_init_settings.trigger = false;
+    default_tis_init_settings.hdr = -1;
+    default_tis_init_settings.autoExpose = false;
+    default_tis_init_settings.autoGain = false;
+    default_tis_init_settings.isGige = -1;
+    default_tis_init_settings.packetDelay = -1;
+    default_tis_init_settings.packetSize = -1;
+
+    default_deimos_init_settings.exposure = 5;
+    default_deimos_init_settings.gain = -1;
+    default_deimos_init_settings.fps = 60;
+    default_deimos_init_settings.binning = -1;
+    default_deimos_init_settings.trigger = -1;
+    default_deimos_init_settings.hdr = false;
+    default_deimos_init_settings.autoExpose = false;
+    default_deimos_init_settings.autoGain = -1;
+    default_deimos_init_settings.isGige = -1;
+    default_deimos_init_settings.packetDelay = -1;
+    default_deimos_init_settings.packetSize = -1;
+
+    frame_timer = new QTimer(this);
 
     /* Calibration */
     connect(ui->actionCalibration_wizard, SIGNAL(triggered(bool)), this,
-            SLOT(startCalibration()));
+            SLOT(startAutoCalibration()));
     connect(ui->actionCalibrate_from_images, SIGNAL(triggered(bool)), this,
             SLOT(startCalibrationFromImages()));
     connect(ui->actionAutoload_Camera, SIGNAL(triggered(bool)), this,
@@ -218,76 +260,148 @@ void MainWindow::resetPointCloudView(){
 }
 
 void MainWindow::stereoCameraInitConnections(void) {
+    //TODO remove rather than disable unused controls
+    double default_exposure = camera_default_init_settings.exposure;
+    int default_gain = camera_default_init_settings.gain;
+    int default_fps = camera_default_init_settings.fps;
+    int default_binning = camera_default_init_settings.binning;
+    int default_iTrigger = camera_default_init_settings.trigger;
+    int default_iHdr = camera_default_init_settings.hdr;
+    int default_iAutoExpose = camera_default_init_settings.autoExpose;
+    int default_iAutoGain = camera_default_init_settings.autoGain;
+    int default_packetDelay = camera_default_init_settings.packetDelay;
+    int default_packetSize = camera_default_init_settings.packetSize;
+    int default_iIsGige = camera_default_init_settings.isGige;
+    bool default_trigger, default_hdr, default_autoExpose, default_autoGain;
+    if (default_iIsGige == 1){
+        using_gige = true;
+    } else {
+        using_gige = false;
+    }
+
+    if (default_exposure != -1){
+        ui->exposureSpinBox->setEnabled(true);
+    } else {
+        default_exposure = 5;
+    }
+    if (default_gain != -1){
+        ui->gainSpinBox->setEnabled(true);
+    } else {
+        default_gain = 0;
+    }
+    if (default_fps != -1){
+        ui->fpsSpinBox->setEnabled(true);
+    } else {
+        default_fps = 5;
+    }
+    if (default_binning != -1){
+        ui->binningSpinBox->setEnabled(true);
+    } else {
+        default_binning = 1;
+    }
+    if (default_packetDelay != -1){
+        ui->packetDelaySpinBox->setEnabled(true);;
+    } else {
+        default_packetDelay = 0;
+    }
+    if (default_packetSize != -1){
+        ui->packetSizeSpinBox->setEnabled(true);
+    } else {
+        default_packetSize = 3000;
+    }
+    if (default_iTrigger != -1){
+        if (default_iTrigger == 1){
+            default_trigger = true;
+        } else {
+            default_trigger = false;
+        }
+        ui->enabledTriggeredCheckbox->setEnabled(true);
+        ui->enabledTriggeredCheckbox->setChecked(default_trigger);
+    } else {
+        default_trigger = false;
+    }
+    if (default_iHdr != -1){
+        if (default_iHdr == 1){
+            default_hdr = true;
+        } else {
+            default_hdr = false;
+        }
+        ui->enableHDRCheckbox->setEnabled(true);
+        ui->enableHDRCheckbox->setChecked(default_hdr);
+    } else {
+        default_hdr = false;
+    }
+    if (default_iAutoExpose != -1){
+        if (default_iAutoExpose == 1){
+            default_autoExpose = true;
+        } else {
+            default_autoExpose = false;
+        }
+        ui->autoExposeCheck->setEnabled(true);
+        ui->autoExposeCheck->setChecked(default_autoExpose);
+    } else {
+        default_autoExpose = false;
+    }
+    if (default_iAutoGain != -1){
+        if (default_iAutoGain == 1){
+            default_autoGain = true;
+        } else {
+            default_autoGain = false;
+        }
+        ui->autoGainCheckBox->setEnabled(true);
+        ui->autoGainCheckBox->setChecked(default_autoGain);
+    } else {
+        default_autoGain = false;
+    }
 
     // set window to default values
     // set fps spin box limits
-    int max_fps = 100;
+    int max_fps = 60;
     int min_fps = 0;
-    int default_fps = 0;
     int step_fps = 1;
 
     int max_gain = 360;
     int min_gain = 0;
-    int default_gain = 0;
     int step_gain = 1;
 
     int max_binning = 4;
     int min_binning = 1;
-    int default_binning = 1;
     int step_binning = 1;
+
+    double max_exposure = 500;
+    double min_exposure = 1;
+    double step_exposure = 1;
+
+    int max_packetDelay = 10000;
+    int min_packetDelay = 0;
+    int step_packetDelay = 1;
+
+    int max_packetSize = 16404;
+    int min_packetSize = 220;
+    int step_packetSize = 1;
+
     if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_DEIMOS){
-        max_fps = 60;
         min_fps = 30;
-        default_fps = 60;
         step_fps = 30;
-
-        ui->enableHDRCheckbox->setEnabled(true);
-        ui->autoExposeCheck->setEnabled(true);
-        ui->exposureSpinBox->setEnabled(true);
-        ui->fpsSpinBox->setEnabled(true);
-    } else if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_BASLER){
-        max_fps = 60;
-        min_fps = 0;
-        default_fps = 0;
-        step_fps = 1;
-
-        max_gain = 360;
-        min_gain = 0;
-        default_gain = 0;
-        step_gain = 1;
-
+    } else if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
         max_binning = 4;
         min_binning = 1;
-        default_binning = 2;
         step_binning = 1;
-
-        ui->autoExposeCheck->setEnabled(true);
-        ui->exposureSpinBox->setEnabled(true);
-        ui->autoGainCheckBox->setEnabled(true);
-        ui->gainSpinBox->setEnabled(true);
-        ui->enabledTriggeredCheckbox->setEnabled(true);
-        ui->fpsSpinBox->setEnabled(true);
-        ui->binCheckBox->setEnabled(true);
-        ui->binCheckBox->setChecked(true);
-        ui->binningSpinBox->setEnabled(true);
+    } else if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
+        //TODO needs testing
+        max_binning = 4;
+        min_binning = 1;
+        step_binning = 1;
     } else if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_TIS){
-        max_fps = 10;
-        min_fps = 0;
-        default_fps = 5;
-        step_fps = 1;
-
         max_gain = 48;
         min_gain = 0;
-        default_gain = 0;
         step_gain = 1;
-        ui->autoExposeCheck->setEnabled(true);
-        ui->exposureSpinBox->setEnabled(true);
-        ui->autoGainCheckBox->setEnabled(true);
-        ui->gainSpinBox->setEnabled(true);
-        ui->enabledTriggeredCheckbox->setEnabled(true);
-        ui->fpsSpinBox->setEnabled(true);
     }
 
+    current_fps = default_fps;
+    current_binning = default_binning;
+
+    // set fps
     ui->fpsSpinBox->blockSignals(true);
     ui->fpsSpinBox->setRange(min_fps,max_fps);
     ui->fpsSpinBox->setSingleStep(step_fps);
@@ -310,26 +424,44 @@ void MainWindow::stereoCameraInitConnections(void) {
 
     // set exposure
     ui->exposureSpinBox->blockSignals(true);
-    ui->exposureSpinBox->setValue(5);
+    ui->exposureSpinBox->setRange(min_exposure,max_exposure);
+    ui->exposureSpinBox->setSingleStep(step_exposure);
+    ui->exposureSpinBox->setValue(default_exposure);
     ui->exposureSpinBox->blockSignals(false);
+
+    // set packet delay
+    ui->packetDelaySpinBox->blockSignals(true);
+    ui->packetDelaySpinBox->setRange(min_packetDelay,max_packetDelay);
+    ui->packetDelaySpinBox->setSingleStep(step_packetDelay);
+    ui->packetDelaySpinBox->setValue(default_packetDelay);
+    ui->packetDelaySpinBox->blockSignals(false);
+
+    // set packet delay
+    ui->packetSizeSpinBox->blockSignals(true);
+    ui->packetSizeSpinBox->setRange(min_packetSize,max_packetSize);
+    ui->packetSizeSpinBox->setSingleStep(step_packetSize);
+    ui->packetSizeSpinBox->setValue(default_packetSize);
+    ui->packetSizeSpinBox->blockSignals(false);
 
     connect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
             SLOT(setExposure(double)));
     connect(ui->gainSpinBox, SIGNAL(valueChanged(int)), stereo_cam,
             SLOT(setGain(int)));
-    connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam,
+    connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
             SLOT(changeFPS(int)));
     connect(ui->binningSpinBox, SIGNAL(valueChanged(int)), this,
             SLOT(changeBinning(int)));
+    connect(ui->packetSizeSpinBox, SIGNAL(editingFinished()), this,
+            SLOT(changePacketSize()));
+    connect(ui->packetDelaySpinBox, SIGNAL(valueChanged(int)), stereo_cam,
+            SLOT(setPacketDelay(int)));
 
     connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_view, SLOT(setSize(int, int, int)));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), right_view, SLOT(setSize(int, int, int)));
 
-    connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), stereo_cam,
-            SLOT(enableTrigger(bool)));
-    connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), stereo_cam,
-            SLOT(enableTrigger(bool)));
+    connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
+            SLOT(toggleFPS(bool)));
 
     connect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
     connect(stereo_cam, SIGNAL(framecount(qint64)), this,
@@ -360,17 +492,21 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(setVisualZmax(double)));
     connect(ui->savePointCloudButton, SIGNAL(clicked()), stereo_cam, SLOT(savePointCloud()));
     connect(ui->dateInFilenameCheckbox, SIGNAL(stateChanged(int)), stereo_cam, SLOT(toggleDateInFilename(int)));
-    connect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString))); 
+    connect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
 
     enableWindow();
 }
 
 void MainWindow::stereoCameraRelease(void) {
-
+    //TODO remove rather than disable unused controls
     disableWindow();
 
     ui->exposureSpinBox->setDisabled(true);
     ui->fpsSpinBox->setDisabled(true);
+    ui->gainSpinBox->setDisabled(true);
+    ui->binningSpinBox->setDisabled(true);
+    ui->packetDelaySpinBox->setDisabled(true);
+    ui->packetSizeSpinBox->setDisabled(true);
     ui->autoExposeCheck->setChecked(false);
     ui->autoExposeCheck->setDisabled(true);
     ui->autoGainCheckBox->setChecked(false);
@@ -381,7 +517,6 @@ void MainWindow::stereoCameraRelease(void) {
     ui->enabledTriggeredCheckbox->setDisabled(true);
     ui->binCheckBox->setDisabled(true);
     ui->binCheckBox->setChecked(false);
-    ui->binningSpinBox->setDisabled(true);
 
     ui->enableStereo->setChecked(false);
     ui->pauseButton->setChecked(false);
@@ -410,11 +545,19 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
                    SLOT(setExposure(double)));
         disconnect(ui->gainSpinBox, SIGNAL(valueChanged(int)), stereo_cam,
-                SLOT(setGain(int)));
-        disconnect(ui->binningSpinBox, SIGNAL(valueChanged(int)), stereo_cam,
-                SLOT(setBinning(int)));
-        disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam,
-                SLOT(changeFPS(int)));
+                   SLOT(setGain(int)));
+        disconnect(ui->binningSpinBox, SIGNAL(valueChanged(int)), this,
+                   SLOT(changeBinning(int)));
+        disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
+                   SLOT(changeFPS(int)));
+        disconnect(ui->packetSizeSpinBox, SIGNAL(valueChanged(int)), this,
+                SLOT(changePacketSize(int)));
+        disconnect(ui->packetDelaySpinBox, SIGNAL(valueChanged(int)), stereo_cam,
+                SLOT(setPacketDelay(int)));
+
+        disconnect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
+                   SLOT(toggleFPS(bool)));
+
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
         disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
         disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
@@ -483,7 +626,7 @@ void MainWindow::stereoCameraRelease(void) {
 
 int MainWindow::stereoCameraLoad(void) {
     cameras_connected = false;
-    int exit_code = -1;
+    int exit_code = -4;
 
     QProgressDialog progressSearch("Finding connected devices...", "", 0, 100, this);
     progressSearch.setWindowTitle("SVT");
@@ -500,7 +643,7 @@ int MainWindow::stereoCameraLoad(void) {
     QThread* deimos_thread = new QThread;
     stereo_cam_deimos->assignThread(deimos_thread);
 
-    StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
+    StereoCameraBasler2 * stereo_cam_basler = new StereoCameraBasler2;
     QThread* basler_thread = new QThread;
     stereo_cam_basler->assignThread(basler_thread);
 
@@ -530,7 +673,7 @@ int MainWindow::stereoCameraLoad(void) {
 
     int total_systems_found = all_camera_serial_info.size();
 
-    if (total_systems_found > 1){
+    if (total_systems_found > 0){
         // more than 1 stereo system found
         // user picks which camera system to use
         QMessageBox msgBoxDevType;
@@ -551,7 +694,7 @@ int MainWindow::stereoCameraLoad(void) {
                 std::string camera_str = "Deimos \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapDeimos);
-            } else if (camera_serial_info.camera_type == CAMERA_TYPE_BASLER || camera_serial_info.camera_type == CAMERA_TYPE_TIS){
+            } else if (camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB || camera_serial_info.camera_type == CAMERA_TYPE_TIS){
                 std::string camera_str = "Phobos \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapPhobos);
@@ -559,22 +702,24 @@ int MainWindow::stereoCameraLoad(void) {
             msgBoxDevSelect.addButton(pButtonDev,QMessageBox::YesRole);
             pButtons.push_back(pButtonDev);
         }
-        msgBoxDevSelect.addButton(tr("Cancel"), QMessageBox::RejectRole);
+        QPushButton* pButtonCancel = msgBoxDevSelect.addButton(tr("Cancel"), QMessageBox::RejectRole);
         msgBoxDevSelect.exec();
 
-        // get serial info camera chosen with button press
-        for (std::vector<QAbstractButton*>::iterator it = pButtons.begin() ; it != pButtons.end(); ++it){
-            int index = it - pButtons.begin();
-            if (msgBoxDevSelect.clickedButton()==*it) {
-                chosen_camera_serial_info = all_camera_serial_info.at(index);
-                camera_chosen = true;
-                break;
+        if (msgBoxDevSelect.clickedButton() == pButtonCancel){
+            return CAMERA_CONNECTION_CANCEL_EXIT_CODE;
+        } else {
+            // get serial info camera chosen with button press
+            for (std::vector<QAbstractButton*>::iterator it = pButtons.begin() ; it != pButtons.end(); ++it){
+                int index = it - pButtons.begin();
+                if (msgBoxDevSelect.clickedButton()==*it) {
+                    chosen_camera_serial_info = all_camera_serial_info.at(index);
+                    camera_chosen = true;
+                    break;
+                }
             }
         }
     } else {
-        // get serial info on only system found
-        chosen_camera_serial_info = all_camera_serial_info.at(0);
-        camera_chosen = true;
+        camera_chosen = false;
     }
 
     if (camera_chosen) {
@@ -587,23 +732,31 @@ int MainWindow::stereoCameraLoad(void) {
         progressConnect.setValue(10);
         QCoreApplication::processEvents();
         if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_DEIMOS){
-            cameras_connected = stereo_cam_deimos->initCamera(chosen_camera_serial_info);
+            camera_default_init_settings = default_deimos_init_settings;
+            cameras_connected = stereo_cam_deimos->initCamera(chosen_camera_serial_info,camera_default_init_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
             qDebug() << "Connecting to Deimos system";
-        } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER){
-            cameras_connected = stereo_cam_basler->initCamera(chosen_camera_serial_info);
+        } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE || chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
+            camera_default_init_settings = default_basler_init_settings;
+            if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+                camera_default_init_settings.isGige = 1;
+            }
+            cameras_connected = stereo_cam_basler->initCamera(chosen_camera_serial_info,camera_default_init_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_basler);
             qDebug() << "Connecting to Phobos system";
-           } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_TIS){
-            cameras_connected = stereo_cam_tis->initCamera(chosen_camera_serial_info);
+        } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_TIS){
+            camera_default_init_settings = default_tis_init_settings;
+            cameras_connected = stereo_cam_tis->initCamera(chosen_camera_serial_info,camera_default_init_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tis);
             left_view->setSettingsCallback(stereo_cam, SLOT(loadLeftSettings()));
             right_view->setSettingsCallback(stereo_cam, SLOT(loadRightSettings()));
             qDebug() << "Connecting to Phobos system";
         }
+
         stereo_cam->camera_serial_info = chosen_camera_serial_info;
 
         if (cameras_connected){
+            current_camera_settings = camera_default_init_settings;
             progressConnect.setLabelText("Setting up camera interface...");
             progressConnect.setValue(50);
             stereoCameraInit();
@@ -611,10 +764,12 @@ int MainWindow::stereoCameraLoad(void) {
             progressConnect.setValue(100);
             progressConnect.close();
             QCoreApplication::processEvents();
-            exit_code = 0;
+            exit_code = CAMERA_CONNECTION_SUCCESS_EXIT_CODE;
         } else {
-            exit_code = -1;
+            exit_code = CAMERA_CONNECTION_FAILED_EXIT_CODE; // failed to connect to camera
         }
+    } else {
+        exit_code = CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE; // no camera chosen
     }
     return (exit_code);
 }
@@ -644,7 +799,13 @@ void MainWindow::stereoCameraInit() {
         left_view->setSize(stereo_cam->getWidth(), stereo_cam->getHeight(), 1);
         right_view->setSize(stereo_cam->getWidth(), stereo_cam->getHeight(), 1);
 
-        QTimer::singleShot(1, stereo_cam, SLOT(freerun()));
+        frame_timer->stop();
+        frame_timer = new QTimer(this);
+        frame_timer->setSingleShot(true);
+        connect(frame_timer, SIGNAL(timeout()), stereo_cam , SLOT(freerun()));
+        frame_timer->start(1);
+        //QTimer::singleShot(1, stereo_cam, SLOT(freerun()));
+
         ui->statusBar->showMessage("Freerunning.");
     }
 }
@@ -652,15 +813,39 @@ void MainWindow::stereoCameraInit() {
 void MainWindow::autoloadCameraTriggered() {
     stereoCameraRelease();
     int stereo_camera_exit_code = stereoCameraLoad();
-    if (stereo_camera_exit_code < 0){
-        //Display quit messagebox as program does not function correctly if no camera is connected
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Stereo Vision Toolkit");
-        msgBox.setText("Failed to connect to cameras. Some features will not work as expected.");
-        msgBox.exec();
-    } else {
+    if (stereo_camera_exit_code == CAMERA_CONNECTION_SUCCESS_EXIT_CODE){
         //re-enable tabs as camera confirmed as connected
         enableWindow();
+        ui->toggleVideoButton->setEnabled(true);
+    } else if (stereo_camera_exit_code == CAMERA_CONNECTION_FAILED_EXIT_CODE){
+        //Display warning messagebox as program does not function correctly if no camera is connected
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Stereo Vision Toolkit");
+        std::string msgBoxMsg;
+        if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+            // notice to user if using gige as can become locked if not closed correctly
+            // suggest power cycling to unlock the device
+            msgBoxMsg = "Failed to connect to cameras. Some features will not work as expected. GigE camera may be locked if closed incorrectly, try power cycling the camera system.";
+        } else {
+            msgBoxMsg = "Failed to connect to cameras. Some features will not work as expected.";
+        }
+        msgBox.setText(msgBoxMsg.c_str());
+        msgBox.exec();
+    } else if (stereo_camera_exit_code == CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE){
+        //Display warning messagebox as program does not function correctly if no camera is connected
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Stereo Vision Toolkit");
+        msgBox.setText("No recognised cameras connected. Some features will not work as expected.");
+        msgBox.exec();
+    } else if (stereo_camera_exit_code == CAMERA_CONNECTION_CANCEL_EXIT_CODE){
+        //Display warning messagebox as program does not function correctly if no camera is connected
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Stereo Vision Toolkit");
+        msgBox.setText("No camera system selected. Some features will not work as expected.");
+        msgBox.exec();
+    } else {
+        // should never happen
+        qDebug() << "Undefined exit code in 'stereoCameraLoad()'";
     }
 }
 
@@ -677,9 +862,10 @@ void MainWindow::videoStreamLoad(void) {
         stereo_cam_video->assignThread(cam_thread);
 
         AbstractStereoCamera::stereoCameraSerialInfo scis;
+        AbstractStereoCamera::stereoCameraSettings scs;
         scis.filename = fname.toStdString();
 
-        if (stereo_cam_video->initCamera(scis)) {
+        if (stereo_cam_video->initCamera(scis,scs)) {
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_video);
             cameras_connected = true;
             ui->frameCountSlider->setEnabled(true);
@@ -692,8 +878,7 @@ void MainWindow::videoStreamLoad(void) {
         }
 
         stereoCameraInit();
-        ui->exposureSpinBox->setDisabled(true);
-        ui->autoExposeCheck->setDisabled(true);
+        ui->toggleVideoButton->setDisabled(true);
     }
 }
 
@@ -717,8 +902,6 @@ void MainWindow::updateCloud() {
 }
 
 void MainWindow::startVideoCapture(void) {
-    stereo_cam->pause();
-    stereo_cam->enableMatching(false);
 
     connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
             SLOT(stopVideoCapture(void)));
@@ -728,16 +911,34 @@ void MainWindow::startVideoCapture(void) {
     ui->toggleVideoButton->setIcon(awesome->icon(fa::stop, icon_options));
     ui->statusBar->showMessage("Video capture started.");
 
+    ui->actionAutoload_Camera->setEnabled(false);
+    ui->actionLoad_Video->setEnabled(false);
+
     ui->pauseButton->setEnabled(false);
     ui->enableStereo->setEnabled(false);
     ui->enableStereo->setChecked(false);
-    ui->saveButton->setEnabled(false);
     ui->singleShotButton->setEnabled(false);
+    ui->saveButton->setEnabled(false);
 
-    QTimer::singleShot(1, stereo_cam, SLOT(videoStreamStart()));
+    //TODO disable FPS camera controls when video is recording
+
+    //QTimer frame_timer = QTimer::singleShot(1, stereo_cam, SLOT(videoStreamStart()));
+    int vid_fps = current_fps;
+    if (current_fps == 0){
+        vid_fps = measured_fps;
+    }
+    stereo_cam->videoStreamInit("",vid_fps);
+    frame_timer->stop();
+    frame_timer = new QTimer(this);
+    frame_timer->setSingleShot(true);
+    connect(frame_timer, SIGNAL(timeout()), stereo_cam , SLOT(videoStreamProcess()));
+    frame_timer->start(1);
 }
 
 void MainWindow::stopVideoCapture(void) {
+    ui->statusBar->showMessage("Stopping video capture...");
+    frame_timer->stop();
+    while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
     stereo_cam->videoStreamStop();
     ui->statusBar->showMessage("Stopped video capture.");
 
@@ -746,15 +947,21 @@ void MainWindow::stopVideoCapture(void) {
     disconnect(ui->toggleVideoButton, SIGNAL(clicked()), this,
                SLOT(stopVideoCapture(void)));
 
+    ui->actionAutoload_Camera->setEnabled(true);
+    ui->actionLoad_Video->setEnabled(true);
+
     ui->enableStereo->setEnabled(true);
     ui->pauseButton->setEnabled(true);
     ui->pauseButton->setIcon(awesome->icon(fa::pause, icon_options));
-    ui->saveButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
+    ui->saveButton->setEnabled(true);
 
     ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
 
-    QTimer::singleShot(1, stereo_cam, SLOT(freerun()));
+    frame_timer = new QTimer(this);
+    frame_timer->setSingleShot(true);
+    connect(frame_timer, SIGNAL(timeout()), stereo_cam , SLOT(freerun()));
+    frame_timer->start(1);
 }
 
 void MainWindow::startCalibrationFromImages(void) {
@@ -762,6 +969,8 @@ void MainWindow::startCalibrationFromImages(void) {
     connect(calibration_images_dialog, SIGNAL(run_calibration()), this, SLOT(runCalibrationFromImages()));
     calibration_images_dialog->move(100, 100);
     calibration_images_dialog->show();
+
+    calibration_from_images_dialog_used = true;
 }
 
 void MainWindow::runCalibrationFromImages(void){
@@ -788,36 +997,45 @@ void MainWindow::runCalibrationFromImages(void){
     calibrator->setImages(left_images, right_images);
     calibrator->setSaveROS(save_ros);
     calibrator->jointCalibration();
-
 }
 
-void MainWindow::startCalibration(void) {
-    stereo_cam->enableMatching(false);
+void MainWindow::startAutoCalibration(void) {
+    ui->toggleRectifyCheckBox->setChecked(false);
     stereo_cam->enableRectify(false);
+    ui->enableStereo->setChecked(false);
+    stereo_cam->enableMatching(false);
 
-    /* Connect calibration */
-    calibrator = new StereoCalibrate(this, stereo_cam);
-    calibrator->setPattern(cv::Size(9, 6), 25e-3);
-    calibrator->setDisplays(left_view->getImageDisplay(), right_view->getImageDisplay());
-    calibrator->loadBoardPoses("./calibration_template_a4.ini");
-
-    calibration_dialog = new CalibrationDialog(this, calibrator);
-
-    ui->tabWidget->setCurrentIndex(0);
-
-    /* Route image capture through via the calibrator */
-
-    disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
-
-    connect(calibration_dialog, SIGNAL(stopCalibration()), calibrator,
-            SLOT(abortCalibration()));
-    connect(calibrator, SIGNAL(doneCalibration(bool)), this,
-            SLOT(doneCalibration(bool)));
-
-    calibrator->startCalibration();
-
+    calibration_dialog = new CalibrationDialog(stereo_cam);
+    connect(calibration_dialog, SIGNAL(startCalibration()), this, SLOT(runAutoCalibration()));
     calibration_dialog->move(100, 100);
     calibration_dialog->show();
+
+    calibration_dialog_used = true;
+}
+
+void MainWindow::runAutoCalibration(void){
+    qDebug() << "Beginning calibration";
+
+    if(calibration_dialog == nullptr) return;
+    qDebug() << "Getting parameters";
+
+    int cols = calibration_dialog->getPatternCols();
+    int rows = calibration_dialog->getPatternRows();
+    double square_size_mm = calibration_dialog->getSquareSizeMm();
+    auto left_images = calibration_dialog->getLeftImages();
+    auto right_images = calibration_dialog->getRightImages();
+    bool save_ros = calibration_dialog->getSaveROS();
+
+    calibration_dialog->close();
+
+    calibrator = new StereoCalibrate(this, nullptr);
+    cv::Size pattern(cols, rows);
+
+    calibrator->setOutputPath(calibration_dialog->getOutputPath());
+    calibrator->setPattern(pattern, square_size_mm);
+    calibrator->setImages(left_images, right_images);
+    calibrator->setSaveROS(save_ros);
+    calibrator->jointCalibration();
 }
 
 void MainWindow::doneCalibration(bool) {
@@ -938,7 +1156,12 @@ void MainWindow::toggleAcquire(void) {
         ui->statusBar->showMessage("Paused.");
         ui->pauseButton->setIcon(awesome->icon(fa::play, icon_options));
     } else {
-        QTimer::singleShot(1, stereo_cam, SLOT(freerun()));
+        frame_timer->stop();
+        frame_timer = new QTimer(this);
+        frame_timer->setSingleShot(true);
+        connect(frame_timer, SIGNAL(timeout()), stereo_cam , SLOT(freerun()));
+        frame_timer->start(1);
+        //QTimer::singleShot(1, stereo_cam, SLOT(freerun()));
         ui->statusBar->showMessage("Freerunning.");
         ui->pauseButton->setIcon(awesome->icon(fa::pause, icon_options));
     }
@@ -1003,8 +1226,8 @@ void MainWindow::setSaveDirectory(QString dir) {
 void MainWindow::toggleAutoGain(bool enable){
     stereo_cam->toggleAutoGain(enable);
     if (!enable){
-        double exposure_val = ui->gainSpinBox->value();
-        stereo_cam->adjustGain(exposure_val);
+        int gain_val = ui->gainSpinBox->value();
+        stereo_cam->adjustGain(gain_val);
     }
 }
 
@@ -1016,7 +1239,57 @@ void MainWindow::toggleAutoExpose(bool enable){
     }
 }
 
-//TODO do gige check for FPS changing
+void MainWindow::toggleFPS(bool enable){
+    if (gigeWarning(current_binning)){
+        stereo_cam->toggleTrigger(enable);
+    } else {
+        if (enable){
+            ui->enabledTriggeredCheckbox->setChecked(false);
+            ui->fpsSpinBox->setEnabled(true);
+        } else {
+            ui->enabledTriggeredCheckbox->setChecked(true);
+            ui->fpsSpinBox->setEnabled(false);
+        }
+    }
+}
+
+void MainWindow::changeFPS(int fps){
+    int binning = 5;
+    if (ui->binCheckBox->isChecked()){
+        binning = ui->binningSpinBox->value();
+    }
+    if (gigeWarning(binning,fps)){
+        stereo_cam->adjustFPS(fps);
+        current_fps = fps;
+    } else {
+        disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
+                   SLOT(changeFPS(int)));
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        ui->fpsSpinBox->setValue(current_fps);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
+                SLOT(changeFPS(int)));
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
+}
+
+void MainWindow::changePacketSize(){
+    QProgressDialog progressPacketSize("Updating packet size...", "", 0, 100, this);
+    progressPacketSize.setWindowTitle("SVT");
+    progressPacketSize.setWindowModality(Qt::WindowModal);
+    progressPacketSize.setCancelButton(nullptr);
+    progressPacketSize.setMinimumDuration(0);
+    progressPacketSize.setValue(30);
+    QCoreApplication::processEvents();
+
+    int packetSize = ui->packetSizeSpinBox->value();
+
+    stereo_cam->adjustPacketSize(packetSize);
+
+    progressPacketSize.setValue(100);
+    progressPacketSize.close();
+}
+
 void MainWindow::changeBinning(int binning){
     if (gigeWarning(binning)){
         QProgressDialog progressBinning("Updating binning...", "", 0, 100, this);
@@ -1028,22 +1301,30 @@ void MainWindow::changeBinning(int binning){
         QCoreApplication::processEvents();
 
         stereo_cam->adjustBinning(binning);
+        current_binning = binning;
+
+        //TODO fix crash after setting binning
 
         progressBinning.setValue(100);
         progressBinning.close();
     } else {
-        if (binning<=3){
-            ui->binningSpinBox->blockSignals(true);
-            ui->binningSpinBox->setValue(binning+1);
-            ui->binningSpinBox->blockSignals(false);
-        }
+        disconnect(ui->binningSpinBox, SIGNAL(valueChanged(int)), this,
+                   SLOT(changeBinning(int)));
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        ui->binningSpinBox->setValue(current_binning);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        connect(ui->binningSpinBox, SIGNAL(valueChanged(int)), this,
+                SLOT(changeBinning(int)));
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     }
 }
 
 void MainWindow::toggleEnableBinning(bool enable){
     int binning_val = 1;
     if (enable){
-        binning_val = ui->binningSpinBox->value();
+        binning_val = current_binning;
+    } else {
+        current_binning = 1;
     }
 
     if (gigeWarning(binning_val)){
@@ -1065,28 +1346,36 @@ void MainWindow::toggleEnableBinning(bool enable){
     }
 }
 
-bool MainWindow::gigeWarning(int binning){
-    int fps;
-    if (!ui->enabledTriggeredCheckbox->isChecked()){
-        fps = ui->fpsSpinBox->value();
+bool MainWindow::gigeWarning(int binning,int new_fps){
+    if (using_gige){
+        int fps;
+        if (new_fps >= 0){
+            fps = new_fps;
+        } else {
+            if (!ui->enabledTriggeredCheckbox->isChecked()){
+                fps = current_fps;
+            } else { // use current measured fps hardware trigger is being used
+                fps = measured_fps;
+            }
+        }
         if (fps == 0){
             fps = 5; // use fps estimate of 5 when fps cap is disabled (fps = 0)
         }
-    } else { // use current measured fps hardware trigger is being used
-        fps = calc_fps;
-    }
-    int bit_per_second = ((stereo_cam->getHeight() * stereo_cam->getWidth() * 2)/binning) * fps;
-    qDebug() << "BPS: " << bit_per_second;
-    int max_for_warning = 8000000; // 1MB
-    if (bit_per_second > max_for_warning){
-        QMessageBox msgBoxWarning;
-        msgBoxWarning.setText(tr("Warning! Data will exceed 1MBps. This may exceed your internet speed if running a GigE camera on a standard network."));
-        msgBoxWarning.setInformativeText(tr("Are you sure you want to continue?"));
-        msgBoxWarning.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBoxWarning.setDefaultButton(QMessageBox::Yes);
-        int ret = msgBoxWarning.exec();
-        if (ret == QMessageBox::No){
-            return false;
+        int bit_per_second = ((stereo_cam->getHeight() * stereo_cam->getWidth() * 2)/binning) * fps;
+        qDebug() << "BPS: " << bit_per_second;
+        int max_for_warning = 8000000; // 1MB
+        if (bit_per_second > max_for_warning){
+            QMessageBox msgBoxWarning;
+            msgBoxWarning.setText(tr("Warning! Data may exceed 1MBps. This may exceed your internet speed when running a GigE camera on a standard network."));
+            msgBoxWarning.setInformativeText(tr("Are you sure you want to continue?"));
+            msgBoxWarning.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBoxWarning.setDefaultButton(QMessageBox::Yes);
+            int ret = msgBoxWarning.exec();
+            if (ret == QMessageBox::No){
+                return false;
+            } else {
+                return true;
+            }
         } else {
             return true;
         }
@@ -1101,7 +1390,7 @@ void MainWindow::updateFrameCount(qint64 count) {
 
 void MainWindow::updateFPS(qint64 time) {
     int fps = 1000.0 / time;
-    calc_fps = fps;
+    measured_fps = fps;
     fps_counter->setText(QString("FPS: %1").arg(fps));
 }
 
@@ -1125,9 +1414,19 @@ void MainWindow::on_btnCameraSettings_clicked()
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void MainWindow::closeEvent(QCloseEvent *) {
     qDebug() << "Closing application";
+    stereo_cam->videoStreamStop();
     stereoCameraRelease();
+    frame_timer->stop();
+    while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+    //TODO fix crash if dialog box used
+    if (calibration_dialog_used){
+        calibration_dialog->close();
+    }
+    if (calibration_from_images_dialog_used){
+        calibration_images_dialog->close();
+    }
 }
 
 MainWindow::~MainWindow() {

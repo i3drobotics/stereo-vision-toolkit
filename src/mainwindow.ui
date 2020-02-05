@@ -203,6 +203,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="toggleVideoButton">
+        <property name="toolTip">
+         <string>Record stereo video</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -244,7 +247,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>100</width>
+          <width>130</width>
           <height>0</height>
          </size>
         </property>
@@ -329,14 +332,14 @@
                  <widget class="QLabel" name="lblExposure">
                   <property name="minimumSize">
                    <size>
-                    <width>52</width>
+                    <width>0</width>
                     <height>0</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>52</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -351,14 +354,14 @@
                  <widget class="QLabel" name="lblGain">
                   <property name="minimumSize">
                    <size>
-                    <width>52</width>
+                    <width>0</width>
                     <height>0</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>52</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -373,14 +376,14 @@
                  <widget class="QLabel" name="lblFPS">
                   <property name="minimumSize">
                    <size>
-                    <width>52</width>
+                    <width>0</width>
                     <height>0</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>52</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -395,14 +398,14 @@
                  <widget class="QLabel" name="lblHDR">
                   <property name="minimumSize">
                    <size>
-                    <width>52</width>
+                    <width>0</width>
                     <height>0</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>52</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -417,14 +420,14 @@
                  <widget class="QLabel" name="lblBinning">
                   <property name="minimumSize">
                    <size>
-                    <width>52</width>
+                    <width>0</width>
                     <height>0</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>52</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="text">
@@ -432,6 +435,20 @@
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lblPacketDelay">
+                  <property name="text">
+                   <string>Packet Delay</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lblPacketSize">
+                  <property name="text">
+                   <string>Packet Size</string>
                   </property>
                  </widget>
                 </item>
@@ -458,8 +475,8 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="layoutDirection">
@@ -502,8 +519,8 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="minimum">
@@ -523,7 +540,7 @@
                    <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
+                   <enum>QSizePolicy::Preferred</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -546,8 +563,8 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
-                    <height>30</height>
+                    <width>16777215</width>
+                    <height>16777215</height>
                    </size>
                   </property>
                   <property name="minimum">
@@ -555,6 +572,20 @@
                   </property>
                   <property name="maximum">
                    <number>3</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="packetDelaySpinBox">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="packetSizeSpinBox">
+                  <property name="enabled">
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -647,6 +678,38 @@
                    <string>Enable</string>
                   </property>
                  </widget>
+                </item>
+                <item>
+                 <spacer name="packetDelaySpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <spacer name="packetSizeSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </item>
@@ -1205,7 +1268,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Calibration wizard</string>
+    <string>Calibration wizard (BETA)</string>
    </property>
   </action>
   <action name="actionExit">
