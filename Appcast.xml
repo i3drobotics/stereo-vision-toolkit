@@ -30,7 +30,7 @@
 			<enclosure
 				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.2.2/Stereo.Vision.Toolkit.Installer.exe"
 				fervor:version="1.2.3"
-				fervor:platform="Q_OS_WIN64"
+				fervor:platform="QT_OS_WIN64"
 				length="0"
 				type="application/octet-stream" />
 
