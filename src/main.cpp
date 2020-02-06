@@ -6,11 +6,23 @@
 #include <QApplication>
 #include <QFile>
 #include <QFontDatabase>
+#include "fvupdater.h"
 
 #include "mainwindow.h"
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
+
+  //QApplication::setApplicationName(APP_NAME);
+  //QApplication::setApplicationVersion(APP_VERSION);
+  //QApplication::setOrganizationName("Industrial 3D Robotics");
+  //QApplication::setOrganizationDomain("i3drobotics.com");
+
+  // Set the Fervor appcast url
+  FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml");
+  // Check for updates silently -- this will not block the initialization of
+  // your application, just start a HTTP request and return immediately.
+  FvUpdater::sharedUpdater()->CheckForUpdatesNotSilent();
 
   QFile f(":qdarkstyle/style.qss");
 
