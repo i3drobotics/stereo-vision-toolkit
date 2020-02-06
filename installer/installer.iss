@@ -43,7 +43,7 @@ Source: "../LICENSE"; DestDir: "{app}/licenses"
 Source: "../{#IconName}"; DestDir: "{app}"
 
 [Run]
-Filename: {tmp}\vcredist_x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
+Filename: {tmp}\vc_redist.x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_USB_Camera_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon USB Camera Driver...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Filter_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Filter Driver...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Performance_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Performance Driver...;
