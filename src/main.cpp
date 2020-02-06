@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
 
   //QApplication::setApplicationName(APP_NAME);
   //QApplication::setApplicationVersion(APP_VERSION);
-  //QApplication::setOrganizationName("Industrial 3D Robotics");
-  //QApplication::setOrganizationDomain("i3drobotics.com");
+  QApplication::setOrganizationName("Industrial 3D Robotics");
+  QApplication::setOrganizationDomain("i3drobotics.com");
 
   // Set the Fervor appcast url
   FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml");
