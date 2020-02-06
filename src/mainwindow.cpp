@@ -94,6 +94,13 @@ MainWindow::MainWindow(QWidget* parent)
     statusBarInit();
     autoloadCameraTriggered();
     pointCloudInit();
+
+    // Set the Fervor appcast url
+    FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml");
+
+    // Check for updates silently -- this will not block the initialization of
+    // your application, just start a HTTP request and return immediately.
+    FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
 }
 
 void MainWindow::disableWindow(){

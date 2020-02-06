@@ -51,6 +51,7 @@
 #include "cameradisplaywidget.h"
 
 #include "paramfile.h"
+#include "fvupdater.h"
 
 //!  Main Window
 /*!
