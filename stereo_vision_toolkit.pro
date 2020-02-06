@@ -7,9 +7,9 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.2.2
+VERSION = 1.2.3
 
-QT += core gui concurrent widgets xml network
+QT += core gui concurrent widgets xml network quick
 
 TARGET = StereoVisionToolkit
 TEMPLATE = app vcapp
@@ -354,6 +354,11 @@ COPIES += helpDocs
 helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/help/*.html, true)
 helpDocs.files += $$files($$_PRO_FILE_PWD_/docs/help/*.png, true)
 helpDocs.path = $${DEPLOY_FOLDER}/docs/help
+
+# Fervor autoupdater
+!include("fervor/Fervor.pri") {
+        error("Unable to include Fervor autoupdater.")
+}
 
 # Auto generate code documenation using doxygen
 CONFIG( doc ){

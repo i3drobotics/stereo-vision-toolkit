@@ -25,9 +25,9 @@ MainWindow::MainWindow(QWidget* parent)
     // if the camera does not use the setting then should be set to -1
     default_basler_init_settings.exposure = 5;
     default_basler_init_settings.gain = 0;
-    default_basler_init_settings.fps = 0;
+    default_basler_init_settings.fps = -1;
     default_basler_init_settings.binning = -1;
-    default_basler_init_settings.trigger = false;
+    default_basler_init_settings.trigger = -1;
     default_basler_init_settings.hdr = -1;
     default_basler_init_settings.autoExpose = false;
     default_basler_init_settings.autoGain = false;
