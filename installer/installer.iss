@@ -3,7 +3,7 @@
 ; MUST be installed on x64 bit machine
 
 #define AppName "Stereo Vision Toolkit"
-#define AppVersion "1.2.2"
+#define AppVersion "1.2.3"
 #define InstallerName "Stereo Vision Toolkit Installer"
 #define ExeName "StereoVisionToolkit.exe"
 #define IconName "i3dr_logo.ico"
@@ -34,7 +34,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "../build/release/*"; Excludes: "\params\*.xml,*.lic,install_drivers.bat"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "../build/release/vcredist_x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/release/vc_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_USB_Camera_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_GigE_Filter_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_GigE_Performance_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
