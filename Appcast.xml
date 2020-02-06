@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss
-	version="1.2.3"
+	version="1.2.2"
 	xmlns:atom="http://www.w3.org/2005/Atom"
 	xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"
 	xmlns:fervor="https://github.com/pypt/fervor"
@@ -8,19 +8,19 @@
 
 	<channel>
 		<title>Stereo Vision Toolkit Changelog</title>
-		<link>http://pypt.github.com/fervor/Appcast.xml</link>
+		<link>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml</link>
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
-		<atom:link href="http://pypt.github.com/fervor/Appcast.xml" rel="self" type="application/rss+xml" />
+		<atom:link href="https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml" rel="self" type="application/rss+xml" />
 
 		<item>
-			<title>Version 2.0 (2 bugs fixed; 3 new features)</title>
-			<pubDate>Mon, 09 Jan 2006 19:20:11 +0000</pubDate>
-			<guid isPermaLink="true">http://pypt.github.com/fervor/RelNotes.html#v2.0</guid>
+			<title>Version 1.2.2</title>
+			<pubDate>Mon, 06 Feb 2020 17:04:00 +0000</pubDate>
+			<guid isPermaLink="true">https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/README.md</guid>
 
 			<!-- One of those (<link> is preferred by Fervor, <sparkle:releaseNotesLink> is used by Sparkle) -->
-			<link>http://pypt.github.com/fervor/RelNotes.html#v2.0</link> <!-- or -->
-			<sparkle:releaseNotesLink>http://pypt.github.com/fervor/RelNotes.html#v2.0</sparkle:releaseNotesLink>
+			<link>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/README.md</link> <!-- or -->
+			<sparkle:releaseNotesLink>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/README.md</sparkle:releaseNotesLink>
 
 			<!--
 				See QtGlobal's QT_OS_* constants for valid platform versions.
@@ -28,31 +28,11 @@
 
 			<!-- Windows version. -->
 			<enclosure
-				url="http://you.com/app/Your%20Great%20App%202.0%20Windows.zip"
-				fervor:version="2.0"
-				fervor:platform="Q_OS_WIN32"
-				length="1656492"
+				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.2.2/Stereo.Vision.Toolkit.Installer.exe"
+				fervor:version="1.2.2"
+				fervor:platform="Q_OS_WIN64"
+				length="0"
 				type="application/octet-stream" />
-
-			<!-- Linux version. -->
-			<enclosure
-				url="http://you.com/app/Your%20Great%20App%202.0%20Linux.zip"
-				fervor:version="2.0"
-				fervor:platform="Q_OS_LINUX"
-				length="1618935"
-				type="application/octet-stream" />
-
-			<!-- OS X version (compatible with Sparkle, just that the DSA signature is not checked).
-				 On OS X, you can use 'fervor' namespace instead of 'sparkle'; usage of 'sparkle'
-				 namespace just tells the updater that this is a download for OS X.
-			 -->
-			<enclosure
-				url="http://you.com/app/Your%20Great%20App%202.0%20OS%20X.zip"
-				sparkle:version="2.0"
-				fervor:platform="Q_OS_MAC"
-				length="1623481"
-				type="application/octet-stream"
-				sparkle:dsaSignature="BAFJW4B6B1K1JyW30nbkBwainOzrN6EQuAh" />
 
 		</item>
 
