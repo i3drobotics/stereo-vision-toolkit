@@ -81,9 +81,9 @@ private:
     void saveImage(QString fname);
 
 public slots:
-    void updateDisparityRange_slide(int val);
-    void updateDisparityRange_spin(int val);
-    void updatePixmapRange();
+    //void updateDisparityRange_slide(int val);
+    //void updateDisparityRange_spin(int val);
+    //void updatePixmapRange();
 };
 
 //! Wrapper around cv::imwrite for saving in parallel

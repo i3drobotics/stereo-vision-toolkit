@@ -12,8 +12,8 @@
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
-  //QApplication::setApplicationName(APP_NAME);
-  //QApplication::setApplicationVersion(APP_VERSION);
+  QApplication::setApplicationName(FV_APP_NAME);
+  QApplication::setApplicationVersion(FV_APP_VERSION);
   QApplication::setOrganizationName("Industrial 3D Robotics");
   QApplication::setOrganizationDomain("i3drobotics.com");
 

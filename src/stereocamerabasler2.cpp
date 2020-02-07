@@ -48,13 +48,13 @@ bool StereoCameraBasler2::initCamera(AbstractStereoCamera::stereoCameraSerialInf
     return res;
 }
 
-bool StereoCameraBasler2::setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, bool bTrigger, int iFps, int iPacketSize){
+bool StereoCameraBasler2::setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps, int iPacketSize){
     //this->connected = false;
     //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
 
     this->camera_serial_info = CSI_cam_info;
     this->m_binning = iBinning;
-    this->m_trigger = bTrigger;
+    this->m_iTrigger = iTrigger;
     this->m_fps = iFps;
     this->m_packet_size = iPacketSize;
 
@@ -112,10 +112,24 @@ bool StereoCameraBasler2::setupCameras(AbstractStereoCamera::stereoCameraSerialI
         getImageSize(cameras->operator[](0),image_width,image_height,image_size);
         emit update_size(image_width, image_height, 1);
 
-        setBinning(iBinning);
-        setTrigger(bTrigger);
-        setPacketSize(iPacketSize);
-        changeFPS(iFps);
+        if (iBinning > 0){
+            setBinning(iBinning);
+        }
+        if (iTrigger >= 0){
+            bool trigger;
+            if (iTrigger == 0){
+                trigger = false;
+            } else {
+                trigger = true;
+            }
+            setTrigger(trigger);
+        }
+        if (iPacketSize >= 0){
+            setPacketSize(iPacketSize);
+        }
+        if (iFps > 0){
+            changeFPS(iFps);
+        }
 
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
@@ -239,7 +253,7 @@ void StereoCameraBasler2::changeBinning(int val){
     qDebug() << "Setting binning";
     cameras->StopGrabbing();
     cameras->Close();
-    setupCameras(this->camera_serial_info,val,this->m_trigger,this->m_fps,this->m_packet_size);
+    setupCameras(this->camera_serial_info,val,this->m_iTrigger,this->m_fps,this->m_packet_size);
     qDebug() << "Binning updated";
 }
 
@@ -248,7 +262,7 @@ void StereoCameraBasler2::changePacketSize(int packetSize){
     qDebug() << "Setting packet size";
     cameras->StopGrabbing();
     cameras->Close();
-    setupCameras(this->camera_serial_info,this->m_binning,this->m_trigger,this->m_fps,packetSize);
+    setupCameras(this->camera_serial_info,this->m_binning,this->m_iTrigger,this->m_fps,packetSize);
     qDebug() << "Packet size updated";
 }
 
@@ -398,7 +412,13 @@ void StereoCameraBasler2::setTrigger(bool enable){
             cameras->operator[](i).Open();
             Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").FromString(enable_str.c_str());
         }
-        this->m_trigger = enable;
+        int iTrigger;
+        if (enable){
+            iTrigger = 1;
+        } else {
+            iTrigger = 0;
+        }
+        this->m_iTrigger = iTrigger;
     }
     catch (const Pylon::GenericException &e)
     {
@@ -587,6 +607,11 @@ bool StereoCameraBasler2::grab(){
         std::cerr << "An exception occurred." << std::endl
                   << e.GetDescription() << std::endl;
         res = false;
+        this->connected = false;
+        cameras->StopGrabbing();
+        cameras->Close();
+        setupCameras(this->camera_serial_info,this->m_binning,this->m_iTrigger,this->m_fps,this->m_packet_size);
+        this->connected = true;
     }
 
     return res;

@@ -19,16 +19,13 @@ bool StereoCameraFromVideo::initCamera(AbstractStereoCamera::stereoCameraSerialI
     image_height = stream.get(CV_CAP_PROP_FRAME_HEIGHT);
     image_width = stream.get(CV_CAP_PROP_FRAME_WIDTH) / 2;
     image_size = cv::Size(image_width, image_height);
-    frame_rate = stream.get(CV_CAP_PROP_FPS);
-
-    if(frame_rate <= 0) frame_rate = 60;
+    frame_rate = inital_camera_settings.fps;
 
     number_frames = stream.get(CV_CAP_PROP_FRAME_COUNT);
 
     connected = true;
 
     frame_timer.restart();
-
     return stream.isOpened();
 }
 
@@ -51,20 +48,24 @@ void StereoCameraFromVideo::disconnectCamera(){
     emit finished();
 }
 
+void StereoCameraFromVideo::adjustFPS(int val){
+    frame_rate = val;
+}
+
 bool StereoCameraFromVideo::capture() {
     bool res = stream.read(image_buffer);
 
     if (res) {
         // Simulate frame rate
 
-        double delay_needed = 1000.0/frame_rate - frame_timer.elapsed();
+        double delay_needed = (1000.0/(frame_rate+1)) - frame_timer.elapsed();
 
         if(delay_needed > 0){
             QThread::msleep(delay_needed);
         }
 
-        if(!isMatching())
-            QThread::msleep(1000 / frame_rate);
+        //if(!isMatching())
+        //    QThread::msleep(1000 / frame_rate);
 
         emit videoPosition(100*((float) stream.get(CV_CAP_PROP_POS_FRAMES))/number_frames);
 

@@ -7,11 +7,16 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.2.3
+VERSION = 1.2.4
+DEFINES += FV_APP_VERSION
+FV_APP_VERSION = $$VERSION
 
 QT += core gui concurrent widgets xml network quick
 
 TARGET = StereoVisionToolkit
+DEFINES += FV_APP_NAME
+FV_APP_NAME = $$TARGET
+
 TEMPLATE = app vcapp
 
 CONFIG += warn_on

@@ -109,6 +109,8 @@ signals:
 public:
     explicit AbstractStereoCamera(QObject *parent = nullptr);
 
+    AbstractStereoMatcher *matcher = nullptr;
+
     virtual void toggleAutoExpose(bool) = 0;
     virtual void adjustExposure(double) = 0;
 
@@ -251,6 +253,8 @@ public:
     cv::Mat left_raw;
     cv::Mat right_raw;
     cv::Mat Q;
+    double fx;
+    double baseline;
 
     cv::Mat stereo_reprojected;
 
@@ -450,8 +454,6 @@ private:
 
     cv::Mat left_output;
     cv::Mat right_output;
-
-    AbstractStereoMatcher *matcher = nullptr;
 
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 2;

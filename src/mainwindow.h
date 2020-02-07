@@ -83,10 +83,10 @@ private:
     int CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE = -2;
     int CAMERA_CONNECTION_CANCEL_EXIT_CODE = -3;
 
-    AbstractStereoCamera::stereoCameraSettings camera_default_init_settings;
     AbstractStereoCamera::stereoCameraSettings default_basler_init_settings;
     AbstractStereoCamera::stereoCameraSettings default_tis_init_settings;
     AbstractStereoCamera::stereoCameraSettings default_deimos_init_settings;
+    AbstractStereoCamera::stereoCameraSettings default_video_init_settings;
     AbstractStereoCamera::stereoCameraSettings current_camera_settings;
 
     QPixmap pmap_left;
@@ -142,6 +142,7 @@ private:
     void stereoCameraInit(void);
     void stereoCameraRelease(void);
     void stereoCameraInitConnections(void);
+    void stereoCameraInitWindow(void);
 
     bool gigeWarning(int binning,int new_fps=-1);
 

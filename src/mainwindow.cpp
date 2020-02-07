@@ -59,6 +59,18 @@ MainWindow::MainWindow(QWidget* parent)
     default_deimos_init_settings.packetDelay = -1;
     default_deimos_init_settings.packetSize = -1;
 
+    default_video_init_settings.exposure = -1;
+    default_video_init_settings.gain = -1;
+    default_video_init_settings.fps = 60;
+    default_video_init_settings.binning = -1;
+    default_video_init_settings.trigger = -1;
+    default_video_init_settings.hdr = -1;
+    default_video_init_settings.autoExpose = -1;
+    default_video_init_settings.autoGain = -1;
+    default_video_init_settings.isGige = -1;
+    default_video_init_settings.packetDelay = -1;
+    default_video_init_settings.packetSize = -1;
+
     frame_timer = new QTimer(this);
 
     /* Calibration */
@@ -257,28 +269,52 @@ void MainWindow::pointCloudInit() {
 }
 
 void MainWindow::resetPointCloudView(){
-    viewer->resetCamera();
-    //viewer->setCameraPosition(0, 0, 0.02, 0, 1, 0);
+    double min_depth = 0.0;
+    double max_depth = 2.0;
 
-    ui->minZSpinBox->setValue(0.2);
-    ui->maxZSpinBox->setValue(2);
+    AbstractStereoMatcher *matcher = stereo_cam->matcher;
+    if (matcher != nullptr){
+        int min_disparity;
+        int disparity_range;
+
+        matcher->getMinDisparity(min_disparity);
+        matcher->getDisparityRange(disparity_range);
+
+        double baseline = stereo_cam->baseline;
+        double focal = stereo_cam->fx;
+
+        int max_disparity = min_disparity+disparity_range;
+
+        double depth_toll = 0.5;
+
+        min_depth = (baseline * focal / (-min_disparity/16)) - depth_toll;
+        max_depth = (baseline * focal / (-max_disparity/16)) + depth_toll;
+
+        if (min_depth < 0){
+            min_depth = 0;
+        }
+    }
+
+    viewer->resetCamera();
+
+    ui->minZSpinBox->setValue(min_depth);
+    ui->maxZSpinBox->setValue(max_depth);
 
     vtk_widget->update();
 }
 
-void MainWindow::stereoCameraInitConnections(void) {
-    //TODO remove rather than disable unused controls
-    double default_exposure = camera_default_init_settings.exposure;
-    int default_gain = camera_default_init_settings.gain;
-    int default_fps = camera_default_init_settings.fps;
-    int default_binning = camera_default_init_settings.binning;
-    int default_iTrigger = camera_default_init_settings.trigger;
-    int default_iHdr = camera_default_init_settings.hdr;
-    int default_iAutoExpose = camera_default_init_settings.autoExpose;
-    int default_iAutoGain = camera_default_init_settings.autoGain;
-    int default_packetDelay = camera_default_init_settings.packetDelay;
-    int default_packetSize = camera_default_init_settings.packetSize;
-    int default_iIsGige = camera_default_init_settings.isGige;
+void MainWindow::stereoCameraInitWindow(void){
+    double default_exposure = current_camera_settings.exposure;
+    int default_gain = current_camera_settings.gain;
+    int default_fps = current_camera_settings.fps;
+    int default_binning = current_camera_settings.binning;
+    int default_iTrigger = current_camera_settings.trigger;
+    int default_iHdr = current_camera_settings.hdr;
+    int default_iAutoExpose = current_camera_settings.autoExpose;
+    int default_iAutoGain = current_camera_settings.autoGain;
+    int default_packetDelay = current_camera_settings.packetDelay;
+    int default_packetSize = current_camera_settings.packetSize;
+    int default_iIsGige = current_camera_settings.isGige;
     bool default_trigger, default_hdr, default_autoExpose, default_autoGain;
     if (default_iIsGige == 1){
         using_gige = true;
@@ -286,35 +322,86 @@ void MainWindow::stereoCameraInitConnections(void) {
         using_gige = false;
     }
 
+    if (default_exposure == -1 && default_iAutoExpose == -1){
+        ui->lblExposure->setVisible(false);
+    } else {
+        ui->lblExposure->setVisible(true);
+    }
+    if (default_gain == -1 && default_iAutoGain == -1){
+        ui->lblGain->setVisible(false);
+    } else {
+        ui->lblGain->setVisible(true);
+    }
+    if (default_fps == -1 && default_iTrigger == -1){
+        ui->lblFPS->setVisible(false);
+    } else {
+        ui->lblFPS->setVisible(true);
+    }
+    if (default_iHdr == -1){
+        ui->lblHDR->setVisible(false);
+    } else {
+        ui->lblHDR->setVisible(true);
+    }
+    if (default_binning == -1){
+        ui->lblBinning->setVisible(false);
+    } else {
+        ui->lblBinning->setVisible(true);
+    }
+    if (default_packetDelay == -1){
+        ui->lblPacketDelay->setVisible(false);
+    } else {
+        ui->lblPacketDelay->setVisible(true);
+    }
+    if (default_packetSize == -1){
+        ui->lblPacketSize->setVisible(false);
+    } else {
+        ui->lblPacketSize->setVisible(true);
+    }
+
     if (default_exposure != -1){
         ui->exposureSpinBox->setEnabled(true);
+        ui->exposureSpinBox->setVisible(true);
     } else {
         default_exposure = 5;
+        ui->exposureSpinBox->setVisible(false);
     }
     if (default_gain != -1){
         ui->gainSpinBox->setEnabled(true);
+        ui->gainSpinBox->setVisible(true);
     } else {
         default_gain = 0;
+        ui->gainSpinBox->setVisible(false);
     }
     if (default_fps != -1){
         ui->fpsSpinBox->setEnabled(true);
+        ui->fpsSpinBox->setVisible(true);
     } else {
         default_fps = 5;
+        ui->fpsSpinBox->setVisible(false);
     }
     if (default_binning != -1){
         ui->binningSpinBox->setEnabled(true);
+        ui->binningSpinBox->setVisible(true);
+        ui->binCheckBox->setEnabled(true);
+        ui->binCheckBox->setVisible(true);
     } else {
-        default_binning = 1;
+        //default_binning = 1;
+        ui->binningSpinBox->setVisible(false);
+        ui->binCheckBox->setVisible(false);
     }
     if (default_packetDelay != -1){
-        ui->packetDelaySpinBox->setEnabled(true);;
+        ui->packetDelaySpinBox->setEnabled(true);
+        ui->packetDelaySpinBox->setVisible(true);
     } else {
-        default_packetDelay = 0;
+        //default_packetDelay = 0;
+        ui->packetDelaySpinBox->setVisible(false);
     }
     if (default_packetSize != -1){
         ui->packetSizeSpinBox->setEnabled(true);
+        ui->packetSizeSpinBox->setVisible(true);
     } else {
-        default_packetSize = 3000;
+        //default_packetSize = 3000;
+        ui->packetSizeSpinBox->setVisible(false);
     }
     if (default_iTrigger != -1){
         if (default_iTrigger == 1){
@@ -324,8 +411,10 @@ void MainWindow::stereoCameraInitConnections(void) {
         }
         ui->enabledTriggeredCheckbox->setEnabled(true);
         ui->enabledTriggeredCheckbox->setChecked(default_trigger);
+        ui->enabledTriggeredCheckbox->setVisible(true);
     } else {
         default_trigger = false;
+        ui->enabledTriggeredCheckbox->setVisible(false);
     }
     if (default_iHdr != -1){
         if (default_iHdr == 1){
@@ -335,8 +424,10 @@ void MainWindow::stereoCameraInitConnections(void) {
         }
         ui->enableHDRCheckbox->setEnabled(true);
         ui->enableHDRCheckbox->setChecked(default_hdr);
+        ui->enableHDRCheckbox->setVisible(true);
     } else {
         default_hdr = false;
+        ui->enableHDRCheckbox->setVisible(false);
     }
     if (default_iAutoExpose != -1){
         if (default_iAutoExpose == 1){
@@ -346,8 +437,10 @@ void MainWindow::stereoCameraInitConnections(void) {
         }
         ui->autoExposeCheck->setEnabled(true);
         ui->autoExposeCheck->setChecked(default_autoExpose);
+        ui->autoExposeCheck->setVisible(true);
     } else {
         default_autoExpose = false;
+        ui->autoExposeCheck->setVisible(false);
     }
     if (default_iAutoGain != -1){
         if (default_iAutoGain == 1){
@@ -357,8 +450,10 @@ void MainWindow::stereoCameraInitConnections(void) {
         }
         ui->autoGainCheckBox->setEnabled(true);
         ui->autoGainCheckBox->setChecked(default_autoGain);
+        ui->autoGainCheckBox->setVisible(true);
     } else {
         default_autoGain = false;
+        ui->autoGainCheckBox->setVisible(false);
     }
 
     // set window to default values
@@ -449,6 +544,11 @@ void MainWindow::stereoCameraInitConnections(void) {
     ui->packetSizeSpinBox->setSingleStep(step_packetSize);
     ui->packetSizeSpinBox->setValue(default_packetSize);
     ui->packetSizeSpinBox->blockSignals(false);
+}
+
+void MainWindow::stereoCameraInitConnections(void) {
+
+    stereoCameraInitWindow();
 
     connect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
             SLOT(setExposure(double)));
@@ -564,6 +664,9 @@ void MainWindow::stereoCameraRelease(void) {
 
         disconnect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
                    SLOT(toggleFPS(bool)));
+
+        // disconnect fps connection used in video
+        disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(adjustFPS(int)));
 
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
         disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
@@ -739,21 +842,21 @@ int MainWindow::stereoCameraLoad(void) {
         progressConnect.setValue(10);
         QCoreApplication::processEvents();
         if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_DEIMOS){
-            camera_default_init_settings = default_deimos_init_settings;
-            cameras_connected = stereo_cam_deimos->initCamera(chosen_camera_serial_info,camera_default_init_settings);
+            current_camera_settings = default_deimos_init_settings;
+            cameras_connected = stereo_cam_deimos->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
             qDebug() << "Connecting to Deimos system";
         } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE || chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
-            camera_default_init_settings = default_basler_init_settings;
+            current_camera_settings = default_basler_init_settings;
             if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
-                camera_default_init_settings.isGige = 1;
+                current_camera_settings.isGige = 1;
             }
-            cameras_connected = stereo_cam_basler->initCamera(chosen_camera_serial_info,camera_default_init_settings);
+            cameras_connected = stereo_cam_basler->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_basler);
             qDebug() << "Connecting to Phobos system";
         } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_TIS){
-            camera_default_init_settings = default_tis_init_settings;
-            cameras_connected = stereo_cam_tis->initCamera(chosen_camera_serial_info,camera_default_init_settings);
+            current_camera_settings = default_tis_init_settings;
+            cameras_connected = stereo_cam_tis->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tis);
             left_view->setSettingsCallback(stereo_cam, SLOT(loadLeftSettings()));
             right_view->setSettingsCallback(stereo_cam, SLOT(loadRightSettings()));
@@ -763,7 +866,6 @@ int MainWindow::stereoCameraLoad(void) {
         stereo_cam->camera_serial_info = chosen_camera_serial_info;
 
         if (cameras_connected){
-            current_camera_settings = camera_default_init_settings;
             progressConnect.setLabelText("Setting up camera interface...");
             progressConnect.setValue(50);
             stereoCameraInit();
@@ -800,8 +902,12 @@ void MainWindow::stereoCameraInit() {
         }
 
         // TODO: Get this from calibration file
-        disparity_view->setCalibration(stereo_cam->Q, 60e-3, 4.3e-3);
-        disparity_view->updatePixmapRange();
+        //double focal =  3.8763048093657375e+02;
+        //double baseline = 60e-3;
+        double focal =  stereo_cam->fx;
+        double baseline = stereo_cam->baseline;
+        disparity_view->setCalibration(stereo_cam->Q,baseline,focal);
+        //disparity_view->updatePixmapRange();
 
         left_view->setSize(stereo_cam->getWidth(), stereo_cam->getHeight(), 1);
         right_view->setSize(stereo_cam->getWidth(), stereo_cam->getHeight(), 1);
@@ -869,15 +975,17 @@ void MainWindow::videoStreamLoad(void) {
         stereo_cam_video->assignThread(cam_thread);
 
         AbstractStereoCamera::stereoCameraSerialInfo scis;
-        AbstractStereoCamera::stereoCameraSettings scs;
         scis.filename = fname.toStdString();
 
-        if (stereo_cam_video->initCamera(scis,scs)) {
+        current_camera_settings = default_video_init_settings;
+
+        if (stereo_cam_video->initCamera(scis,default_video_init_settings)) {
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_video);
             cameras_connected = true;
             ui->frameCountSlider->setEnabled(true);
             connect(stereo_cam, SIGNAL(videoPosition(int)),ui->frameCountSlider, SLOT(setValue(int)));
             connect(ui->frameCountSlider, SIGNAL(sliderMoved(int)),stereo_cam, SLOT(setPosition(int)));
+            connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(adjustFPS(int)));
         } else {
             msg.setText("Failed to open video stream.");
             msg.exec();
@@ -885,6 +993,7 @@ void MainWindow::videoStreamLoad(void) {
         }
 
         stereoCameraInit();
+        stereoCameraInitWindow();
         ui->toggleVideoButton->setDisabled(true);
     }
 }
@@ -1134,6 +1243,9 @@ void MainWindow::setCalibrationFolder(QString dir) {
     }else{
         calibration_directory = dir;
         parameters->update_string("calDir", calibration_directory);
+        double focal =  stereo_cam->fx;
+        double baseline = stereo_cam->baseline;
+        disparity_view->setCalibration(stereo_cam->Q,baseline,focal);
     }
 
     ui->toggleRectifyCheckBox->setEnabled(res);
