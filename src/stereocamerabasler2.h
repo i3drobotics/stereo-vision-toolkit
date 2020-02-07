@@ -55,7 +55,7 @@ private:
     Pylon::CInstantCameraArray *cameras;
     Pylon::CImageFormatConverter *formatConverter;
     int m_binning;
-    bool m_trigger;
+    int m_iTrigger;
     int m_fps;
     int m_packet_size;
 
@@ -69,7 +69,7 @@ private:
 
     bool grab();
 
-    bool setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, bool bTrigger, int iFps, int iPacketSize);
+    bool setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps, int iPacketSize);
 
     void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, cv::Size &size);
 };

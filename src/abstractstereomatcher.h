@@ -66,6 +66,12 @@ class AbstractStereoMatcher : public QObject {
   */
   void getDisparity(cv::Mat &dst);
 
+  //!  Get the min disparity value
+  void getMinDisparity(int &val);
+
+  //!  Get the min disparity value
+  void getDisparityRange(int &val);
+
   //!  Save the disparity map
   /*!
   * @param[in] filename Output filename

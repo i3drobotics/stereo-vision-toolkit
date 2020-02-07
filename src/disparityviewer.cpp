@@ -10,6 +10,7 @@ DisparityViewer::DisparityViewer(QWidget *parent)
     : QWidget(parent), ui(new Ui::DisparityViewer) {
   ui->setupUi(this);
 
+  /*
   connect(ui->disparityRangeSpinbox, SIGNAL(valueChanged(int)),
           this, SLOT(updateDisparityRange_spin(int)));
   connect(ui->disparityRangeSlider, SIGNAL(sliderMoved(int)),
@@ -26,19 +27,23 @@ DisparityViewer::DisparityViewer(QWidget *parent)
 
   connect(ui->minDisparitySpinbox, SIGNAL(valueChanged(int)), this,
           SLOT(updatePixmapRange()));
+          */
 
   connect(ui->colourmapComboBox, SIGNAL(currentIndexChanged(int)), this,
           SLOT(setColourmap(int)));
+
 
   connect(ui->btnSaveDisparityView, SIGNAL(clicked(bool)), this,
           SLOT(saveImageTimestamped()));
 
   ui->colourmapComboBox->setCurrentIndex(colourmap);
 
+  /*
   ui->disparityRangeSpinbox->setValue(disparity_range);
   ui->disparityRangeSlider->setValue(disparity_range);
   ui->minDisparitySlider->setValue(min_disparity);
   ui->minDisparitySpinbox->setValue(min_disparity);
+  */
 }
 
 void DisparityViewer::assignThread(QThread *thread) {
@@ -71,6 +76,7 @@ void DisparityViewer::saveImage(QString fname) {
   emit savedImage(fname);
 }
 
+/*
 void DisparityViewer::updateDisparityRange_spin(int range){
     ui->disparityRangeSpinbox->setValue(range);
     updatePixmapRange();
@@ -119,20 +125,15 @@ void DisparityViewer::updatePixmapRange(void) {
   cv::perspectiveTransform(points, output_points, Q);
 
   qDebug() << output_points[0].z << output_points[1].z;
-/*
-  ui->minDisparityLabel->setText(
-      QString("%1 m").arg(QString::number(min_distance, 'g', 2)));
-  ui->maxDisparityLabel->setText(
-      QString("%1 m").arg(QString::number(max_distance, 'g', 2)));
-*/
 
 }
+*/
 
 void DisparityViewer::setViewer(QLabel *viewer) { this->viewer = viewer; }
 
 void DisparityViewer::setMatcher(AbstractStereoMatcher *matcher) {
   this->matcher = matcher;
-  updatePixmapRange();
+  //updatePixmapRange();
   setColourmap(2);
 }
 
@@ -167,6 +168,22 @@ void DisparityViewer::updateDisparityAsync() {
 
 void DisparityViewer::updateDisparity() {
   matcher->getDisparity(disparity);
+  matcher->getMinDisparity(min_disparity);
+  matcher->getDisparityRange(disparity_range);
+
+  int max_disparity = min_disparity+disparity_range;
+
+  double min_depth = baseline * focal / (-min_disparity/16);
+  double max_depth = baseline * focal / (-max_disparity/16);
+
+  if (min_depth < 0){
+      min_depth = 0;
+  }
+
+  ui->minDisparityLabel->setText(
+      QString("%1 m").arg(QString::number(max_depth)));
+  ui->maxDisparityLabel->setText(
+      QString("%1 m").arg(QString::number(min_depth)));
 
   cv::Mat temp;
   disparity.convertTo(temp, CV_32F);

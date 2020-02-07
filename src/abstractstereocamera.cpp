@@ -384,6 +384,7 @@ bool AbstractStereoCamera::loadCalibration(QString left_cal, QString right_cal,
 
     if (fs_l.isOpened()) {
         fs_l["cameraMatrix"] >> l_camera_matrix;
+        fx = l_camera_matrix.at<double>(0,2);
         fs_l["distCoeffs"] >> l_dist_coeffs;
     } else {
         return false;
@@ -406,6 +407,9 @@ bool AbstractStereoCamera::loadCalibration(QString left_cal, QString right_cal,
 
     if (fs_s.isOpened()) {
         fs_s["Q"] >> Q;
+        cv::Mat T;
+        fs_s["T"] >> T;
+        baseline = T.at<double>(0,0);
         Q.convertTo(Q, CV_32F);
     } else {
         return false;

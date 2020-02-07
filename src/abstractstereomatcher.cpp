@@ -30,6 +30,14 @@ void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {
   return;
 }
 
+void AbstractStereoMatcher::getDisparityRange(int &val) {
+  val = disparity_range;
+}
+
+void AbstractStereoMatcher::getMinDisparity(int &val) {
+  val = min_disparity;
+}
+
 void AbstractStereoMatcher::saveDisparity(QString filename) {
   cv::Mat disparity_output;
 

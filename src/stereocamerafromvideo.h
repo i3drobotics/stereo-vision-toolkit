@@ -32,7 +32,7 @@ public:
     void adjustGain(int){} //NA
     void adjustBinning(int){} //NA
     void toggleTrigger(bool){} //NA
-    void adjustFPS(int){} //NA
+    void adjustFPS(int val);
     void adjustPacketSize(int){}
 public slots:
     void setPosition(int position);
