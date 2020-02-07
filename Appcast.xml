@@ -16,11 +16,11 @@
 		<item>
 			<title>Version 1.2.3</title>
 			<pubDate>Mon, 06 Feb 2020 17:04:00 +0000</pubDate>
-			<guid isPermaLink="true">https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/RelNotes.html</guid>
+			<guid isPermaLink="true">https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/ReleaseNotes.html</guid>
 
 			<!-- One of those (<link> is preferred by Fervor, <sparkle:releaseNotesLink> is used by Sparkle) -->
-			<link>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/RelNotes.html</link> <!-- or -->
-			<sparkle:releaseNotesLink>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/RelNotes.html</sparkle:releaseNotesLink>
+			<link>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/ReleaseNotes.html</link> <!-- or -->
+			<sparkle:releaseNotesLink>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/ReleaseNotes.html</sparkle:releaseNotesLink>
 
 			<!--
 				See QtGlobal's QT_OS_* constants for valid platform versions.
