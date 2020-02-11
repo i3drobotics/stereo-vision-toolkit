@@ -38,6 +38,10 @@ DisparityViewer::DisparityViewer(QWidget *parent)
 
   ui->colourmapComboBox->setCurrentIndex(colourmap);
 
+  ui->minDepthLabel->setVisible(false);
+  ui->depthRangeLabel->setVisible(false);
+  ui->maxDepthLabel->setVisible(false);
+
   /*
   ui->disparityRangeSpinbox->setValue(disparity_range);
   ui->disparityRangeSlider->setValue(disparity_range);
@@ -171,19 +175,44 @@ void DisparityViewer::updateDisparity() {
   matcher->getMinDisparity(min_disparity);
   matcher->getDisparityRange(disparity_range);
 
-  int max_disparity = min_disparity+disparity_range;
+  //TODO use depth rather than disparity for more user readable results
 
-  double min_depth = baseline * focal / (-min_disparity/16);
-  double max_depth = baseline * focal / (-max_disparity/16);
+  int adj_min_disparity = min_disparity;
+  int adj_disparity_range = disparity_range;
 
+  if (this->baseline < 0){
+      //adj_min_disparity = -adj_min_disparity;
+      //adj_disparity_range = -adj_disparity_range;
+  }
+
+  //adj_min_disparity = abs(adj_min_disparity);
+
+  int adj_max_disparity = adj_min_disparity+adj_disparity_range;
+
+  double min_depth = baseline * focal / (adj_max_disparity/16);
+  double max_depth = baseline * focal / (adj_min_disparity/16);
+
+  /*
   if (min_depth < 0){
       min_depth = 0;
   }
+  */
 
   ui->minDisparityLabel->setText(
-      QString("%1 m").arg(QString::number(max_depth)));
+      QString("%1 px").arg(QString::number(adj_min_disparity,'g', 4)));
+  ui->disparityRangeLabel->setText(
+      QString("%1 px").arg(QString::number(adj_disparity_range,'g', 4)));
   ui->maxDisparityLabel->setText(
-      QString("%1 m").arg(QString::number(min_depth)));
+      QString("%1 px").arg(QString::number(adj_max_disparity,'g', 4)));
+
+  /*
+  ui->minDepthLabel->setText(
+      QString("%1 m").arg(QString::number(min_depth,'g', 4)));
+  ui->depthRangeLabel->setText(
+      QString("%1 m").arg(QString::number(max_depth-min_depth,'g', 4)));
+  ui->maxDepthLabel->setText(
+      QString("%1 m").arg(QString::number(max_depth,'g', 4)));
+  */
 
   cv::Mat temp;
   disparity.convertTo(temp, CV_32F);
