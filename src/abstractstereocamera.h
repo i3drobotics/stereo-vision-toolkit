@@ -456,7 +456,7 @@ private:
     cv::Mat right_output;
 
     double visualisation_min_z = 0.2;
-    double visualisation_max_z = 2;
+    double visualisation_max_z = 5;
 
 protected:
 

@@ -270,7 +270,9 @@ void MainWindow::pointCloudInit() {
 
 void MainWindow::resetPointCloudView(){
     double min_depth = 0.0;
-    double max_depth = 2.0;
+    double max_depth = 5.0;
+
+    /*
 
     AbstractStereoMatcher *matcher = stereo_cam->matcher;
     if (matcher != nullptr){
@@ -283,17 +285,24 @@ void MainWindow::resetPointCloudView(){
         double baseline = stereo_cam->baseline;
         double focal = stereo_cam->fx;
 
+        if (baseline < 0){
+            min_disparity = -min_disparity;
+            disparity_range = -disparity_range;
+        }
+
         int max_disparity = min_disparity+disparity_range;
 
         double depth_toll = 0.5;
 
-        min_depth = (baseline * focal / (-min_disparity/16)) - depth_toll;
-        max_depth = (baseline * focal / (-max_disparity/16)) + depth_toll;
+        min_depth = (baseline * focal / (min_disparity/16)) - depth_toll;
+        max_depth = (baseline * focal / (max_disparity/16)) + depth_toll;
 
         if (min_depth < 0){
             min_depth = 0;
         }
+
     }
+    */
 
     viewer->resetCamera();
 
