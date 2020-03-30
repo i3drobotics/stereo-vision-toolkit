@@ -1,0 +1,654 @@
+cmake_minimum_required(VERSION 3.1)
+# #-------------------------------------------------
+# #
+# # Stereo Vision Toolkit
+# #
+# # Copyright I3D Robotics Ltd, 2020
+# # Authors: Josh Veitch-Michaelis, Ben Knight
+# #
+# #-------------------------------------------------
+
+# VERSION = 1.2.5
+# DEFINES += FV_APP_VERSION
+# FV_APP_VERSION = $$VERSION
+
+# TARGET = StereoVisionToolkit
+project(StereoVisionToolkit)
+# DEFINES += BUILD_FV
+# DEFINES += FV_APP_NAME
+# FV_APP_NAME = $$TARGET
+if(NOT DEFINED BUILD_FV)
+	option(BUILD_FV "Build with fevor updater" OFF)
+endif()
+if (BUILD_FV)
+	add_definitions(-DBUILD_FV)
+	#TODO: add fervor sub_directory
+endif()
+
+# QT += core gui concurrent widgets xml network quick
+find_package(Qt5 COMPONENTS Core Gui Concurrent Widgets Xml Network Quick REQUIRED)
+add_definitions( ${QT_DEFINITIONS} )
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# TEMPLATE = app vcapp
+
+# CONFIG += warn_on
+# CONFIG += doc
+
+# # To use I3DR's pro stereo matcher
+# # add 'CONFIG+=include_pro' to build arguments
+# include_pro {
+    # message("Pro enabled")
+    # DEFINES += BUILD_PRO
+# }
+if(NOT DEFINED include_pro)
+	option(include_pro "Use I3DR's pro stereo matcher" ON)
+endif()
+if (include_pro)
+	add_definitions(-DBUILD_PRO)
+endif()
+
+# RC_FILE = icon.rc
+# See 'add_custom_command' later in file
+#file(COPY ${PROJECT_SOURCE_DIR}/icon.rc
+#     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# RESOURCES += \
+    # $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc \
+    # $$_PRO_FILE_PWD_/resources/window/window.qrc
+set(RESOURCES
+	${PROJECT_SOURCE_DIR}/resources/qdarkstyle/style.qrc
+    ${PROJECT_SOURCE_DIR}/resources/window/window.qrc
+)
+
+# include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
+add_subdirectory(${PROJECT_SOURCE_DIR}/resources/QtAwesome)
+include_directories(${QTAWESOME_DIR})
+
+# VPATH = $$_PRO_FILE_PWD_/src
+# INCLUDEPATH += $$_PRO_FILE_PWD_/src
+include_directories(
+	${PROJECT_SOURCE_DIR}/src
+)
+
+# include_pro {
+    # INCLUDEPATH += $$_PRO_FILE_PWD_/pro/src
+# }
+if (include_pro)
+	include_directories(
+		${PROJECT_SOURCE_DIR}/pro/src
+	)
+endif()
+
+# SOURCES += \
+    # main.cpp\
+    # mainwindow.cpp \
+    # calibrationdialog.cpp \
+    # qdevicedialog.cpp \
+    # qdevicebutton.cpp \
+    # stereocalibrate.cpp \
+    # chessboard.cpp \
+    # calibrateconfirmdialog.cpp \
+    # calibratefromimagesdialog.cpp \
+    # abstractstereocamera.cpp \
+    # abstractstereomatcher.cpp \
+    # camerabasler.cpp \
+    # cameraopencv.cpp \
+    # stereocamerabasler.cpp \
+    # stereocamerabasler2.cpp \
+    # stereocameraopencv.cpp \
+    # stereocameratis.cpp \
+    # stereocamerafromvideo.cpp \
+    # matcheropencvblock.cpp \
+    # matcherwidgetopencvblock.cpp \
+    # matcheropencvsgbm.cpp \
+    # matcherwidget.cpp \
+    # matcherwidgetopencvsgbm.cpp \
+    # disparityviewer.cpp \
+    # paramfile.cpp \
+    # cameradisplaywidget.cpp \
+    # cameraimagingsource.cpp
+set(SOURCES
+	${SOURCES}
+    src/main.cpp
+    src/mainwindow.cpp
+    src/calibrationdialog.cpp
+    src/qdevicedialog.cpp
+    src/qdevicebutton.cpp
+    src/stereocalibrate.cpp
+    src/chessboard.cpp
+    src/calibrateconfirmdialog.cpp
+    src/calibratefromimagesdialog.cpp
+    src/abstractstereocamera.cpp
+    src/abstractstereomatcher.cpp
+    src/camerabasler.cpp
+    src/cameraopencv.cpp
+    src/stereocamerabasler.cpp
+    src/stereocamerabasler2.cpp
+    src/stereocameraopencv.cpp
+    src/stereocameratis.cpp
+    src/stereocamerafromvideo.cpp
+    src/matcheropencvblock.cpp
+    src/matcherwidgetopencvblock.cpp
+    src/matcheropencvsgbm.cpp
+    src/matcherwidget.cpp
+    src/matcherwidgetopencvsgbm.cpp
+    src/disparityviewer.cpp
+    src/paramfile.cpp
+    src/cameradisplaywidget.cpp
+    src/cameraimagingsource.cpp
+)
+
+# win32 {
+    # SOURCES += stereocameradeimos.cpp
+# }
+if(WIN32)
+	set(SOURCES
+		${SOURCES}
+		src/stereocameradeimos.cpp
+	)
+endif()
+
+# include_pro {
+    # SOURCES += \
+        # #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.cpp \
+        # #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.cpp \
+        # $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.cpp \
+        # $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.cpp
+# }
+if (include_pro)
+	set(SOURCES
+		${SOURCES}
+		pro/src/matcherwidgeti3drsgm.cpp
+		pro/src/matcheri3drsgm.cpp
+	)
+endif()
+
+# HEADERS += \
+    # mainwindow.h \
+    # calibrationdialog.h \
+    # qdevicedialog.h \
+    # qdevicebutton.h \
+    # asmopencv.h \
+    # stereocalibrate.h \
+    # chessboard.h \
+    # calibrateconfirmdialog.h \
+    # calibratefromimagesdialog.h \
+    # abstractstereocamera.h \
+    # abstractstereomatcher.h \
+    # camerabasler.h \
+    # cameraopencv.h \
+    # stereocamerabasler.h \
+    # stereocamerabasler2.h \
+    # stereocameraopencv.h \
+    # stereocameratis.h \
+    # stereocamerafromvideo.h \
+    # matcheropencvblock.h \
+    # matcherwidgetopencvblock.h \
+    # matcheropencvsgbm.h \
+    # matcherwidget.h \
+    # matcherwidgetopencvsgbm.h \
+    # disparityviewer.h \
+    # paramfile.h \
+    # cameradisplaywidget.h \
+    # cameraimagingsource.h
+set(MOC_HEADERS
+	${MOC_HEADERS}
+	src/mainwindow.h
+    src/calibrationdialog.h
+    src/qdevicedialog.h
+    src/qdevicebutton.h
+    src/asmopencv.h
+    src/stereocalibrate.h
+    src/chessboard.h
+    src/calibrateconfirmdialog.h
+    src/calibratefromimagesdialog.h
+    src/abstractstereocamera.h
+    src/abstractstereomatcher.h
+    src/camerabasler.h
+    src/cameraopencv.h
+    src/stereocamerabasler.h
+    src/stereocamerabasler2.h
+    src/stereocameraopencv.h
+    src/stereocameratis.h
+    src/stereocamerafromvideo.h
+    src/matcheropencvblock.h
+    src/matcherwidgetopencvblock.h
+    src/matcheropencvsgbm.h
+    src/matcherwidget.h
+    src/matcherwidgetopencvsgbm.h
+    src/disparityviewer.h
+    src/paramfile.h
+    src/cameradisplaywidget.h
+    src/cameraimagingsource.h
+)
+
+# win32 {
+    # HEADERS += stereocameradeimos.h
+# }
+if(WIN32)
+	set(MOC_HEADERS
+		${MOC_HEADERS}
+		src/stereocameradeimos.h
+	)
+endif()
+
+# include_pro {
+    # HEADERS += \
+        # #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.h \
+        # #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.h \
+        # $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.h \
+        # $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.h
+# }
+if(include_pro)
+	set(MOC_HEADERS
+		${MOC_HEADERS}
+		pro/src/matcherwidgeti3drsgm.h
+		pro/src/matcheri3drsgm.h
+	)
+endif()
+
+# FORMS += \
+    # mainwindow.ui \
+    # calibrationdialog.ui \
+    # calibrateconfirmdialog.ui \
+    # calibratefromimagesdialog.ui \
+    # matcherwidgetopencvblock.ui \
+    # matcherwidgetopencvsgbm.ui \
+    # disparityviewer.ui \
+    # cameradisplaywidget.ui \
+    # pro/src/matcherwidgeti3drsgm.ui
+set( UIS
+	${UIS}
+	src/mainwindow.ui
+    src/calibrationdialog.ui
+    src/calibrateconfirmdialog.ui
+    src/calibratefromimagesdialog.ui
+    src/matcherwidgetopencvblock.ui
+    src/matcherwidgetopencvsgbm.ui
+    src/disparityviewer.ui
+    src/cameradisplaywidget.ui
+    pro/src/matcherwidgeti3drsgm.ui
+)
+
+# include_pro {
+    # FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.ui
+# }
+if (include_pro)
+	set(UIS
+		${UIS}
+		pro/src/matcherwidgetjrsgm.ui
+	)
+endif()
+
+# # For building in a release and debug in seperate folders
+# DESTDIR = release
+# OBJECTS_DIR = .obj
+# MOC_DIR     = .moc
+
+# # Error if running 32-bit system
+# # not all depencies are currently built to run on 32-bit
+# # remove this when you build the dependencies for 32-bit
+# contains(QT_ARCH, i386) {
+    # error(32-bit system detected. Cannot continue)
+# }
+
+# # Error if running unix system
+# # not all depencies are currently built to run on unix
+# # remove this when you build the dependencies for unix
+# unix {
+    # error(unix system detected. Cannot continue)
+# }
+
+# # Error if running mac system
+# # not all depencies are currently built to run on mac
+# # remove this when you build the dependencies for mac
+# macx {
+    # error(mac system detected. Cannot continue)
+# }
+
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/opencv/include"
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/VTK/include/vtk-7.0"
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/PCL/include/pcl-1.8"
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/hidapi/include"
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/tis/include"
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/yaml-cpp/include"
+include_directories(
+	${PROJECT_SOURCE_DIR}/3rd_party/opencv/include
+	${PROJECT_SOURCE_DIR}/3rd_party/VTK/include/vtk-7.0
+	${PROJECT_SOURCE_DIR}/3rd_party/PCL/include/pcl-1.8
+	${PROJECT_SOURCE_DIR}/3rd_party/hidapi/include
+	${PROJECT_SOURCE_DIR}/3rd_party/tis/include
+	${PROJECT_SOURCE_DIR}/3rd_party/yaml-cpp/include
+)
+
+# message("Release mode")
+# LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
+# LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
+# LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
+# LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/release" -lhidapi
+# LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/release" -lTIS_UDSHL11_x64
+# LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
+# LIBS += -lopencv_ximgproc341 -lopencv_core341 -lopencv_highgui341 -lopencv_calib3d341 -lopencv_videoio341 -lopencv_imgproc341 -lopencv_imgcodecs341
+# LIBS += -lopencv_cudastereo341 -lopencv_cudawarping341
+# LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
+set(OpenCV_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/opencv/lib)
+set(OpenCV_LIBS
+	${OpenCV_LIB_DIR}/opencv_ximgproc341.lib
+	${OpenCV_LIB_DIR}/opencv_core341.lib
+	${OpenCV_LIB_DIR}/opencv_highgui341.lib
+	${OpenCV_LIB_DIR}/opencv_calib3d341.lib
+	${OpenCV_LIB_DIR}/opencv_videoio341.lib
+	${OpenCV_LIB_DIR}/opencv_imgproc341.lib
+	${OpenCV_LIB_DIR}/opencv_imgcodecs341.lib
+	${OpenCV_LIB_DIR}/opencv_cudastereo341.lib
+	${OpenCV_LIB_DIR}/opencv_cudawarping341.lib
+)
+set(PCL_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/pcl/lib)
+set(PCL_LIBS
+	${PCL_LIB_DIR}/pcl_visualization_release.lib
+	${PCL_LIB_DIR}/pcl_io_release.lib
+	${PCL_LIB_DIR}/pcl_common_release.lib
+	${PCL_LIB_DIR}/pcl_filters_release.lib
+)
+set(VTK_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/vtk/lib)
+set(VTK_LIBS
+	${VTK_LIB_DIR}/vtkCommonCore-7.0.lib
+	${VTK_LIB_DIR}/vtkCommonDataModel-7.0.lib
+	${VTK_LIB_DIR}/vtkGUISupportQt-7.0.lib
+	${VTK_LIB_DIR}/vtkViewsQt-7.0.lib
+	${VTK_LIB_DIR}/vtkViewsCore-7.0.lib
+	${VTK_LIB_DIR}/vtkRenderingQt-7.0.lib
+	${VTK_LIB_DIR}/vtkCommonMath-7.0.lib
+	${VTK_LIB_DIR}/vtkRenderingCore-7.0.lib
+	${VTK_LIB_DIR}/vtkIOCore-7.0.lib
+)
+set(hidapi_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/hidapi/lib/Release)
+set(hidapi_LIBS
+	${hidapi_LIB_DIR}/hidapi.lib
+)
+set(tis_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/tis/lib/Release)
+set(tis_LIBS
+	${tis_LIB_DIR}/TIS_UDSHL11_x64.lib
+)
+
+# include_pro {
+    # # Required for JR
+    # #LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/jr/lib" -lDigVTKIntegration
+    # #INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/include"
+    # #DEPENDPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/dep"
+
+    # # Required for I3DR
+    # LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
+    # INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/include"
+    # DEPENDPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep"
+# }
+if (include_pro)
+	set(I3DR_LIB_DIR ${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/lib/PhobosIntegration)
+	set(I3DR_LIBS
+		${I3DR_LIB_DIR}/PhobosIntegration.lib
+	)
+	include_directories(
+		${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/include
+	)
+	file(GLOB I3DR_DLL_FILES
+		"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/bin/*.dll"
+		"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/dep/*.dll"
+	)
+	set(EXTRA_FILES ${EXTRA_FILES} ${I3DR_DLL_FILES})
+endif()
+
+# # Required for PCL
+# LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/eigen"
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
+set(BOOST_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/boost/lib)
+set(BOOST_LIBS
+	${BOOST_LIB_DIR}/libboost_chrono-vc140-mt-1_62.lib
+	${BOOST_LIB_DIR}/libboost_chrono-vc140-mt-gd-1_62.lib
+	${BOOST_LIB_DIR}/libboost_date_time-vc140-mt-1_62.lib
+	${BOOST_LIB_DIR}/libboost_date_time-vc140-mt-gd-1_62.lib
+	${BOOST_LIB_DIR}/libboost_filesystem-vc140-mt-1_62.lib
+	${BOOST_LIB_DIR}/libboost_filesystem-vc140-mt-gd-1_62.lib
+	${BOOST_LIB_DIR}/libboost_iostreams-vc140-mt-1_62.lib
+	${BOOST_LIB_DIR}/libboost_iostreams-vc140-mt-gd-1_62.lib
+	${BOOST_LIB_DIR}/libboost_system-vc140-mt-1_62.lib
+	${BOOST_LIB_DIR}/libboost_system-vc140-mt-gd-1_62.lib
+	${BOOST_LIB_DIR}/libboost_thread-vc140-mt-1_62.lib
+	${BOOST_LIB_DIR}/libboost_thread-vc140-mt-gd-1_62.lib
+)
+include_directories(
+	${PROJECT_SOURCE_DIR}/3rd_party/eigen
+	${PROJECT_SOURCE_DIR}/3rd_party/boost/include
+)
+
+# # Required for Basler
+# contains(QT_ARCH, i386) {
+    # #32-bit
+    # LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/Win32"
+# } else {
+    # #64-bit
+    # LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
+# }
+set(Pylon_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/pylon/lib/x64)
+set(Pylon_LIBS
+	${Pylon_LIB_DIR}/GCBase_MD_VC141_v3_1_Basler_pylon.lib
+	${Pylon_LIB_DIR}/GenApi_MD_VC141_v3_1_Basler_pylon.lib
+	${Pylon_LIB_DIR}/PylonBase_v6_0.lib
+	${Pylon_LIB_DIR}/PylonC.lib
+	${Pylon_LIB_DIR}/PylonGUI_v6_0.lib
+	${Pylon_LIB_DIR}/PylonUtility_v6_0.lib
+)
+# INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
+include_directories(
+	${PROJECT_SOURCE_DIR}/3rd_party/pylon/include
+)
+
+# win32 {
+    # # Directshow class IDs
+    # LIBS += -lstrmiids
+# }
+if (WIN32)
+	set(DIRECTSHOW_LIBS
+		strmiids
+	)
+endif()
+
+# DISTFILES += $$_PRO_FILE_PWD_/resources/fonts/fontawesome-webfont.ttf
+
+# isEmpty(TARGET_EXT) {
+    # win32 {
+        # TARGET_CUSTOM_EXT = .exe
+    # }
+    # macx {
+        # TARGET_CUSTOM_EXT = .app
+    # }
+# } else {
+    # TARGET_CUSTOM_EXT = $${TARGET_EXT}
+# }
+
+# #TODO build 3rd party depencenies for 32-bit systems
+
+# win32 {
+    # # Define dlls to copy to build folder
+    # EXTRA_FILES += \
+        # $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
+        # $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
+        # $$files($$_PRO_FILE_PWD_/3rd_party/qt5.12.6/*.dll, true) \
+        # $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true)
+	file(GLOB MAIN_DLL_FILES
+		"${PROJECT_SOURCE_DIR}/3rd_party/opengl/*.dll"
+		"${PROJECT_SOURCE_DIR}/3rd_party/opencv/dep/*.dll"
+		"${PROJECT_SOURCE_DIR}/3rd_party/qt5.12.6/*.dll"
+		"${PROJECT_SOURCE_DIR}/3rd_party/cuda/bin/*.dll"
+	)
+	set(EXTRA_FILES ${EXTRA_FILES} ${MAIN_DLL_FILES})
+
+    # contains(QT_ARCH, i386) {
+        # #32-bit
+        # EXTRA_FILES += \
+            # $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x86/*.dll, true) \
+            # $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/Win32/*.dll, true)
+    # } else {
+        # #64-bit
+        # EXTRA_FILES += \
+            # $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
+            # $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true)
+    # }
+	file(GLOB PYLON_DLL_FILES
+		"${PROJECT_SOURCE_DIR}/3rd_party/pylon/bin/x64/*.dll"
+		"${PROJECT_SOURCE_DIR}/3rd_party/pylon/dep/x64/*.dll"
+	)
+	set(EXTRA_FILES ${EXTRA_FILES} ${PYLON_DLL_FILES})
+
+    # # Define drivers to copy to build folder
+    # win32 {
+        # EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.msi, true)
+        # EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
+    # }
+	file(GLOB PYLON_INSTALLERS
+		"${PROJECT_SOURCE_DIR}/3rd_party/pylon/drivers/*.msi"
+		"${PROJECT_SOURCE_DIR}/3rd_party/pylon/drivers/*.bat"
+	)
+	set(EXTRA_FILES ${EXTRA_FILES} ${PYLON_EXTRA_FILES})
+    # #TODO add pylon drivers for linux and mac
+
+    # include_pro {
+        # EXTRA_FILES += \
+            # #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/bin/*.dll, true) \
+            # #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/dep/*.DLL, true) \
+            # #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/lic/*.lic, true) \
+            # $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/bin/*.dll, true) \
+            # $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep/*.dll, true) \
+            # $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.lic, true)
+    # }
+	if (include_pro)
+		file(GLOB I3DR_DLL_FILES
+			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/bin/*.dll"
+			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/dep/*.dll"
+			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/lic/*.lic"
+		)
+		set(EXTRA_FILES ${EXTRA_FILES} ${I3DR_EXTRA_FILES})
+	endif()
+
+# }
+
+# # Define additional files to copy to build folder
+# EXTRA_FILES += \
+    # $$_PRO_FILE_PWD_/resources/camera_serials.ini
+set(EXTRA_FILES ${EXTRA_FILES} ${PROJECT_SOURCE_DIR}/resources/camera_serials.ini)
+
+# # Get full output folder path
+# DEPLOY_FOLDER = $$OUT_PWD/$$DESTDIR
+
+# # RELEASE
+# # Define release only dlls to copy to build folder
+# win32 {
+	# EXTRA_FILES += \
+		# $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
+		# $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/release/*.dll, true) \
+		# $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/release/*.dll, true) \
+		# $$_PRO_FILE_PWD_/3rd_party/png/libpng16.dll \
+		# $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll \
+		# $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11_x64.dll \
+		# $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/release/*.dll, true) \
+		# $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/release/*.dll, true)
+# }
+file(GLOB OTHER_DLL_FILES
+	"${PROJECT_SOURCE_DIR}/3rd_party/opencv/bin/release/*.dll"
+	"${PROJECT_SOURCE_DIR}/3rd_party/pcl/bin/release/*.dll"
+	"${PROJECT_SOURCE_DIR}/3rd_party/vtk/bin/release/*.dll"
+	"${PROJECT_SOURCE_DIR}/3rd_party/zlib/bin/release/*.dll"
+)
+set(OTHER_DLL_FILES 
+	${OTHER_DLL_FILES}
+	${PROJECT_SOURCE_DIR}/3rd_party/hidapi/bin/Release/hidapi.dll
+	${PROJECT_SOURCE_DIR}/3rd_party/png/libpng16.dll
+	${PROJECT_SOURCE_DIR}/3rd_party/tbb/tbb.dll
+	${PROJECT_SOURCE_DIR}/3rd_party/tis/bin/TIS_UDSHL11_x64.dll
+)
+set(EXTRA_FILES ${EXTRA_FILES} ${OTHER_DLL_FILES})
+
+# # Deploy qt
+# win32 {
+    # DEPLOY_COMMAND = windeployqt
+# }
+# macx {
+    # DEPLOY_COMMAND = macdeployqt
+# }
+# DEPLOY_TARGET = $$shell_quote($$shell_path($${DEPLOY_FOLDER}/$${TARGET}$${TARGET_CUSTOM_EXT}))
+# QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
+
+# # Copy 3rd party files to build folder
+# CONFIG += file_copies
+# COPIES += extraFiles
+# win32 {
+    # extraFiles.files = $${EXTRA_FILES}
+# }
+# extraFiles.path = $${DEPLOY_FOLDER}
+
+# # Install drivers
+# win32 {
+    # QMAKE_POST_LINK += && cd /d $${DEPLOY_FOLDER}
+    # QMAKE_POST_LINK += && install_drivers.bat
+# }
+
+# # Copy documentation to build folder
+# COPIES += helpDocs
+# helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/help/*.html, true)
+# helpDocs.files += $$files($$_PRO_FILE_PWD_/docs/help/*.png, true)
+# helpDocs.path = $${DEPLOY_FOLDER}/docs/help
+
+# # Fervor autoupdater
+# !include("fervor/Fervor.pri") {
+        # error("Unable to include Fervor autoupdater.")
+# }
+
+# # Auto generate code documenation using doxygen
+# CONFIG( doc ){
+    # QMAKE_POST_LINK += && cd /d $${_PRO_FILE_PWD_} && doxygen -u
+# }
+
+# # Add clean command to remove all files from build directory
+# # use 'extraclean' in clean arguments to trigger this clean step
+# win32 {
+    # extraclean.commands = del /S /Q $$shell_quote($$shell_path($${DEPLOY_FOLDER})\*)
+    # extraclean.commands += del /S /Q $$shell_quote($$shell_path($${DEPLOY_FOLDER})\..\*)
+# }
+# unix {
+    # extraclean.commands = rm -r $$shell_quote($$shell_path($${DEPLOY_FOLDER})/*)
+# }
+# distclean.depends = extraclean
+# QMAKE_EXTRA_TARGETS += distclean extraclean
+
+QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
+QT5_WRAP_UI( UI_HEADERS ${UIS} )
+QT5_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} )
+
+add_executable( ${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
+#qt5_use_modules(${PROJECT_NAME} Core Gui Concurrent Widgets Xml Network Quick)
+target_link_libraries(${PROJECT_NAME} PUBLIC 
+	Qt5::Core
+	Qt5::Gui
+	Qt5::Concurrent
+	Qt5::Widgets
+	Qt5::Xml
+	Qt5::Network
+	Qt5::Quick
+	${OpenCV_LIBS}
+	${PCL_LIBS}
+	${VTK_LIBS}
+	${hidapi_LIBS}
+	${tis_LIBS}
+	${I3DR_LIBS}
+	${BOOST_LIBS}
+	${DIRECTSHOW_LIBS}
+	${Pylon_LIBS}
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/icon.rc $<TARGET_FILE_DIR:${PROJECT_NAME}>
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTRA_FILES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)

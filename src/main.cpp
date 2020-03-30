@@ -12,12 +12,14 @@
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
+#ifdef BUILD_FV
   QApplication::setApplicationName(FV_APP_NAME);
   QApplication::setApplicationVersion(FV_APP_VERSION);
   QApplication::setOrganizationName("Industrial 3D Robotics");
   QApplication::setOrganizationDomain("i3drobotics.com");
 
   qDebug() << QSslSocket::supportsSsl() << QSslSocket::sslLibraryBuildVersionString() << QSslSocket::sslLibraryVersionString();
+#endif
 
   QFile f(":qdarkstyle/style.qss");
 
