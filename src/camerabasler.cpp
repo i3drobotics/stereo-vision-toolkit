@@ -88,10 +88,10 @@ bool CameraBasler::initCamera(std::string camera_serial,int binning, bool trigge
 
         // The parameter MaxNumBuffer can be used to control the count of buffers
         // allocated for grabbing. The default value of this parameter is 16.
-        camera->MaxNumBuffer = 1;
+        camera->MaxNumBuffer = 16;
         // The size of the output queue can be adjusted.
         // When using this strategy the OutputQueueSize parameter can be changed during grabbing.
-        camera->OutputQueueSize = camera->MaxNumBuffer.GetValue();
+        //camera->OutputQueueSize = camera->MaxNumBuffer.GetValue();
 
         formatConverter.OutputPixelFormat = Pylon::PixelType_Mono8;
         formatConverter.OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
