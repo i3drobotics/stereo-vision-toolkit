@@ -7,13 +7,14 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.2.4
+VERSION = 1.2.5
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
 QT += core gui concurrent widgets xml network quick
 
 TARGET = StereoVisionToolkit
+DEFINES += BUILD_FV
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
@@ -79,10 +80,10 @@ win32 {
 
 include_pro {
     SOURCES += \
-        $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.cpp \
-        $$_PRO_FILE_PWD_/pro/src/matcherjrsgm.cpp
-        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm2.cpp
-        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm3.cpp
+        #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.cpp \
+        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.cpp \
+        $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.cpp \
+        $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.cpp
 }
 
 HEADERS += \
@@ -120,10 +121,10 @@ win32 {
 
 include_pro {
     HEADERS += \
-        $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.h \
-        $$_PRO_FILE_PWD_/pro/src/matcherjrsgm.h
-        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm2.h
-        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm3.h
+        #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.h \
+        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.h \
+        $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.h \
+        $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.h
 }
 
 FORMS += \
@@ -134,7 +135,8 @@ FORMS += \
     matcherwidgetopencvblock.ui \
     matcherwidgetopencvsgbm.ui \
     disparityviewer.ui \
-    cameradisplaywidget.ui
+    cameradisplaywidget.ui \
+    pro/src/matcherwidgeti3drsgm.ui
 
 include_pro {
     FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.ui
@@ -209,14 +211,14 @@ LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtk
 
 include_pro {
     # Required for JR
-    LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/jr/lib" -lDigVTKIntegration
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/include"
-    DEPENDPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/dep"
+    #LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/jr/lib" -lDigVTKIntegration
+    #INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/include"
+    #DEPENDPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/dep"
 
-    # Required for JR2
-    #LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/jr2/lib/PhobosIntegration" -lPhobosIntegration
-    #INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/jr2/include"
-    #DEPENDPATH += "$$_PRO_FILE_PWD_/3rd_party/jr2/dep"
+    # Required for I3DR
+    LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/include"
+    DEPENDPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep"
 }
 
 # Required for PCL
@@ -259,7 +261,7 @@ win32 {
     EXTRA_FILES += \
         $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/qt/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rd_party/qt5.12.6/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true)
 
     contains(QT_ARCH, i386) {
@@ -283,12 +285,12 @@ win32 {
 
     include_pro {
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/bin/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/dep/*.DLL, true) \
-            $$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/lic/*.lic, true)
-            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr2/bin/*.dll, true) \
-            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr2/dep/*.dll, true) \
-            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr2/lic/*.lic, true)
+            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/bin/*.dll, true) \
+            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/dep/*.DLL, true) \
+            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/lic/*.lic, true) \
+            $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/bin/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.lic, true)
     }
 
 }
@@ -367,7 +369,7 @@ helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 
 # Auto generate code documenation using doxygen
 CONFIG( doc ){
-    QMAKE_POST_LINK += && cd /d $${_PRO_FILE_PWD_} && doxygen
+    QMAKE_POST_LINK += && cd /d $${_PRO_FILE_PWD_} && doxygen -u
 }
 
 # Add clean command to remove all files from build directory
