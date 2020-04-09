@@ -276,7 +276,8 @@ win32 {
         EXTRA_FILES += \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/bin/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.lic, true)
+            $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.lic, true) \
+            $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.param, true)
     }
 
 }
