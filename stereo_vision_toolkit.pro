@@ -251,7 +251,6 @@ win32 {
     EXTRA_FILES += \
         $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/qt5.12.6/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true)
 
     contains(QT_ARCH, i386) {
