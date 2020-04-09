@@ -29,6 +29,11 @@ if (BUILD_FV)
 endif()
 
 # QT += core gui concurrent widgets xml network quick
+set(CMAKE_PREFIX_PATH
+    ${CMAKE_PREFIX_PATH}
+    # Use QT from 3rd_party folder (saves the need to install QT)
+    ${PROJECT_SOURCE_DIR}/3rd_party/qt5.10.1
+)
 find_package(Qt5 COMPONENTS Core Gui Concurrent Widgets Xml Network Quick REQUIRED)
 add_definitions( ${QT_DEFINITIONS} )
 
@@ -494,8 +499,7 @@ endif()
         # $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true)
 	file(GLOB MAIN_DLL_FILES
 		"${PROJECT_SOURCE_DIR}/3rd_party/opengl/*.dll"
-		"${PROJECT_SOURCE_DIR}/3rd_party/opencv/dep/*.dll"
-		"${PROJECT_SOURCE_DIR}/3rd_party/qt5.12.6/*.dll"
+		"${PROJECT_SOURCE_DIR}/3rd_party/opencv/dep/310/*.dll"
 		"${PROJECT_SOURCE_DIR}/3rd_party/cuda/bin/*.dll"
 	)
 	set(EXTRA_FILES ${EXTRA_FILES} ${MAIN_DLL_FILES})
@@ -539,12 +543,13 @@ endif()
             # $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.lic, true)
     # }
 	if (include_pro)
-		file(GLOB I3DR_DLL_FILES
+		file(GLOB I3DR_EXTRA_FILES
 			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/bin/*.dll"
 			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/dep/*.dll"
-			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/lic/*.lic"
+            "${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/lic/*.lic"
+            "${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/lic/*.param"
 		)
-		set(EXTRA_FILES ${EXTRA_FILES} ${I3DR_EXTRA_FILES})
+        set(EXTRA_FILES_2 ${EXTRA_FILES_2} ${I3DR_EXTRA_FILES})
 	endif()
 
 # }
@@ -651,7 +656,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	Qt5::Widgets
 	Qt5::Xml
 	Qt5::Network
-	Qt5::Quick
+    Qt5::Quick
 	${OpenCV_LIBS}
 	${PCL_LIBS}
 	${VTK_LIBS}
@@ -665,7 +670,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/icon.rc $<TARGET_FILE_DIR:${PROJECT_NAME}>
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTRA_FILES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTRA_FILES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTRA_FILES_2} $<TARGET_FILE_DIR:${PROJECT_NAME}> #second extra_files due to being too long
 )
 
 # Retrieve the absolute path to qmake and then use that path to find
