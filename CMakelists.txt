@@ -14,6 +14,9 @@ cmake_minimum_required(VERSION 3.1)
 
 # TARGET = StereoVisionToolkit
 project(StereoVisionToolkit)
+
+CMAKE_POLICY(SET CMP0071 NEW) 
+
 # DEFINES += BUILD_FV
 # DEFINES += FV_APP_NAME
 # FV_APP_NAME = $$TARGET
@@ -30,7 +33,12 @@ find_package(Qt5 COMPONENTS Core Gui Concurrent Widgets Xml Network Quick REQUIR
 add_definitions( ${QT_DEFINITIONS} )
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+if(CMAKE_VERSION VERSION_LESS "3.7.0")
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif()
 
 # TEMPLATE = app vcapp
 
@@ -113,10 +121,14 @@ endif()
 set(SOURCES
 	${SOURCES}
     src/main.cpp
-    src/mainwindow.cpp
-    src/calibrationdialog.cpp
     src/qdevicedialog.cpp
     src/qdevicebutton.cpp
+    src/paramfile.cpp
+)
+set(UI_SOURCES
+	${UI_SOURCES}
+    src/mainwindow.cpp
+    src/calibrationdialog.cpp
     src/stereocalibrate.cpp
     src/chessboard.cpp
     src/calibrateconfirmdialog.cpp
@@ -136,7 +148,6 @@ set(SOURCES
     src/matcherwidget.cpp
     src/matcherwidgetopencvsgbm.cpp
     src/disparityviewer.cpp
-    src/paramfile.cpp
     src/cameradisplaywidget.cpp
     src/cameraimagingsource.cpp
 )
@@ -194,13 +205,19 @@ endif()
     # paramfile.h \
     # cameradisplaywidget.h \
     # cameraimagingsource.h
+
+set(HEADERS
+    ${HEADERS}
+    src/qdevicedialog.h
+    src/qdevicebutton.h
+    src/asmopencv.h
+    src/paramfile.h
+)
+
 set(MOC_HEADERS
 	${MOC_HEADERS}
 	src/mainwindow.h
     src/calibrationdialog.h
-    src/qdevicedialog.h
-    src/qdevicebutton.h
-    src/asmopencv.h
     src/stereocalibrate.h
     src/chessboard.h
     src/calibrateconfirmdialog.h
@@ -220,7 +237,6 @@ set(MOC_HEADERS
     src/matcherwidget.h
     src/matcherwidgetopencvsgbm.h
     src/disparityviewer.h
-    src/paramfile.h
     src/cameradisplaywidget.h
     src/cameraimagingsource.h
 )
@@ -627,8 +643,7 @@ QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
 QT5_WRAP_UI( UI_HEADERS ${UIS} )
 QT5_WRAP_CPP( MOC_SRCS ${MOC_HEADERS} )
 
-add_executable( ${PROJECT_NAME} ${SOURCES} ${MOC_SRCS} ${RES_SOURCES} ${UI_HEADERS} )
-#qt5_use_modules(${PROJECT_NAME} Core Gui Concurrent Widgets Xml Network Quick)
+add_executable( ${PROJECT_NAME} ${UI_SOURCES} ${SOURCES} ${MOC_SRCS} ${HEADERS} ${RES_SOURCES} ${UI_HEADERS} )
 target_link_libraries(${PROJECT_NAME} PUBLIC 
 	Qt5::Core
 	Qt5::Gui
@@ -652,3 +667,26 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/icon.rc $<TARGET_FILE_DIR:${PROJECT_NAME}>
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${EXTRA_FILES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
+
+# Retrieve the absolute path to qmake and then use that path to find
+# the binaries
+get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
+get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+
+if (WIN32)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND "${CMAKE_COMMAND}" -E
+          env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}"
+              "$<TARGET_FILE:${PROJECT_NAME}>"
+      COMMENT "Running windeployqt..."
+  )
+elseif(APPLE)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+      "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../.."
+      -always-overwrite
+  COMMENT "Running macdeployqt..."
+  )
+endif()
