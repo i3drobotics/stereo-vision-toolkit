@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget* parent)
     default_basler_init_settings.gain = 0;
     default_basler_init_settings.fps = -1;
     default_basler_init_settings.binning = -1;
-    default_basler_init_settings.trigger = -1;
+    default_basler_init_settings.trigger = false;
     default_basler_init_settings.hdr = -1;
     default_basler_init_settings.autoExpose = false;
     default_basler_init_settings.autoGain = false;
