@@ -258,8 +258,7 @@ endif()
     # matcherwidgetopencvblock.ui \
     # matcherwidgetopencvsgbm.ui \
     # disparityviewer.ui \
-    # cameradisplaywidget.ui \
-    # pro/src/matcherwidgeti3drsgm.ui
+    # cameradisplaywidget.ui
 set( UIS
 	${UIS}
 	src/mainwindow.ui
@@ -270,16 +269,15 @@ set( UIS
     src/matcherwidgetopencvsgbm.ui
     src/disparityviewer.ui
     src/cameradisplaywidget.ui
-    pro/src/matcherwidgeti3drsgm.ui
 )
 
 # include_pro {
-    # FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.ui
+    # FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.ui
 # }
 if (include_pro)
 	set(UIS
 		${UIS}
-		pro/src/matcherwidgetjrsgm.ui
+		pro/src/matcherwidgeti3drsgm.ui
 	)
 endif()
 
@@ -622,6 +620,8 @@ set(EXTRA_FILES ${EXTRA_FILES} ${OTHER_DLL_FILES})
 # }
 # distclean.depends = extraclean
 # QMAKE_EXTRA_TARGETS += distclean extraclean
+
+set_source_files_properties("${SOURCES}" PROPERTIES SKIP_AUTOMOC ON)
 
 QT5_ADD_RESOURCES( RES_SOURCES ${RESOURCES} )
 QT5_WRAP_UI( UI_HEADERS ${UIS} )

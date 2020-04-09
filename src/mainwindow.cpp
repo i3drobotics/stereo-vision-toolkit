@@ -1222,15 +1222,6 @@ void MainWindow::setupMatchers(void) {
     ui->matcherSettingsLayout->addWidget(opencv_sgbm);
 
 #ifdef BUILD_PRO
-    /*
-    qDebug() << "Including JRSGM widget";
-    MatcherWidgetJRSGM* jr_sgm =
-            new MatcherWidgetJRSGM(this, stereo_cam->getSize());
-    matcher_list.append(jr_sgm);
-    ui->matcherSelectBox->insertItem(2, "JR SGBM");
-    ui->matcherSettingsLayout->addWidget(jr_sgm);
-    */
-
     qDebug() << "Including I3DRSGM widget";
     MatcherWidgetI3DRSGM* i3dr_sgm =
             new MatcherWidgetI3DRSGM(this, stereo_cam->getSize());
