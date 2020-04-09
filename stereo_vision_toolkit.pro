@@ -80,8 +80,6 @@ win32 {
 
 include_pro {
     SOURCES += \
-        #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.cpp \
-        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.cpp \
         $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.cpp \
         $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.cpp
 }
@@ -121,8 +119,6 @@ win32 {
 
 include_pro {
     HEADERS += \
-        #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.h \
-        #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.h \
         $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.h \
         $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.h
 }
@@ -135,11 +131,10 @@ FORMS += \
     matcherwidgetopencvblock.ui \
     matcherwidgetopencvsgbm.ui \
     disparityviewer.ui \
-    cameradisplaywidget.ui \
-    pro/src/matcherwidgeti3drsgm.ui
+    cameradisplaywidget.ui
 
 include_pro {
-    FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.ui
+    FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.ui
 }
 
 # For building in a release and debug in seperate folders
@@ -210,11 +205,6 @@ CONFIG(debug, debug|release) {
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
 
 include_pro {
-    # Required for JR
-    #LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/jr/lib" -lDigVTKIntegration
-    #INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/include"
-    #DEPENDPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/dep"
-
     # Required for I3DR
     LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
     INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/include"
@@ -285,9 +275,6 @@ win32 {
 
     include_pro {
         EXTRA_FILES += \
-            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/bin/*.dll, true) \
-            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/dep/*.DLL, true) \
-            #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/lic/*.lic, true) \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/bin/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.lic, true)

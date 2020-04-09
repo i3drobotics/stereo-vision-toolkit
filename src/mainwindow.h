@@ -33,7 +33,6 @@
 #include "matcherwidgetopencvblock.h"
 #include "matcherwidgetopencvsgbm.h"
 #ifdef BUILD_PRO
-//#include "matcherwidgetjrsgm.h"
 #include "matcherwidgeti3drsgm.h"
 #endif
 #include "stereocameradeimos.h"
