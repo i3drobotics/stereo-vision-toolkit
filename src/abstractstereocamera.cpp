@@ -98,7 +98,7 @@ void AbstractStereoCamera::saveImage(QString fname) {
     }
 
     if(matching){
-        matcher->saveDisparity(fname + "_ldisp.png");
+        matcher->saveDisparity(fname + "_disp_raw.png");
     }
 
     emit savedImage(fname);
@@ -120,10 +120,14 @@ void AbstractStereoCamera::setVisualZmax(double zmax){
 void AbstractStereoCamera::reproject3D() {
 
     cv::Mat disparity_downscale;
+    cv::Mat disparity;
 
-    matcher->getDisparity(disparity_downscale);
+    matcher->getDisparity(disparity);
+    disparity.copyTo(disparity_downscale);
 
-    cv::abs(disparity_downscale);
+    qDebug() << "disparity image size: " << disparity_downscale.size().width << "," << disparity_downscale.size().height;
+
+    //cv::abs(disparity_downscale);
 
     // By default the disparity maps are scaled by a factor of 16.0
     disparity_downscale /= 16.0;
@@ -135,10 +139,13 @@ void AbstractStereoCamera::reproject3D() {
     qDebug() << "DISPARITY AT CENTER: " << disp_val_f;
 
     if (Q.empty() || disparity_downscale.empty()) {
+        qDebug() << "Q or disparity map is empty";
         return;
     }
 
     cv::reprojectImageTo3D(disparity_downscale, stereo_reprojected, Q, true);
+
+    qDebug() << "reprojected image size: " << stereo_reprojected.size().width << "," << stereo_reprojected.size().height;
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp(
                 new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -155,45 +162,45 @@ void AbstractStereoCamera::reproject3D() {
     point.rgb = *reinterpret_cast<float *>(&rgb);
     ptCloudTemp->points.push_back(point);
 
-    for (int i = 0; i < stereo_reprojected.rows; i++) {
-        float *reconst_ptr = stereo_reprojected.ptr<float>(i);
-        float *disp_ptr = matcher->disparity_lr.ptr<float>(i);
-        uchar *rgb_ptr = left_remapped.ptr<uchar>(i);
+    cv::Matx44d _Q;
+    Q.convertTo(_Q, CV_64F);
 
-        // TODO: Figure out why this can trigger, assume the disparity map isn't generated
-        // when this function gets called.
-        if(!disp_ptr || !rgb_ptr || !reconst_ptr) return;
+    for (int i = 0; i < disparity_downscale.rows; i++)
+    {
+        for (int j = 0; j < disparity_downscale.cols; j++)
+        {
+            float d = disparity_downscale.at<float>(i, j);
 
-        for (int j = 0; j < stereo_reprojected.cols; j++) {
-            if (disp_ptr[j] == 0) continue;
-            if (rgb_ptr[j] == 0) continue;
+            if (d < 10000 && d > 0){
+                float x_index = j;
+                float y_index = i;
 
-            if (j == column){
-                if (i == row){
-                    float reproj_val_2 =  reconst_ptr[3 * j + 2];
-                    qDebug() << "REPROJECT3D AT CENTER 2: " << reproj_val_2;
-                }
+                //qDebug() << d;
+
+                cv::Vec4d homg_pt = _Q * cv::Vec4d((double)x_index, (double)y_index, (double)d, 1.0);
+
+                float x = (float)homg_pt[0] / (float)homg_pt[3];
+                float y = (float)homg_pt[1] / (float)homg_pt[3];
+                float z = (float)homg_pt[2] / (float)homg_pt[3];
+
+                uchar intensity = left_remapped.at<uchar>(i,j);
+
+                pcl::PointXYZRGB point;
+                point.x = x;
+                point.y = y;
+                point.z = z;
+                point.r = intensity;
+                point.g = intensity;
+                point.b = intensity;
+                ptCloudTemp->points.push_back(point);
             }
-
-            point.x = -reconst_ptr[3 * j];
-            point.y = -reconst_ptr[3 * j + 1];
-            point.z = reconst_ptr[3 * j + 2];
-
-            if(abs(point.x) > 10) continue;
-            if(abs(point.y) > 10) continue;
-            if(point.z == 10000) continue;
-            if(point.z == -10000) continue;
-            col = rgb_ptr[j];
-
-            rgb = ((int)col) << 16 | ((int)col) << 8 | ((int)col);
-            point.rgb = *reinterpret_cast<float *>(&rgb);
-
-            ptCloudTemp->points.push_back(point);
         }
     }
 
-    if(ptCloudTemp->points.empty())
+    if(ptCloudTemp->points.empty()){
+        qDebug() << "Failed to create Point cloud. Point cloud is empty";
         return;
+    }
 
     pcl::PassThrough<pcl::PointXYZRGB> pass;
     pass.setInputCloud (ptCloudTemp);
@@ -216,6 +223,9 @@ void AbstractStereoCamera::reproject3D() {
   */
 
     ptCloud = ptCloudTemp;
+
+    qDebug() << "tmp point cloud size: " << ptCloudTemp->points.size();
+    qDebug() << "point cloud size: " << ptCloud->points.size();
 
     emit reprojected();
 }
