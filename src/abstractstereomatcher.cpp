@@ -41,9 +41,11 @@ void AbstractStereoMatcher::getMinDisparity(int &val) {
 void AbstractStereoMatcher::saveDisparity(QString filename) {
   cv::Mat disparity_output;
 
-  disparity_lr.convertTo(disparity_output, CV_16SC1);
-  disparity_output += min_disparity*16;
-  disparity_output.convertTo(disparity_output, CV_16UC1);
+  //disparity_lr.convertTo(disparity_output, CV_16SC1);
+  //disparity_output += min_disparity*16;
+  //disparity_output.convertTo(disparity_output, CV_16UC1);
+  disparity_lr.copyTo(disparity_output);
+  disparity_output /= 16;
 
   cv::imwrite(filename.toStdString(), disparity_output);
 

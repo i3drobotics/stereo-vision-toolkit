@@ -72,13 +72,14 @@ private:
     double focal = 4e-3;
     double pixel_size = 6e-6;
     QLabel *viewer;
-    cv::Mat disparity;
+    //cv::Mat disparity;
     cv::Mat colour_disparity;
     AbstractStereoMatcher *matcher;
     bool processing_disparity;
     QString save_directory = ".";
 
     void saveImage(QString fname);
+    float genZ(cv::Matx44d Q_, int x_index, int y_index, float d);
 
 public slots:
     //void updateDisparityRange_slide(int val);

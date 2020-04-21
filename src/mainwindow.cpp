@@ -586,6 +586,7 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(updateFrameCount(qint64)));
     connect(stereo_cam, SIGNAL(temperature_C(double)), this, SLOT(updateTemperature(double)));
     connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(saveImageTimestamped()));
+    connect(ui->saveButton, SIGNAL(clicked()), disparity_view, SLOT(saveImageTimestamped()));
     connect(stereo_cam, SIGNAL(savedImage(QString)), this,
             SLOT(displaySaved(QString)));
     connect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
@@ -912,9 +913,6 @@ void MainWindow::stereoCameraInit() {
             setCalibrationFolder(calibration_directory);
         }
 
-        // TODO: Get this from calibration file
-        //double focal =  3.8763048093657375e+02;
-        //double baseline = 60e-3;
         double focal =  stereo_cam->fx;
         double baseline = stereo_cam->baseline;
         disparity_view->setCalibration(stereo_cam->Q,baseline,focal);
@@ -1278,7 +1276,9 @@ void MainWindow::singleShotClicked(void) {
     ui->pauseButton->setIcon(awesome->icon(fa::play, icon_options));
 }
 
-void MainWindow::saveSingle(void) { stereo_cam->saveImageTimestamped(); }
+void MainWindow::saveSingle(void) {
+    stereo_cam->saveImageTimestamped();
+}
 
 void MainWindow::toggleAcquire(void) {
     if (stereo_cam->isAcquiring()) {
