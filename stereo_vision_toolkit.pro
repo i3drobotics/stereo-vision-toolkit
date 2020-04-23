@@ -80,8 +80,8 @@ win32 {
 
 WITH_I3DRSGM {
     SOURCES += \
-        $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.cpp \
-        $$_PRO_FILE_PWD_/i3drsgm/src/qmatcheri3drsgm.cpp \
+        matcherwidgeti3drsgm.cpp \
+        qmatcheri3drsgm.cpp \
         $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.cpp
 }
 
@@ -120,8 +120,8 @@ win32 {
 
 WITH_I3DRSGM {
     HEADERS += \
-        $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.h \
-        $$_PRO_FILE_PWD_/i3drsgm/src/qmatcheri3drsgm.h \
+        matcherwidgeti3drsgm.h \
+        qmatcheri3drsgm.h \
         $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.h
 }
 
@@ -136,7 +136,7 @@ FORMS += \
     cameradisplaywidget.ui
 
 WITH_I3DRSGM {
-    FORMS += $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.ui
+    FORMS += matcherwidgeti3drsgm.ui
 }
 
 # For building in a release and debug in seperate folders
