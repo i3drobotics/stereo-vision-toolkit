@@ -109,7 +109,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 #ifdef WITH_FERVOR
     // Set the Fervor appcast url
-    FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml");
+    FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/master/Appcast.xml");
 
     // Check for updates silently -- this will not block the initialization of
     // your application, just start a HTTP request and return immediately.
