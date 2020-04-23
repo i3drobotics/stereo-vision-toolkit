@@ -21,14 +21,14 @@ project(StereoVisionToolkit)
 
 CMAKE_POLICY(SET CMP0071 NEW) 
 
-# DEFINES += BUILD_FV
+# DEFINES += WITH_FERVOR
 # DEFINES += FV_APP_NAME
 # FV_APP_NAME = $$TARGET
-if(NOT DEFINED BUILD_FV)
-	option(BUILD_FV "Build with fevor updater" OFF)
+if(NOT DEFINED WITH_FERVOR)
+	option(WITH_FERVOR "Build with fevor updater" OFF)
 endif()
-if (BUILD_FV)
-	add_definitions(-DBUILD_FV)
+if (WITH_FERVOR)
+	add_definitions(-DWITH_FERVOR)
 	#TODO: add fervor sub_directory
 endif()
 
@@ -55,16 +55,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # CONFIG += doc
 
 # # To use I3DR's pro stereo matcher
-# # add 'CONFIG+=include_pro' to build arguments
-# include_pro {
-    # message("Pro enabled")
-    # DEFINES += BUILD_PRO
+# # add 'CONFIG+=WITH_I3DRSGM' to build arguments
+# WITH_I3DRSGM {
+    # message("I3DRSGM enabled")
+    # DEFINES += WITH_I3DRSGM
 # }
-if(NOT DEFINED include_pro)
-	option(include_pro "Use I3DR's pro stereo matcher" ON)
+if(NOT DEFINED WITH_I3DRSGM)
+	option(WITH_I3DRSGM "Use I3DR's stereo matcher (I3DRSGM)" ON)
 endif()
-if (include_pro)
-	add_definitions(-DBUILD_PRO)
+if (WITH_I3DRSGM)
+	add_definitions(-DWITH_I3DRSGM)
 endif()
 
 # RC_FILE = icon.rc
@@ -90,10 +90,10 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/src
 )
 
-# include_pro {
+# WITH_I3DRSGM {
     # INCLUDEPATH += $$_PRO_FILE_PWD_/pro/src
 # }
-if (include_pro)
+if (WITH_I3DRSGM)
 	include_directories(
 		${PROJECT_SOURCE_DIR}/pro/src
 	)
@@ -171,14 +171,14 @@ if(WIN32)
 	)
 endif()
 
-# include_pro {
+# WITH_I3DRSGM {
     # SOURCES += \
         # #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.cpp \
         # #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.cpp \
         # $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.cpp \
         # $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.cpp
 # }
-if (include_pro)
+if (WITH_I3DRSGM)
 	set(SOURCES
 		${SOURCES}
 		pro/src/matcherwidgeti3drsgm.cpp
@@ -260,14 +260,14 @@ if(WIN32)
 	)
 endif()
 
-# include_pro {
+# WITH_I3DRSGM {
     # HEADERS += \
         # #$$_PRO_FILE_PWD_/pro/src/matcherwidgetjrsgm.h \
         # #$$_PRO_FILE_PWD_/pro/src/matcherjrsgm.h \
         # $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.h \
         # $$_PRO_FILE_PWD_/pro/src/matcheri3drsgm.h
 # }
-if(include_pro)
+if(WITH_I3DRSGM)
 	set(MOC_HEADERS
 		${MOC_HEADERS}
 		pro/src/matcherwidgeti3drsgm.h
@@ -296,10 +296,10 @@ set( UIS
     src/cameradisplaywidget.ui
 )
 
-# include_pro {
+# WITH_I3DRSGM {
     # FORMS += $$_PRO_FILE_PWD_/pro/src/matcherwidgeti3drsgm.ui
 # }
-if (include_pro)
+if (WITH_I3DRSGM)
 	set(UIS
 		${UIS}
 		pro/src/matcherwidgeti3drsgm.ui
@@ -397,7 +397,7 @@ set(tis_LIBS
 	${tis_LIB_DIR}/TIS_UDSHL11_x64.lib
 )
 
-# include_pro {
+# WITH_I3DRSGM {
     # # Required for JR
     # #LIBS += -L"$$_PRO_FILE_PWD_/pro/3rd_party/jr/lib" -lDigVTKIntegration
     # #INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/jr/include"
@@ -408,7 +408,7 @@ set(tis_LIBS
     # INCLUDEPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/include"
     # DEPENDPATH += "$$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep"
 # }
-if (include_pro)
+if (WITH_I3DRSGM)
 	set(I3DR_LIB_DIR ${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/lib/PhobosIntegration)
 	set(I3DR_LIBS
 		${I3DR_LIB_DIR}/PhobosIntegration.lib
@@ -537,7 +537,7 @@ endif()
 	set(EXTRA_FILES ${EXTRA_FILES} ${PYLON_EXTRA_FILES})
     # #TODO add pylon drivers for linux and mac
 
-    # include_pro {
+    # WITH_I3DRSGM {
         # EXTRA_FILES += \
             # #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/bin/*.dll, true) \
             # #$$files($$_PRO_FILE_PWD_/pro/3rd_party/jr/dep/*.DLL, true) \
@@ -546,7 +546,7 @@ endif()
             # $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/dep/*.dll, true) \
             # $$files($$_PRO_FILE_PWD_/pro/3rd_party/i3dr/lic/*.lic, true)
     # }
-	if (include_pro)
+	if (WITH_I3DRSGM)
 		file(GLOB I3DR_EXTRA_FILES
 			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/bin/*.dll"
 			"${PROJECT_SOURCE_DIR}/pro/3rd_party/i3dr/dep/*.dll"

@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget* parent)
     autoloadCameraTriggered();
     pointCloudInit();
 
-#ifdef BUILD_FV
+#ifdef WITH_FERVOR
     // Set the Fervor appcast url
     FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml");
 
@@ -1220,12 +1220,14 @@ void MainWindow::setupMatchers(void) {
     ui->matcherSelectBox->insertItem(1, "OpenCV SGBM");
     ui->matcherSettingsLayout->addWidget(opencv_sgbm);
 
+#ifdef WITH_I3DRSGM
     qDebug() << "Including I3DRSGM widget";
     MatcherWidgetI3DRSGM* i3dr_sgm =
             new MatcherWidgetI3DRSGM(this, stereo_cam->getSize());
     matcher_list.append(i3dr_sgm);
     ui->matcherSelectBox->insertItem(2, "I3DR SGBM");
     ui->matcherSettingsLayout->addWidget(i3dr_sgm);
+#endif
 
     ui->matcherSelectBox->setCurrentIndex(0);
 
