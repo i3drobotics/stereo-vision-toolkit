@@ -1,6 +1,6 @@
-[submodule "svt-pro"]
-	path = pro
-	url = https://github.com/i3drobotics/svt-pro.git
+[submodule "i3drsgm"]
+	path = i3drsgm
+	url = https://github.com/i3drobotics/i3drsgm.git
 [submodule "fervor"]
 	path = fervor
 	url = https://github.com/pypt/fervor.git
