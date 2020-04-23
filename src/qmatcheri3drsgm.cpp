@@ -6,7 +6,7 @@ void QMatcherI3DRSGM::init()
     QString qparam_file = QCoreApplication::applicationDirPath() + "/i3drsgm.param";
     std::string param_file = qparam_file.toStdString();
 
-    QString qtmp_param_file = QCoreApplication::applicationDirPath() + "/tmp.param";
+    QString qtmp_param_file = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/tmp.param";
     std::string tmp_param_file = qtmp_param_file.toStdString();
 
     i3drsgm = new MatcherI3DRSGM(tmp_param_file,param_file);

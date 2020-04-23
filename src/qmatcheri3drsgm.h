@@ -5,6 +5,7 @@
 #include <matcheri3drsgm.h>
 #include <QDir>
 #include <QDebug>
+#include <QStandardPaths>
 
 #include <iostream>
 #include <fstream>
