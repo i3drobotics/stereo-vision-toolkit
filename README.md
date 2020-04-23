@@ -25,15 +25,15 @@ Stereo matching support
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
 ![SVTK matching an outdoor scene using SGM](./docs/images/svtk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
-I3DR's own 3D matching algorithm can be built into this application however the files required are not included in this repository. This because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in a seperate private git repository. However, the 'pro' version of the software with these tool included will be included in 'Releases' but a license will be required from I3DR for this to run. 
-Please contact bknight@i3drobotics.com for more information. 
+I3DR's own 3D matching algorithm can be built into this application however the files required are not included in this repository. This is because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in a the submodule i3drsgm.
+Please contact info@i3drobotics.com for more information. 
 
 Installation
 ---
 
 The software is currently Windows-only, but we are likely to add support for Linux in the future. Currently the only component that is reliant on Windows is camera discovery, which uses DirectShow.
 
-This repository contains everything you need to build the software using MSVC 2015 (including pre-built dependencies.) You will also need an up to date installation of Qt 5 (tested using Qt 5.12.5) and the NVIDIA Cuda SDK. Building with MinGW should be possible, but you will need to build the dependencies yourself. You may also need the Windows SDK.
+This repository contains everything you need to build the software using MSVC 2015 (including pre-built dependencies.) You will also need an up to date installation of Qt 5 (tested using Qt 5.10.1) and the NVIDIA Cuda SDK. Building with MinGW should be possible, but you will need to build the dependencies yourself. You may also need the Windows SDK.
 
 Of course you can also link to your own pre-compiled versions of the dependencies, in this case you'll need to edit the `.pro` file with the appropriate `LIB` and `INCLUDEPATH`'s.
 
