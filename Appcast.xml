@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss
-	version="1.2.4"
+	version="1.2.5"
 	xmlns:atom="http://www.w3.org/2005/Atom"
 	xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"
 	xmlns:fervor="https://github.com/pypt/fervor"
@@ -14,8 +14,8 @@
 		<atom:link href="https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/Appcast.xml" rel="self" type="application/rss+xml" />
 
 		<item>
-			<title>Version 1.2.4</title>
-			<pubDate>Mon, 06 Feb 2020 17:04:00 +0000</pubDate>
+			<title>Version 1.2.5</title>
+			<pubDate>Thu, 23 April 2020 17:04:00 +0000</pubDate>
 			<guid isPermaLink="true">https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/ReleaseNotes.html</guid>
 
 			<!-- One of those (<link> is preferred by Fervor, <sparkle:releaseNotesLink> is used by Sparkle) -->
@@ -28,8 +28,8 @@
 
 			<!-- Windows version. -->
 			<enclosure
-				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.2.4/Stereo.Vision.Toolkit.Installer.exe"
-				fervor:version="1.2.4"
+				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.2.5/StereoVisionToolkit-1.2.5-Win64"
+				fervor:version="1.2.5"
 				fervor:platform="Q_OS_WIN32"
 				length="121651640"
 				type="application/octet-stream" />
