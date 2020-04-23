@@ -8,6 +8,11 @@
 
 #include <abstractstereocamera.h>
 
+//!  Stereo video feed
+/*!
+  Control of stereo video and generation of 3D
+*/
+
 class StereoCameraFromVideo : public AbstractStereoCamera
 {
 
@@ -19,7 +24,16 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(QString fname);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
+    void toggleAutoExpose(bool){} //NA
+    void adjustExposure(double){} //NA
+    void toggleAutoGain(bool){} //NA
+    void adjustGain(int){} //NA
+    void adjustBinning(int){} //NA
+    void toggleTrigger(bool){} //NA
+    void adjustFPS(int val);
+    void adjustPacketSize(int){}
 public slots:
     void setPosition(int position);
     bool enableAutoExpose(bool enable);

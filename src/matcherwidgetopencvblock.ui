@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>521</width>
+    <width>526</width>
     <height>250</height>
    </rect>
   </property>
@@ -77,10 +77,10 @@
         </size>
        </property>
        <property name="minimum">
-        <number>-128</number>
+        <number>-1024</number>
        </property>
        <property name="maximum">
-        <number>128</number>
+        <number>1024</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -130,7 +130,7 @@
         <number>1</number>
        </property>
        <property name="maximum">
-        <number>32</number>
+        <number>64</number>
        </property>
        <property name="singleStep">
         <number>1</number>

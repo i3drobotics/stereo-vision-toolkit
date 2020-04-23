@@ -10,6 +10,11 @@
 #include <QObject>
 #include <opencv2/opencv.hpp>
 
+//!  Class for chessboard detection
+/*!
+  Detection and refinement of chessboard (also known as checkerboard) detection using openCV
+*/
+
 class Chessboard : public QObject {
   Q_OBJECT
  public:

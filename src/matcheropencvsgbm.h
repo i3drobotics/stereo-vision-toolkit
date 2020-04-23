@@ -9,6 +9,11 @@
 #include <abstractstereomatcher.h>
 #include <QFile>
 
+//!  Matcher OpenCV SGBM
+/*!
+  Stereo matcher using OpenCV's SGBM algorithm
+*/
+
 class MatcherOpenCVSGBM : public AbstractStereoMatcher
 {
     Q_OBJECT

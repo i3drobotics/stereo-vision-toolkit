@@ -10,6 +10,11 @@
 #include <matcheropencvsgbm.h>
 #include <opencv2/opencv.hpp>
 
+//!  OpenCV's SGBM QT Widget
+/*!
+  QT widget for OpenCV's SGBM controls
+*/
+
 namespace Ui {
 class MatcherWidgetOpenCVSGBM;
 }

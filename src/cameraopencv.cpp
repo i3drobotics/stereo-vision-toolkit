@@ -47,7 +47,10 @@ bool CameraOpenCV::setMaximumResolution(void) {
 bool CameraOpenCV::setFrame16(void) {
   bool res = false;
 
+  // Note this will not work in versions of OpenCV prior to 4.0 due
+  // to a bug in the DShow driver.
   res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
+  camera.set(CV_CAP_PROP_CONVERT_RGB, false);
 
   image_format = Y16;
 
@@ -57,7 +60,10 @@ bool CameraOpenCV::setFrame16(void) {
 bool CameraOpenCV::setFrame8(void) {
   bool res = false;
 
+  // Note this will not work in versions of OpenCV prior to 4.0 due
+  // to a bug in the DShow driver.
   res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '8', '0', '0'));
+  camera.set(CV_CAP_PROP_CONVERT_RGB, false);
 
   image_format = Y800;
 
@@ -70,6 +76,10 @@ bool CameraOpenCV::setExposure(double exposure) {
 
 bool CameraOpenCV::setGain(double gain) {
   return camera.set(CV_CAP_PROP_GAIN, gain);
+}
+
+bool CameraOpenCV::setFPS(double fps){
+    return camera.set(CV_CAP_PROP_FPS, fps);
 }
 
 bool CameraOpenCV::capture(void) {

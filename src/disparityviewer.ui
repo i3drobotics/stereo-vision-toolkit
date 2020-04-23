@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>177</height>
+    <width>400</width>
+    <height>156</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>320</width>
+    <width>400</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>320</width>
+    <width>400</width>
     <height>16777215</height>
    </size>
   </property>
@@ -32,110 +32,14 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2" colspan="5">
-    <widget class="QLabel" name="colourbar">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>300</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">border: 1px solid black</string>
-     </property>
+   <item row="4" column="5">
+    <widget class="QPushButton" name="btnSaveDisparityView">
      <property name="text">
-      <string>Colourbar</string>
+      <string>Save Image</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Colourmap</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Disparity Range</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="6">
-    <widget class="QSpinBox" name="minDisparitySpinbox">
-     <property name="maximumSize">
-      <size>
-       <width>50</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="suffix">
-      <string> px</string>
-     </property>
-     <property name="minimum">
-      <number>-128</number>
-     </property>
-     <property name="maximum">
-      <number>128</number>
-     </property>
-     <property name="value">
-      <number>1</number>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3" colspan="3">
-    <widget class="QSlider" name="minDisparitySlider">
-     <property name="minimum">
-      <number>-128</number>
-     </property>
-     <property name="maximum">
-      <number>128</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="6">
-    <widget class="QSpinBox" name="disparityRangeSpinbox">
-     <property name="maximumSize">
-      <size>
-       <width>50</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="suffix">
-      <string> px</string>
-     </property>
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>752</number>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Min disparity</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3" colspan="2">
+   <item row="4" column="3" colspan="2">
     <widget class="QComboBox" name="colourmapComboBox">
      <item>
       <property name="text">
@@ -204,23 +108,24 @@
      </item>
     </widget>
    </item>
-   <item row="3" column="3" colspan="3">
-    <widget class="QSlider" name="disparityRangeSlider">
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>752</number>
-     </property>
-     <property name="value">
-      <number>64</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="3" column="2">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Saturation Threshold</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="3">
+   <item row="1" column="3">
+    <widget class="QLabel" name="disparityRangeLabel">
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
     <widget class="QSlider" name="intensityThresholdSlider">
      <property name="maximum">
       <number>255</number>
@@ -234,26 +139,90 @@
     </widget>
    </item>
    <item row="4" column="2">
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Saturation Threshold</string>
+      <string>Colourmap</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="4">
+    <widget class="QLabel" name="colourbar">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: 1px solid black</string>
+     </property>
+     <property name="text">
+      <string>Colourbar</string>
      </property>
     </widget>
    </item>
    <item row="1" column="2">
     <widget class="QLabel" name="maxDisparityLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>0</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="6">
+   <item row="1" column="5">
     <widget class="QLabel" name="minDisparityLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>0</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QLabel" name="minDepthLabel">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="5">
+    <widget class="QLabel" name="maxDepthLabel">
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QLabel" name="depthRangeLabel">
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
