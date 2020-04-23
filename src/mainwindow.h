@@ -32,7 +32,9 @@
 
 #include "matcherwidgetopencvblock.h"
 #include "matcherwidgetopencvsgbm.h"
-#include "matcherwidgeti3drsgm.h"
+#ifdef WITH_I3DRSGM
+    #include "matcherwidgeti3drsgm.h"
+#endif
 #include "stereocameradeimos.h"
 #include "stereocamerafromvideo.h"
 #include "stereocameraopencv.h"
@@ -49,7 +51,7 @@
 #include "cameradisplaywidget.h"
 
 #include "paramfile.h"
-#ifdef BUILD_FV
+#ifdef WITH_FERVOR
 #include "fvupdater.h"
 #endif
 

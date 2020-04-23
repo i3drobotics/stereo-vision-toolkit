@@ -12,7 +12,7 @@
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
-#ifdef BUILD_FV
+#ifdef WITH_FERVOR
   QApplication::setApplicationName(FV_APP_NAME);
   QApplication::setApplicationVersion(FV_APP_VERSION);
   QApplication::setOrganizationName("Industrial 3D Robotics");

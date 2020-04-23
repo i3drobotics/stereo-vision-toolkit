@@ -14,7 +14,7 @@ FV_APP_VERSION = $$VERSION
 QT += core gui concurrent widgets xml network quick
 
 TARGET = StereoVisionToolkit
-DEFINES += BUILD_FV
+DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
@@ -22,6 +22,13 @@ TEMPLATE = app vcapp
 
 CONFIG += warn_on
 CONFIG += doc
+
+# To use I3DRSGM
+# add 'CONFIG+=WITH_I3DRSGM' to build arguments
+WITH_I3DRSGM {
+    message("I3DRSGM enabled")
+    DEFINES += WITH_I3DRSGM
+}
 
 RC_FILE = icon.rc
 
@@ -34,7 +41,9 @@ include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
 VPATH = $$_PRO_FILE_PWD_/src
 INCLUDEPATH += $$_PRO_FILE_PWD_/src
 
-INCLUDEPATH += $$_PRO_FILE_PWD_/i3drsgm/src
+WITH_I3DRSGM {
+    INCLUDEPATH += $$_PRO_FILE_PWD_/i3drsgm/src
+}
 
 SOURCES += \
     main.cpp\
@@ -69,10 +78,12 @@ win32 {
     SOURCES += stereocameradeimos.cpp
 }
 
-SOURCES += \
-    $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.cpp \
-    $$_PRO_FILE_PWD_/i3drsgm/src/qmatcheri3drsgm.cpp \
-    $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.cpp
+WITH_I3DRSGM {
+    SOURCES += \
+        $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.cpp \
+        $$_PRO_FILE_PWD_/i3drsgm/src/qmatcheri3drsgm.cpp \
+        $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.cpp
+}
 
 HEADERS += \
     mainwindow.h \
@@ -107,10 +118,12 @@ win32 {
     HEADERS += stereocameradeimos.h
 }
 
-HEADERS += \
-    $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.h \
-    $$_PRO_FILE_PWD_/i3drsgm/src/qmatcheri3drsgm.h \
-    $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.h
+WITH_I3DRSGM {
+    HEADERS += \
+        $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.h \
+        $$_PRO_FILE_PWD_/i3drsgm/src/qmatcheri3drsgm.h \
+        $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.h
+}
 
 FORMS += \
     mainwindow.ui \
@@ -122,7 +135,9 @@ FORMS += \
     disparityviewer.ui \
     cameradisplaywidget.ui
 
-FORMS += $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.ui
+WITH_I3DRSGM {
+    FORMS += $$_PRO_FILE_PWD_/i3drsgm/src/matcherwidgeti3drsgm.ui
+}
 
 # For building in a release and debug in seperate folders
 CONFIG(debug, debug|release) {
@@ -191,10 +206,12 @@ CONFIG(debug, debug|release) {
 
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
 
-# Required for I3DR
-LIBS += -L"$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
-INCLUDEPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/include"
-DEPENDPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep"
+WITH_I3DRSGM {
+    # Required for I3DRSGM
+    LIBS += -L"$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/include"
+    DEPENDPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep"
+}
 
 # Required for PCL
 LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
@@ -256,12 +273,13 @@ win32 {
         EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
     }
     #TODO add pylon drivers for linux and mac
-
-    EXTRA_FILES += \
-        $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/bin/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.lic, true) \
-        $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.param, true)
+    WITH_I3DRSGM {
+        EXTRA_FILES += \
+            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/bin/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.lic, true) \
+            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.param, true)
+    }
 
 }
 
