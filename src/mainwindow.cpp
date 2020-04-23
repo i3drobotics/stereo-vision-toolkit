@@ -114,6 +114,7 @@ MainWindow::MainWindow(QWidget* parent)
     // Check for updates silently -- this will not block the initialization of
     // your application, just start a HTTP request and return immediately.
     FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
+
 #endif
 }
 
@@ -1219,14 +1220,12 @@ void MainWindow::setupMatchers(void) {
     ui->matcherSelectBox->insertItem(1, "OpenCV SGBM");
     ui->matcherSettingsLayout->addWidget(opencv_sgbm);
 
-#ifdef BUILD_PRO
     qDebug() << "Including I3DRSGM widget";
     MatcherWidgetI3DRSGM* i3dr_sgm =
             new MatcherWidgetI3DRSGM(this, stereo_cam->getSize());
     matcher_list.append(i3dr_sgm);
     ui->matcherSelectBox->insertItem(2, "I3DR SGBM");
     ui->matcherSettingsLayout->addWidget(i3dr_sgm);
-#endif
 
     ui->matcherSelectBox->setCurrentIndex(0);
 
