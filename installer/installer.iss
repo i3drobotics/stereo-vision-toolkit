@@ -1,10 +1,10 @@
-; -- Stereo Vision Toolkit (Pro) --
+; -- Stereo Vision Toolkit --
 ; Inno installer script for Stereo Vision Toolkit
 ; MUST be installed on x64 bit machine
 
 #define AppName "Stereo Vision Toolkit"
-#define AppVersion "1.2.4"
-#define InstallerName "Stereo Vision Toolkit Installer"
+#define AppVersion "1.2.5"
+#define InstallerName "StereoVisionToolkit"
 #define ExeName "StereoVisionToolkit.exe"
 #define IconName "i3dr_logo.ico"
 
@@ -19,7 +19,7 @@ AppUpdatesURL=https://github.com/i3drobotics/stereo_vision_toolkit/releases
 DefaultDirName={pf64}/i3DR/{#AppName}
 DefaultGroupName=i3D Robotics
 LicenseFile=../LICENSE
-OutputBaseFilename={#InstallerName}
+OutputBaseFilename={#InstallerName}-{#AppVersion}-Win64
 SetupIconFile="../{#IconName}"
 Compression=lzma2
 SolidCompression=yes
@@ -34,7 +34,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "../build/release/*"; Excludes: "\params\*.xml,*.lic,install_drivers.bat"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "../build/release/vc_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/release/vcredist_x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_USB_Camera_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_GigE_Filter_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_GigE_Performance_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
@@ -43,7 +43,7 @@ Source: "../LICENSE"; DestDir: "{app}/licenses"
 Source: "../{#IconName}"; DestDir: "{app}"
 
 [Run]
-Filename: {tmp}\vc_redist.x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
+Filename: {tmp}\vcredist_x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_USB_Camera_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon USB Camera Driver...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Filter_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Filter Driver...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Performance_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Performance Driver...;
