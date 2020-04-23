@@ -10,11 +10,16 @@
 
 // Correct for math.h warnings
 #define NOMINMAX
-#define _MATH_DEFINES_DEFINED
+//#define _MATH_DEFINES_DEFINED
 #include <windows.h>
 #include <dshow.h>
 #include <hidapi/hidapi.h>
 #include <QTimer>
+
+//!  Deimos camera control
+/*!
+  Control of deimos camera and generation of 3D
+*/
 
 enum DEIMOS_COMMAND{
     CAMERA_CONTROL_STEREO = 0x78,
@@ -41,8 +46,8 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(int devid = -1);
-    int findCamera(void);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
     bool setFrameSize(int width, int height);
     bool setFrame16(void);
     void getFrameRate(void);
@@ -50,6 +55,17 @@ public:
     void openHID();
 
     int getExposure();
+    void toggleAutoExpose(bool enable);
+    void adjustExposure(double exposure);
+    void adjustPacketSize(int){}
+    void toggleAutoGain(bool){} //TODO create auto gain setting function
+    void adjustGain(int){} //TODO create gain setting function
+    void adjustBinning(int){} //TODO create binning setting function
+    void toggleTrigger(bool){} //NA
+    void adjustFPS(int fps);
+
+    int usb_index_from_serial(std::string serial);
+    std::string serial_from_usb_index(int index);
 
     ~StereoCameraDeimos(void);
 
@@ -58,6 +74,7 @@ public slots:
     bool toggleHDR(bool enable);
     bool enableAutoExpose(bool enable);
     double getTemperature(void);
+    void changeFPS(int fps);
 
 private:
     cv::VideoCapture camera;
@@ -69,6 +86,8 @@ private:
     BSTR device_path;
     hid_device* deimos_device = NULL;
     bool send_hid(std::vector<unsigned char> &buffer, size_t command_len);
+    std::string serial_from_device_path(std::string usb_device_path);
+    std::string get_device_path_serial(IMoniker *pMoniker);
 
     qint64 getSerial(void);
 

@@ -12,6 +12,12 @@
 
 #include <opencv2/opencv.hpp>
 
+//!  OpenCV camera control
+/*!
+  Connecting and controlling a camera using OpenCV
+  More info see: https://docs.opencv.org/3.4.1/dd/de7/group__videoio.html
+*/
+
 class CameraOpenCV : public QObject
 {
     Q_OBJECT
@@ -27,6 +33,7 @@ public:
     bool setMaximumResolution();
     bool setExposure(double exposure);
     bool setGain(double gain);
+    bool setFPS(double fps);
     ~CameraOpenCV(void);
 
 signals:

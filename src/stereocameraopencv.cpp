@@ -63,10 +63,11 @@ bool StereoCameraOpenCV::capture() {
 void StereoCameraOpenCV::disconnectCamera() {
   left_camera->close();
   right_camera->close();
+  emit finished();
+  emit disconnected();
 }
 
 StereoCameraOpenCV::~StereoCameraOpenCV() {
   disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
   disconnectCamera();
-  emit finished();
 }

@@ -6,9 +6,9 @@
 #include "abstractstereomatcher.h"
 
 AbstractStereoMatcher::AbstractStereoMatcher(QObject *parent,
-                                             cv::Size image_size)
+                                             cv::Size img_size)
     : QObject(parent) {
-  this->image_size = image_size;
+  this->image_size = img_size;
   cv::Mat(image_size, CV_32F).copyTo(disparity_buffer);
 }
 
@@ -20,9 +20,9 @@ void AbstractStereoMatcher::assignThread(QThread *thread) {
   thread->start();
 }
 
-void AbstractStereoMatcher::setImages(cv::Mat *left, cv::Mat *right) {
-  this->left = left;
-  this->right = right;
+void AbstractStereoMatcher::setImages(cv::Mat *left_img, cv::Mat *right_img) {
+  this->left = left_img;
+  this->right = right_img;
 }
 
 void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {
@@ -30,14 +30,24 @@ void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {
   return;
 }
 
-void AbstractStereoMatcher::saveDisparity(QString fname) {
+void AbstractStereoMatcher::getDisparityRange(int &val) {
+  val = disparity_range;
+}
+
+void AbstractStereoMatcher::getMinDisparity(int &val) {
+  val = min_disparity;
+}
+
+void AbstractStereoMatcher::saveDisparity(QString filename) {
   cv::Mat disparity_output;
 
-  disparity_lr.convertTo(disparity_output, CV_16SC1);
-  disparity_output += min_disparity*16;
-  disparity_output.convertTo(disparity_output, CV_16UC1);
+  //disparity_lr.convertTo(disparity_output, CV_16SC1);
+  //disparity_output += min_disparity*16;
+  //disparity_output.convertTo(disparity_output, CV_16UC1);
+  disparity_lr.copyTo(disparity_output);
+  disparity_output /= 16;
 
-  cv::imwrite(fname.toStdString(), disparity_output);
+  cv::imwrite(filename.toStdString(), disparity_output);
 
   return;
 }
@@ -48,7 +58,7 @@ void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
 
     cv::Mat difference = disparity_rl - disparity_lr;
 
-    for(int i=0; i < (int) difference.total(); i++){
+    for(int i=0; i < static_cast<int>(difference.total()); i++){
        if( abs(difference.at<float>(i)) < threshold) continue;
        else disparity_lr.at<float>(i) = min_disparity;
     }
