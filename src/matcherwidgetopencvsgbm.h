@@ -28,7 +28,6 @@ class MatcherWidgetOpenCVSGBM : public MatcherWidget {
    void blockSize(int);
    void speckleWindow(int);
    void speckleRange(int);
-   void consistency(int);
    void uniquenessRatio(int);
    void saveClicked();
 
@@ -42,12 +41,12 @@ public slots:
    void updateDisparityRange(int);
    void updateBlockSize(int);
    void updateMinDisparity(int);
-   void updateConsistency(int consistency);
    void updateUniquenessRatio(int ratio);
    void updateSpeckleRange(int range);
    void updateSpeckleWindow(int window);
+   void enableExtendDisparity(bool enable);
+   void enableNegativeDisparity(bool enable);
    void enableSpeckleFilter(bool enable);
-   void enableConsistency(bool enable);
 
    AbstractStereoMatcher* getMatcher(void);
 
@@ -60,6 +59,7 @@ public slots:
   int min_disparity;
   int disparity_range;
   int image_width = 640;
+  bool negative_disparity = true;
 
 };
 

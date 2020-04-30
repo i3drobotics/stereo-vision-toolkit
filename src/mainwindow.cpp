@@ -179,7 +179,7 @@ void MainWindow::statusBarInit(void) {
 
 void MainWindow::controlsInit(void) {
 
-    ui->tabLayoutSettings->setVisible(false);
+    ui->widgetSideSettings->setVisible(false);
     showingSettings = false;
 
     connect(ui->pauseButton, SIGNAL(clicked()), this, SLOT(toggleAcquire()));
@@ -272,40 +272,15 @@ void MainWindow::pointCloudInit() {
 }
 
 void MainWindow::resetPointCloudView(){
-    double min_depth = 0.0;
-    double max_depth = 5.0;
+    double min_depth = disparity_view->getMinDepth();
+    double max_depth = disparity_view->getMaxDepth();
 
-    /*
-
-    AbstractStereoMatcher *matcher = stereo_cam->matcher;
-    if (matcher != nullptr){
-        int min_disparity;
-        int disparity_range;
-
-        matcher->getMinDisparity(min_disparity);
-        matcher->getDisparityRange(disparity_range);
-
-        double baseline = stereo_cam->baseline;
-        double focal = stereo_cam->fx;
-
-        if (baseline < 0){
-            min_disparity = -min_disparity;
-            disparity_range = -disparity_range;
-        }
-
-        int max_disparity = min_disparity+disparity_range;
-
-        double depth_toll = 0.5;
-
-        min_depth = (baseline * focal / (min_disparity/16)) - depth_toll;
-        max_depth = (baseline * focal / (max_disparity/16)) + depth_toll;
-
-        if (min_depth < 0){
-            min_depth = 0;
-        }
-
+    if (min_depth == -1){
+        min_depth = 0.0;
     }
-    */
+    if (max_depth == -1){
+        max_depth = 5.0;
+    }
 
     viewer->resetCamera();
 
@@ -1012,7 +987,9 @@ void MainWindow::updateCloud() {
 
     cloud = stereo_cam->getPointCloud();
 
-    if(!cloud.get()) return;
+    if(!cloud.get()){
+        first_cloud = true;
+    }
 
     if (!cloud->empty()) {
         // Initial point cloud load
@@ -1024,7 +1001,14 @@ void MainWindow::updateCloud() {
         vtk_widget->update();
     } else {
         qDebug() << "Empty point cloud";
+        first_cloud = true;
     }
+
+    if (first_cloud){
+        first_cloud = false;
+        resetPointCloudView();
+    }
+
 }
 
 void MainWindow::startVideoCapture(void) {
@@ -1534,15 +1518,24 @@ void MainWindow::openHelp(){
     QDesktopServices::openUrl(QUrl(link));
 }
 
-void MainWindow::on_btnCameraSettings_clicked()
+void MainWindow::on_btnShowCameraSettings_clicked()
 {
     showingSettings = !showingSettings;
-    ui->tabLayoutSettings->setVisible(showingSettings);
+    ui->widgetSideSettings->setVisible(showingSettings);
     if (showingSettings){
-        ui->btnCameraSettings->setText("< Hide Settings");
+        ui->btnShowCameraSettings->setVisible(false);
+        ui->disparityViewSettings->setVisible(false);
+        ui->btnHideCameraSettings->setVisible(true);
     } else {
-        ui->btnCameraSettings->setText("> Show Settings");
+        ui->btnShowCameraSettings->setVisible(true);
+        ui->disparityViewSettings->setVisible(true);
+        ui->btnHideCameraSettings->setVisible(false);
     }
+}
+
+void MainWindow::on_btnHideCameraSettings_clicked()
+{
+    on_btnShowCameraSettings_clicked();
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {

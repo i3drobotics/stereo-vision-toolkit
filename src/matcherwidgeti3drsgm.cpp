@@ -16,14 +16,19 @@ MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent,
             SLOT(updateBlockSize(int)));
     connect(ui->minDisparitySlider, SIGNAL(valueChanged(int)), this,
             SLOT(updateMinDisparity(int)));
+    connect(ui->checkBoxNegativeDisparity, SIGNAL(toggled(bool)), this,
+            SLOT(enableNegativeDisparity(bool)));
     connect(ui->disparityRangeSlider, SIGNAL(valueChanged(int)), this,
             SLOT(updateDisparityRange(int)));
 
+    //TODO add advanced options for matcher
     //connect(ui->pyramidLevelSlider, SIGNAL(sliderMoved(int)), this,
     //        SLOT(updatePyramidLevel(int)));
 
     connect(ui->interpolateCheck, SIGNAL(toggled(bool)), this,
               SLOT(enableInterpolatation(bool)));
+    connect(ui->checkBoxExtendDisparity, SIGNAL(toggled(bool)), this,
+            SLOT(enableExtendDisparity(bool)));
 
     connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
             SLOT(onSaveClicked()));
@@ -47,9 +52,22 @@ void MatcherWidgetI3DRSGM::onSaveClicked() {
     //matcher->saveParams();
 }
 
+void MatcherWidgetI3DRSGM::enableNegativeDisparity(bool enable){
+    negative_disparity = enable;
+    updateMinDisparity(this->min_disparity);
+}
+
 void MatcherWidgetI3DRSGM::updatePyramidLevel(int level) {
     //ui->prefilterSizeLabel->setNum(level);
     matcher->maxPyramid(level);
+}
+
+void MatcherWidgetI3DRSGM::enableExtendDisparity(bool enable) {
+    if (enable){
+        ui->minDisparitySlider->setMaximum(1024);
+    } else {
+        ui->minDisparitySlider->setMaximum(256);
+    }
 }
 
 void MatcherWidgetI3DRSGM::enableInterpolatation(bool enable) {

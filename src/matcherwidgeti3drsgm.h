@@ -39,6 +39,8 @@ public slots:
    void updateBlockSize(int);
    void updateMinDisparity(int);
    void updatePyramidLevel(int cap);
+   void enableExtendDisparity(bool enable);
+   void enableNegativeDisparity(bool enable);
    void enableInterpolatation(bool enable);
 
    AbstractStereoMatcher* getMatcher(void);
@@ -52,6 +54,7 @@ public slots:
   int min_disparity;
   int disparity_range;
   int image_width = 640;
+  bool negative_disparity = true;
 
 };
 
