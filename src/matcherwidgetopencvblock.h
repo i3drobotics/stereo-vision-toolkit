@@ -26,13 +26,9 @@ class MatcherWidgetOpenCVBlock : public MatcherWidget {
    void minDisparity(int);
    void disparityRange(int);
    void blockSize(int);
-   void prefilterCap(int);
-   void prefilterSize(int);
-   void prefilterType(int);
    void textureThreshold(int);
    void speckleWindow(int);
    void speckleRange(int);
-   void consistency(int);
    void uniquenessRatio(int);
    void saveClicked();
 
@@ -47,16 +43,13 @@ public slots:
    void updateBlockSize(int);
    void updateMinDisparity(int);
 
-   void updatePrefilterCap(int cap);
-   void updatePrefilterSize(int size);
-   void updatePrefilterType(int index);
    void updateTextureThreshold(int threshold);
-   void updateConsistency(int consistency);
    void updateUniquenessRatio(int ratio);
    void updateSpeckleRange(int range);
    void updateSpeckleWindow(int window);
+   void enableExtendDisparity(bool enable);
+   void enableNegativeDisparity(bool enable);
    void enableSpeckleFilter(bool enable);
-   void enableConsistency(bool enable);
 
    AbstractStereoMatcher* getMatcher(void);
 
@@ -69,6 +62,7 @@ public slots:
   int min_disparity;
   int disparity_range;
   int image_width = 640;
+  bool negative_disparity = true;
 
 };
 

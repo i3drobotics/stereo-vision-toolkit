@@ -15,12 +15,16 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent,
   ui->blockSizeSlider->setValue((matcher->getBlockSize() - 1) / 2.0);
   ui->blockSizeLabel->setText(QString::number(matcher->getBlockSize()));
 
+  negative_disparity = matcher->getMinDisparity() <= 0;
+  ui->checkBoxNegativeDisparity->setEnabled(negative_disparity);
+
   ui->disparityRangeSlider->setValue(matcher->getDisparityRange() / 16.0);
   ui->disparityRangeLabel->setText(
       QString::number(matcher->getDisparityRange()));
 
-  ui->minDisparitySlider->setValue(matcher->getMinDisparity());
-  ui->minDisparityLabel->setText(QString::number(matcher->getMinDisparity()));
+  min_disparity = matcher->getMinDisparity();
+  ui->minDisparitySlider->setValue(abs(min_disparity));
+  ui->minDisparityLabel->setText(QString::number(abs(min_disparity)));
 
   ui->uniquenessRatioSlider->setValue(matcher->getUniquenessRatio());
   ui->uniquenessRatioLabel->setText(
@@ -37,17 +41,6 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent,
     ui->speckleWindowLabel->setEnabled(true);
   }
 
-  if (matcher->getDisp12MaxDiff() <= 0 || matcher->getDisp12MaxDiff() <= 0) {
-    ui->consistencyCheck->setChecked(false);
-  } else {
-    ui->consistencyCheck->setChecked(true);
-    ui->consistencyLabel->setEnabled(true);
-    ui->consistencySlider->setEnabled(true);
-  }
-
-  ui->consistencySlider->setValue(matcher->getDisp12MaxDiff());
-  ui->consistencyLabel->setText(QString::number(matcher->getDisp12MaxDiff()));
-
   ui->speckleRangeSlider->setValue(matcher->getSpeckleFilterRange());
   ui->speckleRangeLabel->setText(
       QString::number(matcher->getSpeckleFilterRange()));
@@ -56,17 +49,16 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent,
   ui->speckleWindowLabel->setText(
       QString::number(matcher->getSpeckleFilterWindow()));
 
+  enableExtendDisparity(ui->checkBoxExtendDisparity->isChecked());
+
   connect(ui->blockSizeSlider, SIGNAL(valueChanged(int)), this,
           SLOT(updateBlockSize(int)));
   connect(ui->minDisparitySlider, SIGNAL(valueChanged(int)), this,
           SLOT(updateMinDisparity(int)));
+  connect(ui->checkBoxNegativeDisparity, SIGNAL(toggled(bool)), this,
+          SLOT(enableNegativeDisparity(bool)));
   connect(ui->disparityRangeSlider, SIGNAL(valueChanged(int)), this,
           SLOT(updateDisparityRange(int)));
-
-  connect(ui->consistencySlider, SIGNAL(sliderMoved(int)), ui->consistencyLabel,
-          SLOT(setNum(int)));
-  connect(ui->consistencySlider, SIGNAL(sliderMoved(int)), this,
-          SLOT(updateConsistency(int)));
 
   connect(ui->uniquenessRatioSlider, SIGNAL(sliderMoved(int)),
           ui->uniquenessRatioLabel, SLOT(setNum(int)));
@@ -85,8 +77,8 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent,
 
   connect(ui->speckleFilterCheck, SIGNAL(toggled(bool)), this,
           SLOT(enableSpeckleFilter(bool)));
-  connect(ui->consistencyCheck, SIGNAL(toggled(bool)), this,
-          SLOT(enableConsistency(bool)));
+  connect(ui->checkBoxExtendDisparity, SIGNAL(toggled(bool)), this,
+          SLOT(enableExtendDisparity(bool)));
 
   connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
           SLOT(onSaveClicked()));
@@ -95,6 +87,11 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent,
 AbstractStereoMatcher* MatcherWidgetOpenCVSGBM::getMatcher() { return matcher; }
 
 void MatcherWidgetOpenCVSGBM::onSaveClicked() { matcher->saveParams(); }
+
+void MatcherWidgetOpenCVSGBM::enableNegativeDisparity(bool enable){
+    negative_disparity = enable;
+    updateMinDisparity(this->min_disparity);
+}
 
 void MatcherWidgetOpenCVSGBM::updateSpeckleRange(int range) {
   matcher->setSpeckleFilterRange(range);
@@ -124,23 +121,12 @@ void MatcherWidgetOpenCVSGBM::enableSpeckleFilter(bool enable) {
   }
 }
 
-void MatcherWidgetOpenCVSGBM::enableConsistency(bool enable) {
-  if (enable) {
-    matcher->setDisp12MaxDiff(ui->consistencySlider->value());
-
-    ui->consistencyLabel->setEnabled(true);
-    ui->consistencySlider->setEnabled(true);
-  } else {
-    matcher->setDisp12MaxDiff(-1);
-
-    ui->consistencyLabel->setEnabled(false);
-    ui->consistencySlider->setEnabled(false);
-  }
-}
-
-void MatcherWidgetOpenCVSGBM::updateConsistency(int con) {
-  ui->consistencyLabel->setNum(con);
-  matcher->setDisp12MaxDiff(con);
+void MatcherWidgetOpenCVSGBM::enableExtendDisparity(bool enable) {
+    if (enable){
+        ui->minDisparitySlider->setMaximum(1024);
+    } else {
+        ui->minDisparitySlider->setMaximum(256);
+    }
 }
 
 void MatcherWidgetOpenCVSGBM::updateUniquenessRatio(int ratio) {
@@ -150,11 +136,14 @@ void MatcherWidgetOpenCVSGBM::updateUniquenessRatio(int ratio) {
 void MatcherWidgetOpenCVSGBM::setImageWidth(int width) { image_width = width; }
 
 void MatcherWidgetOpenCVSGBM::updateMinDisparity(int min_disparity) {
-  //if (image_width - min_disparity > disparity_range) {
-    ui->minDisparityLabel->setNum(min_disparity);
     this->min_disparity = min_disparity;
-    matcher->setMinDisparity(min_disparity);
-  //}
+    if (negative_disparity){
+        ui->minDisparityLabel->setNum(-min_disparity);
+        matcher->setMinDisparity(-min_disparity);
+    } else {
+        ui->minDisparityLabel->setNum(min_disparity);
+        matcher->setMinDisparity(min_disparity);
+    }
 }
 
 void MatcherWidgetOpenCVSGBM::updateDisparityRange(int range) {

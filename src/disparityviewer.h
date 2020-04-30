@@ -54,6 +54,14 @@ public:
         save_directory = dir;
     }
 
+    double getMinDepth(){
+        return min_depth_;
+    }
+
+    double getMaxDepth(){
+        return max_depth_;
+    }
+
 public slots:
     void updateDisparity(void);
     void updateDisparityAsync(void);
@@ -77,6 +85,11 @@ private:
     AbstractStereoMatcher *matcher;
     bool processing_disparity;
     QString save_directory = ".";
+
+    double min_disp_ = 10000;
+    double max_disp_ = 0;
+    double min_depth_ = -1;
+    double max_depth_ = -1;
 
     void saveImage(QString fname);
     float genZ(cv::Matx44d Q_, int x_index, int y_index, float d);

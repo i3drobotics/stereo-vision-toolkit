@@ -229,6 +229,11 @@ void DisparityViewer::updateDisparity() {
     //double max_depth = baseline * focal / (-min_disp);
     double range_depth = max_depth - min_depth;
 
+    min_disp_ = min_disp;
+    max_disp_ = max_disp;
+    min_depth_ = min_depth;
+    max_depth_ = max_depth;
+
     ui->minDisparityLabel->setText(
                 QString("%1 px").arg(QString::number(min_disp,'g', 4)));
     ui->disparityRangeLabel->setText(

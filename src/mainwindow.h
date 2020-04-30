@@ -116,6 +116,7 @@ private:
     int current_fps = 0;
     int current_binning = 0;
     bool using_gige = false;
+    bool first_cloud = true;
 
     bool calibration_dialog_used = false;
     bool calibration_from_images_dialog_used = false;
@@ -200,7 +201,8 @@ public slots:
 protected:
     void closeEvent(QCloseEvent *event);
 private slots:
-    void on_btnCameraSettings_clicked();
+    void on_btnShowCameraSettings_clicked();
+    void on_btnHideCameraSettings_clicked();
 };
 
 #endif  // MAINWINDOW_H
