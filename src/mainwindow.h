@@ -40,7 +40,6 @@
 #include "stereocameraopencv.h"
 #include "stereocameratis.h"
 #include "stereocamerabasler.h"
-#include "stereocamerabasler2.h"
 #include "qdevicebutton.h"
 #include "qdevicedialog.h"
 

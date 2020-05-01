@@ -30,6 +30,9 @@ class AbstractStereoMatcher : public QObject {
 
    cv::Mat disparity_lr;
 
+   //! Returns if a valid license was found to use the matcher
+   virtual bool isLicenseValid(void) = 0;
+
  signals:
    //! Emitted when a stereo pair has been matched.
    void finished();
