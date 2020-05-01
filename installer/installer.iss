@@ -25,6 +25,7 @@ Compression=lzma2
 SolidCompression=yes
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
+UninstallDisplayIcon="../{#IconName}"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
