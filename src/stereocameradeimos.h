@@ -15,6 +15,7 @@
 #include <dshow.h>
 #include <hidapi/hidapi.h>
 #include <QTimer>
+#include <mutex>          // std::mutex
 
 //!  Deimos camera control
 /*!
@@ -82,6 +83,8 @@ private:
     cv::Mat channels[3];
     double exposure;
     QTimer *temperature_timer;
+
+    std::mutex mtx;
 
     BSTR device_path;
     hid_device* deimos_device = NULL;

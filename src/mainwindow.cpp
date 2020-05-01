@@ -474,19 +474,19 @@ void MainWindow::stereoCameraInitWindow(void){
     int min_packetSize = -1;
     int step_packetSize = 1;
 
-    if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_DEIMOS){
+    if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
         min_fps = 30;
         step_fps = 30;
-    } else if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+    } else if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
         max_binning = 4;
         min_binning = 1;
         step_binning = 1;
-    } else if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
+    } else if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
         //TODO needs testing
         max_binning = 4;
         min_binning = 1;
         step_binning = 1;
-    } else if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_TIS){
+    } else if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
         max_gain = 48;
         min_gain = 0;
         step_gain = 1;
@@ -793,11 +793,11 @@ int MainWindow::stereoCameraLoad(void) {
         for (std::vector<AbstractStereoCamera::stereoCameraSerialInfo>::iterator it = all_camera_serial_info.begin() ; it != all_camera_serial_info.end(); ++it){
             AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = *it;
             QDeviceButton* pButtonDev = new QDeviceButton();
-            if (camera_serial_info.camera_type == CAMERA_TYPE_DEIMOS){
+            if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
                 std::string camera_str = "Deimos \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapDeimos);
-            } else if (camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB || camera_serial_info.camera_type == CAMERA_TYPE_TIS){
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
                 std::string camera_str = "Phobos \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapPhobos);
@@ -834,25 +834,23 @@ int MainWindow::stereoCameraLoad(void) {
         progressConnect.setMinimumDuration(0);
         progressConnect.setValue(10);
         QCoreApplication::processEvents();
-        if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_DEIMOS){
+        if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
             current_camera_settings = default_deimos_init_settings;
             cameras_connected = stereo_cam_deimos->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
             qDebug() << "Connecting to Deimos system";
-        } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE || chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
+        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
             current_camera_settings = default_basler_init_settings;
-            if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+            if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
                 current_camera_settings.isGige = 1;
             }
             cameras_connected = stereo_cam_basler->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_basler);
             qDebug() << "Connecting to Phobos system";
-        } else if (chosen_camera_serial_info.camera_type == CAMERA_TYPE_TIS){
+        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
             current_camera_settings = default_tis_init_settings;
             cameras_connected = stereo_cam_tis->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tis);
-            left_view->setSettingsCallback(stereo_cam, SLOT(loadLeftSettings()));
-            right_view->setSettingsCallback(stereo_cam, SLOT(loadRightSettings()));
             qDebug() << "Connecting to Phobos system";
         }
 
@@ -925,7 +923,7 @@ void MainWindow::autoloadCameraTriggered() {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Stereo Vision Toolkit");
         std::string msgBoxMsg;
-        if (stereo_cam->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+        if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
             // notice to user if using gige as can become locked if not closed correctly
             // suggest power cycling to unlock the device
             msgBoxMsg = "Failed to connect to cameras. Some features will not work as expected. GigE camera may be locked if closed incorrectly, try power cycling the camera system.";

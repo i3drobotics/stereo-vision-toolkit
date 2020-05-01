@@ -91,7 +91,7 @@ std::string StereoCameraDeimos::get_device_path_serial(IMoniker *pMoniker){
 }
 
 std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraDeimos::listSystems(){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials("usb");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials(CAMERA_TYPE_DEIMOS);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
 
     // Create the System Device Enumerator.
@@ -110,14 +110,54 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraDeimos::li
             pDevEnum->Release();
 
             IMoniker *pMoniker = NULL;
+            int i = 1;
             while (pEnum->Next(1, &pMoniker, NULL) == S_OK) {
-                std::string device_path_serial = get_device_path_serial(pMoniker);
-                for (auto& known_serial_info : known_serial_infos) {
-                    if (device_path_serial == known_serial_info.left_camera_serial){
-                        connected_serial_infos.push_back(known_serial_info);
-                        break;
-                    }
+                IPropertyBag *pPropBag;
+                HRESULT hr = pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPropBag));
+                if (FAILED(hr)) {
+                    pMoniker->Release();
+                    continue;
                 }
+
+                VARIANT var;
+                VariantInit(&var);
+
+                // Get description or friendly name.
+                hr = pPropBag->Read(L"Description", &var, 0);
+                if (FAILED(hr)) {
+                    hr = pPropBag->Read(L"FriendlyName", &var, 0);
+                }
+
+                if (SUCCEEDED(hr)) {
+                    std::wstring str(var.bstrVal);
+                    if (std::string(str.begin(), str.end()) == "See3CAM_Stereo") {
+                        std::string device_path_serial = get_device_path_serial(pMoniker);
+                        bool device_known = false;
+                        AbstractStereoCamera::stereoCameraSerialInfo serial_info;
+                        for (auto& known_serial_info : known_serial_infos) {
+                            if (device_path_serial == known_serial_info.left_camera_serial){
+                                serial_info = known_serial_info;
+                                device_known = true;
+                                break;
+                            }
+                        }
+                        if (!device_known){
+                            serial_info.camera_type = CAMERA_TYPE_DEIMOS;
+                            serial_info.left_camera_serial = device_path_serial;
+                            serial_info.right_camera_serial = device_path_serial;
+                            std::string tmp_identity = QString::number(i).rightJustified(5, '0').toStdString();
+                            serial_info.i3dr_serial = tmp_identity;
+                            //serial_info.filename
+                        }
+                        connected_serial_infos.push_back(serial_info);
+                        i++;
+                    }
+                    VariantClear(&var);
+                }
+                hr = pPropBag->Write(L"FriendlyName", &var);
+
+                pPropBag->Release();
+                pMoniker->Release();
             }
         }
     }
@@ -421,6 +461,7 @@ void StereoCameraDeimos::changeFPS(int fps){
     } else {
         fps_d = 0;
     }
+    const std::lock_guard<std::mutex> lock(mtx);
     camera.set(CV_CAP_PROP_FPS, (double)fps_d);
 }
 
@@ -492,13 +533,14 @@ bool StereoCameraDeimos::setFrameSize(int width, int height) {
 
 bool StereoCameraDeimos::setFrame16(void) {
     bool res = false;
-
+    const std::lock_guard<std::mutex> lock(mtx);
     res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
 
     return res;
 }
 
 void StereoCameraDeimos::getFrameRate() {
+    const std::lock_guard<std::mutex> lock(mtx);
     frame_rate = (int)camera.get(CV_CAP_PROP_FPS);
     qDebug() << "Frame rate: " << frame_rate;
 }
@@ -526,6 +568,7 @@ bool StereoCameraDeimos::capture() {
 
     bool res = false;
 
+    const std::lock_guard<std::mutex> lock(mtx);
     if(connected && camera.grab()){
         if(camera.retrieve(image_buffer)){
 
