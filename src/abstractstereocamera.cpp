@@ -38,7 +38,8 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> AbstractStereoCamera::
 
             if(line.size() == 4 || line.size() == 5){ //TODO change this back to only 4 when excel that generates the serials is fixed
                 QString cam_type = line.at(0);
-                if (cam_type.toStdString() == camera_type){
+                std::string file_cam_type = cam_type.toStdString();
+                if (file_cam_type.compare(camera_type) == 0){
                     QString left_camera_serial = line.at(1);
                     QString right_camera_serial = line.at(2);
                     QString i3dr_serial = line.at(3);

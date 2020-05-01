@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget* parent)
     default_basler_init_settings.gain = 0;
     default_basler_init_settings.fps = -1;
     default_basler_init_settings.binning = -1;
-    default_basler_init_settings.trigger = false;
+    default_basler_init_settings.trigger = true;
     default_basler_init_settings.hdr = -1;
     default_basler_init_settings.autoExpose = false;
     default_basler_init_settings.autoGain = false;
@@ -319,7 +319,7 @@ void MainWindow::stereoCameraInitWindow(void){
     } else {
         ui->lblGain->setVisible(true);
     }
-    if (default_fps == -1 && default_iTrigger == -1){
+    if (default_fps == -1){
         ui->lblFPS->setVisible(false);
     } else {
         ui->lblFPS->setVisible(true);
@@ -741,7 +741,7 @@ int MainWindow::stereoCameraLoad(void) {
     QThread* deimos_thread = new QThread;
     stereo_cam_deimos->assignThread(deimos_thread);
 
-    StereoCameraBasler2 * stereo_cam_basler = new StereoCameraBasler2;
+    StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
     QThread* basler_thread = new QThread;
     stereo_cam_basler->assignThread(basler_thread);
 
@@ -1211,9 +1211,27 @@ void MainWindow::setupMatchers(void) {
     matcher_list.append(i3dr_sgm);
     ui->matcherSelectBox->insertItem(2, "I3DR SGBM");
     ui->matcherSettingsLayout->addWidget(i3dr_sgm);
-#endif
-
+    if (!i3dr_sgm->getMatcher()->isLicenseValid()){
+        QStandardItemModel *model =
+              qobject_cast<QStandardItemModel *>(ui->matcherSelectBox->model());
+          Q_ASSERT(model != nullptr);
+          bool disabled = true;
+          QStandardItem *item = model->item(2);
+          item->setFlags(disabled ? item->flags() & ~Qt::ItemIsEnabled
+                                  : item->flags() | Qt::ItemIsEnabled);
+          ui->matcherSelectBox->setCurrentIndex(0);
+          QMessageBox msg;
+          msg.setText("No license found for I3DRSGM. <br>"
+                      "You will only be able to use OpenSource matchers from OpenCV. <br>"
+                      "Contact info@i3drobotics.com for a license.");
+          msg.exec();
+    } else {
+        ui->matcherSettingsLayout->addWidget(i3dr_sgm);
+        ui->matcherSelectBox->setCurrentIndex(2);
+    }
+#else
     ui->matcherSelectBox->setCurrentIndex(0);
+#endif
 
     connect(ui->matcherSelectBox, SIGNAL(currentIndexChanged(int)), this,
             SLOT(setMatcher(int)));

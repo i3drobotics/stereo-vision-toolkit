@@ -17,6 +17,11 @@ int QMatcherI3DRSGM::getStatus()
     return this->i3drsgm->getStatus();
 }
 
+bool QMatcherI3DRSGM::isLicenseValid()
+{
+    return this->i3drsgm->isLicenseValid();
+}
+
 int QMatcherI3DRSGM::getErrorDisparity(void)
 {
     return this->i3drsgm->getErrorDisparity();

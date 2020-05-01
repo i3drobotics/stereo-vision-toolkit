@@ -17,14 +17,16 @@
 class MatcherOpenCVSGBM : public AbstractStereoMatcher
 {
     Q_OBJECT
-   public:
+public:
     explicit MatcherOpenCVSGBM(QObject *parent = 0,
-                                cv::Size image_size = cv::Size(0, 0))
+                               cv::Size image_size = cv::Size(0, 0))
         : AbstractStereoMatcher(parent, image_size) {
-      init();
+        init();
     }
 
-   public slots:
+    bool isLicenseValid(){return true;}
+
+public slots:
     void setMinDisparity(int min_disparity);
     void setDisparityRange(int disparity_range);
     void setBlockSize(int block_size);
@@ -49,7 +51,7 @@ class MatcherOpenCVSGBM : public AbstractStereoMatcher
     int getSpeckleFilterWindow(){return matcher->getSpeckleWindowSize();}
     int getSpeckleFilterRange(){return matcher->getSpeckleRange();}
 
-   private:
+private:
     cv::Ptr<cv::StereoSGBM> matcher;
     void init(void);
     void setupDefaultMatcher(void);

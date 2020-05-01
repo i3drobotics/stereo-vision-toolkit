@@ -7,8 +7,9 @@
 #ifndef STEREOCAMERABASLER_H
 #define STEREOCAMERABASLER_H
 
+#include <opencv2/opencv.hpp>
 #include <abstractstereocamera.h>
-#include "camerabasler.h"
+#include <pylon/PylonIncludes.h>
 
 //!  Stereo balser cameras
 /*!
@@ -25,47 +26,52 @@ public:
                 {}
     bool capture();
     void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
+    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
     void toggleAutoExpose(bool enable);
-    void adjustExposure(double exposure);
+    void adjustExposure(double val);
     void toggleAutoGain(bool enable);
-    void adjustGain(int gain);
-    void adjustBinning(int gain);
+    void adjustGain(int val);
+    void adjustBinning(int val);
+    void adjustPacketSize(int val);
     void toggleTrigger(bool enable);
-    void adjustFPS(int fps);
-    void adjustPacketSize(int);
-
-    QFuture<bool> qfuture_left;
-    QFuture<bool> qfuture_right;
-
-    QFutureWatcher<bool> qfutureWatcher_left;
-    QFutureWatcher<bool> qfutureWatcher_right;
+    void adjustFPS(int val);
 
     ~StereoCameraBasler(void);
 
 public slots:
-    bool setExposure(double exposure);
-    bool setGain(int gain);
-    void setBinning(int val);
-    void setPacketSize(int val);
-    //TODO add packet delay
-
-    void changeFPS(int fps);
+    bool setExposure(double val);
+    bool setGain(int val);
+    void setPacketDelay(int val);
+    void changeFPS(int val);
+    void changeBinning(int val);
+    void changePacketSize(int val);
     void enableTrigger(bool enable);
     bool enableAutoExpose(bool enable);
     bool enableAutoGain(bool enable);
-    void left_finished();
-    void right_finished();
 
 private:
-    CameraBasler *left_camera;
-    CameraBasler *right_camera;
 
-    bool getImageSize(CameraBasler *camera);
+    Pylon::CInstantCameraArray *cameras;
+    Pylon::CImageFormatConverter *formatConverter;
+    int m_binning;
+    int m_iTrigger;
+    int m_fps;
+    int m_packet_size;
 
-    QThread *left_thread;
-    QThread *right_thread;
+    QFuture<bool> qfuture_capture;
+
+    void setBinning(int val);
+    void setPacketSize(int val);
+    void setFPS(int val);
+    void enableFPS(bool enable);
+    void setTrigger(bool enable);
+
+    bool grab();
+
+    bool setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps, int iPacketSize);
+
+    void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, cv::Size &size);
 };
 
 #endif //STEREOCAMERABASLER_H

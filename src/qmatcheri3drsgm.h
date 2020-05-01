@@ -28,6 +28,7 @@ public:
 
     void parseConfig(std::string input_file);
     int getErrorDisparity();
+    bool isLicenseValid();
 
     void setDisparityShift(int shift);
     void setDisparityRange(int n);
