@@ -35,11 +35,6 @@
 #include <QFile>
 #include <QProgressDialog>
 
-const static std::string CAMERA_TYPE_DEIMOS = "usb";
-const static std::string CAMERA_TYPE_BASLER_GIGE = "baslergige";
-const static std::string CAMERA_TYPE_BASLER_USB = "baslerusb";
-const static std::string CAMERA_TYPE_TIS = "tis";
-
 //!  Stereo camera base class
 /*!
   An abstract class to process stereo images from arbitrary cameras. This class should not be used directly,
@@ -110,6 +105,11 @@ public:
     explicit AbstractStereoCamera(QObject *parent = nullptr);
 
     AbstractStereoMatcher *matcher = nullptr;
+
+    const static std::string CAMERA_TYPE_DEIMOS;
+    const static std::string CAMERA_TYPE_BASLER_GIGE;
+    const static std::string CAMERA_TYPE_BASLER_USB;
+    const static std::string CAMERA_TYPE_TIS;
 
     virtual void toggleAutoExpose(bool) = 0;
     virtual void adjustExposure(double) = 0;

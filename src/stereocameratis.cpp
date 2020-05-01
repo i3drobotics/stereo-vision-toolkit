@@ -18,7 +18,7 @@ bool StereoCameraTIS::initCamera(AbstractStereoCamera::stereoCameraSerialInfo ca
 }
 
 std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraTIS::listSystems(){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials("tis");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TIS);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
     /* Get number of cameras */
     DShowLib::InitLibrary();

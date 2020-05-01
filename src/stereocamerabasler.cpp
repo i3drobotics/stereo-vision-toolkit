@@ -86,7 +86,7 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
         }
 
         if (!cameraLeftFind){
-            std::cerr << "Failed to find left camera with name: " << camera_left_serial << std::endl;
+            std::cerr << "Failed to find left camera with serial: " << camera_left_serial << std::endl;
             return false;
         }
 
@@ -104,7 +104,7 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
         }
 
         if (!cameraRightFind){
-            std::cerr << "Failed to find right camera with name: " << camera_right_serial << std::endl;
+            std::cerr << "Failed to find right camera with serial: " << camera_right_serial << std::endl;
             return false;
         }
 
@@ -157,8 +157,8 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
 }
 
 std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::listSystems(void){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_gige = loadSerials("baslergige");
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_usb = loadSerials("baslerusb");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_gige = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_usb = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_USB);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos;
     known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_gige.begin(), known_serial_infos_gige.end() );
     known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_usb.begin(), known_serial_infos_usb.end() );
@@ -179,17 +179,25 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
     std::string DEVICE_CLASS_GIGE = "BaslerGigE";
     std::string DEVICE_CLASS_USB = "BaslerUsb";
 
-    std::vector<std::string> camera_names;
+    std::vector<std::string> connected_camera_names;
     std::vector<std::string> connected_serials;
+    //TODO add generic way to recognise i3dr cameras whilst still being
+    //able to make sure the correct right and left cameras are selected together
     for (size_t i = 0; i < all_cameras.GetSize(); ++i)
     {
         all_cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
         std::string device_class = std::string(all_cameras[i].GetDeviceInfo().GetDeviceClass());
+        std::string device_name = std::string(all_cameras[i].GetDeviceInfo().GetUserDefinedName());
         std::string device_serial = std::string(all_cameras[i].GetDeviceInfo().GetSerialNumber()); //TODO needs testing with usb
-        if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
-            connected_serials.push_back(device_serial);
+        if (device_name.find("i3dr") != std::string::npos) {
+            if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
+                connected_serials.push_back(device_serial);
+                connected_camera_names.push_back(device_name);
+            } else {
+                qDebug() << "Unsupported basler class: " << device_class.c_str();
+            }
         } else {
-            qDebug() << "Unsupported basler class: " << device_class.c_str();
+            qDebug() << "Unsupported basler camera with name: " << device_name.c_str();
         }
     }
 
