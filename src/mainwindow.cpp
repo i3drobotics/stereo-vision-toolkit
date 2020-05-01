@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget* parent)
     // if the camera does not use the setting then should be set to -1
     default_basler_init_settings.exposure = 5;
     default_basler_init_settings.gain = 0;
-    default_basler_init_settings.fps = -1;
+    default_basler_init_settings.fps = 10;
     default_basler_init_settings.binning = -1;
     default_basler_init_settings.trigger = true;
     default_basler_init_settings.hdr = -1;
@@ -399,6 +399,11 @@ void MainWindow::stereoCameraInitWindow(void){
         ui->enabledTriggeredCheckbox->setEnabled(true);
         ui->enabledTriggeredCheckbox->setChecked(default_trigger);
         ui->enabledTriggeredCheckbox->setVisible(true);
+        if (default_trigger){
+            ui->fpsSpinBox->setEnabled(false);
+        } else {
+            ui->fpsSpinBox->setEnabled(true);
+        }
     } else {
         default_trigger = false;
         ui->enabledTriggeredCheckbox->setVisible(false);
