@@ -28,7 +28,7 @@
 
 			<!-- Windows version. -->
 			<enclosure
-				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.2.6/StereoVisionToolkit-1.2.6-Win64"
+				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.2.6/StereoVisionToolkit-1.2.6-Win64.exe"
 				fervor:version="1.2.6"
 				fervor:platform="Q_OS_WIN32"
 				length="121651640"
