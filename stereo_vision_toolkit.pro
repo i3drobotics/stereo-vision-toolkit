@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.2.6
+VERSION = 1.2.7
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
@@ -276,7 +276,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/bin/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.lic, true) \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.param, true)
+            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/param/*.param, true)
     }
 
 }
