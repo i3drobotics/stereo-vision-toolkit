@@ -163,8 +163,8 @@ void MatcherWidgetOpenCVBlock::updateMinDisparity(int min_disparity) {
 
 void MatcherWidgetOpenCVBlock::updateDisparityRange(int range) {
     this->disparity_range = range;
-    ui->disparityRangeLabel->setNum(-16 * range);
-    matcher->setDisparityRange(-16 * range);
+    ui->disparityRangeLabel->setNum(16 * range);
+    matcher->setDisparityRange(16 * range);
 }
 
 void MatcherWidgetOpenCVBlock::updateBlockSize(int size) {
