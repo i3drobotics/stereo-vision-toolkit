@@ -881,7 +881,6 @@ void MainWindow::stereoCameraInit() {
 
         stereoCameraInitConnections();
         setupMatchers();
-        setMatcher(0);
 
         if (save_directory != "") {
             stereo_cam->setSavelocation(save_directory);
@@ -1228,12 +1227,15 @@ void MainWindow::setupMatchers(void) {
                       "You will only be able to use OpenSource matchers from OpenCV. <br>"
                       "Contact info@i3drobotics.com for a license.");
           msg.exec();
+          this->setMatcher(0);
     } else {
         ui->matcherSettingsLayout->addWidget(i3dr_sgm);
         ui->matcherSelectBox->setCurrentIndex(2);
+        this->setMatcher(2);
     }
 #else
     ui->matcherSelectBox->setCurrentIndex(0);
+    this->setMatcher(0);
 #endif
 
     connect(ui->matcherSelectBox, SIGNAL(currentIndexChanged(int)), this,
