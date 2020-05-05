@@ -25,8 +25,8 @@ Stereo matching support
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
 ![SVTK matching an outdoor scene using SGM](./docs/images/svtk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
-I3DR's own 3D matching algorithm (I3DRSGM) can be built into this application however the files required are not included directly in this repository. This is because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in a the submodule i3drsgm. However, releases are build with I3DRSGM support. 
-Please contact info@i3drobotics.com for more information. 
+I3DR's own 3D matching algorithm (I3DRSGM) can be built into this application however the files required are not included directly in this repository. This is because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in the submodule i3drsgm. However, releases are built with I3DRSGM support. 
+Please contact info@i3drobotics.com for requesting a license. 
 
 Installation
 ---
