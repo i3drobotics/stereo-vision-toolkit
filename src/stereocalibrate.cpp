@@ -124,12 +124,11 @@ bool StereoCalibrate::jointCalibration(void) {
 
     setImageSize(left_images.at(0).size());
 
-    int cornerFlags = cv::CALIB_CB_ADAPTIVE_THRESH +
-            cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK;
-
+    int cornerFlags = cv::CALIB_CB_ADAPTIVE_THRESH+cv::CALIB_CB_NORMALIZE_IMAGE;
 
     cal_dialog->setNumberImages(left_images.size());
     cal_dialog->show();
+    qApp->processEvents();
     QMessageBox alert;
     qDebug() << "Running left calibration.";
     connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateLeftProgress(int)));
@@ -150,31 +149,75 @@ bool StereoCalibrate::jointCalibration(void) {
         return false;
     }
 
-    qDebug() << "Running right calibration.";
+    if (left_valid.size() >= 5){
 
-    disconnect(this, SIGNAL(done_image(int)),  cal_dialog, SLOT(updateLeftProgress(int)));
-    connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
+        qDebug() << "Running right calibration.";
 
-    /* Right Camera */
-    right_valid.clear();
-    right_rms_error = singleCameraCalibration(
-                right_images, right_image_points, right_valid, right_camera_matrix,
-                right_distortion, right_r_vecs, right_t_vecs, cornerFlags);
+        disconnect(this, SIGNAL(done_image(int)),  cal_dialog, SLOT(updateLeftProgress(int)));
+        connect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
 
-    if(right_rms_error > 0){
-        cal_dialog->updateRight(right_camera_matrix, right_distortion, right_rms_error);
-        qDebug() << "Right RMS reprojection error: " << left_rms_error;
-    }else{
-        alert.setText("Right camera calibration failed.");
-        alert.exec();
-        qDebug() << "Right camera calibration failed.";
-        return false;
+        /* Right Camera */
+        right_valid.clear();
+        right_rms_error = singleCameraCalibration(
+                    right_images, right_image_points, right_valid, right_camera_matrix,
+                    right_distortion, right_r_vecs, right_t_vecs, cornerFlags);
+
+        if(right_rms_error > 0){
+            cal_dialog->updateRight(right_camera_matrix, right_distortion, right_rms_error);
+            qDebug() << "Right RMS reprojection error: " << left_rms_error;
+        }else{
+            alert.setText("Right camera calibration failed.");
+            alert.exec();
+            qDebug() << "Right camera calibration failed.";
+            return false;
+        }
+
+        disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
+        qApp->processEvents(); // Otherwise we seem to go too fast for the GUI to keep up
+    } else {
+        qDebug() << "Need at least 5 valid left image for calibration. Found: " << left_valid.size();
+        qApp->processEvents(); // Otherwise we seem to go too fast for the GUI to keep up
     }
 
-    disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
-    qApp->processEvents(); // Otherwise we seem to go too fast for the GUI to keep up
+    if (left_valid.size() >= 5 && left_valid.size() >= 5){
+        // check at least 5 images pairs were found valid
+        int valid_count = 0;
+        auto iter_r_valid = right_valid.begin();
+        auto iter_l_valid = left_valid.begin();
+        while(iter_r_valid != right_valid.end() || iter_l_valid != left_valid.end())
+        {
+            if (*iter_r_valid && *iter_l_valid){
+                valid_count++;
+            }
+            if(iter_r_valid != right_valid.end())
+            {
+                ++iter_r_valid;
+            }
+            if(iter_l_valid != left_valid.end())
+            {
+                ++iter_l_valid;
+            }
+        }
 
-    stereo_rms_error = stereoCameraCalibration();
+        if (valid_count >= 5){
+            try
+            {
+                stereo_rms_error = stereoCameraCalibration();
+            }
+            catch( cv::Exception& e )
+            {
+                const char* err_msg = e.what();
+                std::cout << "exception caught: " << err_msg << std::endl;
+                stereo_rms_error = 0;
+            }
+        } else {
+            stereo_rms_error = 0;
+            qDebug() << "Need at least 5 valid image pairs for calibration. Found: " << valid_count;
+        }
+    } else {
+        stereo_rms_error = 0;
+        qDebug() << "Need at least 5 valid images for calibration. Found: l - " << left_valid.size() << " r - " << right_valid.size();
+    }
 
     if(stereo_rms_error > 0){
         qDebug() << "Stereo RMS reprojection error: " << stereo_rms_error;
@@ -229,6 +272,9 @@ bool StereoCalibrate::jointCalibration(void) {
         alert.setText("Stereo camera calibration failed.");
         alert.exec();
         qDebug() << "Stereo camera calibration failed.";
+        finishedCalibration();
+        cal_dialog->close();
+
         return false;
     }
 }
@@ -304,7 +350,12 @@ double StereoCalibrate::singleCameraCalibration(
     std::vector<std::vector<cv::Point2f> > validImagePoints;
 
     for (cv::Mat image : images) {
-        if (findCorners(image, corners, cornerFlags)) {
+        //QFuture<bool> findCorners_t = QtConcurrent::run(this, &StereoCalibrate::findCorners, image, corners, cornerFlags);
+        //findCorners_t.waitForFinished();
+        //bool success = findCorners_t.result();
+        //TODO run this in a thread to stop locking out the GUI
+        bool success = findCorners(image,corners,cornerFlags);
+        if (success) {
             imagePoints.push_back(corners);
             validImagePoints.push_back(corners);
             objectPoints.push_back(pattern_points);
@@ -315,6 +366,7 @@ double StereoCalibrate::singleCameraCalibration(
             corners.clear();
             imagePoints.push_back(corners);
             qDebug() << "Image " << i << " invalid.";
+            //TODO if x percentage of the images are invalid then cancel the process
         }
 
         i++;
@@ -341,13 +393,46 @@ double StereoCalibrate::singleCameraCalibration(
 bool StereoCalibrate::findCorners(cv::Mat image,
                                   std::vector<cv::Point2f>& corners,
                                   int flags) {
-    bool found = cv::findChessboardCorners(image, pattern_size, corners, flags);
+
+    //if image is high resolution, find checkerboard on downscaled image
+    bool found = false;
+    int max_size = 1100;
+    if (image.size().width > max_size || image.size().height > max_size){
+        qDebug() << "Finding chessboard corners in downscaled image...";
+        float scale_amount = (float)max_size/(float)image.size().width;
+        qDebug() << "Downscaling image by: " << scale_amount;
+        int width = (int)(image.size().width * scale_amount);
+        int height = (int)(image.size().height * scale_amount);
+        cv::Size dim(width, height);
+        qDebug() << "New image size: " << width << "," << height;
+        cv::Mat image_downscaled;
+        cv::resize(image, image_downscaled, dim, 0, 0, cv::INTER_AREA);
+        found = cv::findChessboardCorners(image_downscaled, pattern_size, corners, flags);
+        if (found){
+            qDebug() << "Found corners in downscaled image.";
+            //upscale corners back to correct size
+            for (std::vector<cv::Point2f>::iterator it = corners.begin() ; it != corners.end(); ++it){
+                *it = *it * (1/scale_amount);
+            }
+        }
+    } else {
+        qDebug() << "Finding chessboard corners...";
+        found = cv::findChessboardCorners(image, pattern_size, corners, flags);
+        if (found){
+            qDebug() << "Found corners in image.";
+        }
+    }
 
     if (found) {
+        qDebug() << "Chessboard corners found";
+        qDebug() << "Finding subpix corners...";
         cv::cornerSubPix(
                     image, corners, cv::Size(11, 11), cv::Size(-1, -1),
-                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.001));
+        qDebug() << "Subpix corners complete.";
         return true;
+    } else {
+        qDebug() << "Failed to find chessboard corners.";
     }
 
     return false;
@@ -426,7 +511,7 @@ bool StereoCalibrate::imageValid() {
 
     // int flags = cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE +
     //            cv::CALIB_CB_FAST_CHECK;
-    int flags = cv::CALIB_CB_FAST_CHECK;
+    int flags = cv::CALIB_CB_ADAPTIVE_THRESH+cv::CALIB_CB_NORMALIZE_IMAGE;
     bool valid = false;
     bool found_left = false;
     bool found_right = false;
