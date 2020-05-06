@@ -114,9 +114,9 @@ void MatcherWidgetOpenCVBlock::updateSpeckleWindow(int window) {
 
 void MatcherWidgetOpenCVBlock::enableExtendDisparity(bool enable) {
     if (enable){
-        ui->minDisparitySlider->setMaximum(1024);
+        ui->disparityRangeSlider->setMaximum(1024);
     } else {
-        ui->minDisparitySlider->setMaximum(256);
+        ui->disparityRangeSlider->setMaximum(256);
     }
 }
 

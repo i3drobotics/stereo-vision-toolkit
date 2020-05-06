@@ -1503,6 +1503,7 @@ bool MainWindow::gigeWarning(int binning,int new_fps){
         qDebug() << "BPS: " << bit_per_second;
         int max_for_warning = 8000000; // 1MB
         if (bit_per_second > max_for_warning){
+            /*
             QMessageBox msgBoxWarning;
             msgBoxWarning.setText(tr("Warning! Data may exceed 1MBps. This may exceed your internet speed when running a GigE camera on a standard network."));
             msgBoxWarning.setInformativeText(tr("Are you sure you want to continue?"));
@@ -1514,6 +1515,8 @@ bool MainWindow::gigeWarning(int binning,int new_fps){
             } else {
                 return true;
             }
+            */
+            return true;
         } else {
             return true;
         }
