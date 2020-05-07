@@ -123,8 +123,10 @@ void MatcherWidgetOpenCVSGBM::enableSpeckleFilter(bool enable) {
 
 void MatcherWidgetOpenCVSGBM::enableExtendDisparity(bool enable) {
     if (enable){
-        ui->minDisparitySlider->setMaximum(1024);
+        ui->disparityRangeSlider->setMaximum(128);
+        ui->minDisparitySlider->setMaximum(2048);
     } else {
+        ui->disparityRangeSlider->setMaximum(32);
         ui->minDisparitySlider->setMaximum(256);
     }
 }
