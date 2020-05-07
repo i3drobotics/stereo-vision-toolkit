@@ -3,10 +3,12 @@
 ; MUST be installed on x64 bit machine
 
 #define AppName "Stereo Vision Toolkit"
-#define AppVersion "1.2.7"
+#define AppVersion "1.2.8"
 #define InstallerName "StereoVisionToolkit"
 #define ExeName "StereoVisionToolkit.exe"
 #define IconName "i3dr_logo.ico"
+#define vcredist "vc_redist.x64"
+; Some machines use differnetly named vcredist: vcredist_x64 / vc_redist.x64
 
 [Setup]
 AppId={{IT5MN0J1-DHW4-I62K-FYU-9E4SMMFRFDYL}}
@@ -35,7 +37,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "../build/release/*"; Excludes: "\params\*.xml,*.lic,install_drivers.bat"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "../build/release/vcredist_x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/release/{#vcredist}.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_USB_Camera_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_GigE_Filter_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../build/release/pylon_GigE_Performance_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
@@ -44,7 +46,7 @@ Source: "../LICENSE"; DestDir: "{app}/licenses"
 Source: "../{#IconName}"; DestDir: "{app}"
 
 [Run]
-Filename: {tmp}\vcredist_x64.exe; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
+Filename: "{tmp}\{#vcredist}.exe"; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_USB_Camera_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon USB Camera Driver...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Filter_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Filter Driver...;
 Filename: "msiexec.exe"; Parameters: "/q /i ""{tmp}\pylon_GigE_Performance_Driver.msi"" /qb"; WorkingDir: {tmp}; StatusMsg: Installing Pylon GigE Performance Driver...;
