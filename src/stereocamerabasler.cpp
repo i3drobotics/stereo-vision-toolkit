@@ -40,7 +40,9 @@ bool StereoCameraBasler::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
     enableAutoExpose(autoExpose);
     setExposure(exposure);
     setGain(gain);
-    setPacketDelay(packet_delay);
+    if (packet_delay >= 0){
+        setPacketDelay(packet_delay);
+    }
 
     this->connected = true;
 
@@ -188,17 +190,17 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
         all_cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
         std::string device_class = std::string(all_cameras[i].GetDeviceInfo().GetDeviceClass());
         std::string device_name = std::string(all_cameras[i].GetDeviceInfo().GetUserDefinedName());
-        std::string device_serial = std::string(all_cameras[i].GetDeviceInfo().GetSerialNumber()); //TODO needs testing with usb
-        if (device_name.find("i3dr") != std::string::npos) {
-            if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
-                connected_serials.push_back(device_serial);
-                connected_camera_names.push_back(device_name);
-            } else {
-                qDebug() << "Unsupported basler class: " << device_class.c_str();
-            }
+        std::string device_serial = std::string(all_cameras[i].GetDeviceInfo().GetSerialNumber());
+        //if (device_name.find("i3dr") != std::string::npos) {
+        if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
+            connected_serials.push_back(device_serial);
+            connected_camera_names.push_back(device_name);
         } else {
-            qDebug() << "Unsupported basler camera with name: " << device_name.c_str();
+            qDebug() << "Unsupported basler class: " << device_class.c_str();
         }
+        //} else {
+        //    qDebug() << "Unsupported basler camera with name: " << device_name.c_str();
+        //}
     }
 
     for (auto& known_serial_info : known_serial_infos) {
