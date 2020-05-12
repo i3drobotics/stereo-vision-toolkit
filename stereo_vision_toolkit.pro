@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.2.8
+VERSION = 1.2.9
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
@@ -30,6 +30,13 @@ WITH_I3DRSGM {
     DEFINES += WITH_I3DRSGM
 }
 
+# To use Vimbda camera API (currently optional while being implimented)
+# add 'CONFIG+=WITH_VIMBA' to build arguments
+WITH_VIMBA {
+    message("VIMBA enabled")
+    DEFINES += WITH_VIMBA
+}
+
 RC_FILE = icon.rc
 
 RESOURCES += \
@@ -38,10 +45,22 @@ RESOURCES += \
 
 include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
 
-VPATH = $$_PRO_FILE_PWD_/src
+VPATH += $$_PRO_FILE_PWD_/src
+VPATH += $$_PRO_FILE_PWD_/src/camera
+VPATH += $$_PRO_FILE_PWD_/src/matcher
+VPATH += $$_PRO_FILE_PWD_/src/calibrate
 INCLUDEPATH += $$_PRO_FILE_PWD_/src
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/calibrate
+
+WITH_VIMBA {
+    VPATH += $$_PRO_FILE_PWD_/src/vimba
+    INCLUDEPATH += $$_PRO_FILE_PWD_/src/vimba
+}
 
 WITH_I3DRSGM {
+    VPATH += $$_PRO_FILE_PWD_/i3drsgm/src
     INCLUDEPATH += $$_PRO_FILE_PWD_/i3drsgm/src
 }
 
@@ -77,11 +96,19 @@ win32 {
     SOURCES += stereocameradeimos.cpp
 }
 
+WITH_VIMBA {
+    SOURCES += \
+        stereocameravimba.cpp \
+        ApiController.cpp \
+        CameraObserver.cpp \
+        FrameObserver.cpp
+}
+
 WITH_I3DRSGM {
     SOURCES += \
         matcherwidgeti3drsgm.cpp \
         qmatcheri3drsgm.cpp \
-        $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.cpp
+        matcheri3drsgm.cpp
 }
 
 HEADERS += \
@@ -116,11 +143,19 @@ win32 {
     HEADERS += stereocameradeimos.h
 }
 
+WITH_VIMBA {
+    HEADERS += \
+        stereocameravimba.h \
+        ApiController.h \
+        CameraObserver.h \
+        FrameObserver.h
+}
+
 WITH_I3DRSGM {
     HEADERS += \
         matcherwidgeti3drsgm.h \
         qmatcheri3drsgm.h \
-        $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.h
+        matcheri3drsgm.h
 }
 
 FORMS += \
@@ -149,8 +184,7 @@ CONFIG(debug, debug|release) {
 }
 
 # Error if running 32-bit system
-# not all depencies are currently built to run on 32-bit
-# remove this when you build the dependencies for 32-bit
+# depencies are built to run on 64-bit system
 contains(QT_ARCH, i386) {
     error(32-bit system detected. Cannot continue)
 }
@@ -170,11 +204,14 @@ macx {
 }
 
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/opencv/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/VTK/include/vtk-7.0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/PCL/include/pcl-1.8"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/eigen"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/hidapi/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/tis/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/yaml-cpp/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
 
 CONFIG(debug, debug|release) {
     message("Debug mode")
@@ -203,28 +240,24 @@ CONFIG(debug, debug|release) {
 }
 
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
+LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
+
+WITH_VIMBA {
+    # vimba library and include files
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/vimba/"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Lib/Win64/"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Lib/Win64/"
+}
 
 WITH_I3DRSGM {
-    # Required for I3DRSGM
+    # I3DRSGM library and include files
     LIBS += -L"$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
     INCLUDEPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/include"
     DEPENDPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep"
 }
 
-# Required for PCL
-LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/eigen"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
-
-# Required for Basler
-contains(QT_ARCH, i386) {
-    #32-bit
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/Win32"
-} else {
-    #64-bit
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
-}
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
+# Basler library files
+LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
 
 win32 {
     # Directshow class IDs
@@ -244,32 +277,42 @@ isEmpty(TARGET_EXT) {
     TARGET_CUSTOM_EXT = $${TARGET_EXT}
 }
 
-#TODO build 3rd party depencenies for 32-bit systems
-
 win32 {
     # Define dlls to copy to build folder
     EXTRA_FILES += \
         $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true)
+        $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true) \
+        $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll
 
-    contains(QT_ARCH, i386) {
-        #32-bit
+    CONFIG( debug, debug|release ) {
+        # Debug only dlls
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x86/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/Win32/*.dll, true)
+            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/debug/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/debug/*.dll, true) \
+            $$_PRO_FILE_PWD_/3rd_party/png/libpng16d.dll \
+            $$_PRO_FILE_PWD_/3rd_party/tbb/tbb_debug.dll \
+            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11d_x64.dll \
+            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/debug/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/debug/*.dll, true)
     } else {
-        #64-bit
+        # Release only dlls
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true)
+            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/release/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/release/*.dll, true) \
+            $$_PRO_FILE_PWD_/3rd_party/png/libpng16.dll \
+            $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll \
+            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11_x64.dll \
+            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/release/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/release/*.dll, true)
     }
 
     # Define drivers to copy to build folder
-    win32 {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.msi, true)
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
-    }
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.msi, true)
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
+
     #TODO add pylon drivers for linux and mac
     WITH_I3DRSGM {
         EXTRA_FILES += \
@@ -277,6 +320,19 @@ win32 {
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.lic, true) \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/param/*.param, true)
+    }
+
+    WITH_VIMBA {
+        EXTRA_FILES += \
+            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaC.dll \
+            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Bin/Win64/VimbaImageTransform.dll
+
+        CONFIG( debug, debug|release ) {
+            # Debug only dlls
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
+        } else {
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
+        }
     }
 
 }
@@ -287,36 +343,6 @@ EXTRA_FILES += \
 
 # Get full output folder path
 DEPLOY_FOLDER = $$OUT_PWD/$$DESTDIR
-
-CONFIG( debug, debug|release ) {
-    # DEBUG
-    # Define debug only dlls to copy to build folder
-    win32 {
-        EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Debug/hidapi.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/debug/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/debug/*.dll, true) \
-            $$_PRO_FILE_PWD_/3rd_party/png/libpng16d.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tbb/tbb_debug.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11d_x64.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/debug/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/debug/*.dll, true)
-    }
-} else {
-    # RELEASE
-    # Define release only dlls to copy to build folder
-    win32 {
-        EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/release/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/release/*.dll, true) \
-            $$_PRO_FILE_PWD_/3rd_party/png/libpng16.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11_x64.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/release/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/release/*.dll, true)
-    }
-}
 
 # Deploy qt
 win32 {
