@@ -1,0 +1,4 @@
+https://download.qt.io/new_archive/qt/5.10/5.10.1/
+
+Required additional Qt modules
+ - Qt Web Engine
