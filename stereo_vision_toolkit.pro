@@ -13,6 +13,9 @@ FV_APP_VERSION = $$VERSION
 
 QT += core gui concurrent widgets xml network quick
 
+#QT version > 5.6 required for using openssl 1.0.2j
+!versionAtLeast(QT_VERSION, 5.6.0):error("Use at least Qt version 5.6.0")
+
 TARGET = StereoVisionToolkit
 DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
@@ -285,7 +288,8 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true) \
-        $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll
+        $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
+        $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.0.2j/Win64/bin/*.dll, true)
 
     CONFIG( debug, debug|release ) {
         # Debug only dlls
@@ -318,7 +322,6 @@ win32 {
         EXTRA_FILES += \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/bin/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lic/*.lic, true) \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/param/*.param, true)
     }
 
