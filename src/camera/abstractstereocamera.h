@@ -107,6 +107,7 @@ public:
     AbstractStereoMatcher *matcher = nullptr;
 
     const static std::string CAMERA_TYPE_DEIMOS;
+    const static std::string CAMERA_TYPE_USB;
     const static std::string CAMERA_TYPE_BASLER_GIGE;
     const static std::string CAMERA_TYPE_BASLER_USB;
     const static std::string CAMERA_TYPE_TIS;

@@ -59,6 +59,18 @@ MainWindow::MainWindow(QWidget* parent)
     default_deimos_init_settings.packetDelay = -1;
     default_deimos_init_settings.packetSize = -1;
 
+    default_usb_init_settings.exposure = -1;
+    default_usb_init_settings.gain = -1;
+    default_usb_init_settings.fps = 30;
+    default_usb_init_settings.binning = -1;
+    default_usb_init_settings.trigger = -1;
+    default_usb_init_settings.hdr = -1;
+    default_usb_init_settings.autoExpose = -1;
+    default_usb_init_settings.autoGain = -1;
+    default_usb_init_settings.isGige = -1;
+    default_usb_init_settings.packetDelay = -1;
+    default_usb_init_settings.packetSize = -1;
+
     default_video_init_settings.exposure = -1;
     default_video_init_settings.gain = -1;
     default_video_init_settings.fps = 60;
@@ -94,10 +106,13 @@ MainWindow::MainWindow(QWidget* parent)
     calibration_directory = parameters->get_string("calDir");
 
     left_view = new CameraDisplayWidget(this);
+    left_matcher_view = new CameraDisplayWidget(this);
     right_view = new CameraDisplayWidget(this);
 
     ui->stereoViewLayout->addWidget(left_view);
     ui->stereoViewLayout->addWidget(right_view);
+
+    ui->stereoMatcherLayout->insertWidget(0,left_matcher_view);
 
     //disable tabs untill camera is connected to prevent crashes
     disableWindow();
@@ -561,6 +576,7 @@ void MainWindow::stereoCameraInitConnections(void) {
 
     connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_view, SLOT(setSize(int, int, int)));
+    connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_matcher_view, SLOT(setSize(int, int, int)));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), right_view, SLOT(setSize(int, int, int)));
 
     connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
@@ -750,6 +766,10 @@ int MainWindow::stereoCameraLoad(void) {
     QThread* deimos_thread = new QThread;
     stereo_cam_deimos->assignThread(deimos_thread);
 
+    StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
+    QThread* cv_thread = new QThread;
+    stereo_cam_cv->assignThread(cv_thread);
+
     StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
     QThread* basler_thread = new QThread;
     stereo_cam_basler->assignThread(basler_thread);
@@ -761,14 +781,18 @@ int MainWindow::stereoCameraLoad(void) {
     progressSearch.setValue(30);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
     progressSearch.setLabelText("Searching for deimos cameras...");
-    progressSearch.setValue(60);
+    progressSearch.setValue(40);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
+    progressSearch.setLabelText("Searching for usb cameras...");
+    progressSearch.setValue(60);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> usb_camera_serial_info = stereo_cam_cv->listSystems();
     progressSearch.setLabelText("Processing found devices...");
     progressSearch.setValue(80);
 
     all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
     all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
     all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
+    all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
 
     progressSearch.setLabelText("Process complete");
     progressSearch.setValue(100);
@@ -788,8 +812,10 @@ int MainWindow::stereoCameraLoad(void) {
 
         QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_100.png");
         QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_100.png");
-        QIcon buttonIconDeimos(pixmapDeimos);
-        QIcon buttonIconPhobos(pixmapPhobos);
+        QPixmap pixmapCamera(":/mainwindow/images/camera_square_100.png");
+        //QIcon buttonIconDeimos(pixmapDeimos);
+        //QIcon buttonIconPhobos(pixmapPhobos);
+        //QIcon buttonIconCamera(pixmapCamera);
 
         QMessageBox msgBoxDevSelect;
         msgBoxDevSelect.setText(tr("Select which stereo system to use: "));
@@ -805,6 +831,10 @@ int MainWindow::stereoCameraLoad(void) {
                 std::string camera_str = "Phobos \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapPhobos);
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
+                std::string camera_str = "Device \n" + camera_serial_info.i3dr_serial;
+                pButtonDev->setText(camera_str.c_str());
+                pButtonDev->setPixmap(pixmapCamera);
             }
             msgBoxDevSelect.addButton(pButtonDev,QMessageBox::YesRole);
             pButtons.push_back(pButtonDev);
@@ -856,6 +886,11 @@ int MainWindow::stereoCameraLoad(void) {
             cameras_connected = stereo_cam_tis->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tis);
             qDebug() << "Connecting to Phobos system";
+        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
+            current_camera_settings = default_usb_init_settings;
+            cameras_connected = stereo_cam_cv->initCamera(chosen_camera_serial_info,current_camera_settings);
+            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
+            qDebug() << "Connecting to USB system";
         }
 
         stereo_cam->camera_serial_info = chosen_camera_serial_info;
@@ -901,6 +936,7 @@ void MainWindow::stereoCameraInit() {
         //disparity_view->updatePixmapRange();
 
         left_view->setSize(stereo_cam->getWidth(), stereo_cam->getHeight(), 1);
+        left_matcher_view->setSize(stereo_cam->getWidth(), stereo_cam->getHeight(), 1);
         right_view->setSize(stereo_cam->getWidth(), stereo_cam->getHeight(), 1);
 
         frame_timer->stop();
@@ -1337,13 +1373,14 @@ void MainWindow::updateDisplay(void) {
             }
 
             left_view->updateView(left);
+            left_matcher_view->updateView(left);
             right_view->updateView(right);
 
-            QImage im_left(left.data, left.cols, left.rows, QImage::Format_Indexed8);
-            pmap_left = QPixmap::fromImage(im_left);
+           // QImage im_left(left.data, left.cols, left.rows, QImage::Format_Indexed8);
+            //pmap_left = QPixmap::fromImage(im_left);
 
-            ui->left_image_view_stereo->setPixmap(pmap_left.scaled(
-                                                      ui->left_image_view_stereo->size(), Qt::KeepAspectRatio));
+            //ui->left_image_view_stereo->setPixmap(pmap_left.scaled(
+            //                                          ui->left_image_view_stereo->size(), Qt::KeepAspectRatio));
         } else {
             qDebug() << "Cannot update display. Stereo camera disconnected.";
         }

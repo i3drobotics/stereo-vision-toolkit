@@ -6,6 +6,7 @@
 #include "abstractstereocamera.h"
 
 const std::string AbstractStereoCamera::CAMERA_TYPE_DEIMOS = "deimos";
+const std::string AbstractStereoCamera::CAMERA_TYPE_USB = "usb";
 const std::string AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE = "baslergige";
 const std::string AbstractStereoCamera::CAMERA_TYPE_BASLER_USB = "baslerusb";
 const std::string AbstractStereoCamera::CAMERA_TYPE_TIS = "tis";

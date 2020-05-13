@@ -88,6 +88,7 @@ private:
     AbstractStereoCamera::stereoCameraSettings default_basler_init_settings;
     AbstractStereoCamera::stereoCameraSettings default_tis_init_settings;
     AbstractStereoCamera::stereoCameraSettings default_deimos_init_settings;
+    AbstractStereoCamera::stereoCameraSettings default_usb_init_settings;
     AbstractStereoCamera::stereoCameraSettings default_video_init_settings;
     AbstractStereoCamera::stereoCameraSettings current_camera_settings;
 
@@ -109,6 +110,7 @@ private:
     QtAwesome* awesome;
     DisparityViewer* disparity_view;
     CameraDisplayWidget *left_view;
+    CameraDisplayWidget *left_matcher_view;
     CameraDisplayWidget *right_view;
 
     bool cameras_connected = false;
