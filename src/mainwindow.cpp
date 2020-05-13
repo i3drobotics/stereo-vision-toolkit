@@ -937,16 +937,22 @@ void MainWindow::autoloadCameraTriggered() {
         msgBox.exec();
     } else if (stereo_camera_exit_code == CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE){
         //Display warning messagebox as program does not function correctly if no camera is connected
+        /*
         QMessageBox msgBox;
         msgBox.setWindowTitle("Stereo Vision Toolkit");
-        msgBox.setText("No recognised cameras connected. Some features will not work as expected.");
+        msgBox.setText("No recognised cameras connected. Some features may not work as expected.");
         msgBox.exec();
+        */
+        ui->statusBar->showMessage("No cameras found.");
     } else if (stereo_camera_exit_code == CAMERA_CONNECTION_CANCEL_EXIT_CODE){
         //Display warning messagebox as program does not function correctly if no camera is connected
+        /*
         QMessageBox msgBox;
         msgBox.setWindowTitle("Stereo Vision Toolkit");
-        msgBox.setText("No camera system selected. Some features will not work as expected.");
+        msgBox.setText("No camera system selected. Some features may not work as expected.");
         msgBox.exec();
+        */
+        ui->statusBar->showMessage("No cameras found.");
     } else {
         // should never happen
         qDebug() << "Undefined exit code in 'stereoCameraLoad()'";
