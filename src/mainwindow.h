@@ -78,6 +78,7 @@ private:
 
     bool updatingDisplay = false;
     bool showingSettings = false;
+    bool videoCaptureStarted = false;
 
     int CAMERA_CONNECTION_SUCCESS_EXIT_CODE = 0;
     int CAMERA_CONNECTION_FAILED_EXIT_CODE = -1;

@@ -1018,7 +1018,6 @@ void MainWindow::updateCloud() {
 }
 
 void MainWindow::startVideoCapture(void) {
-
     connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
             SLOT(stopVideoCapture(void)));
     disconnect(ui->toggleVideoButton, SIGNAL(clicked()), this,
@@ -1044,6 +1043,7 @@ void MainWindow::startVideoCapture(void) {
         vid_fps = measured_fps;
     }
     stereo_cam->videoStreamInit("",vid_fps);
+    videoCaptureStarted = true;
     frame_timer->stop();
     frame_timer = new QTimer(this);
     frame_timer->setSingleShot(true);
@@ -1055,7 +1055,8 @@ void MainWindow::stopVideoCapture(void) {
     ui->statusBar->showMessage("Stopping video capture...");
     frame_timer->stop();
     while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
-    stereo_cam->videoStreamStop();
+    if (videoCaptureStarted)
+        stereo_cam->videoStreamStop();
     ui->statusBar->showMessage("Stopped video capture.");
 
     connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
@@ -1570,7 +1571,8 @@ void MainWindow::on_btnHideCameraSettings_clicked()
 
 void MainWindow::closeEvent(QCloseEvent *) {
     qDebug() << "Closing application";
-    stereo_cam->videoStreamStop();
+    if (videoCaptureStarted)
+        stereo_cam->videoStreamStop();
     stereoCameraRelease();
     frame_timer->stop();
     while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}

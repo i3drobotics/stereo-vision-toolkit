@@ -634,6 +634,7 @@ void AbstractStereoCamera::videoStreamStop(){
     //TODO fix read access violation when closing the program
     if (cv_video_writer->isOpened()){
         cv_video_writer->release();
+        cv_video_writer = new cv::VideoWriter();
     }
 }
 
