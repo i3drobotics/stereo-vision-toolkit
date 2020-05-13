@@ -92,6 +92,8 @@ private:
     std::string serial_from_device_path(std::string usb_device_path);
     std::string get_device_path_serial(IMoniker *pMoniker);
 
+    std::string wchar_to_string(WCHAR * buffer);
+
     qint64 getSerial(void);
 
 };

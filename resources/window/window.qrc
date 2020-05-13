@@ -2,5 +2,6 @@
     <qresource prefix="/mainwindow/images">
         <file>deimos_square_100.png</file>
         <file>phobos_square_100.png</file>
+		<file>camera_square_100.png</file>
     </qresource>
 </RCC>

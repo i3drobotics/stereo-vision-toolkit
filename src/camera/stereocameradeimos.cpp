@@ -600,12 +600,12 @@ bool StereoCameraDeimos::capture() {
     return res;
 }
 
-StereoCameraDeimos::~StereoCameraDeimos(void) {
-    disconnectCamera();
-}
-
-std::string wchar_to_string(WCHAR * buffer) {
+std::string StereoCameraDeimos::wchar_to_string(WCHAR * buffer) {
     std::wstring ws(buffer);
     std::string buffer_s(ws.begin(), ws.end());
     return buffer_s;
+}
+
+StereoCameraDeimos::~StereoCameraDeimos(void) {
+    disconnectCamera();
 }
