@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     default_usb_init_settings.exposure = -1;
     default_usb_init_settings.gain = -1;
-    default_usb_init_settings.fps = 30;
+    default_usb_init_settings.fps = 10;
     default_usb_init_settings.binning = -1;
     default_usb_init_settings.trigger = -1;
     default_usb_init_settings.hdr = -1;
