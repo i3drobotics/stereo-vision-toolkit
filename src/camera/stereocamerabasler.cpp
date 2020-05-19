@@ -438,6 +438,7 @@ void StereoCameraBasler::setTrigger(bool enable){
 }
 
 void StereoCameraBasler::toggleTrigger(bool enable){
+    enableFPS(!enable);
     enableTrigger(enable);
 }
 void StereoCameraBasler::adjustFPS(int val){

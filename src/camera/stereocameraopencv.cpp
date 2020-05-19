@@ -26,11 +26,11 @@ bool StereoCameraOpenCV::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
         camera_r = cv::VideoCapture(cv::CAP_DSHOW + usb_index_r);
 
         if (camera_l.isOpened() && camera_r.isOpened()) {
-            //changeFPS(fps);
-            //bool res = setFrameSize(752, 480);
+            changeFPS(fps);
+            //TODO fix issue with incorrect frame rate being used
+            setFrameSize(1000, 1000);
             getImageSize(camera_l,image_width,image_height,image_size);
             emit update_size(image_width, image_height, 1);
-            //setFrameSize(3264,2448);
 
             toggleHDR(hdr);
             enableAutoExpose(autoExpose);
@@ -614,7 +614,6 @@ bool StereoCameraOpenCV::capture() {
     bool res = false;
 
     const std::lock_guard<std::mutex> lock(mtx);
-    /*
     if(connected && camera_l.grab() && camera_r.grab()){
         if(camera_l.retrieve(image_buffer_l) && camera_r.retrieve(image_buffer_r)){
 
@@ -624,26 +623,14 @@ bool StereoCameraOpenCV::capture() {
             left_raw = image_buffer_l.clone();
             right_raw = image_buffer_r.clone();
 
-            res = true;
-
-        }else{
-            qDebug() << "Retrieve fail";
-            res = false;
-        }
-    }else{
-        qDebug() << "Grab fail";
-        res = false;
-    }
-    */
-
-    if(connected && camera_l.grab()){
-        if(camera_l.retrieve(image_buffer_l)){
-
-            //flip(image_buffer_l, image_buffer_l, 0);
-            //flip(image_buffer_r, image_buffer_r, 0);
-
-            left_raw = image_buffer_l.clone();
-            right_raw = image_buffer_l.clone();
+            if (left_raw.size().width != image_width || left_raw.size().height != image_height){
+                image_height = left_raw.size().height;
+                image_width = left_raw.size().width;
+                image_size = cv::Size(image_width,image_height);
+                emit update_size(image_width, image_height, 1);
+                qDebug() << "Image size changed in incomming image";
+                qDebug() << "(" << image_width << "," << image_height << ")";
+            }
 
             res = true;
 
