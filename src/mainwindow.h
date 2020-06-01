@@ -40,7 +40,9 @@
 #include "stereocameraopencv.h"
 #include "stereocameratis.h"
 #include "stereocamerabasler.h"
-#include "stereocameravimba.h"
+#ifdef WITH_VIMBA
+    #include "stereocameravimba.h"
+#endif
 #include "qdevicebutton.h"
 #include "qdevicedialog.h"
 

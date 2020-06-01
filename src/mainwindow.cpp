@@ -786,17 +786,21 @@ int MainWindow::stereoCameraLoad(void) {
     QThread* basler_thread = new QThread;
     stereo_cam_basler->assignThread(basler_thread);
 
+#ifdef WITH_VIMBA
     StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
     QThread* vimba_thread = new QThread;
     stereo_cam_vimba->assignThread(vimba_thread);
+#endif
 
     progressSearch.setValue(10);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info;
     progressSearch.setLabelText("Searching for basler cameras...");
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
     progressSearch.setValue(30);
+#ifdef WITH_VIMBA
     progressSearch.setLabelText("Searching for vimba cameras...");
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
+#endif
     progressSearch.setValue(40);
     progressSearch.setLabelText("Searching for imaging source cameras...");
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
@@ -810,7 +814,9 @@ int MainWindow::stereoCameraLoad(void) {
     progressSearch.setValue(80);
 
     all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
+#ifdef WITH_VIMBA
     all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
+#endif
     all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
     all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
     all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
@@ -914,10 +920,12 @@ int MainWindow::stereoCameraLoad(void) {
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
             qDebug() << "Connecting to USB system";
         } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+#ifdef WITH_VIMBA
            current_camera_settings = default_vimba_init_settings;
            cameras_connected = stereo_cam_vimba->initCamera(chosen_camera_serial_info,current_camera_settings);
            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
            qDebug() << "Connecting to Titania system";
+#endif
        }
 
         stereo_cam->camera_serial_info = chosen_camera_serial_info;
@@ -1207,10 +1215,14 @@ void MainWindow::runAutoCalibration(void){
 
     int cols = calibration_dialog->getPatternCols();
     int rows = calibration_dialog->getPatternRows();
-    double square_size_mm = calibration_dialog->getSquareSizeMm();
+    double square_size_m = calibration_dialog->getSquareSizeMm() / 1000;
     auto left_images = calibration_dialog->getLeftImages();
     auto right_images = calibration_dialog->getRightImages();
     bool save_ros = calibration_dialog->getSaveROS();
+
+    qDebug() << "Square size: " << square_size_m;
+    qDebug() << "Cols: " << cols;
+    qDebug() << "Rows: " << rows;
 
     calibration_dialog->close();
 
@@ -1218,7 +1230,7 @@ void MainWindow::runAutoCalibration(void){
     cv::Size pattern(cols, rows);
 
     calibrator->setOutputPath(calibration_dialog->getOutputPath());
-    calibrator->setPattern(pattern, square_size_mm);
+    calibrator->setPattern(pattern, square_size_m);
     calibrator->setImages(left_images, right_images);
     calibrator->setSaveROS(save_ros);
     calibrator->jointCalibration();
