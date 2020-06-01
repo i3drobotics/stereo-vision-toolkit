@@ -143,7 +143,12 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
         formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
         formatConverter->OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
 
-        cameras->StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImageOnly);
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImages);
+        }
+
+        //cameras->StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImages);
 
         return true;
     }
@@ -541,7 +546,8 @@ bool StereoCameraBasler::grab(){
     try
     {
         if (this->connected){
-            if (cameras->IsGrabbing())
+            //if (cameras->IsGrabbing())
+            if (cameras->operator[](0).IsGrabbing() && cameras->operator[](1).IsGrabbing())
             {
                 Pylon::CGrabResultPtr ptrGrabResult_left,ptrGrabResult_right;
                 cameras->operator[](0).RetrieveResult(max_timeout, ptrGrabResult_left, Pylon::TimeoutHandling_ThrowException);
