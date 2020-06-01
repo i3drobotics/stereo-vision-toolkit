@@ -1,0 +1,153 @@
+===========================================================================
+
+  Vimba 1394 Transport Layer - Release Notes 
+  
+  Version: 1.6.0
+  Date:    October 2019
+===========================================================================
+
+--------------------------------
+Components and Version Reference  
+--------------------------------
+
+Driver
+------
+  intek 1394 Bus Driver (FireDrv.sys)                 2.9.0.7
+                        (Firegrab.dll)                2.9.0.11
+
+Vimba Genicam Transport Layer modules
+-----------------------------------
+  1394 Transport Layer (Vimba1394TL.cti)              1.6.0*
+
+Tools
+-----
+  Vimba Driver Installer (VimbaDriverInstaller.exe)   1.1.8
+
+
+---------------------
+Hardware Requirements
+---------------------
+PC or laptop with 1 GHz 32-bit (x86) or 64-bit (x64) processor or better.
+
+Additionally a built-in IEEE 1394 interface or IEEE 1394 adapter (OHCI) card 
+(one or more) for PCI or PCI Express bus or PC card or ExpressCard with IEEE 
+1394 port(s) is required.
+
+  Remark:
+  Testing has been performed on host controllers that are based on OHCI chip
+  sets from Texas Instruments. The driver should run on host controllers that
+  are based on OHCI chip sets from other vendors, too. 
+  However, if there are any problems please feel free to contact our Technical
+  Software Support (see below).
+
+
+---------------------------
+Supported Operating Systems
+---------------------------
+The Vimba 1394 Transport Layer is designed for the 32-bit or 64-bit Windows 
+operating systems:
+
+   Windows 7
+   Windows 8.1
+   Windows 10 (tested with versions 1803, 1809, and 1903)
+   
+
+------------
+Installation
+------------            
+The Vimba 1394 Transport Layer is part of the Vimba SDK. For instructions how 
+to install this module please refer to the Vimba SDK User Guide.
+
+
+------------
+Known Issues
+------------
+The Vimba 1394 Transport Layer module supports most of the features 
+implemented in Allied Visions 1394 cameras. Please contact Allied Vision
+in case you require a feature currently not supported.
+
+MSI Uninstallation by new Windows 10 dialog "Apps&Features" is not supported by now.
+Please use the old "Programs and Features" dialog.
+
+
+---------------------------
+Changes and release history
+---------------------------
+
+Changes in version 1.6.0:
+-------------------------
+- GenTL 1.5 support
+
+
+Changes in version 1.5.0:
+-------------------------
+Driver
+  - New version of intek 1394 Bus Driver
+  - Fixed: OpenCapture returns 1005 FCE_MISSINGBUFFERS
+
+Installer and driver
+   - New certificates for installer and driver (Windows 7, Windows 8, and Windows 8.1)
+
+
+Changes in version 1.4.2:
+-------------------------
+1394 Transport Layer
+  - Bug fixes
+
+Vimba Driver Installer
+  - Bug fixes
+
+Changes in version 1.4.1:
+-------------------------
+1394 Transport Layer
+  - Fixed maximum of DeviceRegisterAddress
+  - Omitted some unnecessary "pSelected" links for single-value selectors
+  - Small changes
+
+Vimba Driver Installer
+  - Bug fixes
+
+Changes in version 1.3.2:
+-------------------------
+1394 Transport Layer
+  - Now conforms to GenTL specification 1.3
+  - Corrected value of LineStatus, allowed AcquisitionStop at all times,
+    disabled caching of StreamAnnouncedBufferCount, other small fixes
+  - Refined the documentation
+
+AVT Driver Installer
+  - Small bug-fixes
+
+Changes in version 1.2.0:
+-------------------------
+1394 Transport Layer
+  - Added features: FirmwareVerMajor, FirmwareVerMinor, FirmwareVerBuild, 
+    ImageSize, AcquisitionAbort, AcquisitionFrameRateLimit and
+    ExposureAutoAlg for compatibility with GigE cameras
+  - Refined and corrected some tooltips and descriptions
+  - Refined the documentation for categories (now available in PDF)
+  
+Changes in version 1.1.0:
+-------------------------
+1394 Transport Layer
+  - Added features: SensorTaps, SensorDigitizationTaps, DeviceStatusLight,
+    SmearReductionEnable, ExposureAutoTarget and GainAutoTarget
+  - Renamed category ShadingControl to ImageQualityControl, moved SensorBits
+    to category ImageFormatControl
+  - Refined some tooltips and descriptions
+  - Extended the documentation for categories (now available in PDF)
+  - Bugfix: Commands UserSetLoad and UserSetSave were switched
+  - Bugfix: Oscar cameras were always ignored by the AVT1394TL
+
+
+-------------------------------------------------------
+Correlations with other Allied Vision Software Packages
+-------------------------------------------------------
+Please refer to the Vimba SDK Release Notes.
+
+
+----------------------------------------
+Allied Vision Technical Support
+----------------------------------------
+Contact us:
+https://www.alliedvision.com/contact

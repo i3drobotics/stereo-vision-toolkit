@@ -1,0 +1,72 @@
+===========================================================================
+
+  Vimba CL Config Transport Layer - Release Notes 
+  
+  Version: 1.2.0
+  Date:    October 2019
+===========================================================================
+
+--------------------------------
+Components and Version Reference  
+--------------------------------
+
+Vimba GenICam Transport Layer modules
+-----------------------------------
+  CL Config Transport Layer (VimbaCLConfigTL.cti)     1.2.0
+
+---------------------
+Hardware Requirements
+---------------------
+PC or laptop with 1 GHz 32-bit (x86) or 64-bit (x64) processor or better.
+
+Additionally, a built-in Camera Link frame grabber is required.
+
+---------------------------
+Supported Operating Systems
+---------------------------
+The Vimba CL Config Transport Layer is designed for the 32-bit or 64-bit Windows 
+operating systems:
+
+   Windows 7
+   Windows 8.1
+   Windows 10 (tested with versions 1803, 1809, and 1903)
+   
+
+------------
+Installation
+------------            
+The Vimba CL Config Transport Layer is part of the Vimba SDK. For instructions on how
+to install this module please refer to the Vimba User Manual.
+
+---------------------------
+Changes and release history
+---------------------------
+
+Changes in version 1.2.0:
+-------------------------
+- GenTL 1.5 support
+- Vimba version 3.1: updated supported operating systems
+
+
+Changes in version 1.0.2:
+-------------------------
+- Fixed API crash when TL is loaded without hardware
+- General improvements
+
+
+Changes in version 1.0.1:
+-------------------------
+- Minor fixes
+
+
+-------------------------------------------------------
+Correlations with other Allied Vision Software Packages
+-------------------------------------------------------
+Please refer to the Vimba SDK Release Notes.
+
+
+----------------------------------------
+Allied Vision Technical Software Support
+----------------------------------------
+Contact us:
+https://www.alliedvision.com/contact

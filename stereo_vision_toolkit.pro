@@ -102,9 +102,7 @@ win32 {
 WITH_VIMBA {
     SOURCES += \
         stereocameravimba.cpp \
-        ApiController.cpp \
-        CameraObserver.cpp \
-        FrameObserver.cpp
+        ApiController.cpp
 }
 
 WITH_I3DRSGM {
@@ -149,9 +147,7 @@ win32 {
 WITH_VIMBA {
     HEADERS += \
         stereocameravimba.h \
-        ApiController.h \
-        CameraObserver.h \
-        FrameObserver.h
+        ApiController.h
 }
 
 WITH_I3DRSGM {
@@ -248,8 +244,9 @@ LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
 WITH_VIMBA {
     # vimba library and include files
     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/vimba/"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Lib/Win64/"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Lib/Win64/"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaC/Lib/Win64/" -lVimbaC
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Lib/Win64/" -lVimbaImageTransform
 }
 
 WITH_I3DRSGM {
@@ -328,13 +325,12 @@ win32 {
     WITH_VIMBA {
         EXTRA_FILES += \
             $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaC.dll \
-            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Bin/Win64/VimbaImageTransform.dll
+            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Bin/Win64/VimbaImageTransform.dll \
+            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
 
         CONFIG( debug, debug|release ) {
             # Debug only dlls
             EXTRA_FILES += $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
-        } else {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
         }
     }
 

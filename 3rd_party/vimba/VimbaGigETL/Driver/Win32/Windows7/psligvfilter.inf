@@ -1,0 +1,141 @@
+;************************************************************************
+;
+; PSLIGVFILTER.INF
+;
+; This is the INF file for installing
+; Allied Vision GigE Vision Filter Driver
+;
+; The file is used by the service (protocol) part
+;
+;************************************************************************
+
+[Version]
+Signature  		= "$Windows NT$"
+Class      		= NetService
+ClassGUID  		= {4D36E974-E325-11CE-BFC1-08002BE10318}
+Provider   		= %PSLI%
+DriverVer  		= 07/09/2015,1.24.17
+CatalogFile 		= psligvfilter.cat
+CatalogFile.NTamd64 	= psligvfilter.cat
+DriverPackageType	= Network
+
+[Manufacturer]
+%PSLI% = PSLIGF,NTamd64,NTamd64.6.0,NTamd64.6.1,NTx86.6.0,NTx86
+
+[ControlFlags]
+
+;=========================================================================
+;
+;=========================================================================
+
+; 2K
+[PSLIGF]
+%PslIGvFilter_Desc% = PslIGvFilter.ndi, ms_psligvfilter
+
+; XP
+[PSLIGF.NTx86]
+%PslIGvFilter_Desc% = PslIGvFilter.ndi, ms_psligvfilter
+
+; XP x64
+[PSLIGF.NTamd64]
+%PslIGvFilter_Desc% = PslIGvFilter.ndi, ms_psligvfilter
+
+; Vista
+[PSLIGF.NTx86.6.0]
+%PslIGvFilter_Desc% = PslIGvFilter.ndi, ms_psligvfilter
+
+; Vista x64
+[PSLIGF.NTamd64.6.0]
+%PslIGvFilter_Desc% = PslIGvFilter.ndi, ms_psligvfilter
+
+; Windows 7 x64
+[PSLIGF.NTamd64.6.1]
+%PslIGvFilter_Desc% = PslIGvFilter.ndi, ms_psligvfilter
+
+[PslIGvFilter.ndi]
+AddReg          = PslIGvFilter.ndi.AddReg, PslIGvFilter.AddReg
+Characteristics = 0x4410 ; NCF_FILTER | NCF_NO_SERVICE | NCF_NDIS_PROTOCOL !--Filter Specific--!!
+CopyFiles       = PslIGvFilter.Files.Sys
+CopyInf         = psligvfilter_m.inf
+
+[PslIGvFilter.ndi.Remove]
+DelFiles = PslIGvFilter.Files.Sys
+
+[PslIGvFilter.ndi.Services]
+AddService = PslIGvFilter,, PslIGvFilter.AddService
+
+[PslIGvFilter.AddService]
+DisplayName    = %PslIGvFilterService_Desc%
+ServiceType    = 1 ;SERVICE_KERNEL_DRIVER
+StartType      = 3 ;SERVICE_DEMAND_START
+ErrorControl   = 1 ;SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\psligvfilter.sys
+LoadOrderGroup = PNP_TDI
+AddReg         = PslIGvFilter.AddService.AddReg
+
+[PslIGvFilter.AddService.AddReg]
+; ----------------------------------------------------------------------
+; Add any miniport-specific parameters here.  These are params that your
+; filter device is going to use.
+;
+;HKR, Parameters, ParameterName,  0x10000, "MultiSz", "Parameter", "Value"
+;HKR, Parameters, ParameterName2, 0x10001, 4
+
+; ----------------------------------------------------------------------
+; File copy
+;
+[SourceDisksNames]
+1=%DiskDescription%,"",,
+
+[SourceDisksFiles]
+psligvfilter.sys=1
+psligvfilter_m.inf=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+PslIGvFilter.Files.Sys   = 12   ; %windir%\System32\drivers
+
+[PslIGvFilter.Files.Sys]
+psligvfilter.sys,,,2
+
+; ----------------------------------------------------------------------
+; Filter Install
+;
+
+[PslIGvFilter.ndi.AddReg]
+HKR, Ndi, HelpText, , %PslIGvFilter_HELP%
+
+; ----------------------------------------------------------------------
+; !!--Filter Specific--!!
+;
+; Note:
+; 1. Other components may also have UpperRange/LowerRange but for filters
+;    the value of both of them must be noupper/nolower
+; 2. The value FilterClass is required.
+; 3. The value Service is required
+; 4. FilterDeviceInfId is the InfId of the filter device (miniport) that will
+;    be installed for each filtered adapter.
+;    In this case this is ms_psligvfiltermp (refer to netsf_m.inf)
+;
+HKR, Ndi,            FilterClass,         , failover
+HKR, Ndi,            FilterDeviceInfId,   , ms_psligvfiltermp
+HKR, Ndi,            Service,             , PslIGvFilter
+HKR, Ndi\Interfaces, UpperRange,          , noupper
+HKR, Ndi\Interfaces, LowerRange,          , nolower
+HKR, Ndi\Interfaces, FilterMediaTypes,    , "ethernet"
+
+[PslIGvFilter.AddReg]
+; The following key is Required
+; The following key is PslIGvFilter specific
+HKR, Parameters, Param1, 0, 4
+
+; ----------------------------------------------------------------------
+[Strings]
+MSFT = "Allied Vision Technologies"
+PSLI = "Allied Vision"
+DiskDescription = "Allied Vision GigE Vision Filter Disk"
+
+PslIGvFilter_Desc = "Allied Vision GigE Vision Filter Driver"
+PslIGvFilter_HELP = "Allied Vision GigE Vision Filter Driver"
+PslIGvFilterService_Desc = "Allied Vision GigE Vision Filter Service"
+

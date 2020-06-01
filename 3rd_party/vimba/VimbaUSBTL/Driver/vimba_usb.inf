@@ -1,0 +1,217 @@
+;
+; Vimba USB Driver Setup Information file V1.0
+; Copyright (c) 2014-2015 by Allied Vision
+;
+; This file supports:
+;     Windows XP         Windows XP x64 Edition
+;     Windows Vista      Windows Vista x64
+;     Windows 7          Windows 7 x64
+;     Windows 8          Windows 8 x64
+;     Windows 8.1        Windows 8.1 x64
+;
+
+;******************************************************************************
+; Version section
+;------------------------------------------------------------------------------
+[Version]
+Signature="$Windows NT$"
+Provider=%S_Provider%
+DriverVer=02/21/2014,1.0.0.0
+CatalogFile=vimba_usb.cat
+
+Class=Image
+ClassGUID={6bdd1fc6-810f-11d0-bec7-08002be2092f}
+
+
+;******************************************************************************
+; Options
+;------------------------------------------------------------------------------
+[ControlFlags]
+; Advanced options can be specified here.
+
+;******************************************************************************
+; Manufacturer section
+;------------------------------------------------------------------------------
+[Manufacturer]
+%S_Mfg%=_Models, ntamd64
+
+;******************************************************************************
+; Models section
+;------------------------------------------------------------------------------
+; x86-based systems
+[_Models]
+"Allied Vision USB3 Vision Device"=_Install, USB\VID_1AB2&PID_0001&MI_00
+"Vimba USB-Loader"=_Install, USB\VID_1AB2&PID_FF01
+
+
+; x64-based systems
+[_Models.ntamd64]
+"Allied Vision USB3 Vision Device"=_Install, USB\VID_1AB2&PID_0001&MI_00
+"Vimba USB-Loader"=_Install, USB\VID_1AB2&PID_FF01
+
+
+;******************************************************************************
+; Install sections x86-based systems
+;------------------------------------------------------------------------------
+[_Install.ntx86]
+CopyFiles=_CopyFiles_sys_x86
+
+[_Install.ntx86.HW]
+AddReg=_AddReg_HW
+
+[_Install.ntx86.Services]
+AddService = vimba_usb, 0x00000002, _AddService_x86, _EventLog_x86
+
+[_AddService_x86]
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\vimba_usb.sys
+
+[_EventLog_x86]
+AddReg=_EventLog_AddReg_x86
+
+[_EventLog_AddReg_x86]
+HKR,,EventMessageFile,%REG_EXPAND_SZ%,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\vimba_usb.sys"
+HKR,,TypesSupported,  %REG_DWORD%,7
+
+
+;******************************************************************************
+; Install sections x64-based systems
+;------------------------------------------------------------------------------
+[_Install.ntamd64]
+CopyFiles=_CopyFiles_sys_x64
+
+[_Install.ntamd64.HW]
+AddReg=_AddReg_HW
+
+[_Install.ntamd64.Services]
+AddService = vimba_usb_x64, 0x00000002, _AddService_x64, _EventLog_x64
+
+[_AddService_x64]
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\vimba_usb_x64.sys
+
+[_EventLog_x64]
+AddReg=_EventLog_x64_AddReg
+
+[_EventLog_x64_AddReg]
+HKR,,EventMessageFile,%REG_EXPAND_SZ%,"%%SystemRoot%%\System32\IoLogMsg.dll;%%SystemRoot%%\System32\drivers\vimba_usb_x64.sys"
+HKR,,TypesSupported,  %REG_DWORD%,7
+
+
+;******************************************************************************
+; Registry sections
+;------------------------------------------------------------------------------
+[_AddReg_HW]
+HKR,,DriverUserInterfaceGuid,%REG_SZ%,"{312dba56-3bf9-4592-974d-208ce979b1b7}"
+HKR,, DisableDefaultInterface, %REG_DWORD%, 1
+HKR,,CleanupWizard_DeviceIdentString,%REG_SZ%,"{DAB6A146-D93E-48ab-B3E5-374AB8FFF277}"
+
+
+; Set the default behaviour of the driver 
+; For a description of the parameters, refer to the USBIO Reference Manual.
+HKR,,PowerStateOnOpen,      %REG_DWORD%, 0
+HKR,,PowerStateOnClose,     %REG_DWORD%, 0
+HKR,,MinPowerStateUsed,     %REG_DWORD%, 3
+HKR,,MinPowerStateUnused,   %REG_DWORD%, 3
+HKR,,EnableRemoteWakeup,    %REG_DWORD%, 0
+HKR,,AbortPipesOnPowerDown, %REG_DWORD%, 1
+HKR,,UnconfigureOnClose,    %REG_DWORD%, 1
+HKR,,ResetDeviceOnClose,    %REG_DWORD%, 0
+HKR,,MaxIsoPackets,         %REG_DWORD%, 512
+HKR,,ShortTransferOk,       %REG_DWORD%, 1
+HKR,,RequestTimeout,        %REG_DWORD%, 1000
+HKR,,SuppressPnPRemoveDlg,  %REG_DWORD%, 1
+HKR,,ConfigDescMinQuerySize,%REG_DWORD%, 0
+
+; Uncomment the following lines to enable automatic configuration 
+; of the device when the USBIO driver starts.
+;HKR,,ConfigIndex,          %REG_DWORD%, 0
+;HKR,,Interface,            %REG_DWORD%, 0
+;HKR,,AlternateSetting,     %REG_DWORD%, 0
+
+; Uncomment the following lines to enable FX firmware download.
+; The firmware file must be located in "%SystemRoot%\System32\Drivers".
+; You cannot specify a path for the file.
+;HKR,,FxFwFile,            %REG_SZ%, "YourFirmwareFile.ihx"
+;HKR,,FxBootloaderCheck,   %REG_DWORD%, 1
+;HKR,,FxExtRamBase,        %REG_DWORD%, 0x4000
+
+; NOTE: You can copy the firmware file to "%SystemRoot%\System32\Drivers" during driver installation.
+; If you want to do this then you have to add the firmware file to [_CopyFiles_sys] and 
+; [SourceDisksFiles] sections. See below.
+
+
+;******************************************************************************
+; Copy Files section
+;------------------------------------------------------------------------------
+[_CopyFiles_sys_x86]
+vimba_usb.sys,,,0x00000004
+; If you want to copy a firmware file, activate the following line.
+;YourFirmwareFile.ihx,,,0x00000004
+
+[_CopyFiles_sys_x64]
+vimba_usb_x64.sys,,,0x00000004
+; If you want to copy a firmware file, activate the following line.
+;YourFirmwareFile.ihx,,,0x00000004
+
+;******************************************************************************
+; Destination Directories
+;------------------------------------------------------------------------------
+[DestinationDirs]
+DefaultDestDir     =     12   ; %SystemRoot%\system32\drivers 
+_CopyFiles_sys_x86 =     12
+_CopyFiles_sys_x64 =     12
+
+
+;******************************************************************************
+; Disk Layout
+;------------------------------------------------------------------------------
+[SourceDisksNames.x86]
+1=%S_DiskName%,,
+
+[SourceDisksNames.amd64]
+1=%S_DiskName%,,
+
+[SourceDisksFiles.x86]
+; Specify the correct file name of the driver binary.
+vimba_usb.sys=1
+; If you want to copy a firmware file, activate the following line.
+;YourFirmwareFile.ihx=1
+
+[SourceDisksFiles.amd64]
+; Specify the correct file name of the driver binary.
+vimba_usb_x64.sys=1
+; If you want to copy a firmware file, activate the following line.
+;YourFirmwareFile.ihx=1
+
+;******************************************************************************
+; Text Strings
+;------------------------------------------------------------------------------
+[Strings]
+;
+; Non-Localizable Strings, DO NOT MODIFY!
+;
+REG_SZ         = 0x00000000
+REG_MULTI_SZ   = 0x00010000
+REG_EXPAND_SZ  = 0x00020000
+REG_BINARY     = 0x00000001
+REG_DWORD      = 0x00010001
+
+;
+; Localizable Strings, modify as required
+;
+
+; provider name
+S_Provider="Allied Vision" 
+; manufacturer name
+S_Mfg="Allied Vision"
+
+; disk name
+S_DiskName="Vimba USB Driver driver disk"
+
+
+; *** EOF ***

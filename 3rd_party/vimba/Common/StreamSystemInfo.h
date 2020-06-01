@@ -47,5 +47,5 @@ STREAM& operator<<( STREAM& os, AVT::VmbAPI::VimbaSystem &sys )
     return os;
 }
 
-}} // Namespace AVT::VmbAPI
+}} // Namespace AVT::VmbAPI::Examples
 #endif

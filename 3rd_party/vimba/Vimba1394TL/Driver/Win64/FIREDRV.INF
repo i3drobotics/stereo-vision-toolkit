@@ -1,0 +1,210 @@
+;*** Created 04.04.2002 intek (darmstadt)
+; INF file for Windows 2000 and XP for IEEE1394 OHCI and PCILynx
+
+[Version]
+Signature="$CHICAGO$"
+Class=1394
+ClassGuid={6BDD1FC1-810F-11D0-BEC7-08002BE2092F}
+Provider=%INTEK%
+;LayoutFile=layout.inf
+CatalogFile.NTamd64=firedrv.cat
+DriverVer=03/12/2017,2.9.0.7
+
+; =================== Class Sections ===========================
+
+; =================== Table of content =========================
+
+[DestinationDirs]
+DefaultDestDir=12
+FireDrv_CopyFiles=12
+
+[SourceDisksNames]
+1 = %Disk1%
+
+[SourceDisksFiles]
+firedrv.sys=1
+;firedrv.cat=1
+firedrv.inf=1
+
+[Manufacturer]
+%GLOBAL1394%=GLOBAL1394,NTamd64
+%NECMfg%=NEC,NTamd64
+%TIOHCIMfg%=TIOHCI,NTamd64
+%TIPCILYNXMfg%=TIPCILYNX,NTamd64
+%NSCMfg%=NSC,NTamd64
+%SONYMfg%=SONY,NTamd64
+%VIAMfg%=VIA,NTamd64
+
+; =================== GLOBAL OHCI CONTROLLERS ========================
+
+[GLOBAL1394.NTamd64]
+%PCI\CC_0C0010.DeviceDesc%=GLOBAL1394_INSTALL,PCI\CC_0C0010
+
+[GLOBAL1394_INSTALL.NTamd64]
+CopyFiles=FireDrv_CopyFiles
+
+[GLOBAL1394_INSTALL.NTamd64.Services]
+AddService=firedrv, 2, GLOBAL1394_ServiceInstallSection.NTamd64
+
+[GLOBAL1394_ServiceInstallSection.NTamd64]
+DisplayName    = %PCI\CC_0C0010.DeviceDesc%
+ServiceType    = 1
+StartType      = 0
+ErrorControl   = 1
+ServiceBinary  = %12%\firedrv.sys
+
+; =================== NEC ========================
+
+[NEC.NTamd64]
+%PCI\VEN_1033&DEV_0063.DeviceDesc%=NEC_Install,PCI\VEN_1033&DEV_0063
+%PCI\VEN_1033&CC_0C0010.DeviceDesc%=NEC_Install,PCI\VEN_1033&CC_0C0010
+
+[NEC_Install.NTamd64]
+CopyFiles=FireDrv_CopyFiles
+
+[NEC_Install.NTamd64.Services]
+AddService=firedrv, 2, NEC_ServiceInstallSection.NTamd64
+
+[NEC_ServiceInstallSection.NTamd64]
+DisplayName=%PCI\VEN_1033&DEV_0063.DeviceDesc%
+ServiceType    = 1
+StartType      = 0
+ErrorControl   = 1
+ServiceBinary  = %12%\firedrv.sys
+
+; =================== VIA ========================
+
+[VIA.NTamd64]
+%PCI\VEN_1106&DEV_3044.DeviceDesc%=VIA_Install,PCI\VEN_1106&DEV_3044
+%PCI\VEN_1106&CC_0C0010.DeviceDesc%=VIA_Install,PCI\VEN_1106&CC_0C0010
+
+[VIA_Install.NTamd64]
+CopyFiles=FireDrv_CopyFiles
+
+[VIA_Install.NTamd64.Services]
+AddService=firedrv, 2, VIA_ServiceInstallSection.NTamd64
+
+[VIA_ServiceInstallSection.NTamd64]
+DisplayName=%PCI\VEN_1106&DEV_3044.DeviceDesc%
+ServiceType    = 1
+StartType      = 0
+ErrorControl   = 1
+ServiceBinary  = %12%\firedrv.sys
+
+; =================== National Semi ========================
+
+[NSC.NTamd64]
+%PCI\VEN_100B&DEV_000F.DeviceDesc%=NSC_Install,PCI\VEN_100B&DEV_000F
+%PCI\VEN_100B&CC_0C0010.DeviceDesc%=NSC_Install,PCI\VEN_100B&CC_0C0010
+
+[NSC_Install.NTamd64]
+CopyFiles=FireDrv_CopyFiles
+
+[NSC_Install.NTamd64.Services]
+AddService=firedrv, 2, NSC_ServiceInstallSection.NTamd64
+
+[NSC_ServiceInstallSection.NTamd64]
+DisplayName=%PCI\VEN_100B&DEV_000F.DeviceDesc%
+ServiceType    = 1
+StartType      = 0
+ErrorControl   = 1
+ServiceBinary  = %12%\firedrv.sys
+
+; =================== TI OHCI ========================
+
+[TIOHCI.NTamd64]
+%PCI\VEN_104C&DEV_8009.DeviceDesc%=TIOHCI_Install,PCI\VEN_104C&DEV_8009
+%PCI\VEN_104C&DEV_8019.DeviceDesc%=TIOHCI_Install,PCI\VEN_104C&DEV_8019
+%PCI\VEN_104C&CC_0C0010.DeviceDesc%=TIOHCI_Install,PCI\VEN_104C&CC_0C0010
+%PCI\VEN_104C&DEV_8009&SUBSYS_8032104D.DeviceDesc%=TIOHCI_Install,PCI\VEN_104C&DEV_8009&SUBSYS_8032104D
+
+[TIOHCI_Install.NTamd64]
+CopyFiles=FireDrv_CopyFiles
+
+[TIOHCI_Install.NTamd64.Services]
+AddService=firedrv, 2, TIOHCI_ServiceInstallSection.NTamd64
+
+[TIOHCI_ServiceInstallSection.NTamd64]
+DisplayName=%PCI\VEN_104C&DEV_8009.DeviceDesc%
+ServiceType    = 1
+StartType      = 0
+ErrorControl   = 1
+ServiceBinary  = %12%\firedrv.sys
+
+; =================== SONY ========================
+
+[SONY.NTamd64]
+%PCI\VEN_104D&DEV_8039.DeviceDesc%=SONY_Install,PCI\VEN_104D&DEV_8039
+%PCI\VEN_104D&DEV_8039&REV_03.DeviceDesc%=SONY_Install,PCI\VEN_104D&DEV_8039&REV_03
+
+[SONY_Install.NTamd64]
+CopyFiles=FireDrv_CopyFiles
+
+[SONY_Install.NTamd64.Services]
+AddService=firedrv, 2, SONY_ServiceInstallSection.NTamd64
+
+[SONY_ServiceInstallSection.NTamd64]
+DisplayName=%PCI\VEN_104D&DEV_8039.DeviceDesc%
+ServiceType    = 1
+StartType      = 0
+ErrorControl   = 1
+ServiceBinary  = %12%\firedrv.sys
+
+; =================== TI PCILynx ==================================
+
+[TIPCILYNX.NTamd64]
+%PCI\VEN_104C&DEV_8000.DeviceDesc%=TIPCILYNX_INSTALL,PCI\VEN_104C&DEV_8000
+
+[TIPCILYNX_INSTALL.NTamd64]
+CopyFiles=FireDrv_CopyFiles
+
+[TIPCILYNX_INSTALL.NTamd64.Services]
+AddService=firedrv, 2, TIPCILYNX_ServiceInstallSection.NTamd64
+
+[TIPCILYNX_ServiceInstallSection.NTamd64]
+DisplayName    = %PCI\VEN_104C&DEV_8000.DeviceDesc%
+ServiceType    = 1
+StartType      = 0
+ErrorControl   = 1
+ServiceBinary  = %12%\firedrv.sys
+
+; =================== Generic ==================================
+
+[FireDrv_CopyFiles]
+firedrv.sys
+
+[ControlFlags]
+
+[Strings]
+Disk1 = "Zip File for FirePackage64"
+INTEK = "Intek (Darmstadt)"
+1394ClassName = "IEEE1394 Controller (Ohci/PciLynx) "
+
+GLOBAL1394 = "IEEE1394 Chip-Manufacturer"
+
+PCI\CC_0C0010.DeviceDesc = "Generic OHCILynx-1394 (intek)"
+
+NECMfg="NEC"
+PCI\VEN_1033&DEV_0063.DeviceDesc="NEC OHCI-1394 (intek)"
+PCI\VEN_1033&CC_0C0010.DeviceDesc="NEC OHCI-1394 (intek)"
+
+TIOHCIMfg="Texas Instruments"
+TIPCILYNXMfg="Texas Instruments"
+PCI\VEN_104C&DEV_8009.DeviceDesc="TI OHCI-1394 (intek)"
+PCI\VEN_104C&DEV_8019.DeviceDesc="TI OHCI-1394 (intek)"
+PCI\VEN_104C&CC_0C0010.DeviceDesc="TI OHCI-1394 (intek)"
+PCI\VEN_104C&DEV_8000.DeviceDesc="TI PCILynx-1394 (intek)"
+
+NSCMfg="National Semiconductor"
+PCI\VEN_100B&DEV_000F.DeviceDesc="NSC OHCI-1394 (intek)"
+PCI\VEN_100B&CC_0C0010.DeviceDesc="NSC OHCI-1394 (intek)"
+
+SONYMfg="Sony Corporation"
+PCI\VEN_104D&DEV_8039&REV_03.DeviceDesc="SONY OHCI-1394 (intek)"
+PCI\VEN_104D&DEV_8039.DeviceDesc="SONY OHCI-1394 (intek)"
+PCI\VEN_104C&DEV_8009&SUBSYS_8032104d.DeviceDesc="SONY OHCI-1394 (intek)"
+
+VIAMfg="VIA"
+PCI\VEN_1106&DEV_3044.DeviceDesc="VIA OHCI-1394 (intek)"
+PCI\VEN_1106&CC_0C0010.DeviceDesc="VIA OHCI-1394 (intek)"
+

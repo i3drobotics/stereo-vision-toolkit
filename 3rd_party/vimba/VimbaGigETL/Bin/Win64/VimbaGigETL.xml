@@ -1,0 +1,31 @@
+<?xml version="1.0" standalone="no" ?>
+<Settings>
+
+    <!--
+            Use this to activate logging and set filename for logging (path can be absolute or relative to TL)
+            Default behavior if omitted:    Logging is deactivated
+    -->
+    <!-- <LogFileName>VimbaGigETL.log</LogFileName> -->
+	
+	
+    <!--
+            Append messages to log file or reset log file at each transport layer restart (if logging is enabled)
+            True:                           Always append log messages
+            False:                          Reset log file at each transport layer restart
+            Default behavior if omitted:    Reset log file at each transport layer restart
+    -->	
+    <!-- <AppendLog>False</AppendLog> -->
+	
+
+	<!--
+			Set the payload size of one Ethernet frame in Bytes. This is equivalent to the MTU. Increasing this value
+			reduces the CPU load. Only set it to a higher value than 1500 Bytes if the network infrastructure supports Jumbo Frames.
+			
+			[numeric value]:              	Set GVSPPacketSize to [numeric value]
+			Minimum:						500
+			Maximum:						16384
+			Default behavior if omitted:    8228 (Jumbo Frames required) or volatile value stored in the cam
+	-->	
+    <!-- <DefaultPacketSize>8228</DefaultPacketSize> -->
+	
+</Settings>

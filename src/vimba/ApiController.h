@@ -1,5 +1,5 @@
 /*=============================================================================
-  Copyright (C) 2012 - 2016 Allied Vision Technologies.  All Rights Reserved.
+  Copyright (C) 2013 - 2016 Allied Vision Technologies.  All Rights Reserved.
 
   Redistribution of this file, in original or modified form, without
   prior written consent of Allied Vision Technologies is prohibited.
@@ -9,7 +9,7 @@
   File:        ApiController.h
 
   Description: Implementation file for the ApiController helper class that
-               demonstrates how to implement an asynchronous, continuous image
+               demonstrates how to implement a synchronous single image
                acquisition with VimbaCPP.
 
 -------------------------------------------------------------------------------
@@ -32,10 +32,7 @@
 
 #include <string>
 
-#include <VimbaCPP/Include/VimbaCPP.h>
-
-#include <CameraObserver.h>
-#include <FrameObserver.h>
+#include "VimbaCPP/Include/VimbaCPP.h"
 
 namespace AVT {
 namespace VmbAPI {
@@ -53,61 +50,47 @@ class ApiController
     // Returns:
     //  An API status code
     //
-    VmbErrorType        StartUp();
-
+    VmbErrorType    StartUp();
+    
     //
     // Shuts down the API
     //
-    void                ShutDown();
+    void            ShutDown();
+
+    //
+    // Opens the given camera
+    // Parameters:
+    //  [in]    rStrCameraID        The ID of the camera to open
+    //  [out]   pCamera             Camera pointer
+    //
+    // Returns:
+    //  An API status code
+    //
+    VmbErrorType OpenCamera( const std::string &rStrCameraID);
+
+    VmbErrorType GetCamera( const std::string &rStrCameraID, CameraPtr pCamera);
+
+    VmbErrorType AcquireCameraImage( const std::string &rStrCameraID, FramePtr &rpFrame );
+
+    VmbErrorType GetFeatureIntValue( const CameraPtr &camera, const std::string &featureName, VmbInt64_t & value );
+
+    VmbErrorType SetFeatureIntValue( const CameraPtr &camera, const std::string &featureName, VmbInt64_t value );
 
     //
     // Opens the given camera
     // Sets the maximum possible Ethernet packet size
     // Adjusts the image format
-    // Sets up the observer that will be notified on every incoming frame
-    // Calls the API convenience function to start image acquisition
+    // Calls the API convenience function to start single image acquisition
     // Closes the camera in case of failure
     //
     // Parameters:
-    //  [in]    rStrCameraID    The ID of the camera to open as reported by Vimba
+    //  [in]    rStrCameraID        The ID of the camera to work on
+    //  [out]   rpFrame             The frame that will be filled. Does not need to be initialized.
     //
     // Returns:
     //  An API status code
     //
-    VmbErrorType        StartContinuousImageAcquisition( const std::string &rStrCameraID );
-
-    //
-    // Calls the API convenience function to stop image acquisition
-    // Closes the camera
-    //
-    // Returns:
-    //  An API status code
-    //
-    VmbErrorType        StopContinuousImageAcquisition();
-
-    //
-    // Gets the width of a frame
-    //
-    // Returns:
-    //  The width as integer
-    //
-    int                 GetWidth() const;
-
-    //
-    // Gets the height of a frame
-    //
-    // Returns:
-    //  The height as integer
-    //
-    int                 GetHeight() const;
-
-    //
-    // Gets the pixel format of a frame
-    //
-    // Returns:
-    //  The pixel format as enum
-    //
-    VmbPixelFormatType  GetPixelFormat() const;
+    VmbErrorType    AcquireSingleImage( const std::string &rStrCameraID, FramePtr &rpFrame );
 
     //
     // Gets all cameras known to Vimba
@@ -115,41 +98,7 @@ class ApiController
     // Returns:
     //  A vector of camera shared pointers
     //
-    CameraPtrVector     GetCameraList();
-
-    //
-    // Gets the oldest frame that has not been picked up yet
-    //
-    // Returns:
-    //  A frame shared pointer
-    //
-    FramePtr            GetFrame();
-
-    //
-    // Queues a given frame to be filled by the API
-    //
-    // Parameters:
-    //  [in]    pFrame          The frame to queue
-    //
-    // Returns:
-    //  An API status code
-    //
-    VmbErrorType        QueueFrame( FramePtr pFrame );
-
-    //
-    // Clears all remaining frames that have not been picked up
-    //
-    void                ClearFrameQueue();
-    
-    //
-    // Returns the camera observer as QObject pointer to connect their signals to the view's slots
-    //
-    QObject*            GetCameraObserver();
-
-    //
-    // Returns the frame observer as QObject pointer to connect their signals to the view's slots
-    //
-    QObject*            GetFrameObserver();
+    CameraPtrVector GetCameraList();
 
     //
     // Translates Vimba error codes to readable error messages
@@ -160,30 +109,21 @@ class ApiController
     // Returns:
     //  A descriptive string representation of the error code
     //
-    std::string         ErrorCodeToMessage( VmbErrorType eErr ) const;
-
+    /*
+    std::string     ErrorCodeToMessage( VmbErrorType eErr ) const;
+    */
+    
     //
     // Gets the version of the Vimba API
     //
     // Returns:
     //  The version as string
     //
-    std::string         GetVersion() const;
+    std::string     GetVersion() const;
+
   private:
     // A reference to our Vimba singleton
-    VimbaSystem&                m_system;
-    // The currently streaming camera
-    CameraPtr                   m_pCamera;
-    // Every camera has its own frame observer
-    IFrameObserverPtr           m_pFrameObserver;
-    // Our camera observer
-    ICameraListObserverPtr      m_pCameraObserver;
-    // The current pixel format
-    VmbInt64_t                  m_nPixelFormat;
-    // The current width
-    VmbInt64_t                  m_nWidth;
-    // The current height
-    VmbInt64_t                  m_nHeight;
+    VimbaSystem &m_system;
 };
 
 }}} // namespace AVT::VmbAPI::Examples

@@ -143,7 +143,7 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
         formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
         formatConverter->OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
 
-        cameras->StartGrabbing();
+        cameras->StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImageOnly);
 
         return true;
     }
