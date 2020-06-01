@@ -1,0 +1,70 @@
+<?xml version="1.0" standalone="no" ?>
+<Settings>
+
+    <!--
+            Use this to activate logging and set filename for logging (path can be absolute or relative to TL)
+            Default behavior if omitted:    Logging is deactivated
+    -->
+    <!-- <LogFileName>&#37;TEMP&#37;\VimbaUSBTL.log</LogFileName> -->
+
+
+    <!--
+            Append messages to log file or reset log file at each transport layer restart (if logging is enabled)
+            True:                           Always append log messages
+            False:                          Reset log file at each transport layer restart
+            Default behavior if omitted:    Reset log file at each transport layer restart
+    -->
+    <!-- <AppendLog>True</AppendLog> -->
+
+
+    <!--
+            Activate less pedantic function parameter checks (needed for some TL consumers)
+            True:                           Tolerant function parameter checks
+            False:                          Pedantic function parameter checks
+            Default behavior if omitted:    Pedantic function parameter checks (GenTL compliant behavior)
+    -->
+    <TolerateTypeNullptr>True</TolerateTypeNullptr>
+
+
+    <!--
+            Emulate unsupported device access modes (needed for some TL consumers)
+            True:                           Emulation on
+            False:                          Emulation off
+            Default behavior if omitted:    Emulation off (GenTL compliant behavior)
+    -->
+    <EmulateAccessModes>True</EmulateAccessModes>
+    
+    
+    <!--
+			Use manual maximum transfer count for USB transfers
+            Decimal and hexadecimal numbers (prefixed with "0x") can be used
+            Default behavior if omitted:    Windows: 64
+                                            Linux:   31
+    -->
+    <!-- <MaxTransferCount>64</MaxTransferCount> -->
+	
+    
+	<!--
+			Use manual maximum transfer size (in bytes) for USB transfers
+            Decimal and hexadecimal numbers (prefixed with "0x") can be used
+            Default behavior if omitted:    Windows: 262144
+                                            Linux:   32768
+    -->
+    <!-- <MaxTransferSize>262144</MaxTransferSize> -->
+    
+    
+    <!--
+			Number of frames to use for intermediate frame buffering. Values
+            greater than 0 mean that no zero copy is possible anymore.
+            Decimal and hexadecimal numbers (prefixed with "0x") can be used
+            Default behavior if omitted:    0 (No intermediate frame buffering)
+    -->
+    <!-- <DriverBuffersCount>3</DriverBuffersCount> -->
+    
+    <!--
+            Set the folder in which remote device XML files will be cached
+            Default behavior if omitted:    No XML files will be cached
+    -->
+    <!-- <XMLCacheFolder>XMLCache</XMLCacheFolder> -->
+
+</Settings>

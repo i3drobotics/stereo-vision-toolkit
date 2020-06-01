@@ -10,6 +10,7 @@ const std::string AbstractStereoCamera::CAMERA_TYPE_USB = "usb";
 const std::string AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE = "baslergige";
 const std::string AbstractStereoCamera::CAMERA_TYPE_BASLER_USB = "baslerusb";
 const std::string AbstractStereoCamera::CAMERA_TYPE_TIS = "tis";
+const std::string AbstractStereoCamera::CAMERA_TYPE_VIMBA = "vimba";
 
 AbstractStereoCamera::AbstractStereoCamera(QObject *parent) : QObject(parent) {
 

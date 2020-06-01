@@ -40,6 +40,7 @@
 #include "stereocameraopencv.h"
 #include "stereocameratis.h"
 #include "stereocamerabasler.h"
+#include "stereocameravimba.h"
 #include "qdevicebutton.h"
 #include "qdevicedialog.h"
 
@@ -91,6 +92,7 @@ private:
     AbstractStereoCamera::stereoCameraSettings default_usb_init_settings;
     AbstractStereoCamera::stereoCameraSettings default_video_init_settings;
     AbstractStereoCamera::stereoCameraSettings current_camera_settings;
+    AbstractStereoCamera::stereoCameraSettings default_vimba_init_settings;
 
     QPixmap pmap_left;
     QPixmap pmap_right;

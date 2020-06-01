@@ -43,6 +43,7 @@
 
 namespace AVT {
 namespace VmbAPI {
+namespace Examples {
 
 //
 // Translates Vimba error codes to readable error messages
@@ -79,5 +80,5 @@ inline string_type ErrorCodeToMessage( VmbError_t eError )
     default:                        return string_type( MAKE_STRING_LITERAL( "Unknown" ) );
     }
 }
-}} // AVT::VmbAPI
+}}} // AVT::VmbAPI::Examples
 #endif

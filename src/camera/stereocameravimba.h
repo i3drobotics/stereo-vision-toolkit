@@ -10,7 +10,8 @@
 #include <opencv2/opencv.hpp>
 #include <abstractstereocamera.h>
 #include <VimbaCPP/include/VimbaCPP.h>
-#include <vimba/ApiController.h>
+
+#include "ApiController.h"
 
 //!  Stereo vimba cameras
 /*!
@@ -23,8 +24,11 @@ Q_OBJECT
 
 public:
     explicit StereoCameraVimba(QObject *parent = 0) :
-                AbstractStereoCamera(parent)
-                {}
+                AbstractStereoCamera(parent),
+                apiController(AVT::VmbAPI::Examples::ApiController())
+                {
+        apiControllerStatus = apiController.StartUp();
+    }
     bool capture();
     void disconnectCamera();
     bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
@@ -36,6 +40,7 @@ public:
     void adjustBinning(int val);
     void toggleTrigger(bool enable);
     void adjustFPS(int val);
+    void adjustPacketSize(int val){} //NA
 
     ~StereoCameraVimba(void);
 
@@ -49,11 +54,14 @@ public slots:
     bool enableAutoGain(bool enable);
 
 private:
+    AVT::VmbAPI::Examples::ApiController apiController;
+    AVT::VmbAPI::CameraPtr camera_l, camera_r;
 
-    //TODO add vimba camera
     int m_binning;
     int m_iTrigger;
     int m_fps;
+
+    VmbErrorType apiControllerStatus;
 
     QFuture<bool> qfuture_capture;
 

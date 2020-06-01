@@ -35,6 +35,16 @@ MainWindow::MainWindow(QWidget* parent)
     default_basler_init_settings.packetDelay = -1;
     default_basler_init_settings.packetSize = -1; //TODO fix packet size problems
 
+    default_vimba_init_settings.exposure = -1;
+    default_vimba_init_settings.gain = -1;
+    default_vimba_init_settings.fps = -1;
+    default_vimba_init_settings.binning = -1;
+    default_vimba_init_settings.trigger = -1;
+    default_vimba_init_settings.hdr = -1;
+    default_vimba_init_settings.autoExpose = -1;
+    default_vimba_init_settings.autoGain = -1;
+    default_vimba_init_settings.isGige = -1;
+
     default_tis_init_settings.exposure = 5;
     default_tis_init_settings.gain = 0;
     default_tis_init_settings.fps = 5;
@@ -509,6 +519,8 @@ void MainWindow::stereoCameraInitWindow(void){
         max_gain = 48;
         min_gain = 0;
         step_gain = 1;
+    } else  if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+        //VIMBA only settings
     }
 
     current_fps = default_fps;
@@ -774,14 +786,22 @@ int MainWindow::stereoCameraLoad(void) {
     QThread* basler_thread = new QThread;
     stereo_cam_basler->assignThread(basler_thread);
 
+    StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
+    QThread* vimba_thread = new QThread;
+    stereo_cam_vimba->assignThread(vimba_thread);
+
     progressSearch.setValue(10);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info;
+    progressSearch.setLabelText("Searching for basler cameras...");
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
-    progressSearch.setLabelText("Searching for phobos cameras...");
     progressSearch.setValue(30);
+    progressSearch.setLabelText("Searching for vimba cameras...");
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
+    progressSearch.setValue(40);
+    progressSearch.setLabelText("Searching for imaging source cameras...");
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
     progressSearch.setLabelText("Searching for deimos cameras...");
-    progressSearch.setValue(40);
+    progressSearch.setValue(50);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
     progressSearch.setLabelText("Searching for usb cameras...");
     progressSearch.setValue(60);
@@ -790,6 +810,7 @@ int MainWindow::stereoCameraLoad(void) {
     progressSearch.setValue(80);
 
     all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
+    all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
     all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
     all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
     all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
@@ -813,9 +834,6 @@ int MainWindow::stereoCameraLoad(void) {
         QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_100.png");
         QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_100.png");
         QPixmap pixmapCamera(":/mainwindow/images/camera_square_100.png");
-        //QIcon buttonIconDeimos(pixmapDeimos);
-        //QIcon buttonIconPhobos(pixmapPhobos);
-        //QIcon buttonIconCamera(pixmapCamera);
 
         QMessageBox msgBoxDevSelect;
         msgBoxDevSelect.setText(tr("Select which stereo system to use: "));
@@ -831,6 +849,10 @@ int MainWindow::stereoCameraLoad(void) {
                 std::string camera_str = "Phobos \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapPhobos);
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+                std::string camera_str = "Titania \n" + camera_serial_info.i3dr_serial;
+                pButtonDev->setText(camera_str.c_str());
+                pButtonDev->setPixmap(pixmapCamera);
             } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
                 std::string camera_str = "Device \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
@@ -891,7 +913,12 @@ int MainWindow::stereoCameraLoad(void) {
             cameras_connected = stereo_cam_cv->initCamera(chosen_camera_serial_info,current_camera_settings);
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
             qDebug() << "Connecting to USB system";
-        }
+        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+           current_camera_settings = default_vimba_init_settings;
+           cameras_connected = stereo_cam_vimba->initCamera(chosen_camera_serial_info,current_camera_settings);
+           stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
+           qDebug() << "Connecting to Titania system";
+       }
 
         stereo_cam->camera_serial_info = chosen_camera_serial_info;
 

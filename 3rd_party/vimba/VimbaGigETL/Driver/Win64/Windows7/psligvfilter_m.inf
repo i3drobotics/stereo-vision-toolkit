@@ -1,0 +1,89 @@
+;************************************************************************
+;
+; PSLIGVFILTER_M.INF
+;
+; This is the INF file for installing
+; Allied Vision GigE Vision Filter Driver
+;
+; The file is used by the service (miniport) part
+;
+;************************************************************************
+
+[Version]
+signature  = "$Windows NT$"
+Class      = Net
+ClassGUID  = {4d36e972-e325-11ce-bfc1-08002be10318}
+Provider   = %PSLI%
+DriverVer  = 07/09/2015,1.24.17
+CatalogFile = psligvfilter.cat
+CatalogFile.NTamd64 = psligvfilter.cat
+DriverPackageType=Network
+
+[ControlFlags]
+ExcludeFromSelect = ms_psligvfiltermp
+
+[DestinationDirs]
+DefaultDestDir=12
+; No files to copy 
+
+[Manufacturer]
+%PSLI% = PSLIGF,NTx86.6.0,NTamd64,NTamd64.6.0,NTamd64.6.1,NTx86
+
+; 2K
+[PSLIGF]
+%PslIGvFilterMP_Desc% = PslIGvFilterMP.ndi, ms_psligvfiltermp
+
+; XP
+[PSLIGF.NTx86]
+%PslIGvFilterMP_Desc% = PslIGvFilterMP.ndi, ms_psligvfiltermp
+
+; x64
+[PSLIGF.NTamd64]
+%PslIGvFilterMP_Desc% = PslIGvFilterMP.ndi, ms_psligvfiltermp
+
+; Vista
+[PSLIGF.NTx86.6.0]
+%PslIGvFilterMP_Desc% = PslIGvFilterMP.ndi, ms_psligvfiltermp
+
+; Vista x64
+[PSLIGF.NTamd64.6.0]
+%PslIGvFilterMP_Desc% = PslIGvFilterMP.ndi, ms_psligvfiltermp
+
+; Windows 7 x64
+[PSLIGF.NTamd64.6.1]
+%PslIGvFilterMP_Desc% = PslIGvFilterMP.ndi, ms_psligvfiltermp
+
+[PslIGvFilterMP.ndi]
+Characteristics = 0x29 ;NCF_NOT_USER_REMOVABLE | NCF_VIRTUAL | NCF_HIDDEN
+CopyFiles = 
+
+[PslIGvFilterMP.ndi.Services]
+AddService = PslIGvFilter,0x2, PslIGvFilterMP.AddService
+
+
+[PslIGvFilterMP.AddService]
+ServiceType    = 1 ;SERVICE_KERNEL_DRIVER
+StartType      = 3 ;SERVICE_DEMAND_START
+ErrorControl   = 1 ;SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\psligvfilter.sys
+
+[PassthruMP.AddService.AddReg]
+; ----------------------------------------------------------------------
+; Add any miniport-specific parameters here.  These are params that your
+; filter device is going to use.
+;
+;HKR, Parameters, ParameterName,  0x10000, "MultiSz", "Parameter", "Value"
+;HKR, Parameters, ParameterName2, 0x10001, 4
+
+[Strings]
+MSFT = "Allied Vision Technologies"
+PSLI = "Allied Vision"
+PslIGvFilterMP_Desc = "Allied Vision GigE Vision Filter Miniport"
+
+[SourceDisksNames]
+;None 
+
+[SourceDisksFiles]
+;None
+
+

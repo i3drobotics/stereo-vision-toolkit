@@ -111,6 +111,7 @@ public:
     const static std::string CAMERA_TYPE_BASLER_GIGE;
     const static std::string CAMERA_TYPE_BASLER_USB;
     const static std::string CAMERA_TYPE_TIS;
+    const static std::string CAMERA_TYPE_VIMBA;
 
     virtual void toggleAutoExpose(bool) = 0;
     virtual void adjustExposure(double) = 0;
