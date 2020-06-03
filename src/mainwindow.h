@@ -171,6 +171,8 @@ public slots:
     void enableWindow();
 
     int stereoCameraLoad(void);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> getDeviceList(bool showGUI);
+    void refreshCameraList(void);
     void autoloadCameraTriggered();
     void toggleAutoExpose(bool);
     void toggleAutoGain(bool);

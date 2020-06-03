@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget* parent)
             SLOT(startAutoCalibration()));
     connect(ui->actionCalibrate_from_images, SIGNAL(triggered(bool)), this,
             SLOT(startCalibrationFromImages()));
-    connect(ui->actionAutoload_Camera, SIGNAL(triggered(bool)), this,
+    connect(ui->connectButton, SIGNAL(clicked(bool)), this,
             SLOT(autoloadCameraTriggered()));
     connect(ui->actionDocumentation, SIGNAL(triggered(bool)), this,
             SLOT(openHelp()));
@@ -129,7 +129,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     controlsInit();
     statusBarInit();
-    autoloadCameraTriggered();
+    refreshCameraList();
     pointCloudInit();
 
 #ifdef WITH_FERVOR
@@ -208,8 +208,8 @@ void MainWindow::statusBarInit(void) {
 
 void MainWindow::controlsInit(void) {
 
-    ui->widgetSideSettings->setVisible(false);
-    showingSettings = false;
+    ui->widgetSideSettings->setVisible(true);
+    showingSettings = true;
 
     connect(ui->pauseButton, SIGNAL(clicked()), this, SLOT(toggleAcquire()));
     connect(ui->singleShotButton, SIGNAL(clicked()), this,
@@ -224,7 +224,10 @@ void MainWindow::controlsInit(void) {
     connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), ui->fpsSpinBox, SLOT(setDisabled(bool)));
     connect(ui->binCheckBox, SIGNAL(clicked(bool)), ui->binningSpinBox, SLOT(setEnabled(bool)));
 
+    connect(ui->btnRefreshCameras, SIGNAL(clicked(bool)), this, SLOT(refreshCameraList()));
+
     icon_options.insert("color", QColor(255, 255, 255));
+    ui->connectButton->setIcon(awesome->icon(fa::bolt, icon_options));
     ui->pauseButton->setIcon(awesome->icon(fa::pause, icon_options));
     ui->saveButton->setIcon(awesome->icon(fa::save, icon_options));
     ui->singleShotButton->setIcon(awesome->icon(fa::camera, icon_options));
@@ -758,18 +761,7 @@ void MainWindow::stereoCameraRelease(void) {
     }
 }
 
-
-int MainWindow::stereoCameraLoad(void) {
-    cameras_connected = false;
-    int exit_code = -4;
-
-    QProgressDialog progressSearch("Finding connected devices...", "", 0, 100, this);
-    progressSearch.setWindowTitle("SVT");
-    progressSearch.setWindowModality(Qt::WindowModal);
-    progressSearch.setCancelButton(nullptr);
-    progressSearch.setMinimumDuration(0);
-    progressSearch.setValue(1);
-
+std::vector<AbstractStereoCamera::stereoCameraSerialInfo> MainWindow::getDeviceList(bool showGUI = true){
     StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
     QThread* tis_thread = new QThread;
     stereo_cam_tis->assignThread(tis_thread);
@@ -792,39 +784,176 @@ int MainWindow::stereoCameraLoad(void) {
     stereo_cam_vimba->assignThread(vimba_thread);
 #endif
 
-    progressSearch.setValue(10);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info;
-    progressSearch.setLabelText("Searching for basler cameras...");
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
-    progressSearch.setValue(30);
-#ifdef WITH_VIMBA
-    progressSearch.setLabelText("Searching for vimba cameras...");
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
-#endif
-    progressSearch.setValue(40);
-    progressSearch.setLabelText("Searching for imaging source cameras...");
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
-    progressSearch.setLabelText("Searching for deimos cameras...");
-    progressSearch.setValue(50);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
-    progressSearch.setLabelText("Searching for usb cameras...");
-    progressSearch.setValue(60);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> usb_camera_serial_info = stereo_cam_cv->listSystems();
-    progressSearch.setLabelText("Processing found devices...");
-    progressSearch.setValue(80);
+    if (showGUI){
+        QProgressDialog progressSearch("Finding connected devices...", "", 0, 100, this);
+        progressSearch.setWindowTitle("SVT");
+        progressSearch.setWindowModality(Qt::WindowModal);
+        progressSearch.setCancelButton(nullptr);
+        progressSearch.setMinimumDuration(0);
+        progressSearch.setValue(1);
 
-    all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
-#ifdef WITH_VIMBA
-    all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
-#endif
-    all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
-    all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
-    all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
+        progressSearch.setValue(10);
+        progressSearch.setLabelText("Searching for basler cameras...");
 
-    progressSearch.setLabelText("Process complete");
-    progressSearch.setValue(100);
-    progressSearch.close();
-    QCoreApplication::processEvents();
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
+        progressSearch.setValue(30);
+
+    #ifdef WITH_VIMBA
+        progressSearch.setLabelText("Searching for vimba cameras...");
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
+    #endif
+        progressSearch.setValue(40);
+        progressSearch.setLabelText("Searching for imaging source cameras...");
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
+        progressSearch.setLabelText("Searching for deimos cameras...");
+        progressSearch.setValue(50);
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
+        progressSearch.setLabelText("Searching for usb cameras...");
+        progressSearch.setValue(60);
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> usb_camera_serial_info = stereo_cam_cv->listSystems();
+        progressSearch.setLabelText("Processing found devices...");
+        progressSearch.setValue(80);
+
+        all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
+    #ifdef WITH_VIMBA
+        all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
+    #endif
+        all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
+        all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
+        all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
+
+        progressSearch.setLabelText("Process complete");
+        progressSearch.setValue(100);
+        progressSearch.close();
+        QCoreApplication::processEvents();
+    } else {
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
+
+    #ifdef WITH_VIMBA
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
+    #endif
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> usb_camera_serial_info = stereo_cam_cv->listSystems();
+
+        all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
+    #ifdef WITH_VIMBA
+        all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
+    #endif
+        all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
+        all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
+        all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
+    }
+
+    return all_camera_serial_info;
+}
+
+void MainWindow::refreshCameraList(void){
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = getDeviceList(true);
+
+    QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_100.png");
+    QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_100.png");
+    QPixmap pixmapCamera(":/mainwindow/images/camera_square_100.png");
+
+    //Clear layout list
+    QLayoutItem *item;
+    while ((item = ui->LayoutCameraList->takeAt(0)) != 0) {
+        delete item;
+    }
+
+    if (all_camera_serial_info.size() <= 0){
+        QLabel *lblNoCameras = new QLabel();
+        lblNoCameras->setText("No cameras found");
+        ui->LayoutCameraList->addWidget(lblNoCameras);
+    } else {
+        for (std::vector<AbstractStereoCamera::stereoCameraSerialInfo>::iterator it = all_camera_serial_info.begin() ; it != all_camera_serial_info.end(); ++it){
+            AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = *it;
+            std::string camera_type, camera_serial;
+            QPixmap camera_icon;
+            if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
+                camera_type = "Deimos";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapDeimos;
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
+                camera_type = "Phobos";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapPhobos;
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+                camera_type = "Titania";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapPhobos;
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
+                camera_type = "Generic";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapCamera;
+            }
+            //TODO add camera icon
+            QHBoxLayout *layoutV = new QHBoxLayout();
+
+            QHBoxLayout *layoutHUpper = new QHBoxLayout();
+            QLabel *lblCameraIcon = new QLabel();
+            lblCameraIcon->setPixmap(camera_icon);
+            layoutHUpper->addWidget(lblCameraIcon);
+            layoutV->addLayout(layoutHUpper);
+
+            QHBoxLayout *layoutHLower = new QHBoxLayout();
+            QLabel *lblCameraType = new QLabel();
+            lblCameraType->setText(QString::fromStdString(camera_type));
+            layoutHLower->addWidget(lblCameraType);
+            QLabel *lblCameraName = new QLabel();
+            lblCameraName->setText(QString::fromStdString(camera_serial));
+            layoutHLower->addWidget(lblCameraName);
+            QCheckBox *chkBx = new QCheckBox();
+            chkBx->setText("");
+            layoutHLower->addWidget(chkBx);
+            layoutHLower->setStretch(0,0);
+            layoutHLower->setStretch(1,1);
+            layoutHLower->setStretch(2,0);
+
+            layoutV->addLayout(layoutHLower);
+
+            ui->LayoutCameraList->addLayout(layoutV);
+        }
+    }
+    QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    ui->LayoutCameraList->addSpacerItem(spacer);
+}
+
+int MainWindow::stereoCameraLoad(void) {
+    cameras_connected = false;
+    int exit_code = -4;
+
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = getDeviceList(true);
+
+    StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
+    QThread* tis_thread = new QThread;
+    stereo_cam_tis->assignThread(tis_thread);
+
+    StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
+    QThread* deimos_thread = new QThread;
+    stereo_cam_deimos->assignThread(deimos_thread);
+
+    StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
+    QThread* cv_thread = new QThread;
+    stereo_cam_cv->assignThread(cv_thread);
+
+    StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
+    QThread* basler_thread = new QThread;
+    stereo_cam_basler->assignThread(basler_thread);
+
+#ifdef WITH_VIMBA
+    StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
+    QThread* vimba_thread = new QThread;
+    stereo_cam_vimba->assignThread(vimba_thread);
+#endif
 
     AbstractStereoCamera::stereoCameraSerialInfo chosen_camera_serial_info;
     bool camera_chosen = false;
@@ -860,7 +989,7 @@ int MainWindow::stereoCameraLoad(void) {
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapCamera);
             } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
-                std::string camera_str = "Device \n" + camera_serial_info.i3dr_serial;
+                std::string camera_str = "Generic \n" + camera_serial_info.i3dr_serial;
                 pButtonDev->setText(camera_str.c_str());
                 pButtonDev->setPixmap(pixmapCamera);
             }
