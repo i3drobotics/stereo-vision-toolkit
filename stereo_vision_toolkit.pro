@@ -58,8 +58,8 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/calibrate
 
 WITH_VIMBA {
-    VPATH += $$_PRO_FILE_PWD_/src/vimba
-    INCLUDEPATH += $$_PRO_FILE_PWD_/src/vimba
+    VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
+    INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/vimba
 }
 
 WITH_I3DRSGM {
