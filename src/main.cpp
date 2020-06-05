@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   MainWindow w;
-  w.show();
+  w.showMaximized();
 
   return a.exec();
 }

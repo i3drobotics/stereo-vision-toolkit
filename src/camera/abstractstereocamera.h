@@ -474,6 +474,8 @@ protected:
     bool captured_stereo = false;
     bool capturing = false;
 
+    int grab_fail_count = 0;
+
 protected slots:
     void register_right_capture(void);
     void register_left_capture(void);
