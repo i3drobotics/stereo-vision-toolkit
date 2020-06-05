@@ -102,6 +102,7 @@ private:
     QTimer* status_bar_timer;
 
     QTimer* frame_timer;
+    QTimer* device_list_timer;
 
     ParamFile* parameters;
 
@@ -116,6 +117,8 @@ private:
     CameraDisplayWidget *left_view;
     CameraDisplayWidget *left_matcher_view;
     CameraDisplayWidget *right_view;
+
+    std::vector<QPushButton> deviceListButtons;
 
     bool cameras_connected = false;
     int measured_fps = 0;
@@ -142,6 +145,8 @@ private:
     QString save_directory = "";
 
     QVTKWidget* vtk_widget;
+
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> current_camera_serial_info_list;
 
     void setupMatchers();
     void statusBarInit();
@@ -172,7 +177,10 @@ public slots:
 
     int stereoCameraLoad(void);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> getDeviceList(bool showGUI);
-    void refreshCameraList(void);
+    int openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
+    void cameraDeviceSelected(int index);
+    void refreshCameraList(bool showGUI);
+    void refreshCameraListTimer(void);
     void autoloadCameraTriggered();
     void toggleAutoExpose(bool);
     void toggleAutoGain(bool);

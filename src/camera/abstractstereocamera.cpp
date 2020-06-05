@@ -581,7 +581,15 @@ void AbstractStereoCamera::capture_and_process(void){
     captured_stereo = false;
 
     // Capture, process_stereo is called via signal/slot
-    capture();
+    bool res = capture();
+    if (!res){
+        grab_fail_count++;
+    } else {
+        grab_fail_count = 0;
+    }
+    if (grab_fail_count > 3){ //disconnect if failed to grab for more than 3 frames in a row
+        disconnectCamera();
+    }
 
     while(!captured_stereo){
         /* Check for events, e.g. pause/quit */

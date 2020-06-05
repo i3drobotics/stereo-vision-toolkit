@@ -100,8 +100,6 @@ MainWindow::MainWindow(QWidget* parent)
             SLOT(startAutoCalibration()));
     connect(ui->actionCalibrate_from_images, SIGNAL(triggered(bool)), this,
             SLOT(startCalibrationFromImages()));
-    connect(ui->connectButton, SIGNAL(clicked(bool)), this,
-            SLOT(autoloadCameraTriggered()));
     connect(ui->actionDocumentation, SIGNAL(triggered(bool)), this,
             SLOT(openHelp()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), QApplication::instance(),
@@ -129,7 +127,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     controlsInit();
     statusBarInit();
-    refreshCameraList();
+    refreshCameraList(true);
     pointCloudInit();
 
 #ifdef WITH_FERVOR
@@ -145,10 +143,18 @@ MainWindow::MainWindow(QWidget* parent)
     //FvUpdater::sharedUpdater()->CheckForUpdatesNotSilent();
 
 #endif
+    // refresh device list every 5 seconds
+    //TODO replace this with event driven system
+    device_list_timer = new QTimer(this);
+    device_list_timer->start(3000);
+    QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListTimer()));
+}
+
+void MainWindow::refreshCameraListTimer(void){
+    refreshCameraList(false);
 }
 
 void MainWindow::disableWindow(){
-
     ui->toggleSwapLeftRight->setDisabled(true);
     ui->tabWidget->setDisabled(true);
     ui->matcherSelectBox->setDisabled(true);
@@ -227,7 +233,6 @@ void MainWindow::controlsInit(void) {
     connect(ui->btnRefreshCameras, SIGNAL(clicked(bool)), this, SLOT(refreshCameraList()));
 
     icon_options.insert("color", QColor(255, 255, 255));
-    ui->connectButton->setIcon(awesome->icon(fa::bolt, icon_options));
     ui->pauseButton->setIcon(awesome->icon(fa::pause, icon_options));
     ui->saveButton->setIcon(awesome->icon(fa::save, icon_options));
     ui->singleShotButton->setIcon(awesome->icon(fa::camera, icon_options));
@@ -618,6 +623,7 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(ui->binCheckBox, SIGNAL(clicked(bool)), this, SLOT(toggleEnableBinning(bool)));
     connect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(toggleHDR(bool)));
     connect(stereo_cam, SIGNAL(disconnected()), this, SLOT(disableWindow()));
+    connect(stereo_cam, SIGNAL(disconnected()), this, SLOT(refreshCameraList()));
 
     /* Point cloud */
     connect(stereo_cam, SIGNAL(reprojected()), this, SLOT(updateCloud()));
@@ -856,16 +862,143 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> MainWindow::getDeviceL
     return all_camera_serial_info;
 }
 
-void MainWindow::refreshCameraList(void){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = getDeviceList(true);
+int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info){
+    stereoCameraRelease();
+    QProgressDialog progressConnect("Connecting to camera...", "", 0, 100, this);
+    progressConnect.setWindowTitle("SVT");
+    progressConnect.setWindowModality(Qt::WindowModal);
+    progressConnect.setCancelButton(nullptr);
+    progressConnect.setMinimumDuration(0);
+    progressConnect.setValue(10);
+    QCoreApplication::processEvents();
+    int exit_code = CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE;
 
-    QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_100.png");
-    QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_100.png");
-    QPixmap pixmapCamera(":/mainwindow/images/camera_square_100.png");
+    StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
+    QThread* tis_thread = new QThread;
+    stereo_cam_tis->assignThread(tis_thread);
+
+    StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
+    QThread* deimos_thread = new QThread;
+    stereo_cam_deimos->assignThread(deimos_thread);
+
+    StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
+    QThread* cv_thread = new QThread;
+    stereo_cam_cv->assignThread(cv_thread);
+
+    StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
+    QThread* basler_thread = new QThread;
+    stereo_cam_basler->assignThread(basler_thread);
+
+#ifdef WITH_VIMBA
+    StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
+    QThread* vimba_thread = new QThread;
+    stereo_cam_vimba->assignThread(vimba_thread);
+#endif
+
+    if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
+        current_camera_settings = default_deimos_init_settings;
+        cameras_connected = stereo_cam_deimos->initCamera(camera_serial_info,current_camera_settings);
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
+        qDebug() << "Connecting to Deimos system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
+        current_camera_settings = default_basler_init_settings;
+        if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
+            current_camera_settings.isGige = 1;
+        }
+        cameras_connected = stereo_cam_basler->initCamera(camera_serial_info,current_camera_settings);
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_basler);
+        qDebug() << "Connecting to Phobos system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
+        current_camera_settings = default_tis_init_settings;
+        cameras_connected = stereo_cam_tis->initCamera(camera_serial_info,current_camera_settings);
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tis);
+        qDebug() << "Connecting to Phobos system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
+        current_camera_settings = default_usb_init_settings;
+        cameras_connected = stereo_cam_cv->initCamera(camera_serial_info,current_camera_settings);
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
+        qDebug() << "Connecting to USB system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+#ifdef WITH_VIMBA
+       current_camera_settings = default_vimba_init_settings;
+       cameras_connected = stereo_cam_vimba->initCamera(camera_serial_info,current_camera_settings);
+       stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
+       qDebug() << "Connecting to Titania system";
+#endif
+   }
+
+    stereo_cam->camera_serial_info = camera_serial_info;
+    QCoreApplication::processEvents();
+
+    if (cameras_connected){
+        progressConnect.setLabelText("Setting up camera interface...");
+        progressConnect.setValue(50);
+        stereoCameraInit();
+        progressConnect.setLabelText("Camera system connected");
+        progressConnect.setValue(100);
+        progressConnect.close();
+        QCoreApplication::processEvents();
+        exit_code = CAMERA_CONNECTION_SUCCESS_EXIT_CODE;
+    } else {
+        exit_code = CAMERA_CONNECTION_FAILED_EXIT_CODE; // failed to connect to camera
+    }
+
+    if (exit_code == CAMERA_CONNECTION_SUCCESS_EXIT_CODE){
+        //re-enable tabs as camera confirmed as connected
+        enableWindow();
+        ui->toggleVideoButton->setEnabled(true);
+    } else if (exit_code == CAMERA_CONNECTION_FAILED_EXIT_CODE){
+        //Display warning messagebox as program does not function correctly if no camera is connected
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Stereo Vision Toolkit");
+        std::string msgBoxMsg;
+        if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
+            // notice to user if using gige as can become locked if not closed correctly
+            // suggest power cycling to unlock the device
+            msgBoxMsg = "Failed to connect to cameras. Some features will not work as expected. GigE camera may be locked if closed incorrectly, try power cycling the camera system.";
+        } else {
+            msgBoxMsg = "Failed to connect to cameras. Some features will not work as expected.";
+        }
+        msgBox.setText(msgBoxMsg.c_str());
+        msgBox.exec();
+    } else if (exit_code == CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE){
+        //Display warning messagebox as program does not function correctly if no camera is connected
+        /*
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Stereo Vision Toolkit");
+        msgBox.setText("No recognised cameras connected. Some features may not work as expected.");
+        msgBox.exec();
+        */
+        ui->statusBar->showMessage("No cameras found.");
+    } else if (exit_code == CAMERA_CONNECTION_CANCEL_EXIT_CODE){
+        //Display warning messagebox as program does not function correctly if no camera is connected
+        /*
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Stereo Vision Toolkit");
+        msgBox.setText("No camera system selected. Some features may not work as expected.");
+        msgBox.exec();
+        */
+        ui->statusBar->showMessage("No cameras found.");
+    } else {
+        // should never happen
+        qDebug() << "Undefined exit code in 'stereoCameraLoad()'";
+    }
+    return exit_code;
+}
+
+void MainWindow::refreshCameraList(bool showGUI = true){
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = getDeviceList(showGUI);
+    current_camera_serial_info_list = all_camera_serial_info;
+
+    QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_50.png");
+    QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_50.png");
+    QPixmap pixmapCamera(":/mainwindow/images/camera_square_50.png");
 
     //Clear layout list
+    deviceListButtons.clear();
     QLayoutItem *item;
     while ((item = ui->LayoutCameraList->takeAt(0)) != 0) {
+        delete item->widget();
         delete item;
     }
 
@@ -874,6 +1007,7 @@ void MainWindow::refreshCameraList(void){
         lblNoCameras->setText("No cameras found");
         ui->LayoutCameraList->addWidget(lblNoCameras);
     } else {
+        int i = 0;
         for (std::vector<AbstractStereoCamera::stereoCameraSerialInfo>::iterator it = all_camera_serial_info.begin() ; it != all_camera_serial_info.end(); ++it){
             AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = *it;
             std::string camera_type, camera_serial;
@@ -895,36 +1029,48 @@ void MainWindow::refreshCameraList(void){
                 camera_serial = camera_serial_info.i3dr_serial;
                 camera_icon = pixmapCamera;
             }
-            //TODO add camera icon
-            QHBoxLayout *layoutV = new QHBoxLayout();
 
-            QHBoxLayout *layoutHUpper = new QHBoxLayout();
-            QLabel *lblCameraIcon = new QLabel();
-            lblCameraIcon->setPixmap(camera_icon);
-            layoutHUpper->addWidget(lblCameraIcon);
-            layoutV->addLayout(layoutHUpper);
 
-            QHBoxLayout *layoutHLower = new QHBoxLayout();
-            QLabel *lblCameraType = new QLabel();
-            lblCameraType->setText(QString::fromStdString(camera_type));
-            layoutHLower->addWidget(lblCameraType);
-            QLabel *lblCameraName = new QLabel();
-            lblCameraName->setText(QString::fromStdString(camera_serial));
-            layoutHLower->addWidget(lblCameraName);
-            QCheckBox *chkBx = new QCheckBox();
-            chkBx->setText("");
-            layoutHLower->addWidget(chkBx);
-            layoutHLower->setStretch(0,0);
-            layoutHLower->setStretch(1,1);
-            layoutHLower->setStretch(2,0);
+            QPushButton *btnCamera = new QPushButton();
+            std::string button_text = camera_type + " " + camera_serial;
+            btnCamera->setText(button_text.c_str());
+            QIcon ButtonIcon(camera_icon);
+            btnCamera->setIcon(ButtonIcon);
+            btnCamera->setIconSize(camera_icon.rect().size());
+            btnCamera->setStyleSheet("text-align:left;");
+            btnCamera->setLayout(new QGridLayout);
 
-            layoutV->addLayout(layoutHLower);
+            QLabel* textLabel = new QLabel(button_text.c_str());
+            textLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // or center
+            textLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
-            ui->LayoutCameraList->addLayout(layoutV);
+            btnCamera->layout()->addWidget(textLabel);
+
+            ui->LayoutCameraList->addWidget(btnCamera);
+
+            QSignalMapper * mapper = new QSignalMapper(this);
+            QObject::connect(mapper,SIGNAL(mapped(int)),this,SLOT(cameraDeviceSelected(int)));
+
+            QObject::connect(btnCamera, SIGNAL(clicked()),mapper,SLOT(map()));
+            mapper->setMapping(btnCamera, i);
+
+            i++;
         }
     }
     QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->LayoutCameraList->addSpacerItem(spacer);
+}
+
+void MainWindow::cameraDeviceSelected(int index){
+    int button_index = index; //TODO get index from layout
+    if (button_index < current_camera_serial_info_list.size()){
+        AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = current_camera_serial_info_list.at(button_index);
+        openCamera(camera_serial_info);
+        //autoloadCameraTriggered();
+        //TODO disable all other buttons if camera open is sucessfull
+    } else {
+        refreshCameraList();
+    }
 }
 
 int MainWindow::stereoCameraLoad(void) {
