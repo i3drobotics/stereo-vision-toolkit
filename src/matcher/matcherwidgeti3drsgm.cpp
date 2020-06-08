@@ -6,11 +6,10 @@
 #include "matcherwidgeti3drsgm.h"
 #include "ui_matcherwidgeti3drsgm.h"
 
-MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent,
-                                           cv::Size image_size)
+MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent)
     : MatcherWidget(parent), ui(new Ui::MatcherWidgetI3DRSGM) {
     ui->setupUi(this);
-    matcher = new QMatcherI3DRSGM(this, image_size);
+    matcher = new QMatcherI3DRSGM(this);
 
     connect(ui->blockSizeSlider, SIGNAL(valueChanged(int)), this,
             SLOT(updateBlockSize(int)));

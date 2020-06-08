@@ -25,7 +25,7 @@ class AbstractStereoMatcher : public QObject {
   Q_OBJECT
  public:
 
-  explicit AbstractStereoMatcher(QObject* parent = 0, cv::Size image_size = cv::Size(0,0));
+  explicit AbstractStereoMatcher(QObject* parent = 0);
   ~AbstractStereoMatcher(void);
 
    cv::Mat disparity_lr;

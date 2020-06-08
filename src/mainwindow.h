@@ -43,6 +43,7 @@
 #ifdef WITH_VIMBA
     #include "stereocameravimba.h"
 #endif
+#include "stereocamerasupport.h"
 #include "qdevicebutton.h"
 #include "qdevicedialog.h"
 
@@ -118,6 +119,8 @@ private:
     CameraDisplayWidget *left_matcher_view;
     CameraDisplayWidget *right_view;
 
+    StereoCameraSupport *stereoCamSupport;
+
     std::vector<QPushButton> deviceListButtons;
 
     bool cameras_connected = false;
@@ -147,6 +150,7 @@ private:
     QVTKWidget* vtk_widget;
 
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> current_camera_serial_info_list;
+    std::vector<QSignalMapper*>* camera_button_signal_mapper_list;
 
     void setupMatchers();
     void statusBarInit();
@@ -154,13 +158,13 @@ private:
     void pointCloudInit();
 
     void stereoCameraInit(void);
-    void stereoCameraRelease(void);
     void stereoCameraInitConnections(void);
     void stereoCameraInitWindow(void);
 
     bool gigeWarning(int binning,int new_fps=-1);
 
 public slots:
+    void stereoCameraRelease(void);
     void updateDisplay(void);
     void updateFPS(qint64);
     void updateTemperature(double temperature);
@@ -176,11 +180,13 @@ public slots:
     void enableWindow();
 
     int stereoCameraLoad(void);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> getDeviceList(bool showGUI);
+
     int openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
     void cameraDeviceSelected(int index);
     void refreshCameraList(bool showGUI);
-    void refreshCameraListTimer(void);
+    void refreshCameraListNoGui(void){refreshCameraList(false);}
+    void startDeviceListTimer(void);
+    void stopDeviceListTimer(void);
     void autoloadCameraTriggered();
     void toggleAutoExpose(bool);
     void toggleAutoGain(bool);

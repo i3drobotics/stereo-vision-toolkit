@@ -6,11 +6,10 @@
 #include "MatcherWidgetOpenCVSGBM.h"
 #include "ui_MatcherWidgetOpenCVSGBM.h"
 
-MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent,
-                                                 cv::Size image_size)
+MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent)
     : MatcherWidget(parent), ui(new Ui::MatcherWidgetOpenCVSGBM) {
   ui->setupUi(this);
-  matcher = new MatcherOpenCVSGBM(this, image_size);
+  matcher = new MatcherOpenCVSGBM(this);
 
   ui->blockSizeSlider->setValue((matcher->getBlockSize() - 1) / 2.0);
   ui->blockSizeLabel->setText(QString::number(matcher->getBlockSize()));

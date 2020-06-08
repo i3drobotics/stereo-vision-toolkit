@@ -34,7 +34,7 @@ class MatcherWidgetOpenCVBlock : public MatcherWidget {
 
 
  public:
-   explicit MatcherWidgetOpenCVBlock(QWidget *parent = 0, cv::Size image_size =cv::Size(0,0));
+   explicit MatcherWidgetOpenCVBlock(QWidget *parent = 0);
   ~MatcherWidgetOpenCVBlock();
    void setImageWidth(int width);
 

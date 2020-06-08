@@ -6,11 +6,10 @@
 #include "matcherwidgetopencvblock.h"
 #include "ui_matcherwidgetopencvblock.h"
 
-MatcherWidgetOpenCVBlock::MatcherWidgetOpenCVBlock(QWidget* parent,
-                                                   cv::Size image_size)
+MatcherWidgetOpenCVBlock::MatcherWidgetOpenCVBlock(QWidget* parent)
     : MatcherWidget(parent), ui(new Ui::MatcherWidgetOpenCVBlock) {
     ui->setupUi(this);
-    matcher = new MatcherOpenCVBlock(this, image_size);
+    matcher = new MatcherOpenCVBlock(this);
 
     ui->blockSizeSlider->setValue((matcher->getBlockSize() - 1) / 2.0);
     ui->blockSizeLabel->setText(QString::number(matcher->getBlockSize()));

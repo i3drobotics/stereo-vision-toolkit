@@ -377,6 +377,8 @@ std::string StereoCameraOpenCV::serial_from_device_path(std::string usb_device_p
         qDebug() << "USB device path formatted incorrectly: " << usb_device_path.c_str();
         for (std::vector<std::string>::iterator it = device_path_delim.begin() ; it != device_path_delim.end(); ++it)
             qDebug() << (*it).c_str();
+        qDebug() << "Will use full device path as camera serial";
+        camera_serial = usb_device_path;
     }
     return camera_serial;
 }
