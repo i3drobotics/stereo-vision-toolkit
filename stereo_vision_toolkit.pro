@@ -14,7 +14,18 @@ FV_APP_VERSION = $$VERSION
 QT += core gui concurrent widgets xml network quick
 
 #QT version > 5.6 required for using openssl 1.0.2j
-!versionAtLeast(QT_VERSION, 5.6.0):error("Use at least Qt version 5.6.0")
+!versionAtLeast(QT_VERSION, 5.6.0):
+versionAtLeast(QT_VERSION, 5.6.0){
+    versionAtLeast(QT_VERSION, 5.12.4){
+        CONFIG += WITH_OPENSSL_111g
+        message("Building with OpenSSL 1.1.1g")
+    } else {
+        CONFIG += WITH_OPENSSL_102j
+        message("Building with OpenSSL 1.0.2j")
+    }
+} else {
+    error("Use at least Qt version 5.6.0")
+}
 
 TARGET = StereoVisionToolkit
 DEFINES += WITH_FERVOR
@@ -286,7 +297,14 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true) \
         $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
-        $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.0.2j/Win64/bin/*.dll, true)
+        $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll
+
+    WITH_OPENSSL_102j {
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.0.2j/Win64/bin/*.dll, true)
+    }
+    WITH_OPENSSL_111g {
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.1.1g/Win64/bin/*.dll, true)
+    }
 
     CONFIG( debug, debug|release ) {
         # Debug only dlls
@@ -304,7 +322,6 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/release/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/release/*.dll, true) \
             $$_PRO_FILE_PWD_/3rd_party/png/libpng16.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll \
             $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11_x64.dll \
             $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/release/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/release/*.dll, true)
