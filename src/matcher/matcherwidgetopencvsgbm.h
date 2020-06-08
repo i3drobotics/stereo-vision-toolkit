@@ -33,7 +33,7 @@ class MatcherWidgetOpenCVSGBM : public MatcherWidget {
 
 
  public:
-   explicit MatcherWidgetOpenCVSGBM(QWidget *parent = 0, cv::Size image_size =cv::Size(0,0));
+   explicit MatcherWidgetOpenCVSGBM(QWidget *parent = 0);
   ~MatcherWidgetOpenCVSGBM();
    void setImageWidth(int width);
 

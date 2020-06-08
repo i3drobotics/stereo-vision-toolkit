@@ -18,10 +18,6 @@ void MatcherOpenCVBlock::init(void) {
     }else{
         setupDefaultMatcher();
     }
-
-  // Setup for 16-bit disparity
-  cv::Mat(image_size, CV_16S).copyTo(disparity_lr);
-  cv::Mat(image_size, CV_16S).copyTo(disparity_rl);
 }
 
 void MatcherOpenCVBlock::setupDefaultMatcher(void){
@@ -36,7 +32,7 @@ void MatcherOpenCVBlock::setMinDisparity(int min_disparity) {
 }
 
 void MatcherOpenCVBlock::setDisparityRange(int disparity_range) {
-  if ((disparity_range + min_disparity) > image_size.width) return;
+  //if ((disparity_range + min_disparity) > image_size.width) return;
 
   if ((disparity_range > 0) && (disparity_range % 16 == 0)) {
     this->disparity_range = disparity_range;
@@ -86,6 +82,7 @@ int MatcherOpenCVBlock::getErrorDisparity(void){
 }
 
 void MatcherOpenCVBlock::forwardMatch() {
+
   matcher->setMinDisparity(min_disparity);
 
   try {

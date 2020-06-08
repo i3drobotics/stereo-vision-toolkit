@@ -5,11 +5,8 @@
 
 #include "abstractstereomatcher.h"
 
-AbstractStereoMatcher::AbstractStereoMatcher(QObject *parent,
-                                             cv::Size img_size)
+AbstractStereoMatcher::AbstractStereoMatcher(QObject *parent)
     : QObject(parent) {
-  this->image_size = img_size;
-  cv::Mat(image_size, CV_32F).copyTo(disparity_buffer);
 }
 
 void AbstractStereoMatcher::assignThread(QThread *thread) {
@@ -23,6 +20,7 @@ void AbstractStereoMatcher::assignThread(QThread *thread) {
 void AbstractStereoMatcher::setImages(cv::Mat *left_img, cv::Mat *right_img) {
   this->left = left_img;
   this->right = right_img;
+  this->image_size = left_img->size();
 }
 
 void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {

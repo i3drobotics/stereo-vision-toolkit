@@ -485,11 +485,16 @@ void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
 
 void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 
-    enableAcquire(false);
+    bool reenable_required = false;
+    if (this->isAcquiring()){
+        reenable_required = true;
+        enableAcquire(false);
+    }
     this->matcher = matcher;
     this->matcher->setImages(&left_remapped, &right_remapped);
-    enableAcquire(true);
-
+    if (reenable_required){
+        enableAcquire(true);
+    }
     qDebug() << "Changed matcher";
 }
 

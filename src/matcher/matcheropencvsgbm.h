@@ -18,9 +18,8 @@ class MatcherOpenCVSGBM : public AbstractStereoMatcher
 {
     Q_OBJECT
 public:
-    explicit MatcherOpenCVSGBM(QObject *parent = 0,
-                               cv::Size image_size = cv::Size(0, 0))
-        : AbstractStereoMatcher(parent, image_size) {
+    explicit MatcherOpenCVSGBM(QObject *parent = 0)
+        : AbstractStereoMatcher(parent) {
         init();
     }
 

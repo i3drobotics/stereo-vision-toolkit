@@ -21,8 +21,12 @@ MainWindow::MainWindow(QWidget* parent)
     calibration_dialog_used = false;
     calibration_from_images_dialog_used = false;
 
+    stereoCamSupport = new StereoCameraSupport();
+    device_list_timer = new QTimer(this);
+
     // define default settings for cameras
     // if the camera does not use the setting then should be set to -1
+    // TODO replace this by reading current value from camera
     default_basler_init_settings.exposure = 5;
     default_basler_init_settings.gain = 0;
     default_basler_init_settings.fps = 10;
@@ -127,8 +131,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     controlsInit();
     statusBarInit();
-    refreshCameraList(true);
     pointCloudInit();
+    setupMatchers();
 
 #ifdef WITH_FERVOR
     // Set the Fervor appcast url
@@ -140,23 +144,16 @@ MainWindow::MainWindow(QWidget* parent)
     // Check for updates silently -- this will not block the initialization of
     // your application, just start a HTTP request and return immediately.
     FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
-    //FvUpdater::sharedUpdater()->CheckForUpdatesNotSilent();
 
 #endif
-    // refresh device list every 5 seconds
-    //TODO replace this with event driven system
-    device_list_timer = new QTimer(this);
-    device_list_timer->start(3000);
-    QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListTimer()));
-}
-
-void MainWindow::refreshCameraListTimer(void){
-    refreshCameraList(false);
+    startDeviceListTimer();
 }
 
 void MainWindow::disableWindow(){
     ui->toggleSwapLeftRight->setDisabled(true);
     ui->tabWidget->setDisabled(true);
+    ui->tabCameraSettings->setDisabled(true);
+    ui->tabApplicationSettings->setDisabled(true);
     ui->matcherSelectBox->setDisabled(true);
     ui->enableStereo->setDisabled(true);
 
@@ -172,6 +169,8 @@ void MainWindow::enableWindow(){
 
     ui->toggleSwapLeftRight->setEnabled(true);
     ui->tabWidget->setEnabled(true);
+    ui->tabCameraSettings->setEnabled(true);
+    ui->tabApplicationSettings->setEnabled(true);
     ui->matcherSelectBox->setEnabled(true);
     ui->enableStereo->setEnabled(true);
 
@@ -622,8 +621,8 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(toggleAutoGain(bool)));
     connect(ui->binCheckBox, SIGNAL(clicked(bool)), this, SLOT(toggleEnableBinning(bool)));
     connect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(toggleHDR(bool)));
-    connect(stereo_cam, SIGNAL(disconnected()), this, SLOT(disableWindow()));
-    connect(stereo_cam, SIGNAL(disconnected()), this, SLOT(refreshCameraList()));
+
+    connect(stereo_cam, SIGNAL(disconnected()), this, SLOT(stereoCameraRelease()));
 
     /* Point cloud */
     connect(stereo_cam, SIGNAL(reprojected()), this, SLOT(updateCloud()));
@@ -673,6 +672,7 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.setWindowTitle("SVT");
         progressClose.setWindowModality(Qt::WindowModal);
         progressClose.setCancelButton(nullptr);
+        progressClose.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         progressClose.setMinimumDuration(0);
         progressClose.setValue(10);
 
@@ -764,102 +764,9 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.setValue(100);
         progressClose.close();
         QCoreApplication::processEvents();
+
+        startDeviceListTimer();
     }
-}
-
-std::vector<AbstractStereoCamera::stereoCameraSerialInfo> MainWindow::getDeviceList(bool showGUI = true){
-    StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
-    QThread* tis_thread = new QThread;
-    stereo_cam_tis->assignThread(tis_thread);
-
-    StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
-    QThread* deimos_thread = new QThread;
-    stereo_cam_deimos->assignThread(deimos_thread);
-
-    StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
-    QThread* cv_thread = new QThread;
-    stereo_cam_cv->assignThread(cv_thread);
-
-    StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
-    QThread* basler_thread = new QThread;
-    stereo_cam_basler->assignThread(basler_thread);
-
-#ifdef WITH_VIMBA
-    StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
-    QThread* vimba_thread = new QThread;
-    stereo_cam_vimba->assignThread(vimba_thread);
-#endif
-
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info;
-    if (showGUI){
-        QProgressDialog progressSearch("Finding connected devices...", "", 0, 100, this);
-        progressSearch.setWindowTitle("SVT");
-        progressSearch.setWindowModality(Qt::WindowModal);
-        progressSearch.setCancelButton(nullptr);
-        progressSearch.setMinimumDuration(0);
-        progressSearch.setValue(1);
-
-        progressSearch.setValue(10);
-        progressSearch.setLabelText("Searching for basler cameras...");
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
-        progressSearch.setValue(30);
-
-    #ifdef WITH_VIMBA
-        progressSearch.setLabelText("Searching for vimba cameras...");
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
-    #endif
-        progressSearch.setValue(40);
-        progressSearch.setLabelText("Searching for imaging source cameras...");
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
-        progressSearch.setLabelText("Searching for deimos cameras...");
-        progressSearch.setValue(50);
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
-        progressSearch.setLabelText("Searching for usb cameras...");
-        progressSearch.setValue(60);
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> usb_camera_serial_info = stereo_cam_cv->listSystems();
-        progressSearch.setLabelText("Processing found devices...");
-        progressSearch.setValue(80);
-
-        all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
-    #ifdef WITH_VIMBA
-        all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
-    #endif
-        all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
-        all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
-        all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
-
-        progressSearch.setLabelText("Process complete");
-        progressSearch.setValue(100);
-        progressSearch.close();
-        QCoreApplication::processEvents();
-    } else {
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
-
-    #ifdef WITH_VIMBA
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
-    #endif
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
-
-        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> usb_camera_serial_info = stereo_cam_cv->listSystems();
-
-        all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
-    #ifdef WITH_VIMBA
-        all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
-    #endif
-        all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
-        all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
-        all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
-    }
-
-    return all_camera_serial_info;
 }
 
 int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info){
@@ -987,8 +894,9 @@ int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_s
 }
 
 void MainWindow::refreshCameraList(bool showGUI = true){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = getDeviceList(showGUI);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = stereoCamSupport->getDeviceList(showGUI);
     current_camera_serial_info_list = all_camera_serial_info;
+    camera_button_signal_mapper_list = new vector<QSignalMapper*>();
 
     QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_50.png");
     QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_50.png");
@@ -997,16 +905,15 @@ void MainWindow::refreshCameraList(bool showGUI = true){
     //Clear layout list
     deviceListButtons.clear();
     QLayoutItem *item;
-    while ((item = ui->LayoutCameraList->takeAt(0)) != 0) {
+    while ((item = ui->gridLayoutCameraList->takeAt(0)) != 0) {
         delete item->widget();
-        delete item;
+        //delete item;
     }
 
     if (all_camera_serial_info.size() <= 0){
-        QLabel *lblNoCameras = new QLabel();
-        lblNoCameras->setText("No cameras found");
-        ui->LayoutCameraList->addWidget(lblNoCameras);
+        ui->lblNoCameras->show();
     } else {
+        ui->lblNoCameras->hide();
         int i = 0;
         for (std::vector<AbstractStereoCamera::stereoCameraSerialInfo>::iterator it = all_camera_serial_info.begin() ; it != all_camera_serial_info.end(); ++it){
             AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = *it;
@@ -1030,46 +937,78 @@ void MainWindow::refreshCameraList(bool showGUI = true){
                 camera_icon = pixmapCamera;
             }
 
+            QHBoxLayout *hlayoutCamera = new QHBoxLayout();
 
-            QPushButton *btnCamera = new QPushButton();
+            QLabel* cameraIconLabel = new QLabel();
+            cameraIconLabel->setPixmap(camera_icon);
+            hlayoutCamera->addWidget(cameraIconLabel);
+
             std::string button_text = camera_type + " " + camera_serial;
-            btnCamera->setText(button_text.c_str());
-            QIcon ButtonIcon(camera_icon);
-            btnCamera->setIcon(ButtonIcon);
-            btnCamera->setIconSize(camera_icon.rect().size());
-            btnCamera->setStyleSheet("text-align:left;");
-            btnCamera->setLayout(new QGridLayout);
+            QLabel* cameraNameLabel = new QLabel(button_text.c_str());
+            hlayoutCamera->addWidget(cameraNameLabel);
 
-            QLabel* textLabel = new QLabel(button_text.c_str());
-            textLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // or center
-            textLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+            QPushButton *btnSelectCamera = new QPushButton("Connect");
+            btnSelectCamera->setStyleSheet("background-color: green");
+            hlayoutCamera->addWidget(btnSelectCamera);
 
-            btnCamera->layout()->addWidget(textLabel);
-
-            ui->LayoutCameraList->addWidget(btnCamera);
+            ui->gridLayoutCameraList->addWidget(cameraIconLabel,i+1,0);
+            ui->gridLayoutCameraList->addWidget(cameraNameLabel,i+1,1);
+            ui->gridLayoutCameraList->addWidget(btnSelectCamera,i+1,2);
 
             QSignalMapper * mapper = new QSignalMapper(this);
             QObject::connect(mapper,SIGNAL(mapped(int)),this,SLOT(cameraDeviceSelected(int)));
 
-            QObject::connect(btnCamera, SIGNAL(clicked()),mapper,SLOT(map()));
-            mapper->setMapping(btnCamera, i);
+            QObject::connect(btnSelectCamera, SIGNAL(clicked()),mapper,SLOT(map()));
+            mapper->setMapping(btnSelectCamera, i);
+            camera_button_signal_mapper_list->push_back(mapper);
 
             i++;
         }
     }
-    QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    ui->LayoutCameraList->addSpacerItem(spacer);
 }
 
 void MainWindow::cameraDeviceSelected(int index){
-    int button_index = index; //TODO get index from layout
+    stopDeviceListTimer();
+    unsigned long long button_index = index; //TODO get index from layout
     if (button_index < current_camera_serial_info_list.size()){
+        //TODO add diconnect of camera if already connected
         AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = current_camera_serial_info_list.at(button_index);
-        openCamera(camera_serial_info);
-        //autoloadCameraTriggered();
-        //TODO disable all other buttons if camera open is sucessfull
+        unsigned long long i = 0;
+        if (openCamera(camera_serial_info) == CAMERA_CONNECTION_SUCCESS_EXIT_CODE){
+            // disable all other buttons if camera open is successful
+            for (std::vector<AbstractStereoCamera::stereoCameraSerialInfo>::iterator it = current_camera_serial_info_list.begin() ; it != current_camera_serial_info_list.end(); ++it){
+                AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = *it;
+                // Get button widget from grid layout
+                QWidget *wSelectCamera = ui->gridLayoutCameraList->itemAtPosition(i+1,2)->widget();
+                QPushButton *btnSelectCamera = qobject_cast<QPushButton*>(wSelectCamera);
+                if (i != button_index){
+                    //btnSelectCamera->setStyleSheet("background-color: grey");
+                    //btnSelectCamera->setText("Connect");
+                    //btnSelectCamera->setEnabled(false);
+                    // Remove from list camera that wasn't used
+                    QWidget *w1 = ui->gridLayoutCameraList->itemAtPosition(i+1,0)->widget();
+                    QWidget *w2 = ui->gridLayoutCameraList->itemAtPosition(i+1,1)->widget();
+                    delete(w1);
+                    delete(w2);
+                    delete(btnSelectCamera);
+                } else {
+                    btnSelectCamera->setStyleSheet("background-color: #e83131"); //red
+                    btnSelectCamera->setText("Disconnect");
+                    // Disconnect signal mapper
+                    QSignalMapper * mapper = camera_button_signal_mapper_list->at(i);
+                    QObject::disconnect(mapper,SIGNAL(mapped(int)),this,SLOT(cameraDeviceSelected(int)));
+                    QObject::disconnect(btnSelectCamera, SIGNAL(clicked()),mapper,SLOT(map()));
+
+                    connect(btnSelectCamera, SIGNAL(clicked()), stereo_cam, SLOT(disconnectCamera()));
+                    //connect(btnSelectCamera, SIGNAL(clicked()), this, SLOT(stereoCameraRelease()));
+                }
+                i++;
+            }
+        } else {
+            startDeviceListTimer();
+        }
     } else {
-        refreshCameraList();
+        startDeviceListTimer();
     }
 }
 
@@ -1077,7 +1016,7 @@ int MainWindow::stereoCameraLoad(void) {
     cameras_connected = false;
     int exit_code = -4;
 
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = getDeviceList(true);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = stereoCamSupport->getDeviceList(true);
 
     StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
     QThread* tis_thread = new QThread;
@@ -1229,7 +1168,7 @@ void MainWindow::stereoCameraInit() {
         calibration_directory = parameters->get_string("calDir");
 
         stereoCameraInitConnections();
-        setupMatchers();
+        setMatcher(ui->matcherSelectBox->currentIndex());
 
         if (save_directory != "") {
             stereo_cam->setSavelocation(save_directory);
@@ -1258,6 +1197,20 @@ void MainWindow::stereoCameraInit() {
 
         ui->statusBar->showMessage("Freerunning.");
     }
+}
+
+void MainWindow::startDeviceListTimer() {
+    // refresh device list every 5 seconds
+    //TODO replace this with event driven system
+    device_list_timer->stop();
+    device_list_timer = new QTimer(this);
+    refreshCameraListNoGui();
+    device_list_timer->start(3000);
+    QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListNoGui()));
+}
+
+void MainWindow::stopDeviceListTimer() {
+    device_list_timer->stop();
 }
 
 void MainWindow::autoloadCameraTriggered() {
@@ -1526,7 +1479,9 @@ void MainWindow::setMatcher(int index) {
 
     auto matcher_widget = matcher_list.at(index);
     qDebug() << "Changing matcher to" << ui->matcherSelectBox->itemText(index);
-    stereo_cam->setMatcher(matcher_widget->getMatcher());
+    if (cameras_connected){
+        stereo_cam->setMatcher(matcher_widget->getMatcher());
+    }
 
     for (int i = 0; i < ui->matcherSettingsLayout->count(); ++i) {
         QWidget* widget = ui->matcherSettingsLayout->itemAt(i)->widget();
@@ -1556,13 +1511,13 @@ void MainWindow::setupMatchers(void) {
     matcher_list.clear();
 
     MatcherWidgetOpenCVBlock* block_matcher =
-            new MatcherWidgetOpenCVBlock(this, stereo_cam->getSize());
+            new MatcherWidgetOpenCVBlock(this);
     matcher_list.append(block_matcher);
     ui->matcherSelectBox->insertItem(0, "OpenCV Block");
     ui->matcherSettingsLayout->addWidget(block_matcher);
 
     MatcherWidgetOpenCVSGBM* opencv_sgbm =
-            new MatcherWidgetOpenCVSGBM(this, stereo_cam->getSize());
+            new MatcherWidgetOpenCVSGBM(this);
     matcher_list.append(opencv_sgbm);
     ui->matcherSelectBox->insertItem(1, "OpenCV SGBM");
     ui->matcherSettingsLayout->addWidget(opencv_sgbm);
@@ -1570,7 +1525,7 @@ void MainWindow::setupMatchers(void) {
 #ifdef WITH_I3DRSGM
     qDebug() << "Including I3DRSGM widget";
     MatcherWidgetI3DRSGM* i3dr_sgm =
-            new MatcherWidgetI3DRSGM(this, stereo_cam->getSize());
+            new MatcherWidgetI3DRSGM(this);
     matcher_list.append(i3dr_sgm);
     ui->matcherSelectBox->insertItem(2, "I3DR SGBM");
     ui->matcherSettingsLayout->addWidget(i3dr_sgm);
@@ -1678,23 +1633,19 @@ void MainWindow::updateDisplay(void) {
 
     if (cameras_connected){
         if (stereo_cam->isConnected()){
-            stereo_cam->getLeftImage(left);
-            stereo_cam->getRightImage(right);
+            if (stereo_cam->isAcquiring()){
+                stereo_cam->getLeftImage(left);
+                stereo_cam->getRightImage(right);
 
-            if (left.empty() || right.empty()){
-                qDebug() << "Empty image sent to display";
-                return;
+                if (left.empty() || right.empty()){
+                    qDebug() << "Empty image sent to display";
+                    return;
+                }
+
+                left_view->updateView(left);
+                left_matcher_view->updateView(left);
+                right_view->updateView(right);
             }
-
-            left_view->updateView(left);
-            left_matcher_view->updateView(left);
-            right_view->updateView(right);
-
-           // QImage im_left(left.data, left.cols, left.rows, QImage::Format_Indexed8);
-            //pmap_left = QPixmap::fromImage(im_left);
-
-            //ui->left_image_view_stereo->setPixmap(pmap_left.scaled(
-            //                                          ui->left_image_view_stereo->size(), Qt::KeepAspectRatio));
         } else {
             qDebug() << "Cannot update display. Stereo camera disconnected.";
         }

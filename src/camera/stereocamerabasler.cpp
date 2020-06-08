@@ -8,7 +8,7 @@
 //see: https://github.com/basler/pypylon/blob/master/samples/grabmultiplecameras.py
 
 bool StereoCameraBasler::initCamera(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings) {
-
+    Pylon::PylonInitialize();
     int binning = inital_camera_settings.binning;
     bool trigger;
     if (inital_camera_settings.trigger == 1){
@@ -164,6 +164,7 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
 }
 
 std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::listSystems(void){
+    Pylon::PylonInitialize();
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_gige = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos_usb = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_USB);
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos;
@@ -173,7 +174,6 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
     // find basler systems connected
     // Initialise Basler Pylon
-    Pylon::PylonInitialize();
     // Create an instant camera object with the camera device found first.
     Pylon::CTlFactory& tlFactory = Pylon::CTlFactory::GetInstance();
 
@@ -238,6 +238,7 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
         }
     }
 
+    Pylon::PylonTerminate();
     return connected_serial_infos;
 }
 
@@ -660,6 +661,7 @@ void StereoCameraBasler::disconnectCamera() {
     connected = false;
     emit finished();
     emit disconnected();
+    Pylon::PylonTerminate();
 }
 
 StereoCameraBasler::~StereoCameraBasler() {

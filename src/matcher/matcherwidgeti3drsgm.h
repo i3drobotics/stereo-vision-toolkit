@@ -30,7 +30,7 @@ class MatcherWidgetI3DRSGM : public MatcherWidget {
    void saveClicked();
 
  public:
-   explicit MatcherWidgetI3DRSGM(QWidget *parent = 0, cv::Size image_size =cv::Size(0,0));
+   explicit MatcherWidgetI3DRSGM(QWidget *parent = 0);
   ~MatcherWidgetI3DRSGM();
    void setImageWidth(int width);
 

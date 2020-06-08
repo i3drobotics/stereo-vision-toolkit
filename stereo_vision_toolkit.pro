@@ -84,6 +84,7 @@ SOURCES += \
     calibrationdialog.cpp \
     qdevicedialog.cpp \
     qdevicebutton.cpp \
+    src/camera/stereocamerasupport.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -96,6 +97,7 @@ SOURCES += \
     stereocameraopencv.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
+    stereocamerasupport.cpp \
     matcheropencvblock.cpp \
     matcherwidgetopencvblock.cpp \
     matcheropencvsgbm.cpp \
@@ -129,6 +131,7 @@ HEADERS += \
     qdevicedialog.h \
     qdevicebutton.h \
     asmopencv.h \
+    src/camera/stereocamerasupport.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -141,6 +144,7 @@ HEADERS += \
     stereocameraopencv.h \
     stereocameratis.h \
     stereocamerafromvideo.h \
+    stereocamerasupport.h \
     matcheropencvblock.h \
     matcherwidgetopencvblock.h \
     matcheropencvsgbm.h \
