@@ -659,7 +659,7 @@ void StereoCameraBasler::disconnectCamera() {
         cameras->operator[](1).Close();
     }
     connected = false;
-    emit finished();
+    //emit finished();
     emit disconnected();
     Pylon::PylonTerminate();
 }

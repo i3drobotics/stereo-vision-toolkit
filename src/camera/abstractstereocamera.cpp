@@ -67,11 +67,17 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> AbstractStereoCamera::
 }
 
 void AbstractStereoCamera::assignThread(QThread *thread) {
+    m_thread = thread;
     this->moveToThread(thread);
     connect(this, SIGNAL(finished()), thread, SLOT(quit()));
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
+}
+
+void AbstractStereoCamera::finishThread(){
+    m_thread->quit();
+    m_thread->deleteLater();
 }
 
 void AbstractStereoCamera::saveImageTimestamped(void) {

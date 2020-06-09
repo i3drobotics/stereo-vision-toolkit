@@ -45,7 +45,7 @@ bool StereoCameraFromVideo::enableAutoExpose(bool enable) {
 void StereoCameraFromVideo::disconnectCamera(){
     connected = false;
     emit disconnected();
-    emit finished();
+    //emit finished();
 }
 
 void StereoCameraFromVideo::adjustFPS(int val){

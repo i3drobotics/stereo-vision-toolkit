@@ -301,8 +301,8 @@ void StereoCameraTIS::disconnectCamera(){
     disconnect(this, SIGNAL(stereo_grab(void)), right_camera, SLOT(grabImage(void)));
 
     disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-    emit finished();
     emit disconnected();
+    //emit finished();
 }
 
 StereoCameraTIS::~StereoCameraTIS(){
