@@ -126,11 +126,11 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->stereoMatcherLayout->insertWidget(0,left_matcher_view);
 
+    statusBarInit();
+
     //disable tabs untill camera is connected to prevent crashes
     disableWindow();
-
     controlsInit();
-    statusBarInit();
     pointCloudInit();
     setupMatchers();
 
@@ -163,8 +163,6 @@ void MainWindow::disableWindow(){
     ui->toggleVideoButton->setDisabled(true);
     ui->toggleRectifyCheckBox->setDisabled(true);
     ui->actionCalibration_wizard->setDisabled(true);
-
-    fps_counter->setText(QString("FPS: 0"));
 }
 
 void MainWindow::enableWindow(){
@@ -186,6 +184,11 @@ void MainWindow::enableWindow(){
 void MainWindow::pointCloudSaveStatus(QString msg){
     qDebug() << msg;
     QMessageBox::warning(this,"Stereo Vision Toolkit",msg);
+}
+
+void MainWindow::resetStatusBar(void) {
+    fps_counter->setText("FPS: 0");
+    frame_counter->setText("Frame count: 0");
 }
 
 void MainWindow::statusBarInit(void) {
@@ -781,6 +784,7 @@ void MainWindow::stereoCameraRelease(void) {
 
         startDeviceListTimer();
     }
+    resetStatusBar();
 }
 
 int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info){
