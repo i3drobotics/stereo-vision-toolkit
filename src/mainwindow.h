@@ -154,6 +154,7 @@ private:
 
     void setupMatchers();
     void statusBarInit();
+    void resetStatusBar();
     void controlsInit();
     void pointCloudInit();
 
