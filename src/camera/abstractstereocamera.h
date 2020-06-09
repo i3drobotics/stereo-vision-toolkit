@@ -167,6 +167,8 @@ public:
   */
     void assignThread(QThread *thread);
 
+    void finishThread();
+
     //! Returns whether the camera is currently capturing or processing a frame
     bool isCapturing();
 
@@ -369,6 +371,8 @@ private slots:
 
 private:
     qint64 frames = 0;
+
+    QThread *m_thread;
 
     bool includeDateInFilename = false;
     bool acquiring = false;

@@ -163,6 +163,8 @@ void MainWindow::disableWindow(){
     ui->toggleVideoButton->setDisabled(true);
     ui->toggleRectifyCheckBox->setDisabled(true);
     ui->actionCalibration_wizard->setDisabled(true);
+
+    fps_counter->setText(QString("FPS: 0"));
 }
 
 void MainWindow::enableWindow(){
@@ -638,7 +640,6 @@ void MainWindow::stereoCameraInitConnections(void) {
 }
 
 void MainWindow::stereoCameraRelease(void) {
-    //TODO remove rather than disable unused controls
     disableWindow();
 
     ui->exposureSpinBox->setDisabled(true);
@@ -666,6 +667,9 @@ void MainWindow::stereoCameraRelease(void) {
     ui->toggleRectifyCheckBox->setChecked(false);
     ui->toggleSwapLeftRight->setChecked(false);
 
+    ui->tabWidget->setCurrentIndex(0);
+    ui->tabLayoutSettings->setCurrentIndex(0);
+
     if (cameras_connected) {
         cameras_connected = false;
         QProgressDialog progressClose("Ending camera capture...", "", 0, 100, this);
@@ -676,25 +680,25 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.setMinimumDuration(0);
         progressClose.setValue(10);
 
-        stereo_cam->pause();
-        stereo_cam->enableRectify(false);
-        stereo_cam->enableMatching(false);
-
         progressClose.setLabelText("Closing camera connections...");
         progressClose.setValue(30);
+
+        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
+        disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
 
         disconnect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
                    SLOT(setExposure(double)));
         disconnect(ui->gainSpinBox, SIGNAL(valueChanged(int)), stereo_cam,
                    SLOT(setGain(int)));
+        disconnect(ui->packetDelaySpinBox, SIGNAL(valueChanged(int)), stereo_cam,
+                SLOT(setPacketDelay(int)));
+
         disconnect(ui->binningSpinBox, SIGNAL(valueChanged(int)), this,
                    SLOT(changeBinning(int)));
         disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
                    SLOT(changeFPS(int)));
         disconnect(ui->packetSizeSpinBox, SIGNAL(valueChanged(int)), this,
                 SLOT(changePacketSize(int)));
-        disconnect(ui->packetDelaySpinBox, SIGNAL(valueChanged(int)), stereo_cam,
-                SLOT(setPacketDelay(int)));
 
         disconnect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
                    SLOT(toggleFPS(bool)));
@@ -724,7 +728,8 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(toggleAutoGain(bool)));
         disconnect(ui->binCheckBox, SIGNAL(clicked(bool)), this, SLOT(toggleEnableBinning(bool)));
         disconnect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(toggleHDR(bool)));
-        disconnect(stereo_cam, SIGNAL(disconnected()), this, SLOT(disableWindow()));
+
+        disconnect(stereo_cam, SIGNAL(disconnected()), this, SLOT(stereoCameraRelease()));
 
         /* Point cloud */
         disconnect(stereo_cam, SIGNAL(reprojected()), this, SLOT(updateCloud()));
@@ -742,6 +747,13 @@ void MainWindow::stereoCameraRelease(void) {
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
         }
 
+        if (stereo_cam->isAcquiring()){
+            //stereo_cam->enableAcquire(false);
+            stereo_cam->pause();
+        }
+        stereo_cam->enableRectify(false);
+        stereo_cam->enableMatching(false);
+
         progressClose.setLabelText("Waiting for acquisition to finish...");
         progressClose.setValue(50);
 
@@ -755,6 +767,8 @@ void MainWindow::stereoCameraRelease(void) {
         stereo_cam->disconnectCamera();
 
         QCoreApplication::processEvents();
+
+        stereo_cam->finishThread();
 
         delete stereo_cam;
 
@@ -981,10 +995,11 @@ void MainWindow::cameraDeviceSelected(int index){
                 // Get button widget from grid layout
                 QWidget *wSelectCamera = ui->gridLayoutCameraList->itemAtPosition(i+1,2)->widget();
                 QPushButton *btnSelectCamera = qobject_cast<QPushButton*>(wSelectCamera);
+                // Disconnect signal mapper
+                QSignalMapper * mapper = camera_button_signal_mapper_list->at(i);
+                QObject::disconnect(mapper,SIGNAL(mapped(int)),this,SLOT(cameraDeviceSelected(int)));
+                QObject::disconnect(btnSelectCamera, SIGNAL(clicked()),mapper,SLOT(map()));
                 if (i != button_index){
-                    //btnSelectCamera->setStyleSheet("background-color: grey");
-                    //btnSelectCamera->setText("Connect");
-                    //btnSelectCamera->setEnabled(false);
                     // Remove from list camera that wasn't used
                     QWidget *w1 = ui->gridLayoutCameraList->itemAtPosition(i+1,0)->widget();
                     QWidget *w2 = ui->gridLayoutCameraList->itemAtPosition(i+1,1)->widget();
@@ -994,13 +1009,9 @@ void MainWindow::cameraDeviceSelected(int index){
                 } else {
                     btnSelectCamera->setStyleSheet("background-color: #e83131"); //red
                     btnSelectCamera->setText("Disconnect");
-                    // Disconnect signal mapper
-                    QSignalMapper * mapper = camera_button_signal_mapper_list->at(i);
-                    QObject::disconnect(mapper,SIGNAL(mapped(int)),this,SLOT(cameraDeviceSelected(int)));
-                    QObject::disconnect(btnSelectCamera, SIGNAL(clicked()),mapper,SLOT(map()));
 
-                    connect(btnSelectCamera, SIGNAL(clicked()), stereo_cam, SLOT(disconnectCamera()));
-                    //connect(btnSelectCamera, SIGNAL(clicked()), this, SLOT(stereoCameraRelease()));
+                    //connect(btnSelectCamera, SIGNAL(clicked()), stereo_cam, SLOT(disconnectCamera()));
+                    connect(btnSelectCamera, SIGNAL(clicked()), this, SLOT(stereoCameraRelease()));
                 }
                 i++;
             }
@@ -1633,21 +1644,19 @@ void MainWindow::updateDisplay(void) {
 
     if (cameras_connected){
         if (stereo_cam->isConnected()){
-            if (stereo_cam->isAcquiring()){
-                stereo_cam->getLeftImage(left);
-                stereo_cam->getRightImage(right);
+            stereo_cam->getLeftImage(left);
+            stereo_cam->getRightImage(right);
 
-                if (left.empty() || right.empty()){
-                    qDebug() << "Empty image sent to display";
-                    return;
-                }
-
-                left_view->updateView(left);
-                left_matcher_view->updateView(left);
-                right_view->updateView(right);
+            if (left.empty() || right.empty()){
+                qDebug() << "Empty image sent to display";
+                return;
             }
+
+            left_view->updateView(left);
+            left_matcher_view->updateView(left);
+            right_view->updateView(right);
         } else {
-            qDebug() << "Cannot update display. Stereo camera disconnected.";
+            qDebug() << "Cannot update display";
         }
     } else {
         qDebug() << "Cannot update display. Stereo camera missing.";
@@ -1882,7 +1891,11 @@ void MainWindow::closeEvent(QCloseEvent *) {
     if (videoCaptureStarted)
         stereo_cam->videoStreamStop();
     stereoCameraRelease();
+    qDebug() << "Waiting for device list timer to finish...";
+    stopDeviceListTimer();
+    while(device_list_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
     frame_timer->stop();
+    qDebug() << "Waiting for frame timer to finish...";
     while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
     //TODO fix crash if dialog box used
     if (calibration_dialog_used){

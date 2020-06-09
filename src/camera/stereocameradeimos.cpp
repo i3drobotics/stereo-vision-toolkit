@@ -554,7 +554,7 @@ void StereoCameraDeimos::disconnectCamera() {
         hid_exit();
     }
     emit disconnected();
-    emit finished();
+    //emit finished();
 }
 
 bool StereoCameraDeimos::capture() {
@@ -568,7 +568,7 @@ bool StereoCameraDeimos::capture() {
 
     bool res = false;
 
-    const std::lock_guard<std::mutex> lock(mtx);
+    //const std::lock_guard<std::mutex> lock(mtx);
     if(connected && camera.grab()){
         if(camera.retrieve(image_buffer)){
 
@@ -589,9 +589,6 @@ bool StereoCameraDeimos::capture() {
         res = false;
     }
 
-    //if(!res){
-    //    disconnectCamera();
-    //}
     emit left_captured();
     emit right_captured();
 
@@ -607,5 +604,7 @@ std::string StereoCameraDeimos::wchar_to_string(WCHAR * buffer) {
 }
 
 StereoCameraDeimos::~StereoCameraDeimos(void) {
-    disconnectCamera();
+    if (connected){
+        disconnectCamera();
+    }
 }

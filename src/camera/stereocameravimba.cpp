@@ -420,8 +420,8 @@ void StereoCameraVimba::disconnectCamera() {
         VmbErrorType err_r = camera_r->Close();
     }
     connected = false;
-    emit finished();
     emit disconnected();
+    //emit finished();
 }
 
 StereoCameraVimba::~StereoCameraVimba() {

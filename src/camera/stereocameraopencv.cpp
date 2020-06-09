@@ -601,7 +601,7 @@ void StereoCameraOpenCV::disconnectCamera() {
     hid_close(cam_device_r);
     hid_exit();
     emit disconnected();
-    emit finished();
+    //emit finished();
 }
 
 bool StereoCameraOpenCV::capture() {

@@ -6,15 +6,25 @@ StereoCameraSupport::StereoCameraSupport(){
 
 std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraSupport::getDeviceList(bool showGUI = true){
     StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
+    QThread* tis_thread = new QThread;
+    stereo_cam_tis->assignThread(tis_thread);
 
     StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
+    QThread* deimos_thread = new QThread;
+    stereo_cam_deimos->assignThread(deimos_thread);
 
     StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
+    QThread* cv_thread = new QThread;
+    stereo_cam_cv->assignThread(cv_thread);
 
     StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
+    QThread* basler_thread = new QThread;
+    stereo_cam_basler->assignThread(basler_thread);
 
 #ifdef WITH_VIMBA
     StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
+    QThread* vimba_thread = new QThread;
+    stereo_cam_vimba->assignThread(vimba_thread);
 #endif
 
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info;

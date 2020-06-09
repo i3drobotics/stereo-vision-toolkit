@@ -393,7 +393,7 @@
                <item>
                 <layout class="QVBoxLayout" name="layoutCameraList">
                  <item>
-                  <layout class="QGridLayout" name="gridLayoutCameraList">
+                  <layout class="QGridLayout" name="gridLayoutCameraListHeaders">
                    <property name="topMargin">
                     <number>0</number>
                    </property>
@@ -419,6 +419,9 @@
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                 <item>
+                  <layout class="QGridLayout" name="gridLayoutCameraList"/>
                  </item>
                  <item>
                   <widget class="QLabel" name="lblNoCameras">
@@ -957,7 +960,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="imageViewTab">
            <attribute name="title">
