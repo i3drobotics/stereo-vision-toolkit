@@ -416,16 +416,14 @@ bool StereoCameraVimba::capture() {
 void StereoCameraVimba::disconnectCamera() {
     if (connected){
         //close vimba camera
+        //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
         VmbErrorType err_l = camera_l->Close();
         VmbErrorType err_r = camera_r->Close();
     }
     connected = false;
     emit disconnected();
-    //emit finished();
 }
 
 StereoCameraVimba::~StereoCameraVimba() {
-    disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-    disconnectCamera();
     apiController.ShutDown();
 }

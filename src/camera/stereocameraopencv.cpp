@@ -589,19 +589,19 @@ void StereoCameraOpenCV::getFrameRate() {
 }
 
 void StereoCameraOpenCV::disconnectCamera() {
+    if (connected){
+        if (camera_l.isOpened()) {
+            camera_l.release();
+        }
+        if (camera_r.isOpened()) {
+            camera_r.release();
+        }
+        hid_close(cam_device_l);
+        hid_close(cam_device_r);
+        hid_exit();
+    }
     connected = false;
-
-    if (camera_l.isOpened()) {
-        camera_l.release();
-    }
-    if (camera_r.isOpened()) {
-        camera_r.release();
-    }
-    hid_close(cam_device_l);
-    hid_close(cam_device_r);
-    hid_exit();
     emit disconnected();
-    //emit finished();
 }
 
 bool StereoCameraOpenCV::capture() {

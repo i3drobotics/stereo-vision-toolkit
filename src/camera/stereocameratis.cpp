@@ -173,10 +173,11 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::stereoCameraSettings i
     assert(left_camera->getListener() != nullptr);
     assert(right_camera->getListener() != nullptr);
 
-    connect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(register_left_capture()));
-    connect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(register_right_capture()));
-    connect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(left_captured()));
-    connect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(right_captured()));
+    connect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(leftCaptured()));
+    connect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(rightCaptured()));
+
+    connect(left_camera, SIGNAL(grabError()), this, SLOT(leftGrabFailed()));
+    connect(right_camera, SIGNAL(grabError()), this, SLOT(rightGrabFailed()));
 
     connect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
     connect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));
@@ -202,6 +203,30 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::stereoCameraSettings i
     connected = true;
 
     emit start_capture();
+}
+
+void StereoCameraTIS::leftGrabFailed(){
+    grab_success_l = false;
+    //connected = false;
+    emit register_left_capture();
+    //disconnectCamera();
+}
+
+void StereoCameraTIS::rightGrabFailed(){
+    grab_success_r = false;
+    //connected = false;
+    emit register_right_capture();
+    //disconnectCamera();
+}
+
+void StereoCameraTIS::leftCaptured(){
+    grab_success_l = true;
+    emit register_left_capture();
+}
+
+void StereoCameraTIS::rightCaptured(){
+    grab_success_r = true;
+    emit register_right_capture();
 }
 
 void StereoCameraTIS::loadLeftSettings(){
@@ -279,32 +304,37 @@ bool StereoCameraTIS::capture(){
 
     capturing = false;
 
-    return true;
+    if (!grab_success_l || !grab_success_r){
+        emit register_right_capture();
+        emit register_left_capture();
+    }
 
+    return grab_success_l && grab_success_r;
 }
 
 void StereoCameraTIS::disconnectCamera(){
     if (connected){
+        disconnect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(leftCaptured()));
+        disconnect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(rightCaptured()));
+
+        disconnect(left_camera, SIGNAL(grabError()), this, SLOT(leftGrabFailed()));
+        disconnect(right_camera, SIGNAL(grabError()), this, SLOT(rightGrabFailed()));
+
+        disconnect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
+        disconnect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));
+
+        disconnect(this, SIGNAL(stereo_grab(void)), left_camera, SLOT(grabImage(void)));
+        disconnect(this, SIGNAL(stereo_grab(void)), right_camera, SLOT(grabImage(void)));
+
+        //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
+
         left_camera->close();
         right_camera->close();
     }
     connected = false;
-    disconnect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(register_left_capture()));
-    disconnect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(register_right_capture()));
-    disconnect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(left_captured()));
-    disconnect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(right_captured()));
 
-    disconnect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
-    disconnect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));
-
-    disconnect(this, SIGNAL(stereo_grab(void)), left_camera, SLOT(grabImage(void)));
-    disconnect(this, SIGNAL(stereo_grab(void)), right_camera, SLOT(grabImage(void)));
-
-    disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
     emit disconnected();
-    //emit finished();
 }
 
 StereoCameraTIS::~StereoCameraTIS(){
-    disconnectCamera();
 }

@@ -651,6 +651,7 @@ bool StereoCameraBasler::capture() {
 
 void StereoCameraBasler::disconnectCamera() {
     if (connected){
+        //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
         cameras->StopGrabbing();
         cameras->operator[](0).StopGrabbing();
         cameras->operator[](1).StopGrabbing();
@@ -659,13 +660,9 @@ void StereoCameraBasler::disconnectCamera() {
         cameras->operator[](1).Close();
     }
     connected = false;
-    //emit finished();
     emit disconnected();
-    //Pylon::PylonTerminate();
 }
 
 StereoCameraBasler::~StereoCameraBasler() {
-    disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-    disconnectCamera();
     Pylon::PylonTerminate();
 }

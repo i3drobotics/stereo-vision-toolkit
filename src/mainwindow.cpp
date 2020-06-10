@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     default_tis_init_settings.exposure = 5;
     default_tis_init_settings.gain = 0;
-    default_tis_init_settings.fps = 5;
+    default_tis_init_settings.fps = 10;
     default_tis_init_settings.binning = -1;
     default_tis_init_settings.trigger = false;
     default_tis_init_settings.hdr = -1;
@@ -1778,7 +1778,18 @@ void MainWindow::updateFrameCount(qint64 count) {
 void MainWindow::updateFPS(qint64 time) {
     int fps = 1000.0 / time;
     measured_fps = fps;
-    fps_counter->setText(QString("FPS: %1").arg(fps));
+
+    fps_measure_total+= measured_fps;
+    fps_measure_count++;
+
+    int average_fps = 0;
+    average_fps = ceil((float)fps_measure_total / (float)fps_measure_count);
+    fps_counter->setText(QString("FPS: %1").arg(average_fps));
+
+    if (fps_measure_count > 10){
+        fps_measure_total = average_fps;
+        fps_measure_count = 1;
+    }
 }
 
 void MainWindow::updateTemperature(double temperature) {
