@@ -80,6 +80,8 @@ public:
 private:
     Ui::MainWindow* ui;
 
+    QThread* cam_thread;
+
     bool updatingDisplay = false;
     bool showingSettings = false;
     bool videoCaptureStarted = false;

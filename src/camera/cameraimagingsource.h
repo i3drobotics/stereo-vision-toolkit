@@ -170,6 +170,8 @@ class CameraImagingSource : public QObject {
   void toggleCapture(bool capture);
   void setTrigger(bool trigger);
 
+  void finishThread(void);
+
   void setFrameRate(double);
   double getFrameRate(void);
 

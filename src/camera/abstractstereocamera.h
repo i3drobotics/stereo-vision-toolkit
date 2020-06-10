@@ -372,7 +372,7 @@ private slots:
 private:
     qint64 frames = 0;
 
-    QThread *m_thread;
+    //QThread *m_thread;
 
     bool includeDateInFilename = false;
     bool acquiring = false;

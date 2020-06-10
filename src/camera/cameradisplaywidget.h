@@ -25,7 +25,9 @@ public:
     ~CameraDisplayWidget();
 
     void updateView(cv::Mat new_image){
-        pixmap = ASM::cvMatToQPixmap(new_image);
+        cv::Mat downsample_image;
+        cv::resize(new_image,downsample_image,cv::Size(),downsample_rate,downsample_rate);
+        pixmap = ASM::cvMatToQPixmap(downsample_image);
 
         if(pixmap.isNull()) return;
 
@@ -43,6 +45,11 @@ private:
     QVector<QRgb> colourMap;
     int camwidth = 0;
     int camheight = 0;
+
+    int camMaxSize = 480000; //800×600
+    int camMaxWidth = 800;
+    int camMaxHeight = 600;
+    float downsample_rate = 1;
 
     QPixmap pixmap;
     QImage *display_image = nullptr;

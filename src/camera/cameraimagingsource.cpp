@@ -369,8 +369,7 @@ void CameraImagingSource::setTrigger(bool trigger){
     }
 
     stopCapture();
-    while (handle.isLive())
-      ;
+    while (handle.isLive());
 
     handle.setExternalTrigger(trigger);
 
@@ -382,9 +381,14 @@ void CameraImagingSource::setTrigger(bool trigger){
 void CameraImagingSource::close(){
     debugMessage("Freeing camera");
     stopCapture();
-    while (handle.isLive())
-      ;
+    debugMessage("Waiting for camera handle to close...");
+    while (handle.isLive());
     handle.closeDev();
+    debugMessage("Closing camera thread");
+    finishThread();
+}
+
+void CameraImagingSource::finishThread(){
     emit finished();
 }
 

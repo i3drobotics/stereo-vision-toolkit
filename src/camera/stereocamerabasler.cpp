@@ -238,7 +238,7 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
         }
     }
 
-    Pylon::PylonTerminate();
+    //Pylon::PylonTerminate();
     return connected_serial_infos;
 }
 
@@ -646,7 +646,7 @@ bool StereoCameraBasler::capture() {
     emit right_captured();
     emit left_captured();
 
-    return true;
+    return qfuture_capture;
 }
 
 void StereoCameraBasler::disconnectCamera() {
@@ -661,7 +661,7 @@ void StereoCameraBasler::disconnectCamera() {
     connected = false;
     //emit finished();
     emit disconnected();
-    Pylon::PylonTerminate();
+    //Pylon::PylonTerminate();
 }
 
 StereoCameraBasler::~StereoCameraBasler() {

@@ -18,11 +18,27 @@ CameraDisplayWidget::~CameraDisplayWidget()
 }
 
 void CameraDisplayWidget::setSize(int width, int height, int bit_depth) {
+    int image_size = width * height;
 
-  camwidth = width;
-  camheight = height;
+    if (image_size > camMaxSize){
+        float width_scale = (float)camMaxWidth/(float)width;
+        float height_scale = (float)camMaxHeight/(float)height;
 
-  displayBuffer.resize(camwidth * camheight * bit_depth);
-  display_image = new QImage(camwidth, camheight, QImage::Format_Indexed8);
-  display_image->setColorTable(colourMap);
+        if (width_scale < height_scale){
+            downsample_rate = width_scale;
+        } else {
+            downsample_rate = height_scale;
+        }
+
+        camwidth = width * downsample_rate;
+        camheight = height * downsample_rate;
+    } else {
+        downsample_rate = 1;
+        camwidth = width;
+        camheight = height;
+    }
+
+    displayBuffer.resize(camwidth * camheight * bit_depth);
+    display_image = new QImage(camwidth, camheight, QImage::Format_Indexed8);
+    display_image->setColorTable(colourMap);
 }
