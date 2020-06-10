@@ -35,7 +35,6 @@ public:
     void adjustBinning(int val);
     void adjustPacketSize(int val);
     void toggleTrigger(bool enable);
-    void adjustFPS(int val);
 
     ~StereoCameraBasler(void);
 
@@ -43,6 +42,7 @@ public slots:
     bool setExposure(double val);
     bool setGain(int val);
     void setPacketDelay(int val);
+    void adjustFPS(int val);
     void changeFPS(int val);
     void changeBinning(int val);
     void changePacketSize(int val);
