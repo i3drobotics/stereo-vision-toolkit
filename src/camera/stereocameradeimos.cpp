@@ -546,13 +546,14 @@ void StereoCameraDeimos::getFrameRate() {
 }
 
 void StereoCameraDeimos::disconnectCamera() {
-    connected = false;
-
-    if (camera.isOpened()) {
-        camera.release();
-        hid_close(deimos_device);
-        hid_exit();
+    if (connected){
+        if (camera.isOpened()) {
+            camera.release();
+            hid_close(deimos_device);
+            hid_exit();
+        }
     }
+    connected = false;
     emit disconnected();
     //emit finished();
 }

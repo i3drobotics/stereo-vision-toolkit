@@ -18,7 +18,6 @@ Q_OBJECT
 signals:
     void start_capture();
     void stereopair_captured();
-    void update_size(int width, int height, int bitdepth);
 
 public slots:
     void loadLeftSettings();
@@ -29,6 +28,10 @@ public slots:
     void enableAutoExpose(bool enable);
     void enableAutoGain(bool enable);
     void changeFPS(int fps);
+    void leftGrabFailed();
+    void rightGrabFailed();
+    void leftCaptured();
+    void rightCaptured();
 
 public:
     explicit StereoCameraTIS(QObject *parent = 0) :
@@ -63,6 +66,9 @@ private:
     QList<qint64> load_serials(QString filename);
     QList<int> widths;
     QList<int> heights;
+
+    bool grab_success_l = true;
+    bool grab_success_r = true;
 
     void setup_cameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
 };

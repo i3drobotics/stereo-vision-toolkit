@@ -58,6 +58,8 @@
 #include "fvupdater.h"
 #endif
 
+#include "math.h"
+
 //!  Main Window
 /*!
   QT Main Window of application
@@ -81,6 +83,9 @@ private:
     Ui::MainWindow* ui;
 
     QThread* cam_thread;
+
+    int fps_measure_count = 0;
+    int fps_measure_total = 0;
 
     bool updatingDisplay = false;
     bool showingSettings = false;
