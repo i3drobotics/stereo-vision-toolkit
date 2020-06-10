@@ -504,10 +504,6 @@ void MainWindow::stereoCameraInitWindow(void){
     int min_binning = 1;
     int step_binning = 1;
 
-    double max_exposure = 500;
-    double min_exposure = 1;
-    double step_exposure = 1;
-
     int max_packetDelay = 10000;
     int min_packetDelay = -1;
     int step_packetDelay = 1;
@@ -562,8 +558,8 @@ void MainWindow::stereoCameraInitWindow(void){
 
     // set exposure
     ui->exposureSpinBox->blockSignals(true);
-    ui->exposureSpinBox->setRange(min_exposure,max_exposure);
-    ui->exposureSpinBox->setSingleStep(step_exposure);
+    //ui->exposureSpinBox->setRange(min_exposure,max_exposure); //set by ui
+    //ui->exposureSpinBox->setSingleStep(step_exposure); //set by ui
     ui->exposureSpinBox->setValue(default_exposure);
     ui->exposureSpinBox->blockSignals(false);
 
@@ -709,7 +705,7 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
                    SLOT(changeFPS(int)));
         disconnect(ui->packetSizeSpinBox, SIGNAL(valueChanged(int)), this,
-                SLOT(changePacketSize(int)));
+                SLOT(changePacketSize()));
 
         disconnect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
                    SLOT(toggleFPS(bool)));
@@ -918,9 +914,35 @@ void MainWindow::refreshCameraList(bool showGUI = true){
     deviceListButtons.clear();
     QLayoutItem *item;
     while ((item = ui->gridLayoutCameraList->takeAt(0)) != 0) {
-        delete item->widget();
-        //delete item;
+        if (item->layout()){
+            QLayoutItem *item2;
+            while ((item2 = item->layout()->takeAt(0)) != 0) {
+                if (item2->widget()){
+                    delete item2->widget();
+                }
+            }
+            delete item->layout();
+        } else if (item->widget()){
+            delete item->widget();
+        }
     }
+
+    /*
+    QLabel *colHeader1 = new QLabel("Type");
+    QLabel *colHeader2 = new QLabel("Serial");
+    QLabel *colHeader3 = new QLabel("");
+
+    colHeader1->setAlignment(Qt::AlignHCenter);
+    colHeader2->setAlignment(Qt::AlignHCenter);
+
+    ui->gridLayoutCameraList->addWidget(colHeader1,0,0);
+    ui->gridLayoutCameraList->addWidget(colHeader2,0,1);
+    ui->gridLayoutCameraList->addWidget(colHeader3,0,2);
+    */
+
+    ui->gridLayoutCameraList->setColumnStretch(0,0);
+    ui->gridLayoutCameraList->setColumnStretch(1,1);
+    ui->gridLayoutCameraList->setColumnStretch(2,0);
 
     if (all_camera_serial_info.size() <= 0){
         ui->lblNoCameras->show();
@@ -949,22 +971,25 @@ void MainWindow::refreshCameraList(bool showGUI = true){
                 camera_icon = pixmapCamera;
             }
 
-            QHBoxLayout *hlayoutCamera = new QHBoxLayout();
+            QHBoxLayout *hlayoutCameraType = new QHBoxLayout();
 
             QLabel* cameraIconLabel = new QLabel();
             cameraIconLabel->setPixmap(camera_icon);
-            hlayoutCamera->addWidget(cameraIconLabel);
+            hlayoutCameraType->addWidget(cameraIconLabel);
 
-            std::string button_text = camera_type + " " + camera_serial;
-            QLabel* cameraNameLabel = new QLabel(button_text.c_str());
-            hlayoutCamera->addWidget(cameraNameLabel);
+            std::string cameraTypeBtnText = camera_type;
+            QLabel* cameraTypeLabel = new QLabel(cameraTypeBtnText.c_str());
+            hlayoutCameraType->addWidget(cameraTypeLabel);
+
+            std::string cameraSerialBtnText = camera_serial;
+            QLabel* cameraSerialLabel = new QLabel(cameraSerialBtnText.c_str());
+            cameraSerialLabel->setAlignment(Qt::AlignCenter);
 
             QPushButton *btnSelectCamera = new QPushButton("Connect");
             btnSelectCamera->setStyleSheet("background-color: green");
-            hlayoutCamera->addWidget(btnSelectCamera);
 
-            ui->gridLayoutCameraList->addWidget(cameraIconLabel,i+1,0);
-            ui->gridLayoutCameraList->addWidget(cameraNameLabel,i+1,1);
+            ui->gridLayoutCameraList->addLayout(hlayoutCameraType,i+1,0);
+            ui->gridLayoutCameraList->addWidget(cameraSerialLabel,i+1,1);
             ui->gridLayoutCameraList->addWidget(btnSelectCamera,i+1,2);
 
             QSignalMapper * mapper = new QSignalMapper(this);
