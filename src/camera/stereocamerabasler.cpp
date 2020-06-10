@@ -327,7 +327,12 @@ void StereoCameraBasler::setFPS(int val){
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateAbs").SetValue(fps_f);
+            if (this->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+                Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateAbs").SetValue(fps_f);
+            }
+            if  (this->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
+                Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRate").SetValue(fps_f);
+            }
         }
         this->m_fps = val;
     }
@@ -375,7 +380,12 @@ bool StereoCameraBasler::setExposure(double val) {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "ExposureTimeRaw").SetValue(exposure_i);
+            if (this->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+                Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "ExposureTimeRaw").SetValue(exposure_i);
+            }
+            if  (this->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
+                Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "ExposureTime").SetValue(exposure_i);
+            }
         }
         return true;
     }
@@ -474,7 +484,12 @@ bool StereoCameraBasler::setGain(int val) {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "GainRaw").SetValue(gain_i);
+            if (this->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_GIGE){
+                Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "GainRaw").SetValue(gain_i);
+            }
+            if  (this->camera_serial_info.camera_type == CAMERA_TYPE_BASLER_USB){
+                Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "Gain").SetValue(gain_i);
+            }
         }
         return true;
     }
