@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget* parent)
     calibration_dialog_used = false;
     calibration_from_images_dialog_used = false;
 
+    cam_thread = new QThread;
     stereoCamSupport = new StereoCameraSupport();
     device_list_timer = new QTimer(this);
 
@@ -675,6 +676,7 @@ void MainWindow::stereoCameraRelease(void) {
 
     if (cameras_connected) {
         cameras_connected = false;
+
         QProgressDialog progressClose("Ending camera capture...", "", 0, 100, this);
         progressClose.setWindowTitle("SVT");
         progressClose.setWindowModality(Qt::WindowModal);
@@ -682,6 +684,12 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         progressClose.setMinimumDuration(0);
         progressClose.setValue(10);
+
+        if (stereo_cam->isAcquiring()){
+            stereo_cam->pause();
+        }
+        stereo_cam->enableRectify(false);
+        stereo_cam->enableMatching(false);
 
         progressClose.setLabelText("Closing camera connections...");
         progressClose.setValue(30);
@@ -750,13 +758,6 @@ void MainWindow::stereoCameraRelease(void) {
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
         }
 
-        if (stereo_cam->isAcquiring()){
-            //stereo_cam->enableAcquire(false);
-            stereo_cam->pause();
-        }
-        stereo_cam->enableRectify(false);
-        stereo_cam->enableMatching(false);
-
         progressClose.setLabelText("Waiting for acquisition to finish...");
         progressClose.setValue(50);
 
@@ -798,26 +799,18 @@ int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_s
     QCoreApplication::processEvents();
     int exit_code = CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE;
 
+    cam_thread = new QThread;
+
     StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
-    QThread* tis_thread = new QThread;
-    stereo_cam_tis->assignThread(tis_thread);
 
     StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
-    QThread* deimos_thread = new QThread;
-    stereo_cam_deimos->assignThread(deimos_thread);
 
     StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
-    QThread* cv_thread = new QThread;
-    stereo_cam_cv->assignThread(cv_thread);
 
     StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
-    QThread* basler_thread = new QThread;
-    stereo_cam_basler->assignThread(basler_thread);
 
 #ifdef WITH_VIMBA
     StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
-    QThread* vimba_thread = new QThread;
-    stereo_cam_vimba->assignThread(vimba_thread);
 #endif
 
     if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
@@ -856,6 +849,7 @@ int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_s
     QCoreApplication::processEvents();
 
     if (cameras_connected){
+        stereo_cam->assignThread(cam_thread);
         progressConnect.setLabelText("Setting up camera interface...");
         progressConnect.setValue(50);
         stereoCameraInit();
@@ -1033,28 +1027,6 @@ int MainWindow::stereoCameraLoad(void) {
 
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = stereoCamSupport->getDeviceList(true);
 
-    StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
-    QThread* tis_thread = new QThread;
-    stereo_cam_tis->assignThread(tis_thread);
-
-    StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
-    QThread* deimos_thread = new QThread;
-    stereo_cam_deimos->assignThread(deimos_thread);
-
-    StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
-    QThread* cv_thread = new QThread;
-    stereo_cam_cv->assignThread(cv_thread);
-
-    StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
-    QThread* basler_thread = new QThread;
-    stereo_cam_basler->assignThread(basler_thread);
-
-#ifdef WITH_VIMBA
-    StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
-    QThread* vimba_thread = new QThread;
-    stereo_cam_vimba->assignThread(vimba_thread);
-#endif
-
     AbstractStereoCamera::stereoCameraSerialInfo chosen_camera_serial_info;
     bool camera_chosen = false;
 
@@ -1118,59 +1090,7 @@ int MainWindow::stereoCameraLoad(void) {
 
     if (camera_chosen) {
         // connect to chosen camera
-        QProgressDialog progressConnect("Connecting to camera...", "", 0, 100, this);
-        progressConnect.setWindowTitle("SVT");
-        progressConnect.setWindowModality(Qt::WindowModal);
-        progressConnect.setCancelButton(nullptr);
-        progressConnect.setMinimumDuration(0);
-        progressConnect.setValue(10);
-        QCoreApplication::processEvents();
-        if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
-            current_camera_settings = default_deimos_init_settings;
-            cameras_connected = stereo_cam_deimos->initCamera(chosen_camera_serial_info,current_camera_settings);
-            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
-            qDebug() << "Connecting to Deimos system";
-        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
-            current_camera_settings = default_basler_init_settings;
-            if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
-                current_camera_settings.isGige = 1;
-            }
-            cameras_connected = stereo_cam_basler->initCamera(chosen_camera_serial_info,current_camera_settings);
-            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_basler);
-            qDebug() << "Connecting to Phobos system";
-        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
-            current_camera_settings = default_tis_init_settings;
-            cameras_connected = stereo_cam_tis->initCamera(chosen_camera_serial_info,current_camera_settings);
-            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tis);
-            qDebug() << "Connecting to Phobos system";
-        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
-            current_camera_settings = default_usb_init_settings;
-            cameras_connected = stereo_cam_cv->initCamera(chosen_camera_serial_info,current_camera_settings);
-            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
-            qDebug() << "Connecting to USB system";
-        } else if (chosen_camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
-#ifdef WITH_VIMBA
-           current_camera_settings = default_vimba_init_settings;
-           cameras_connected = stereo_cam_vimba->initCamera(chosen_camera_serial_info,current_camera_settings);
-           stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_cv);
-           qDebug() << "Connecting to Titania system";
-#endif
-       }
-
-        stereo_cam->camera_serial_info = chosen_camera_serial_info;
-
-        if (cameras_connected){
-            progressConnect.setLabelText("Setting up camera interface...");
-            progressConnect.setValue(50);
-            stereoCameraInit();
-            progressConnect.setLabelText("Camera system connected");
-            progressConnect.setValue(100);
-            progressConnect.close();
-            QCoreApplication::processEvents();
-            exit_code = CAMERA_CONNECTION_SUCCESS_EXIT_CODE;
-        } else {
-            exit_code = CAMERA_CONNECTION_FAILED_EXIT_CODE; // failed to connect to camera
-        }
+        exit_code = openCamera(chosen_camera_serial_info);
     } else {
         exit_code = CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE; // no camera chosen
     }
@@ -1282,7 +1202,7 @@ void MainWindow::videoStreamLoad(void) {
         stereoCameraRelease();
 
         StereoCameraFromVideo* stereo_cam_video = new StereoCameraFromVideo;
-        QThread* cam_thread = new QThread;
+        cam_thread = new QThread;
         stereo_cam_video->assignThread(cam_thread);
 
         AbstractStereoCamera::stereoCameraSerialInfo scis;
@@ -1901,13 +1821,14 @@ void MainWindow::closeEvent(QCloseEvent *) {
     frame_timer->stop();
     qDebug() << "Waiting for frame timer to finish...";
     while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
-    //TODO fix crash if dialog box used
+    // Close external windows
     if (calibration_dialog_used){
         calibration_dialog->close();
     }
     if (calibration_from_images_dialog_used){
         calibration_images_dialog->close();
     }
+    qDebug() << "Closing processes...";
 }
 
 MainWindow::~MainWindow() {

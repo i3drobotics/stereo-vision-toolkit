@@ -645,9 +645,6 @@ bool StereoCameraOpenCV::capture() {
         res = false;
     }
 
-    //if(!res){
-    //    disconnectCamera();
-    //}
     emit left_captured();
     emit right_captured();
 

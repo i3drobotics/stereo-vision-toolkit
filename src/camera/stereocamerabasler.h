@@ -59,6 +59,8 @@ private:
     int m_fps;
     int m_packet_size;
 
+    //bool grab_success = true;
+
     QFuture<bool> qfuture_capture;
 
     void setBinning(int val);
