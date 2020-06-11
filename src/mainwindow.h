@@ -196,7 +196,6 @@ public slots:
     void startDeviceListTimer(void);
     void stopDeviceListTimer(void);
     void autoloadCameraTriggered();
-    void toggleDownsample(bool);
     void toggleAutoExpose(bool);
     void toggleAutoGain(bool);
     void toggleEnableBinning(bool enable);

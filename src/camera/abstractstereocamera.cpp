@@ -112,8 +112,9 @@ void AbstractStereoCamera::saveImage(QString fname) {
         res_r.waitForFinished();
     }
 
-    if(matching){
+    if(matching && savingDisparity){
         matcher->saveDisparity(fname + "_disp_raw.png");
+        matcher->saveDisparityColormap(fname + "_disp_colormap.png");
     }
 
     emit savedImage(fname);
@@ -140,6 +141,9 @@ void AbstractStereoCamera::reproject3D() {
     matcher->getDisparity(disparity);
     disparity.copyTo(disparity_downscale);
 
+    cv::Mat depth;
+    matcher->calcDepth(disparity,depth);
+
     qDebug() << "disparity image size: " << disparity_downscale.size().width << "," << disparity_downscale.size().height;
 
     //cv::abs(disparity_downscale);
@@ -158,9 +162,9 @@ void AbstractStereoCamera::reproject3D() {
         return;
     }
 
-    cv::reprojectImageTo3D(disparity_downscale, stereo_reprojected, Q, true);
+    //cv::reprojectImageTo3D(disparity_downscale, stereo_reprojected, Q, true);
 
-    qDebug() << "reprojected image size: " << stereo_reprojected.size().width << "," << stereo_reprojected.size().height;
+    //qDebug() << "reprojected image size: " << stereo_reprojected.size().width << "," << stereo_reprojected.size().height;
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp(
                 new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -307,8 +311,14 @@ void AbstractStereoCamera::enableSwapLeftRight(bool swap){
     swappingLeftRight = swap;
 }
 
-void AbstractStereoCamera::enableDownsample(bool downsample){
-    downsampling = downsample;
+void AbstractStereoCamera::enableSaveDisparity(bool enable){
+    savingDisparity = enable;
+}
+
+void AbstractStereoCamera::enableDownsampleCalibration(bool enable){
+    downsamplingCalibration = enable;
+    //TODO Re-load calibration with downsample applied
+
 }
 
 void AbstractStereoCamera::changeDownsampleFactor(int factor){
@@ -326,7 +336,9 @@ bool AbstractStereoCamera::isRectifying() { return rectifying; }
 
 bool AbstractStereoCamera::isSwappingLeftRight() { return swappingLeftRight; }
 
-bool AbstractStereoCamera::isDownsampling() { return downsampling; }
+bool AbstractStereoCamera::isDownsamplingCalibration() { return downsamplingCalibration; }
+
+bool AbstractStereoCamera::isSavingDisparity() { return savingDisparity; }
 
 bool AbstractStereoCamera::isConnected() {
     bool connected_tmp = connected;
@@ -453,6 +465,8 @@ bool AbstractStereoCamera::loadCalibration(QString left_cal, QString right_cal,
 
     fs_s.release();
 
+    //TODO: scale calibration by downsample factor
+
     return true;
 }
 
@@ -521,11 +535,6 @@ void AbstractStereoCamera::process_stereo(void) {
     frames++;
     emit framecount(frames);
 
-    if (isDownsampling()){
-        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
-    }
-
     if (isSwappingLeftRight()){
         cv::Mat right_tmp;
         right_raw.copyTo(right_tmp);
@@ -543,6 +552,11 @@ void AbstractStereoCamera::process_stereo(void) {
 
     left_remapped.copyTo(left_output);
     right_remapped.copyTo(right_output);
+
+    if (downsample_factor != 1){
+        cv::resize(right_output,right_output,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(left_output,left_output,cv::Size(),downsample_factor,downsample_factor);
+    }
 
     if (matching) {
         matcher->match();
