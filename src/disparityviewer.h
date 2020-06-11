@@ -33,6 +33,8 @@ signals:
     void savedImage();
     //! Emit when an image has been saved, including the filename
     void savedImage(QString filename);
+    //! Emit when disparity save checkbox is toggled
+    void toggledDisparitySave(bool enable);
 
 public:
     explicit DisparityViewer(QWidget *parent = 0);
@@ -69,6 +71,7 @@ public slots:
     void setColourmap(int);
     void setCalibration(cv::Mat &Q, double baseline = 1.0, double focal = 1.0);
     void saveImageTimestamped(void);
+    void saveDisparityChanged(bool enable);
 
 private:
     Ui::DisparityViewer *ui;

@@ -152,7 +152,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 void MainWindow::disableWindow(){
     ui->toggleSwapLeftRight->setDisabled(true);
-    ui->toggleDownsample->setDisabled(true);
+    ui->toggleCalibrationDownsample->setDisabled(true);
     ui->spinBoxDownsample->setDisabled(true);
     ui->tabWidget->setDisabled(true);
     ui->tabCameraSettings->setDisabled(true);
@@ -171,7 +171,7 @@ void MainWindow::disableWindow(){
 void MainWindow::enableWindow(){
 
     ui->toggleSwapLeftRight->setEnabled(true);
-    ui->toggleDownsample->setEnabled(true);
+    ui->toggleCalibrationDownsample->setEnabled(true);
     ui->spinBoxDownsample->setEnabled(true);
     ui->tabWidget->setEnabled(true);
     ui->tabCameraSettings->setEnabled(true);
@@ -610,7 +610,7 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(updateFrameCount(qint64)));
     connect(stereo_cam, SIGNAL(temperature_C(double)), this, SLOT(updateTemperature(double)));
     connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(saveImageTimestamped()));
-    connect(ui->saveButton, SIGNAL(clicked()), disparity_view, SLOT(saveImageTimestamped()));
+    connect(disparity_view, SIGNAL(toggledDisparitySave(bool)), stereo_cam, SLOT(enableSaveDisparity(bool)));
     connect(stereo_cam, SIGNAL(savedImage(QString)), this,
             SLOT(displaySaved(QString)));
     connect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
@@ -619,9 +619,8 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(enableRectify(bool)));
     connect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
             SLOT(enableSwapLeftRight(bool)));
-    connect(ui->toggleDownsample, SIGNAL(clicked(bool)), this,
-            SLOT(toggleDownsample(bool)));
-    connect(ui->toggleDownsample, SIGNAL(clicked(bool)), ui->spinBoxDownsample, SLOT(setEnabled(bool)));
+    connect(ui->toggleCalibrationDownsample, SIGNAL(clicked(bool)), stereo_cam,
+            SLOT(enableDownsampleCalibration(bool)));
     connect(ui->spinBoxDownsample, SIGNAL(valueChanged(int)), stereo_cam,
             SLOT(changeDownsampleFactor(int)));
     connect(stereo_cam, SIGNAL(matched()), disparity_view,
@@ -673,7 +672,7 @@ void MainWindow::stereoCameraRelease(void) {
 
     ui->toggleRectifyCheckBox->setChecked(false);
     ui->toggleSwapLeftRight->setChecked(false);
-    ui->toggleDownsample->setChecked(false);
+    ui->toggleCalibrationDownsample->setChecked(false);
 
     ui->tabWidget->setCurrentIndex(0);
     ui->tabLayoutSettings->setCurrentIndex(0);
@@ -731,6 +730,7 @@ void MainWindow::stereoCameraRelease(void) {
                    SLOT(updateFrameCount(qint64)));
         disconnect(ui->saveButton, SIGNAL(clicked()), stereo_cam,
                    SLOT(saveImageTimestamped()));
+        disconnect(disparity_view, SIGNAL(toggledDisparitySave(bool)), stereo_cam, SLOT(enableSaveDisparity(bool)));
         disconnect(stereo_cam, SIGNAL(savedImage(QString)), this,
                    SLOT(displaySaved(QString)));
         disconnect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
@@ -739,9 +739,8 @@ void MainWindow::stereoCameraRelease(void) {
                    SLOT(enableRectify(bool)));
         disconnect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
                    SLOT(enableSwapLeftRight(bool)));
-        disconnect(ui->toggleDownsample, SIGNAL(clicked(bool)), this,
-                SLOT(toggleDownsample(bool)));
-        disconnect(ui->toggleDownsample, SIGNAL(clicked(bool)), ui->spinBoxDownsample, SLOT(setEnabled(bool)));
+        disconnect(ui->toggleCalibrationDownsample, SIGNAL(clicked(bool)), stereo_cam,
+                SLOT(enableDownsampleCalibration(bool)));
         disconnect(ui->spinBoxDownsample, SIGNAL(valueChanged(int)), stereo_cam,
                 SLOT(changeDownsampleFactor(int)));
         disconnect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(toggleAutoExpose(bool)));
@@ -1037,9 +1036,20 @@ void MainWindow::cameraDeviceSelected(int index){
                 QObject::disconnect(btnSelectCamera, SIGNAL(clicked()),mapper,SLOT(map()));
                 if (i != button_index){
                     // Remove from list camera that wasn't used
-                    QWidget *w1 = ui->gridLayoutCameraList->itemAtPosition(i+1,0)->widget();
+                    if (ui->gridLayoutCameraList->itemAtPosition(i+1,0)->widget()){
+                        QWidget *w1 = ui->gridLayoutCameraList->itemAtPosition(i+1,0)->widget();
+                        delete(w1);
+                    } else if (ui->gridLayoutCameraList->itemAtPosition(i+1,0)->layout()){
+                        QLayout *l1 = ui->gridLayoutCameraList->itemAtPosition(i+1,0)->layout();
+                        QLayoutItem *item2;
+                        while ((item2 = l1->takeAt(0)) != 0) {
+                            if (item2->widget()){
+                                delete item2->widget();
+                            }
+                        }
+                        delete l1;
+                    }
                     QWidget *w2 = ui->gridLayoutCameraList->itemAtPosition(i+1,1)->widget();
-                    delete(w1);
                     delete(w2);
                     delete(btnSelectCamera);
                 } else {
@@ -1180,10 +1190,12 @@ void MainWindow::startDeviceListTimer() {
     refreshCameraListNoGui();
     device_list_timer->start(3000);
     QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListNoGui()));
+    ui->btnRefreshCameras->setEnabled(true);
 }
 
 void MainWindow::stopDeviceListTimer() {
     device_list_timer->stop();
+    ui->btnRefreshCameras->setEnabled(false);
 }
 
 void MainWindow::autoloadCameraTriggered() {
@@ -1644,14 +1656,6 @@ void MainWindow::setSaveDirectory(QString dir) {
         if(stereo_cam)
             stereo_cam->setSavelocation(save_directory);
         disparity_view->setSavelocation(save_directory);
-    }
-}
-
-void MainWindow::toggleDownsample(bool enable){
-    stereo_cam->enableDownsample(enable);
-    if (!enable){
-        int downsample_factor = ui->spinBoxDownsample->value();
-        stereo_cam->changeDownsampleFactor(downsample_factor);
     }
 }
 

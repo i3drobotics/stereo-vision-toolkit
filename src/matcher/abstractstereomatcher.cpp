@@ -37,6 +37,10 @@ void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {
     return;
 }
 
+void AbstractStereoMatcher::getDisparity16(cv::Mat &dst) {
+    disparity16.copyTo(dst);
+}
+
 void AbstractStereoMatcher::getDisparityRange(int &val) {
     val = disparity_range;
 }
@@ -48,11 +52,18 @@ void AbstractStereoMatcher::getMinDisparity(int &val) {
 void AbstractStereoMatcher::saveDisparity(QString filename) {
     cv::Mat disparity_output;
 
-    //disparity_lr.convertTo(disparity_output, CV_16SC1);
-    //disparity_output += min_disparity*16;
-    //disparity_output.convertTo(disparity_output, CV_16UC1);
-    disparity_lr.copyTo(disparity_output);
-    disparity_output /= 16;
+    disparity16.copyTo(disparity_output);
+
+    cv::imwrite(filename.toStdString(), disparity_output);
+
+    return;
+}
+
+void AbstractStereoMatcher::saveDisparityColormap(QString filename) {
+    cv::Mat disparity_output;
+
+    //generate normalised colormap for saving
+    disparity2colormap(disparity16,disparity_output);
 
     cv::imwrite(filename.toStdString(), disparity_output);
 
@@ -80,6 +91,98 @@ void AbstractStereoMatcher::match() {
     //checkLRConsistencyFull(5);
 
     disparity_lr.convertTo(disparity_buffer, CV_32F);
+    disparity16 = disparity_lr / 16;
+}
+
+void AbstractStereoMatcher::normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity){
+    cv::Mat disparity_thresh;
+
+    inDisparity.copyTo(disparity_thresh);
+
+    double min_disp, max_disp;
+    getMinMaxDisparity(disparity_thresh, min_disp, max_disp);
+
+    for (int i = 0; i < disparity_thresh.rows; i++)
+    {
+        for (int j = 0; j < disparity_thresh.cols; j++)
+        {
+            float d = disparity_thresh.at<float>(i, j);
+            if (d > max_disp || d < min_disp){
+                disparity_thresh.at<float>(i, j) = 0;
+            }
+        }
+    }
+
+    for (int i = 0; i < disparity_thresh.rows; i++)
+    {
+        for (int j = 0; j < disparity_thresh.cols; j++)
+        {
+            float d = disparity_thresh.at<float>(i, j);
+            if (d > max_disp || d < min_disp){
+                disparity_thresh.at<float>(i, j) = 0;
+            }
+        }
+    }
+
+    disparity_thresh.convertTo(disparity_thresh, CV_8U);
+
+    cv::normalize(disparity_thresh, disparity_thresh, 0, 255, cv::NORM_MINMAX);
+
+    outNormalisedDisparity = disparity_thresh;
+}
+
+void AbstractStereoMatcher::getMinMaxDisparity(cv::Mat inDisparity, double &min_disp, double &max_disp){
+    min_disp = 10000;
+    max_disp = 0;
+
+    for (int i = 0; i < inDisparity.rows; i++)
+    {
+        for (int j = 0; j < inDisparity.cols; j++)
+        {
+            float d = inDisparity.at<float>(i, j);
+            if (d < 10000 && d > 0){
+                float d = inDisparity.at<float>(i, j);
+                if (d < min_disp){
+                    min_disp = d;
+                }
+                if (d > max_disp){
+                    max_disp = d;
+                }
+            }
+        }
+    }
+}
+
+void AbstractStereoMatcher::disparity2colormap(cv::Mat inDisparity, cv::Mat &outColormap){
+    // normalise disparity
+    cv::Mat normDisp;
+    normaliseDisparity(inDisparity, normDisp);
+
+    // apply colormap
+    int colourmap_index = 2;
+    cv::Mat colormap;
+    cv::applyColorMap(normDisp, colormap, colourmap_index);
+
+    // remove blue background (black becomes blue after colormap)
+    for (int x = 0; x < colormap.cols; x++) {
+        for (int y = 0; y < colormap.rows; y++) {
+            if (colormap.at<cv::Vec3b>(y, x)[2] == 0) {
+                colormap.at<cv::Vec3b>(y, x)[0] = 0;
+                colormap.at<cv::Vec3b>(y, x)[1] = 0;
+                colormap.at<cv::Vec3b>(y, x)[2] = 0;
+            }
+        }
+    }
+
+    outColormap = colormap;
+}
+
+void AbstractStereoMatcher::calcDepth(cv::Mat inDisparity, cv::Mat &outDepth){
+    //TODO impliment this
+}
+
+void AbstractStereoMatcher::calcPointCloud(cv::Mat inDepth, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outPoints){
+    //TODO impliment this
 }
 
 AbstractStereoMatcher::~AbstractStereoMatcher() { emit finished(); }

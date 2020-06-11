@@ -974,12 +974,12 @@
                   </widget>
                  </item>
                  <item row="1" column="2">
-                  <widget class="QCheckBox" name="toggleDownsample">
+                  <widget class="QCheckBox" name="toggleCalibrationDownsample">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
                    <property name="text">
-                    <string>Enable</string>
+                    <string>Calibration</string>
                    </property>
                   </widget>
                  </item>

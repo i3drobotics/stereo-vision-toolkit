@@ -189,8 +189,11 @@ public:
     //! Returns whether left and right images are being swapped
     bool isSwappingLeftRight();
 
-    //! Returns whether downsampling images
-    bool isDownsampling();
+    //! Returns whether downsampling is also being applied to calibration
+    bool isDownsamplingCalibration();
+
+    //! Returns wheather to save disparity along with stereo pair
+    bool isSavingDisparity();
 
     //! Returns wheather the camera is connected
     bool isConnected();
@@ -336,8 +339,12 @@ public slots:
     //! Enable swap left and right images
     void enableSwapLeftRight(bool swap);
 
-    //! Enable downsample of images
-    void enableDownsample(bool downsample);
+    //! Enable applying downsampling to calibration as well as image
+    //! this is done to avoid needed to re-calibration when using downsampling
+    void enableDownsampleCalibration(bool enable);
+
+    //! Enable saving disparity image
+    void enableSaveDisparity(bool enable);
 
     //! Change downsample factor
     void changeDownsampleFactor(int factor);
@@ -396,9 +403,10 @@ private:
     bool matching = false;
     bool rectifying = false;
     bool swappingLeftRight = false;
-    bool downsampling = false;
     bool reprojecting = false;
     bool has_cuda = false;
+    bool downsamplingCalibration = true;
+    bool savingDisparity = true;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloud;
     QString save_directory = ".";
 

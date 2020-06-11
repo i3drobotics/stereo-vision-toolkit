@@ -32,9 +32,7 @@ DisparityViewer::DisparityViewer(QWidget *parent)
     connect(ui->colourmapComboBox, SIGNAL(currentIndexChanged(int)), this,
             SLOT(setColourmap(int)));
 
-
-    connect(ui->btnSaveDisparityView, SIGNAL(clicked(bool)), this,
-            SLOT(saveImageTimestamped()));
+    connect(ui->checkBoxSaveDisparity, SIGNAL(checked(bool)), this, SLOT(saveDisparityChanged(bool)));
 
     ui->colourmapComboBox->setCurrentIndex(colourmap);
 
@@ -46,6 +44,10 @@ DisparityViewer::DisparityViewer(QWidget *parent)
   */
 }
 
+void DisparityViewer::saveDisparityChanged(bool enable){
+    emit toggledDisparitySave(enable);
+}
+
 void DisparityViewer::assignThread(QThread *thread) {
     this->moveToThread(thread);
     connect(this, SIGNAL(finished()), thread, SLOT(quit()));
@@ -55,7 +57,6 @@ void DisparityViewer::assignThread(QThread *thread) {
 }
 
 void DisparityViewer::saveImageTimestamped(void) {
-    ui->btnSaveDisparityView->setEnabled(false);
     QString fname;
     QDateTime dateTime = dateTime.currentDateTime();
     QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
@@ -63,7 +64,6 @@ void DisparityViewer::saveImageTimestamped(void) {
     fname = QString("%1/%2").arg(save_directory).arg(date_string);
 
     saveImage(fname);
-    ui->btnSaveDisparityView->setEnabled(true);
 }
 
 void DisparityViewer::saveImage(QString fname) {
@@ -73,7 +73,6 @@ void DisparityViewer::saveImage(QString fname) {
 
         res_l.waitForFinished();
     }
-
     emit savedImage(fname);
 }
 
@@ -178,12 +177,10 @@ float DisparityViewer::genZ(cv::Matx44d Q_, int x_index, int y_index, float d){
 
 void DisparityViewer::updateDisparity() {
     cv::Mat disparity;
-    matcher->getDisparity(disparity);
-    cv::Mat disparity_downscale, disparity_thresh;
-    disparity.copyTo(disparity_downscale);
-    disparity_downscale /= 16.0;
+    matcher->getDisparity16(disparity);
+    cv::Mat disparity_thresh;
 
-    disparity_downscale.copyTo(disparity_thresh);
+    disparity.copyTo(disparity_thresh);
 
     double min_disp = 10000;
     double max_disp = 0;
@@ -193,13 +190,13 @@ void DisparityViewer::updateDisparity() {
     cv::Matx44d _Q;
     Q.convertTo(_Q, CV_64F);
 
-    for (int i = 0; i < disparity_downscale.rows; i++)
+    for (int i = 0; i < disparity.rows; i++)
     {
-        for (int j = 0; j < disparity_downscale.cols; j++)
+        for (int j = 0; j < disparity.cols; j++)
         {
-            float d = disparity_downscale.at<float>(i, j);
+            float d = disparity.at<float>(i, j);
             if (d < 10000 && d > 0){
-                float d = disparity_downscale.at<float>(i, j);
+                float d = disparity.at<float>(i, j);
                 if (d < min_disp){
                     min_disp = d;
                     max_depth = (double)genZ(_Q,(double)j,(double)i,(double)d);
@@ -212,21 +209,19 @@ void DisparityViewer::updateDisparity() {
         }
     }
 
-    for (int i = 0; i < disparity_downscale.rows; i++)
+    for (int i = 0; i < disparity.rows; i++)
     {
-        for (int j = 0; j < disparity_downscale.cols; j++)
+        for (int j = 0; j < disparity.cols; j++)
         {
-            float d = disparity_downscale.at<float>(i, j);
+            float d = disparity.at<float>(i, j);
             if (d > max_disp || d < min_disp){
                 disparity_thresh.at<float>(i, j) = 0;
             }
         }
     }
 
-    //TODO use depth rather than disparity for more user readable results
+    //use depth rather than disparity for more user readable results
     double range_disp = max_disp - min_disp;
-    //double min_depth = baseline * focal / (-max_disp);
-    //double max_depth = baseline * focal / (-min_disp);
     double range_depth = max_depth - min_depth;
 
     min_disp_ = min_disp;

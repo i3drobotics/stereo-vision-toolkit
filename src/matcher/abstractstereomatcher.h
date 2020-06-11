@@ -15,6 +15,13 @@
 #include <opencv2/ximgproc.hpp>
 #include <QStandardPaths>
 
+// Point Cloud Library
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/io/ply_io.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/visualization/pcl_visualizer.h>
+
 //!  Stereo matcher base class
 /*!
   An abstract class to match stereo images. This class should not be used directly,
@@ -69,6 +76,12 @@ class AbstractStereoMatcher : public QObject {
   */
   void getDisparity(cv::Mat &dst);
 
+  //! Get disparity map after removing multiply factor from matching (16)
+  /*!
+  * @param[out] dst Output Mat
+  */
+  void getDisparity16(cv::Mat &dst);
+
   //!  Get the min disparity value
   void getMinDisparity(int &val);
 
@@ -80,6 +93,12 @@ class AbstractStereoMatcher : public QObject {
   * @param[in] filename Output filename
   */
   void saveDisparity(QString filename);
+
+  //!  Save the disparity map as normalised colormap
+  /*!
+  * @param[in] filename Output filename
+  */
+  void saveDisparityColormap(QString filename);
 
   //!  Perform a full left-right consistency check (experimental)
   /*!
@@ -98,6 +117,16 @@ class AbstractStereoMatcher : public QObject {
 
   virtual void match();
 
+  void normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity);
+
+  void getMinMaxDisparity(cv::Mat inDisparity, double &min_disp, double &max_disp);
+
+  void disparity2colormap(cv::Mat inDisparity, cv::Mat &outColormap);
+
+  void calcDepth(cv::Mat inDisparity, cv::Mat &outDepth);
+
+  void calcPointCloud(cv::Mat inDepth, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outPoints);
+
  protected:
   cv::Mat *left;
   cv::Mat *right;
@@ -105,7 +134,7 @@ class AbstractStereoMatcher : public QObject {
   cv::Mat disparity_buffer;
   cv::Mat disparity_rl;
 
-  cv::Mat disparity_scale;
+  cv::Mat disparity16;
 
   cv::Size image_size;
 
