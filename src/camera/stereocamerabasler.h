@@ -73,7 +73,7 @@ private:
 
     bool setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps, int iPacketSize);
 
-    void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, cv::Size &size);
+    void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth);
 };
 
 #endif //STEREOCAMERABASLER_H

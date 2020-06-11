@@ -24,15 +24,7 @@ public:
     explicit CameraDisplayWidget(QWidget *parent = nullptr);
     ~CameraDisplayWidget();
 
-    void updateView(cv::Mat new_image){
-        cv::Mat downsample_image;
-        cv::resize(new_image,downsample_image,cv::Size(),downsample_rate,downsample_rate);
-        pixmap = ASM::cvMatToQPixmap(downsample_image);
-
-        if(pixmap.isNull()) return;
-
-        ui->imageDisplay->setPixmap(pixmap.scaled(ui->imageDisplay->size(), Qt::KeepAspectRatio));
-    }
+    void updateView(cv::Mat new_image);
 
     QLabel* getImageDisplay(void){return ui->imageDisplay;}
 

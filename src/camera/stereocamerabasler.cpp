@@ -110,8 +110,8 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
             return false;
         }
 
-        getImageSize(cameras->operator[](0),image_width,image_height,image_size);
-        emit update_size(image_width, image_height, 1);
+        getImageSize(cameras->operator[](0),image_width,image_height,image_bitdepth);
+        emit update_size(image_width, image_height, image_bitdepth);
 
         if (iBinning > 0){
             setBinning(iBinning);
@@ -242,14 +242,14 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraBasler::li
     return connected_serial_infos;
 }
 
-void StereoCameraBasler::getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, cv::Size &size)
+void StereoCameraBasler::getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth)
 {
     try
     {
         camera.Open();
         width = Pylon::CIntegerParameter(camera.GetNodeMap(), "Width").GetValue();
         height = Pylon::CIntegerParameter(camera.GetNodeMap(), "Height").GetValue();
-        size = cv::Size(width,height);
+        bitdepth = 1; //TODO get bitdepth
     }
     catch (const Pylon::GenericException &e)
     {
@@ -414,8 +414,8 @@ void StereoCameraBasler::setBinning(int val){
 
         this->m_binning = val;
 
-        getImageSize(cameras->operator[](0),image_width,image_height,image_size);
-        emit update_size(image_width, image_height, 1);
+        getImageSize(cameras->operator[](0),image_width,image_height,image_bitdepth);
+        emit update_size(image_width, image_height, image_bitdepth);
     }
     catch (const Pylon::GenericException &e)
     {

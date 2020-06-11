@@ -132,9 +132,9 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::stereoCameraSettings i
 
     image_height = left_camera->height;
     image_width = left_camera->width;
+    image_bitdepth = 1; //TODO get bit depth
 
-    image_size = cv::Size(image_width, image_height);
-    emit update_size(image_width, image_height, 1);
+    emit update_size(image_width, image_height, image_bitdepth);
 
     double exposure = inital_camera_settings.exposure;
     int gain = inital_camera_settings.gain;
@@ -161,8 +161,8 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::stereoCameraSettings i
     left_camera->setup(image_width, image_height, fps);
     right_camera->setup(image_width, image_height, fps);
 
-    left_raw.create(image_size, CV_8UC1);
-    right_raw.create(image_size, CV_8UC1);
+    left_raw.create(getSize(), CV_8UC1);
+    right_raw.create(getSize(), CV_8UC1);
 
     left_listener->setOutputBuffer(left_raw.data);
     right_listener->setOutputBuffer(right_raw.data);

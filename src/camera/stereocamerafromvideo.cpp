@@ -18,7 +18,9 @@ bool StereoCameraFromVideo::initCamera(AbstractStereoCamera::stereoCameraSerialI
 
     image_height = stream.get(CV_CAP_PROP_FRAME_HEIGHT);
     image_width = stream.get(CV_CAP_PROP_FRAME_WIDTH) / 2;
-    image_size = cv::Size(image_width, image_height);
+    image_bitdepth = 1; //TODO get bit depth
+    emit update_size(image_width, image_height, image_bitdepth);
+
     frame_rate = inital_camera_settings.fps;
 
     number_frames = stream.get(CV_CAP_PROP_FRAME_COUNT);
