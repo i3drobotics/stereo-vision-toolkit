@@ -526,7 +526,8 @@ bool StereoCameraDeimos::setFrameSize(int width, int height) {
     res &= camera.set(CV_CAP_PROP_FRAME_HEIGHT, height);
     image_width = width;
     image_height = height;
-    image_size = cv::Size(width, height);
+    image_bitdepth = 1; //TODO get bit depth
+    emit update_size(image_width, image_height, image_bitdepth);
 
     return res;
 }

@@ -102,8 +102,8 @@ bool StereoCameraVimba::setupCameras(AbstractStereoCamera::stereoCameraSerialInf
     VmbErrorType err_r = camera_r->Open(VmbAccessModeFull);
 
     if (err_l == VmbErrorSuccess && err_r == VmbErrorSuccess){
-        getImageSize(image_width,image_height,image_size);
-        emit update_size(image_width, image_height, 1);
+        getImageSize(image_width,image_height,image_size,image_bitdepth);
+        emit update_size(image_width, image_height, image_bitdepth);
 
         if (iBinning > 0){
             setBinning(iBinning);
@@ -193,7 +193,7 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraVimba::lis
     return connected_serial_infos;
 }
 
-void StereoCameraVimba::getImageSize(int &width, int &height, cv::Size &size)
+void StereoCameraVimba::getImageSize(int &width, int &height, int &bitdepth)
 {
     //get image size
     VmbInt64_t h, w;
@@ -202,7 +202,7 @@ void StereoCameraVimba::getImageSize(int &width, int &height, cv::Size &size)
     if (err_h == VmbErrorSuccess && err_w == VmbErrorSuccess){
         height = (int) h;
         width = (int) w;
-        size = cv::Size(width,height);
+        bitdepth = 1; //TODO get bit depth
     } else {
         qDebug() << "Failed to get width / height";
     }

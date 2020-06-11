@@ -126,6 +126,8 @@ public:
 
     virtual void adjustPacketSize(int) = 0;
 
+    float downsample_factor = 1;
+
     struct stereoCameraSerialInfo {
         std::string left_camera_serial;
         std::string right_camera_serial;
@@ -187,6 +189,9 @@ public:
     //! Returns whether left and right images are being swapped
     bool isSwappingLeftRight();
 
+    //! Returns whether downsampling images
+    bool isDownsampling();
+
     //! Returns wheather the camera is connected
     bool isConnected();
 
@@ -232,11 +237,17 @@ public:
   */
     int getHeight(void){ return image_height; }
 
+    //! Get the image bitdepth
+    /*!
+  * @return Image bit depth
+  */
+    int getBitDepth(void){ return image_bitdepth; }
+
     //! Get the image size
     /*!
   * @return Image size
   */
-    cv::Size getSize(void){ return image_size; }
+    cv::Size getSize(void){ return cv::Size(getWidth(),getHeight()); }
 
     //! Initalise video stream for writing a video stream to a file
     /*!
@@ -322,8 +333,14 @@ public slots:
     //! Emable or disable disparity map reprojection to 3D
     void enableReproject(bool reproject);
 
+    //! Enable swap left and right images
     void enableSwapLeftRight(bool swap);
 
+    //! Enable downsample of images
+    void enableDownsample(bool downsample);
+
+    //! Change downsample factor
+    void changeDownsampleFactor(int factor);
 
     //! Set the point cloud clipping distance closest to the camera (i.e. specify the closest distance to display)
     /*!
@@ -379,6 +396,7 @@ private:
     bool matching = false;
     bool rectifying = false;
     bool swappingLeftRight = false;
+    bool downsampling = false;
     bool reprojecting = false;
     bool has_cuda = false;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloud;
@@ -469,7 +487,7 @@ protected:
     int frame_rate = 30;
     int image_width = 0;
     int image_height = 0;
-    cv::Size image_size;
+    int image_bitdepth = 1;
 
     QElapsedTimer frametimer;
 

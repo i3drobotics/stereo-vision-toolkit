@@ -10,44 +10,53 @@ AbstractStereoMatcher::AbstractStereoMatcher(QObject *parent)
 }
 
 void AbstractStereoMatcher::assignThread(QThread *thread) {
-  this->moveToThread(thread);
-  connect(this, SIGNAL(finished()), thread, SLOT(quit()));
-  connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-  connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-  thread->start();
+    this->moveToThread(thread);
+    connect(this, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    thread->start();
 }
 
 void AbstractStereoMatcher::setImages(cv::Mat *left_img, cv::Mat *right_img) {
-  this->left = left_img;
-  this->right = right_img;
-  this->image_size = left_img->size();
+    if (downsample_factor != 1){
+        cv::Mat right_tmp, left_tmp;
+        cv::resize(*right_img,right_tmp,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(*left_img,left_tmp,cv::Size(),downsample_factor,downsample_factor);
+        this->left = &left_tmp;
+        this->right = &right_tmp;
+    } else {
+        this->left = left_img;
+        this->right = right_img;
+    }
+
+    this->image_size = left_img->size();
 }
 
 void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {
-  disparity_buffer.copyTo(dst);
-  return;
+    disparity_buffer.copyTo(dst);
+    return;
 }
 
 void AbstractStereoMatcher::getDisparityRange(int &val) {
-  val = disparity_range;
+    val = disparity_range;
 }
 
 void AbstractStereoMatcher::getMinDisparity(int &val) {
-  val = min_disparity;
+    val = min_disparity;
 }
 
 void AbstractStereoMatcher::saveDisparity(QString filename) {
-  cv::Mat disparity_output;
+    cv::Mat disparity_output;
 
-  //disparity_lr.convertTo(disparity_output, CV_16SC1);
-  //disparity_output += min_disparity*16;
-  //disparity_output.convertTo(disparity_output, CV_16UC1);
-  disparity_lr.copyTo(disparity_output);
-  disparity_output /= 16;
+    //disparity_lr.convertTo(disparity_output, CV_16SC1);
+    //disparity_output += min_disparity*16;
+    //disparity_output.convertTo(disparity_output, CV_16UC1);
+    disparity_lr.copyTo(disparity_output);
+    disparity_output /= 16;
 
-  cv::imwrite(filename.toStdString(), disparity_output);
+    cv::imwrite(filename.toStdString(), disparity_output);
 
-  return;
+    return;
 }
 
 void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
@@ -57,20 +66,20 @@ void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
     cv::Mat difference = disparity_rl - disparity_lr;
 
     for(int i=0; i < static_cast<int>(difference.total()); i++){
-       if( abs(difference.at<float>(i)) < threshold) continue;
-       else disparity_lr.at<float>(i) = min_disparity;
+        if( abs(difference.at<float>(i)) < threshold) continue;
+        else disparity_lr.at<float>(i) = min_disparity;
     }
 }
 
 void AbstractStereoMatcher::match() {
-  QElapsedTimer timer;
-  timer.restart();
-  forwardMatch();
-  // qDebug() << 1/(timer.elapsed() / 1e3);
+    QElapsedTimer timer;
+    timer.restart();
+    forwardMatch();
+    // qDebug() << 1/(timer.elapsed() / 1e3);
 
-  //checkLRConsistencyFull(5);
+    //checkLRConsistencyFull(5);
 
-  disparity_lr.convertTo(disparity_buffer, CV_32F);
+    disparity_lr.convertTo(disparity_buffer, CV_32F);
 }
 
 AbstractStereoMatcher::~AbstractStereoMatcher() { emit finished(); }

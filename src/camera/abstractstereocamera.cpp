@@ -307,6 +307,15 @@ void AbstractStereoCamera::enableSwapLeftRight(bool swap){
     swappingLeftRight = swap;
 }
 
+void AbstractStereoCamera::enableDownsample(bool downsample){
+    downsampling = downsample;
+}
+
+void AbstractStereoCamera::changeDownsampleFactor(int factor){
+    downsample_factor = 1.0f/(float)factor;
+    emit update_size((float)getWidth()*downsample_factor, (float)getHeight()*downsample_factor, getBitDepth());
+}
+
 bool AbstractStereoCamera::isCapturing() { return capturing; }
 
 bool AbstractStereoCamera::isAcquiring() { return acquiring; }
@@ -316,6 +325,8 @@ bool AbstractStereoCamera::isMatching() { return matching; }
 bool AbstractStereoCamera::isRectifying() { return rectifying; }
 
 bool AbstractStereoCamera::isSwappingLeftRight() { return swappingLeftRight; }
+
+bool AbstractStereoCamera::isDownsampling() { return downsampling; }
 
 bool AbstractStereoCamera::isConnected() {
     bool connected_tmp = connected;
@@ -509,6 +520,11 @@ void AbstractStereoCamera::process_stereo(void) {
 
     frames++;
     emit framecount(frames);
+
+    if (isDownsampling()){
+        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
+    }
 
     if (isSwappingLeftRight()){
         cv::Mat right_tmp;

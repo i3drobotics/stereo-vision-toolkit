@@ -74,7 +74,7 @@ private:
 
     bool setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps);
 
-    void getImageSize(int &width, int &height, cv::Size &size);
+    void getImageSize(int &width, int &height, int &bitdepth);
 };
 
 #endif //STEREOCAMERAVIMBA_H

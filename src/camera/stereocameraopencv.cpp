@@ -29,8 +29,8 @@ bool StereoCameraOpenCV::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
             changeFPS(fps);
             //TODO fix issue with incorrect frame rate being used
             setFrameSize(1000, 1000);
-            getImageSize(camera_l,image_width,image_height,image_size);
-            emit update_size(image_width, image_height, 1);
+            getImageSize(camera_l,image_width,image_height,image_bitdepth);
+            emit update_size(image_width, image_height, image_bitdepth);
 
             toggleHDR(hdr);
             enableAutoExpose(autoExpose);
@@ -567,7 +567,8 @@ bool StereoCameraOpenCV::setFrameSize(int width, int height) {
     res &= camera_r.set(CV_CAP_PROP_FRAME_HEIGHT, height);
     image_width = width;
     image_height = height;
-    image_size = cv::Size(width, height);
+    image_bitdepth = 1; //TODO get bit depth
+    emit update_size(image_width, image_height, image_bitdepth);
 
     return res;
 }
@@ -628,8 +629,8 @@ bool StereoCameraOpenCV::capture() {
             if (left_raw.size().width != image_width || left_raw.size().height != image_height){
                 image_height = left_raw.size().height;
                 image_width = left_raw.size().width;
-                image_size = cv::Size(image_width,image_height);
-                emit update_size(image_width, image_height, 1);
+                image_bitdepth = 1; //TODO get bit depth
+                emit update_size(image_width, image_height, image_bitdepth);
                 qDebug() << "Image size changed in incomming image";
                 qDebug() << "(" << image_width << "," << image_height << ")";
             }
@@ -653,11 +654,11 @@ bool StereoCameraOpenCV::capture() {
     return res;
 }
 
-void StereoCameraOpenCV::getImageSize(cv::VideoCapture camera, int &width, int &height, cv::Size &size){
+void StereoCameraOpenCV::getImageSize(cv::VideoCapture camera, int &width, int &height, int &bitdepth){
     const std::lock_guard<std::mutex> lock(mtx);
     width = (int)camera.get(CV_CAP_PROP_FRAME_WIDTH);
     height = (int)camera.get(CV_CAP_PROP_FRAME_WIDTH);
-    size = cv::Size(width,height);
+    bitdepth = 1; //TODO get bit depth
 }
 
 std::string StereoCameraOpenCV::wchar_to_string(WCHAR * buffer) {

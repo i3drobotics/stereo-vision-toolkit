@@ -94,6 +94,8 @@ class AbstractStereoMatcher : public QObject {
   //!  Get a pointer to the right image
   cv::Mat *getRighttImage(void){return right;}
 
+  void setDownsampleFactor(int factor){ downsample_factor=factor; };
+
   virtual void match();
 
  protected:
@@ -110,6 +112,7 @@ class AbstractStereoMatcher : public QObject {
   int min_disparity = 0;
   int disparity_range = 64;
   int block_size = 9;
+  int downsample_factor = 1;
 };
 
 #endif  // ABSTRACTSTEREOMATCHER_H

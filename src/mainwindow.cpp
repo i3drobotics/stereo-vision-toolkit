@@ -152,6 +152,8 @@ MainWindow::MainWindow(QWidget* parent)
 
 void MainWindow::disableWindow(){
     ui->toggleSwapLeftRight->setDisabled(true);
+    ui->toggleDownsample->setDisabled(true);
+    ui->spinBoxDownsample->setDisabled(true);
     ui->tabWidget->setDisabled(true);
     ui->tabCameraSettings->setDisabled(true);
     ui->tabApplicationSettings->setDisabled(true);
@@ -169,11 +171,12 @@ void MainWindow::disableWindow(){
 void MainWindow::enableWindow(){
 
     ui->toggleSwapLeftRight->setEnabled(true);
+    ui->toggleDownsample->setEnabled(true);
+    ui->spinBoxDownsample->setEnabled(true);
     ui->tabWidget->setEnabled(true);
     ui->tabCameraSettings->setEnabled(true);
     ui->tabApplicationSettings->setEnabled(true);
     ui->matcherSelectBox->setEnabled(true);
-    ui->enableStereo->setEnabled(true);
 
     ui->pauseButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
@@ -520,7 +523,6 @@ void MainWindow::stereoCameraInitWindow(void){
         min_binning = 1;
         step_binning = 1;
     } else if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
-        //TODO needs testing
         max_binning = 4;
         min_binning = 1;
         step_binning = 1;
@@ -617,6 +619,11 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(enableRectify(bool)));
     connect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
             SLOT(enableSwapLeftRight(bool)));
+    connect(ui->toggleDownsample, SIGNAL(clicked(bool)), this,
+            SLOT(toggleDownsample(bool)));
+    connect(ui->toggleDownsample, SIGNAL(clicked(bool)), ui->spinBoxDownsample, SLOT(setEnabled(bool)));
+    connect(ui->spinBoxDownsample, SIGNAL(valueChanged(int)), stereo_cam,
+            SLOT(changeDownsampleFactor(int)));
     connect(stereo_cam, SIGNAL(matched()), disparity_view,
             SLOT(updateDisparityAsync(void)));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(toggleAutoExpose(bool)));
@@ -666,6 +673,7 @@ void MainWindow::stereoCameraRelease(void) {
 
     ui->toggleRectifyCheckBox->setChecked(false);
     ui->toggleSwapLeftRight->setChecked(false);
+    ui->toggleDownsample->setChecked(false);
 
     ui->tabWidget->setCurrentIndex(0);
     ui->tabLayoutSettings->setCurrentIndex(0);
@@ -731,6 +739,11 @@ void MainWindow::stereoCameraRelease(void) {
                    SLOT(enableRectify(bool)));
         disconnect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
                    SLOT(enableSwapLeftRight(bool)));
+        disconnect(ui->toggleDownsample, SIGNAL(clicked(bool)), this,
+                SLOT(toggleDownsample(bool)));
+        disconnect(ui->toggleDownsample, SIGNAL(clicked(bool)), ui->spinBoxDownsample, SLOT(setEnabled(bool)));
+        disconnect(ui->spinBoxDownsample, SIGNAL(valueChanged(int)), stereo_cam,
+                SLOT(changeDownsampleFactor(int)));
         disconnect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(toggleAutoExpose(bool)));
         disconnect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(toggleAutoGain(bool)));
         disconnect(ui->binCheckBox, SIGNAL(clicked(bool)), this, SLOT(toggleEnableBinning(bool)));
@@ -1006,9 +1019,9 @@ void MainWindow::refreshCameraList(bool showGUI = true){
 
 void MainWindow::cameraDeviceSelected(int index){
     stopDeviceListTimer();
-    unsigned long long button_index = index; //TODO get index from layout
+    unsigned long long button_index = index;
     if (button_index < current_camera_serial_info_list.size()){
-        //TODO add diconnect of camera if already connected
+        // disconnect of camera if already connected
         AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = current_camera_serial_info_list.at(button_index);
         unsigned long long i = 0;
         if (openCamera(camera_serial_info) == CAMERA_CONNECTION_SUCCESS_EXIT_CODE){
@@ -1530,10 +1543,12 @@ void MainWindow::setCalibrationFolder(QString dir) {
     bool res = stereo_cam->loadCalibration(dir);
 
     if(!res) {
+        ui->enableStereo->setEnabled(false);
         QMessageBox msg;
         msg.setText("Unable to load calibration files");
         msg.exec();
     }else{
+        ui->enableStereo->setEnabled(true);
         calibration_directory = dir;
         parameters->update_string("calDir", calibration_directory);
         double focal =  stereo_cam->fx;
@@ -1629,6 +1644,14 @@ void MainWindow::setSaveDirectory(QString dir) {
         if(stereo_cam)
             stereo_cam->setSavelocation(save_directory);
         disparity_view->setSavelocation(save_directory);
+    }
+}
+
+void MainWindow::toggleDownsample(bool enable){
+    stereo_cam->enableDownsample(enable);
+    if (!enable){
+        int downsample_factor = ui->spinBoxDownsample->value();
+        stereo_cam->changeDownsampleFactor(downsample_factor);
     }
 }
 

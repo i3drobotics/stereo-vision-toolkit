@@ -76,7 +76,7 @@ private:
 
     qint64 getSerial(void);
 
-    void getImageSize(cv::VideoCapture camera, int &width, int &height, cv::Size &size);
+    void getImageSize(cv::VideoCapture camera, int &width, int &height, int &bitdepth);
 
 };
 

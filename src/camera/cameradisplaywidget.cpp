@@ -11,10 +11,14 @@ CameraDisplayWidget::CameraDisplayWidget(QWidget *parent) :
     for (int i = 0; i < 256; i++) colourMap.push_back(qRgb(i, i, i));
 }
 
-CameraDisplayWidget::~CameraDisplayWidget()
-{
-    delete ui;
-    if(display_image) delete display_image;
+void CameraDisplayWidget::updateView(cv::Mat new_image){
+    cv::Mat downsample_image;
+    cv::resize(new_image,downsample_image,cv::Size(),downsample_rate,downsample_rate);
+    pixmap = ASM::cvMatToQPixmap(downsample_image);
+
+    if(pixmap.isNull()) return;
+
+    ui->imageDisplay->setPixmap(pixmap.scaled(ui->imageDisplay->size(), Qt::KeepAspectRatio));
 }
 
 void CameraDisplayWidget::setSize(int width, int height, int bit_depth) {
@@ -41,4 +45,10 @@ void CameraDisplayWidget::setSize(int width, int height, int bit_depth) {
     displayBuffer.resize(camwidth * camheight * bit_depth);
     display_image = new QImage(camwidth, camheight, QImage::Format_Indexed8);
     display_image->setColorTable(colourMap);
+}
+
+CameraDisplayWidget::~CameraDisplayWidget()
+{
+    delete ui;
+    if(display_image) delete display_image;
 }
