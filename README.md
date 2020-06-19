@@ -1,3 +1,7 @@
+Releases
+---
+See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for pre-compliled builds (Windows x64). 
+
 About
 ---
 
@@ -19,6 +23,7 @@ Currently SVTK is a useful and functional tool for exploring stereo imaging, and
 - Support for sequential capture (e.g. file naming options)
 - Unit tests and other deployment issues
 - Better 3D visualisation support
+- Linux support
 
 Stereo matching support
 ---
