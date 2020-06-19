@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget* parent)
     // TODO replace this by reading current value from camera
     default_basler_init_settings.exposure = 5;
     default_basler_init_settings.gain = 0;
-    default_basler_init_settings.fps = 10;
+    default_basler_init_settings.fps = 30;
     default_basler_init_settings.binning = -1;
     default_basler_init_settings.trigger = true;
     default_basler_init_settings.hdr = -1;
@@ -109,6 +109,7 @@ MainWindow::MainWindow(QWidget* parent)
             SLOT(openHelp()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), QApplication::instance(),
             SLOT(quit()));
+    connect(this, SIGNAL(cameraListUpdated(void)), this, SLOT(refreshCameraListGUI(void)));
 
     awesome = new QtAwesome(qApp);
     awesome->initFontAwesome();
@@ -238,7 +239,7 @@ void MainWindow::controlsInit(void) {
     connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), ui->fpsSpinBox, SLOT(setDisabled(bool)));
     connect(ui->binCheckBox, SIGNAL(clicked(bool)), ui->binningSpinBox, SLOT(setEnabled(bool)));
 
-    connect(ui->btnRefreshCameras, SIGNAL(clicked(bool)), this, SLOT(refreshCameraList()));
+    connect(ui->btnRefreshCameras, SIGNAL(clicked(bool)), this, SLOT(refreshCameraListThreaded()));
 
     icon_options.insert("color", QColor(255, 255, 255));
     ui->pauseButton->setIcon(awesome->icon(fa::pause, icon_options));
@@ -444,10 +445,14 @@ void MainWindow::stereoCameraInitWindow(void){
         ui->enabledTriggeredCheckbox->setEnabled(true);
         ui->enabledTriggeredCheckbox->setChecked(default_trigger);
         ui->enabledTriggeredCheckbox->setVisible(true);
-        if (default_trigger){
-            ui->fpsSpinBox->setEnabled(false);
-        } else {
+        if (stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || stereo_cam->camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
             ui->fpsSpinBox->setEnabled(true);
+        } else {
+            if (default_trigger){
+                ui->fpsSpinBox->setEnabled(false);
+            } else {
+                ui->fpsSpinBox->setEnabled(true);
+            }
         }
     } else {
         default_trigger = false;
@@ -913,10 +918,20 @@ int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_s
     return exit_code;
 }
 
-void MainWindow::refreshCameraList(bool showGUI = true){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = stereoCamSupport->getDeviceList(showGUI);
-    current_camera_serial_info_list = all_camera_serial_info;
+void MainWindow::refreshCameraListThreaded(){
+    qfuture_refreshcameralist = QtConcurrent::run(this, &MainWindow::refreshCameraList);
+}
+
+void MainWindow::refreshCameraList(){
+    current_camera_serial_info_list = stereoCamSupport->getDeviceList();
+    emit cameraListUpdated();
+}
+
+void MainWindow::refreshCameraListGUI(){
+    //triggered by 'cameraListUpdated()' signal
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> camera_serial_info_list = current_camera_serial_info_list;
     camera_button_signal_mapper_list = new vector<QSignalMapper*>();
+
 
     QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_50.png");
     QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_50.png");
@@ -939,29 +954,16 @@ void MainWindow::refreshCameraList(bool showGUI = true){
         }
     }
 
-    /*
-    QLabel *colHeader1 = new QLabel("Type");
-    QLabel *colHeader2 = new QLabel("Serial");
-    QLabel *colHeader3 = new QLabel("");
-
-    colHeader1->setAlignment(Qt::AlignHCenter);
-    colHeader2->setAlignment(Qt::AlignHCenter);
-
-    ui->gridLayoutCameraList->addWidget(colHeader1,0,0);
-    ui->gridLayoutCameraList->addWidget(colHeader2,0,1);
-    ui->gridLayoutCameraList->addWidget(colHeader3,0,2);
-    */
-
     ui->gridLayoutCameraList->setColumnStretch(0,0);
     ui->gridLayoutCameraList->setColumnStretch(1,1);
     ui->gridLayoutCameraList->setColumnStretch(2,0);
 
-    if (all_camera_serial_info.size() <= 0){
+    if (camera_serial_info_list.size() <= 0){
         ui->lblNoCameras->show();
     } else {
         ui->lblNoCameras->hide();
         int i = 0;
-        for (std::vector<AbstractStereoCamera::stereoCameraSerialInfo>::iterator it = all_camera_serial_info.begin() ; it != all_camera_serial_info.end(); ++it){
+        for (std::vector<AbstractStereoCamera::stereoCameraSerialInfo>::iterator it = camera_serial_info_list.begin() ; it != camera_serial_info_list.end(); ++it){
             AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info = *it;
             std::string camera_type, camera_serial;
             QPixmap camera_icon;
@@ -1073,7 +1075,7 @@ int MainWindow::stereoCameraLoad(void) {
     cameras_connected = false;
     int exit_code = -4;
 
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = stereoCamSupport->getDeviceList(true);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = stereoCamSupport->getDeviceList();
 
     AbstractStereoCamera::stereoCameraSerialInfo chosen_camera_serial_info;
     bool camera_chosen = false;
@@ -1187,13 +1189,14 @@ void MainWindow::startDeviceListTimer() {
     //TODO replace this with event driven system
     device_list_timer->stop();
     device_list_timer = new QTimer(this);
-    refreshCameraListNoGui();
-    device_list_timer->start(3000);
-    QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListNoGui()));
+    refreshCameraListThreaded();
+    device_list_timer->start(5000);
+    QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
     ui->btnRefreshCameras->setEnabled(true);
 }
 
 void MainWindow::stopDeviceListTimer() {
+    QObject::disconnect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
     device_list_timer->stop();
     ui->btnRefreshCameras->setEnabled(false);
 }
@@ -1676,17 +1679,21 @@ void MainWindow::toggleAutoExpose(bool enable){
 }
 
 void MainWindow::toggleFPS(bool enable){
-    if (gigeWarning(current_binning)){
-        stereo_cam->toggleTrigger(enable);
+    //if (gigeWarning(current_binning)){
+        //stereo_cam->toggleTrigger(enable);
+    //} else {
+    /*
+    if (enable){
+        ui->enabledTriggeredCheckbox->setChecked(false);
+        ui->fpsSpinBox->setEnabled(true);
     } else {
-        if (enable){
-            ui->enabledTriggeredCheckbox->setChecked(false);
-            ui->fpsSpinBox->setEnabled(true);
-        } else {
-            ui->enabledTriggeredCheckbox->setChecked(true);
-            ui->fpsSpinBox->setEnabled(false);
-        }
+        ui->enabledTriggeredCheckbox->setChecked(true);
+        ui->fpsSpinBox->setEnabled(false);
+        changeFPS(ui->fpsSpinBox->value());
     }
+    */
+    // TODO: re-enable this
+    //}
 }
 
 void MainWindow::changeFPS(int fps){

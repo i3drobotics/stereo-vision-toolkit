@@ -11,7 +11,7 @@ VERSION = 1.2.10
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
-QT += core gui concurrent widgets xml network quick
+QT += core gui concurrent widgets xml network quick serialport
 
 #QT version > 5.6 required for using openssl 1.0.2j
 !versionAtLeast(QT_VERSION, 5.6.0):
@@ -63,10 +63,18 @@ VPATH += $$_PRO_FILE_PWD_/src
 VPATH += $$_PRO_FILE_PWD_/src/camera
 VPATH += $$_PRO_FILE_PWD_/src/matcher
 VPATH += $$_PRO_FILE_PWD_/src/calibrate
+VPATH += $$_PRO_FILE_PWD_/src/camera/widgets
+VPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
+VPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
+VPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
 INCLUDEPATH += $$_PRO_FILE_PWD_/src
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/calibrate
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/widgets
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
 
 WITH_VIMBA {
     VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
@@ -79,12 +87,13 @@ WITH_I3DRSGM {
 }
 
 SOURCES += \
+    arduinocommscameracontrol.cpp \
     main.cpp\
     mainwindow.cpp \
     calibrationdialog.cpp \
     qdevicedialog.cpp \
     qdevicebutton.cpp \
-    src/camera/stereocamerasupport.cpp \
+    abstractarduinocoms.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -106,7 +115,8 @@ SOURCES += \
     disparityviewer.cpp \
     paramfile.cpp \
     cameradisplaywidget.cpp \
-    cameraimagingsource.cpp
+    cameraimagingsource.cpp \
+    virtualcam.cpp
 
 win32 {
     SOURCES += stereocameradeimos.cpp
@@ -126,12 +136,13 @@ WITH_I3DRSGM {
 }
 
 HEADERS += \
+    arduinocommscameracontrol.h \
     mainwindow.h \
     calibrationdialog.h \
     qdevicedialog.h \
     qdevicebutton.h \
     asmopencv.h \
-    src/camera/stereocamerasupport.h \
+    abstractarduinocoms.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -153,7 +164,8 @@ HEADERS += \
     disparityviewer.h \
     paramfile.h \
     cameradisplaywidget.h \
-    cameraimagingsource.h
+    cameraimagingsource.h \
+    virtualcam.h
 
 win32 {
     HEADERS += stereocameradeimos.h
@@ -226,6 +238,7 @@ INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/hidapi/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/tis/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/yaml-cpp/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/dshow/include"
 
 CONFIG(debug, debug|release) {
     message("Debug mode")
@@ -255,6 +268,7 @@ CONFIG(debug, debug|release) {
 
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
 LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
+LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/dshow/lib/x64" -lstrmbasd -lstrmbase
 
 WITH_VIMBA {
     # vimba library and include files
