@@ -36,12 +36,12 @@
     #include "matcherwidgeti3drsgm.h"
 #endif
 #include "stereocameradeimos.h"
-#include "stereocamerafromvideo.h"
-#include "stereocameraopencv.h"
-#include "stereocameratis.h"
-#include "stereocamerabasler.h"
+//#include "stereocamerafromvideo.h"
+//#include "stereocameraopencv.h"
+//#include "stereocameratis.h"
+//#include "stereocamerabasler.h"
 #ifdef WITH_VIMBA
-    #include "stereocameravimba.h"
+//    #include "stereocameravimba.h"
 #endif
 #include "stereocamerasupport.h"
 #include "qdevicebutton.h"
@@ -128,8 +128,6 @@ private:
     CameraDisplayWidget *left_matcher_view;
     CameraDisplayWidget *right_view;
 
-    StereoCameraSupport *stereoCamSupport;
-
     std::vector<QPushButton> deviceListButtons;
 
     bool cameras_connected = false;
@@ -177,7 +175,6 @@ public slots:
     void stereoCameraRelease(void);
     void updateDisplay(void);
     void updateFPS(qint64);
-    void updateTemperature(double temperature);
     void updateFrameCount(qint64);
     void toggleAcquire(void);
     void singleShotClicked(void);

@@ -115,7 +115,6 @@ class CameraImagingSource : public QObject {
   char* estring;
 
   double frameRate = -1;
-  double temperature = 0;
 
   DShowLib::Grabber handle;
 

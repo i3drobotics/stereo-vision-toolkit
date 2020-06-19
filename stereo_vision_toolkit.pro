@@ -102,11 +102,10 @@ SOURCES += \
     abstractstereomatcher.cpp \
     camerabasler.cpp \
     cameraopencv.cpp \
-    stereocamerabasler.cpp \
-    stereocameraopencv.cpp \
-    stereocameratis.cpp \
-    stereocamerafromvideo.cpp \
-    stereocamerasupport.cpp \
+    #stereocamerabasler.cpp \
+    #stereocameraopencv.cpp \
+    #stereocameratis.cpp \
+    #stereocamerafromvideo.cpp \
     matcheropencvblock.cpp \
     matcherwidgetopencvblock.cpp \
     matcheropencvsgbm.cpp \
@@ -124,8 +123,8 @@ win32 {
 
 WITH_VIMBA {
     SOURCES += \
-        stereocameravimba.cpp \
-        ApiController.cpp
+        #stereocameravimba.cpp \
+        #ApiController.cpp
 }
 
 WITH_I3DRSGM {
@@ -143,6 +142,7 @@ HEADERS += \
     qdevicebutton.h \
     asmopencv.h \
     abstractarduinocoms.h \
+    cvsupport.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -151,10 +151,10 @@ HEADERS += \
     abstractstereomatcher.h \
     camerabasler.h \
     cameraopencv.h \
-    stereocamerabasler.h \
-    stereocameraopencv.h \
-    stereocameratis.h \
-    stereocamerafromvideo.h \
+    #stereocamerabasler.h \
+    #stereocameraopencv.h \
+    #stereocameratis.h \
+    #stereocamerafromvideo.h \
     stereocamerasupport.h \
     matcheropencvblock.h \
     matcherwidgetopencvblock.h \
@@ -173,8 +173,8 @@ win32 {
 
 WITH_VIMBA {
     HEADERS += \
-        stereocameravimba.h \
-        ApiController.h
+        #stereocameravimba.h \
+        #ApiController.h
 }
 
 WITH_I3DRSGM {

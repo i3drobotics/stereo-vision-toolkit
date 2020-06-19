@@ -72,7 +72,7 @@ void StereoCalibrate::startCalibration(void) {
     connect(this, SIGNAL(requestImage()), this->stereo_camera,
             SLOT(singleShot()));
 
-    this->stereo_camera->singleShot();
+    //this->stereo_camera->singleShot();
 }
 
 void StereoCalibrate::checkImages(void) {

@@ -45,10 +45,8 @@ public:
     explicit StereoCameraDeimos(QObject *parent = 0) :
                 AbstractStereoCamera(parent)
                 {}
-    bool capture();
-    void disconnectCamera();
     std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
+    bool setCameraParams(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
     bool setFrameSize(int width, int height);
     bool setFrame16(void);
     void getFrameRate(void);
@@ -56,14 +54,6 @@ public:
     void openHID();
 
     int getExposure();
-    void toggleAutoExpose(bool enable);
-    void adjustExposure(double exposure);
-    void adjustPacketSize(int){}
-    void toggleAutoGain(bool){} //TODO create auto gain setting function
-    void adjustGain(int){} //TODO create gain setting function
-    void adjustBinning(int){} //TODO create binning setting function
-    void toggleTrigger(bool){} //NA
-    void adjustFPS(int fps);
 
     int usb_index_from_serial(std::string serial);
     std::string serial_from_usb_index(int index);
@@ -71,18 +61,25 @@ public:
     ~StereoCameraDeimos(void);
 
 public slots:
-    bool setExposure(double exposure_time);
-    bool toggleHDR(bool enable);
-    bool enableAutoExpose(bool enable);
-    double getTemperature(void);
-    void changeFPS(int fps);
+    bool openCamera();
+    bool closeCamera();
+    bool captureSingle();
+    bool enableCapture(bool enable);
+    bool setFPS(int fps);
+    bool setExposure(double exposure);
+    bool enableHDR(bool enable);
+    bool enableAutoExposure(bool enable);
+    bool setPacketSize(int){return false;} //NA
+    bool enableTrigger(bool){return false;} //NA
+    bool enableAutoGain(bool){return false;} //TODO create auto gain setting function
+    bool setGain(int){return false;} //TODO create gain setting function
+    bool setBinning(int){return false;} //TODO create binning setting function
 
 private:
     cv::VideoCapture camera;
     cv::Mat image_buffer;
     cv::Mat channels[3];
     double exposure;
-    QTimer *temperature_timer;
 
     std::mutex mtx;
 
