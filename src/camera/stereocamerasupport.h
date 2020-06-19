@@ -19,7 +19,7 @@ public:
     ~StereoCameraSupport();
 
 public slots:
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> getDeviceList(bool showGUI);
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> getDeviceList(void);
 
 };
 

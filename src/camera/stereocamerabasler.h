@@ -10,6 +10,7 @@
 #include <opencv2/opencv.hpp>
 #include <abstractstereocamera.h>
 #include <pylon/PylonIncludes.h>
+#include "arduinocommscameracontrol.h"
 
 //!  Stereo balser cameras
 /*!
@@ -62,6 +63,8 @@ private:
     //bool grab_success = true;
 
     QFuture<bool> qfuture_capture;
+
+    ArduinoCommsCameraControl* camControl;
 
     void setBinning(int val);
     void setPacketSize(int val);

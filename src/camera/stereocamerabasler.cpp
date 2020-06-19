@@ -8,15 +8,20 @@
 //see: https://github.com/basler/pypylon/blob/master/samples/grabmultiplecameras.py
 
 bool StereoCameraBasler::initCamera(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings) {
+    camControl = new ArduinoCommsCameraControl();
+    std::vector<QSerialPortInfo> serial_device_list = camControl->getSerialDevices();
+    camControl->open(serial_device_list.at(0),115200);
+
     Pylon::PylonInitialize();
     int binning = inital_camera_settings.binning;
     bool trigger;
+    int fps = inital_camera_settings.fps;;
     if (inital_camera_settings.trigger == 1){
         trigger = true;
     } else {
         trigger = false;
     }
-    int fps = inital_camera_settings.fps;
+
     double exposure = inital_camera_settings.exposure;
     int gain = inital_camera_settings.gain;
     int packet_size = inital_camera_settings.packetSize;
@@ -128,9 +133,7 @@ bool StereoCameraBasler::setupCameras(AbstractStereoCamera::stereoCameraSerialIn
         if (iPacketSize >= 0){
             setPacketSize(iPacketSize);
         }
-        if (iFps > 0){
-            changeFPS(iFps);
-        }
+        changeFPS(iFps);
 
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
@@ -363,11 +366,16 @@ void StereoCameraBasler::enableFPS(bool enable){
 
 void StereoCameraBasler::changeFPS(int val){
     // unlimited frame rate if set to 0
-    if (val>0){
-        setFPS(val);
-        enableFPS(true);
-    } else {
+    if (m_iTrigger == 1){
+        camControl->updateFPS(val); //TODO fix this
         enableFPS(false);
+    } else {
+        if (val>0){
+            setFPS(val);
+            enableFPS(true);
+        } else {
+            enableFPS(false);
+        }
     }
 }
 
@@ -426,6 +434,7 @@ void StereoCameraBasler::setBinning(int val){
 }
 
 void StereoCameraBasler::setTrigger(bool enable){
+    enableFPS(!enable);
     try
     {
         std::string enable_str = "Off";
@@ -454,9 +463,9 @@ void StereoCameraBasler::setTrigger(bool enable){
 }
 
 void StereoCameraBasler::toggleTrigger(bool enable){
-    enableFPS(!enable);
     enableTrigger(enable);
 }
+
 void StereoCameraBasler::adjustFPS(int val){
     changeFPS(val);
 }

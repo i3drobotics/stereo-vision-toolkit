@@ -109,6 +109,8 @@ private:
     QPixmap pmap_disparity;
     QTimer* status_bar_timer;
 
+    QFuture<void> qfuture_refreshcameralist;
+
     QTimer* frame_timer;
     QTimer* device_list_timer;
 
@@ -191,8 +193,9 @@ public slots:
 
     int openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
     void cameraDeviceSelected(int index);
-    void refreshCameraList(bool showGUI);
-    void refreshCameraListNoGui(void){refreshCameraList(false);}
+    void refreshCameraList(void);
+    void refreshCameraListThreaded(void);
+    void refreshCameraListGUI(void);
     void startDeviceListTimer(void);
     void stopDeviceListTimer(void);
     void autoloadCameraTriggered();
@@ -233,6 +236,9 @@ protected:
 private slots:
     void on_btnShowCameraSettings_clicked();
     void on_btnHideCameraSettings_clicked();
+
+signals:
+    void cameraListUpdated(void);
 };
 
 #endif  // MAINWINDOW_H
