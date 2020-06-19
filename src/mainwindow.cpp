@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget* parent)
     calibration_from_images_dialog_used = false;
 
     cam_thread = new QThread;
-    stereoCamSupport = new StereoCameraSupport();
     device_list_timer = new QTimer(this);
 
     // define default settings for cameras
@@ -612,8 +611,7 @@ void MainWindow::stereoCameraInitConnections(void) {
 
     connect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
     connect(stereo_cam, SIGNAL(framecount(qint64)), this,
-            SLOT(updateFrameCount(qint64)));
-    connect(stereo_cam, SIGNAL(temperature_C(double)), this, SLOT(updateTemperature(double)));
+            SLOT(updateFrameCount(qint64))); 
     connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(saveImageTimestamped()));
     connect(disparity_view, SIGNAL(toggledDisparitySave(bool)), stereo_cam, SLOT(enableSaveDisparity(bool)));
     connect(stereo_cam, SIGNAL(savedImage(QString)), this,
@@ -693,9 +691,7 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.setMinimumDuration(0);
         progressClose.setValue(10);
 
-        if (stereo_cam->isAcquiring()){
-            stereo_cam->pause();
-        }
+        stereo_cam->enableCapture(false);
         stereo_cam->enableRectify(false);
         stereo_cam->enableMatching(false);
 
@@ -729,7 +725,6 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
         disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
                    SLOT(updateDisparityAsync(void)));
-        disconnect(stereo_cam, SIGNAL(temperature_C(double)), this, SLOT(updateTemperature(double)));
         disconnect(stereo_cam, SIGNAL(fps(qint64)), this, SLOT(updateFPS(qint64)));
         disconnect(stereo_cam, SIGNAL(framecount(qint64)), this,
                    SLOT(updateFrameCount(qint64)));
@@ -775,13 +770,13 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.setValue(50);
 
         qDebug() << "Waiting for acquisition to finish";
-        while (stereo_cam->isAcquiring() || stereo_cam->isCapturing());
+        while (stereo_cam->isCapturing());
         qDebug() << "Acquisition finished";
 
         progressClose.setLabelText("Disconnecting camera...");
         progressClose.setValue(80);
 
-        stereo_cam->disconnectCamera();
+        stereo_cam->closeCamera();
 
         QCoreApplication::processEvents();
 
@@ -814,16 +809,16 @@ int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_s
 
     cam_thread = new QThread;
 
-    StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
+    //StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
 
-    StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos;
+    StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos();
 
-    StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
+    //StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
 
-    StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
+    //StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
 
 #ifdef WITH_VIMBA
-    StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
+    //StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
 #endif
 
     if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
@@ -831,6 +826,8 @@ int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_s
         cameras_connected = stereo_cam_deimos->initCamera(camera_serial_info,current_camera_settings);
         stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
         qDebug() << "Connecting to Deimos system";
+    }
+        /*
     } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
         current_camera_settings = default_basler_init_settings;
         if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
@@ -857,6 +854,7 @@ int MainWindow::openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_s
        qDebug() << "Connecting to Titania system";
 #endif
    }
+   */
 
     stereo_cam->camera_serial_info = camera_serial_info;
     QCoreApplication::processEvents();
@@ -923,7 +921,7 @@ void MainWindow::refreshCameraListThreaded(){
 }
 
 void MainWindow::refreshCameraList(){
-    current_camera_serial_info_list = stereoCamSupport->getDeviceList();
+    current_camera_serial_info_list = getStereoDeviceList();
     emit cameraListUpdated();
 }
 
@@ -1075,7 +1073,7 @@ int MainWindow::stereoCameraLoad(void) {
     cameras_connected = false;
     int exit_code = -4;
 
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = stereoCamSupport->getDeviceList();
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info = getStereoDeviceList();
 
     AbstractStereoCamera::stereoCameraSerialInfo chosen_camera_serial_info;
     bool camera_chosen = false;
@@ -1254,14 +1252,16 @@ void MainWindow::videoStreamLoad(void) {
     if (fname != "") {
         stereoCameraRelease();
 
-        StereoCameraFromVideo* stereo_cam_video = new StereoCameraFromVideo;
-        cam_thread = new QThread;
-        stereo_cam_video->assignThread(cam_thread);
+        //StereoCameraFromVideo* stereo_cam_video = new StereoCameraFromVideo;
+        //cam_thread = new QThread;
+        //stereo_cam_video->assignThread(cam_thread);
 
         AbstractStereoCamera::stereoCameraSerialInfo scis;
         scis.filename = fname.toStdString();
 
         current_camera_settings = default_video_init_settings;
+
+        /*
 
         if (stereo_cam_video->initCamera(scis,default_video_init_settings)) {
             stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_video);
@@ -1275,6 +1275,7 @@ void MainWindow::videoStreamLoad(void) {
             msg.exec();
             ui->statusBar->showMessage("Disconnected.");
         }
+        */
 
         stereoCameraInit();
         stereoCameraInitWindow();
@@ -1459,7 +1460,7 @@ void MainWindow::doneCalibration(bool) {
                SLOT(abortCalibration()));
     disconnect(calibrator, SIGNAL(doneCalibration(bool)), this,
                SLOT(doneCalibration(bool)));
-    stereo_cam->freerun();
+    stereo_cam->enableCapture(true);
 }
 
 void MainWindow::setMatcher(int index) {
@@ -1577,15 +1578,15 @@ void MainWindow::setCalibrationFolder(QString dir) {
 }
 
 void MainWindow::statusMessageTimeout(void) {
-    if (stereo_cam->isAcquiring()) {
-        ui->statusBar->showMessage("Freerunning.");
+    if (stereo_cam->isCapturing()) {
+        ui->statusBar->showMessage("Capturing.");
     } else {
         ui->statusBar->showMessage("Paused.");
     }
 }
 
 void MainWindow::singleShotClicked(void) {
-    stereo_cam->singleShot();
+    stereo_cam->captureSingle();
     ui->statusBar->showMessage("Paused.");
     ui->pauseButton->setIcon(awesome->icon(fa::play, icon_options));
 }
@@ -1595,8 +1596,8 @@ void MainWindow::saveSingle(void) {
 }
 
 void MainWindow::toggleAcquire(void) {
-    if (stereo_cam->isAcquiring()) {
-        stereo_cam->pause();
+    if (stereo_cam->isCapturing()) {
+        stereo_cam->enableCapture(false);
         ui->statusBar->showMessage("Paused.");
         ui->pauseButton->setIcon(awesome->icon(fa::play, icon_options));
     } else {
@@ -1663,18 +1664,18 @@ void MainWindow::setSaveDirectory(QString dir) {
 }
 
 void MainWindow::toggleAutoGain(bool enable){
-    stereo_cam->toggleAutoGain(enable);
+    stereo_cam->enableAutoGain(enable);
     if (!enable){
         int gain_val = ui->gainSpinBox->value();
-        stereo_cam->adjustGain(gain_val);
+        stereo_cam->setGain(gain_val);
     }
 }
 
 void MainWindow::toggleAutoExpose(bool enable){
-    stereo_cam->toggleAutoExpose(enable);
+    stereo_cam->enableAutoExposure(enable);
     if (!enable){
         double exposure_val = ui->exposureSpinBox->value();
-        stereo_cam->adjustExposure(exposure_val);
+        stereo_cam->setExposure(exposure_val);
     }
 }
 
@@ -1702,7 +1703,7 @@ void MainWindow::changeFPS(int fps){
         binning = ui->binningSpinBox->value();
     }
     if (gigeWarning(binning,fps)){
-        stereo_cam->adjustFPS(fps);
+        stereo_cam->setFPS(fps);
         current_fps = fps;
     } else {
         disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
@@ -1727,7 +1728,7 @@ void MainWindow::changePacketSize(){
 
     int packetSize = ui->packetSizeSpinBox->value();
 
-    stereo_cam->adjustPacketSize(packetSize);
+    stereo_cam->setPacketSize(packetSize);
 
     progressPacketSize.setValue(100);
     progressPacketSize.close();
@@ -1743,7 +1744,7 @@ void MainWindow::changeBinning(int binning){
         progressBinning.setValue(30);
         QCoreApplication::processEvents();
 
-        stereo_cam->adjustBinning(binning);
+        stereo_cam->setBinning(binning);
         current_binning = binning;
 
         //TODO fix crash after setting binning
@@ -1779,7 +1780,7 @@ void MainWindow::toggleEnableBinning(bool enable){
         progressBinning.setValue(30);
         QCoreApplication::processEvents();
 
-        stereo_cam->adjustBinning(binning_val);
+        stereo_cam->setBinning(binning_val);
 
         progressBinning.setValue(100);
         progressBinning.close();
@@ -1849,10 +1850,6 @@ void MainWindow::updateFPS(qint64 time) {
         fps_measure_total = average_fps;
         fps_measure_count = 1;
     }
-}
-
-void MainWindow::updateTemperature(double temperature) {
-    temp_label->setText(QString("Temp: %1 C").arg(QString::number(temperature, 'f', 2)));
 }
 
 void MainWindow::openHelp(){

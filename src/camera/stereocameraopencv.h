@@ -54,7 +54,6 @@ public slots:
     bool setExposure(double exposure_time);
     bool toggleHDR(bool enable);
     bool enableAutoExpose(bool enable);
-    double getTemperature(void);
     void changeFPS(int fps);
 
 private:

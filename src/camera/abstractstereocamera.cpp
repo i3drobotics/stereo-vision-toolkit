@@ -5,19 +5,11 @@
 
 #include "abstractstereocamera.h"
 
-const std::string AbstractStereoCamera::CAMERA_TYPE_DEIMOS = "deimos";
-const std::string AbstractStereoCamera::CAMERA_TYPE_USB = "usb";
-const std::string AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE = "baslergige";
-const std::string AbstractStereoCamera::CAMERA_TYPE_BASLER_USB = "baslerusb";
-const std::string AbstractStereoCamera::CAMERA_TYPE_TIS = "tis";
-const std::string AbstractStereoCamera::CAMERA_TYPE_VIMBA = "vimba";
-
 AbstractStereoCamera::AbstractStereoCamera(QObject *parent) : QObject(parent) {
 
 #ifdef CUDA
     if (cv::cuda::getCudaEnabledDeviceCount() > 0) {
-        has_cuda = true;
-        emit haveCuda();
+        cuda_device_found = true;
     }
 #endif
 
@@ -26,15 +18,42 @@ AbstractStereoCamera::AbstractStereoCamera(QObject *parent) : QObject(parent) {
     cv_video_writer = new cv::VideoWriter();
 
     connect(this, SIGNAL(stereopair_captured()), this, SLOT(process_stereo()));
-    connect(this, SIGNAL(left_captured()), this, SLOT(register_left_capture()));
-    connect(this, SIGNAL(right_captured()), this, SLOT(register_right_capture()));
+}
+
+std::string AbstractStereoCamera::StereoCameraType2String(StereoCameraType camera_type){
+    switch(camera_type)
+    {
+        case CAMERA_TYPE_DEIMOS  : return "deimos"; break;
+        case CAMERA_TYPE_BASLER_GIGE  : return "basler_gige"; break;
+        case CAMERA_TYPE_BASLER_USB  : return "basler_usb"; break;
+        case CAMERA_TYPE_TIS  : return "tis"; break;
+        case CAMERA_TYPE_VIMBA  : return "vimba"; break;
+        default  : return ""; break;
+    }
+}
+
+StereoCameraType AbstractStereoCamera::String2StereoCameraType(std::string camera_type){
+    if (camera_type.compare("deimos") == 0){
+        return CAMERA_TYPE_DEIMOS;
+    } else if (camera_type.compare("usb") == 0){
+        return CAMERA_TYPE_USB;
+    } else if (camera_type.compare("basler_gige") == 0){
+        return CAMERA_TYPE_BASLER_GIGE;
+    } else if (camera_type.compare("basler_usb") == 0){
+        return CAMERA_TYPE_BASLER_USB;
+    } else if (camera_type.compare("tis") == 0){
+        return CAMERA_TYPE_TIS;
+    } else if (camera_type.compare("vimba") == 0){
+        return CAMERA_TYPE_VIMBA;
+    }
+    return CAMERA_TYPE_INVALID;
 }
 
 void AbstractStereoCamera::try_capture(){
-    capture();
+    //capture();
 }
 
-std::vector<AbstractStereoCamera::stereoCameraSerialInfo> AbstractStereoCamera::loadSerials(std::string camera_type, std::string filename){
+std::vector<AbstractStereoCamera::stereoCameraSerialInfo> AbstractStereoCamera::loadSerials(StereoCameraType camera_type, std::string filename){
     std::vector<stereoCameraSerialInfo> serials;
     QString qFilname = QString::fromStdString(filename);
     QFile inputFile(qFilname);
@@ -45,8 +64,9 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> AbstractStereoCamera::
 
             if(line.size() == 4 || line.size() == 5){ //TODO change this back to only 4 when excel that generates the serials is fixed
                 QString cam_type = line.at(0);
-                std::string file_cam_type = cam_type.toStdString();
-                if (file_cam_type.compare(camera_type) == 0){
+                std::string file_cam_type_str = cam_type.toStdString();
+                StereoCameraType file_cam_type = String2StereoCameraType(file_cam_type_str);
+                if (file_cam_type = camera_type){
                     QString left_camera_serial = line.at(1);
                     QString right_camera_serial = line.at(2);
                     QString i3dr_serial = line.at(3);
@@ -78,7 +98,7 @@ void AbstractStereoCamera::assignThread(QThread *thread) {
 void AbstractStereoCamera::finishThread(){
     //m_thread->quit();
     //m_thread->deleteLater();
-    emit finished();
+    //emit finished();
 }
 
 void AbstractStereoCamera::saveImageTimestamped(void) {
@@ -297,10 +317,6 @@ void AbstractStereoCamera::enableReproject(bool reproject) {
     reprojecting = reproject;
 }
 
-void AbstractStereoCamera::enableCapture(bool capture) { capturing = capture; }
-
-void AbstractStereoCamera::enableAcquire(bool acquire) { acquiring = acquire; }
-
 void AbstractStereoCamera::enableMatching(bool match) { matching = match; }
 
 void AbstractStereoCamera::enableRectify(bool rectify) {
@@ -327,8 +343,6 @@ void AbstractStereoCamera::changeDownsampleFactor(int factor){
 }
 
 bool AbstractStereoCamera::isCapturing() { return capturing; }
-
-bool AbstractStereoCamera::isAcquiring() { return acquiring; }
 
 bool AbstractStereoCamera::isMatching() { return matching; }
 
@@ -472,7 +486,7 @@ bool AbstractStereoCamera::loadCalibration(QString left_cal, QString right_cal,
 
 void AbstractStereoCamera::rectifyImages(void) {
 #ifdef CUDA
-    if (has_cuda) {
+    if (cuda_device_found){
         cv::cuda::GpuMat d_left, d_right, d_left_remap, d_right_remap;
 
         d_left.upload(left_raw);
@@ -492,7 +506,6 @@ void AbstractStereoCamera::rectifyImages(void) {
 
         d_left_remap.download(left_remapped);
         d_right_remap.download(right_remapped);
-
     } else {
 #endif
         QFuture<void> res_l =
@@ -518,14 +531,14 @@ void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
 void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 
     bool reenable_required = false;
-    if (this->isAcquiring()){
+    if (this->isMatching()){
         reenable_required = true;
-        enableAcquire(false);
+        enableMatching(false);
     }
     this->matcher = matcher;
     this->matcher->setImages(&left_remapped, &right_remapped);
     if (reenable_required){
-        enableAcquire(true);
+        enableMatching(true);
     }
     qDebug() << "Changed matcher";
 }
@@ -567,89 +580,13 @@ void AbstractStereoCamera::process_stereo(void) {
     }
 
     emit stereopair_processed();
-    emit fps(frametimer.elapsed());
+    emit frametime(frametimer.elapsed());
     frametimer.restart();
-
 }
 
-void AbstractStereoCamera::register_left_capture(void){
-    captured_left = true;
-    register_stereo_capture();
-}
-
-void AbstractStereoCamera::register_right_capture(void){
-    captured_right = true;
-    register_stereo_capture();
-}
-
-void AbstractStereoCamera::register_stereo_capture(){
-    if(captured_left && captured_right){
-        emit stereopair_captured();
-
-        captured_stereo = true;
-
-        captured_left = false;
-        captured_right = false;
-    }
-
-}
-
-void AbstractStereoCamera::pause(void) {
-    acquiring = false;
-    finishCapture();
-}
-
-void AbstractStereoCamera::singleShot(void) {
-    pause();
-    capture_and_process();
-}
-
-void AbstractStereoCamera::finishCapture(void) {
-    while (capturing) {
-        QCoreApplication::processEvents();
-    }
-}
-
-void AbstractStereoCamera::freerun(void) {
-    acquiring = true;
-
-    while(acquiring && connected){
-        QCoreApplication::processEvents();
-        capture_and_process();
-    }
-}
-
-void AbstractStereoCamera::capture_and_process(void){
-    captured_stereo = false;
-
-    // Capture, process_stereo is called via signal/slot
-    bool res = capture();
-    if (!res){
-        grab_fail_count++;
-    } else {
-        grab_fail_count = 0;
-    }
-    if (grab_fail_count > 3){ //disconnect if failed to grab for more than 3 frames in a row
-        disconnectCamera();
-    }
-
-    while(!captured_stereo){
-        /* Check for events, e.g. pause/quit */
-        QCoreApplication::processEvents();
-    }
-}
-
-void AbstractStereoCamera::videoStreamProcess(){
-    acquiring = true;
-    while(acquiring && connected){
-        QCoreApplication::processEvents();
-        capture_and_process();
-        cv::Mat left,right;
-        getLeftImage(left);
-        getRightImage(right);
-        cv::hconcat(left, right, video_frame);
-        cv_video_writer->write(video_frame);
-    }
+void AbstractStereoCamera::videoStreamAddFrame(cv::Mat left, cv::Mat right){
+    cv::hconcat(left, right, video_frame);
+    cv_video_writer->write(video_frame);
 }
 
 bool AbstractStereoCamera::videoStreamInit(QString filename, int fps) {
@@ -688,13 +625,4 @@ void AbstractStereoCamera::videoStreamStop(){
         cv_video_writer->release();
         cv_video_writer = new cv::VideoWriter();
     }
-}
-
-bool write_parallel(std::string fname, cv::Mat src) {
-    std::vector<int> params;
-    int compression_level = 9;
-    params.push_back(cv::IMWRITE_PNG_COMPRESSION);
-    params.push_back(compression_level);
-
-    return cv::imwrite(fname, src, params);
 }

@@ -412,32 +412,6 @@ int StereoCameraOpenCV::getExposure() {
     return 0;
 }
 
-double StereoCameraOpenCV::getTemperature(void){
-    /*
-    std::vector<unsigned char> buffer(16);
-
-    buffer.at(1) = CAMERA_CONTROL_STEREO;
-    buffer.at(2) = GET_IMU_TEMP_DATA;
-
-    if (!send_hid(buffer, 2)) return -1;
-
-    if (!buffer.at(6)) {
-        return -1;
-    } else {
-        uint8_t msb = buffer.at(2);
-        uint8_t lsb = buffer.at(3);
-        double temp = (msb << 8) | lsb;
-
-        temp = ((temp - 20.0) / 16.0) + 21.0;
-        emit temperature_C(temp);
-
-        return temp;
-    }
-    */
-    return 0;
-
-}
-
 void StereoCameraOpenCV::adjustFPS(int fps){
     changeFPS(fps);
 }

@@ -3,24 +3,50 @@
 
 #include <QObject>
 #include "stereocameradeimos.h"
-#include "stereocamerafromvideo.h"
-#include "stereocameraopencv.h"
-#include "stereocameratis.h"
-#include "stereocamerabasler.h"
+//#include "stereocamerafromvideo.h"
+//#include "stereocameraopencv.h"
+//#include "stereocameratis.h"
+//#include "stereocamerabasler.h"
 #ifdef WITH_VIMBA
-    #include "stereocameravimba.h"
+    //#include "stereocameravimba.h"
 #endif
 
-class StereoCameraSupport : public QObject {
-    Q_OBJECT
+std::vector<AbstractStereoCamera::stereoCameraSerialInfo> getStereoDeviceList(){
+    //StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
 
-public:
-    StereoCameraSupport();
-    ~StereoCameraSupport();
+    StereoCameraDeimos* stereo_cam_deimos = new StereoCameraDeimos();
 
-public slots:
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> getDeviceList(void);
+    //StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
 
-};
+    //StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
+
+#ifdef WITH_VIMBA
+    //StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
+#endif
+
+    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> all_camera_serial_info;
+
+        //std::vector<AbstractStereoCamera::stereoCameraSerialInfo> basler_camera_serial_info = stereo_cam_basler->listSystems();
+
+    #ifdef WITH_VIMBA
+        //std::vector<AbstractStereoCamera::stereoCameraSerialInfo> vimba_camera_serial_info = stereo_cam_vimba->listSystems();
+    #endif
+
+        //std::vector<AbstractStereoCamera::stereoCameraSerialInfo> tis_camera_serial_info = stereo_cam_tis->listSystems();
+
+        std::vector<AbstractStereoCamera::stereoCameraSerialInfo> deimos_camera_serial_info = stereo_cam_deimos->listSystems();
+
+        //std::vector<AbstractStereoCamera::stereoCameraSerialInfo> usb_camera_serial_info = stereo_cam_cv->listSystems();
+
+        //all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
+    #ifdef WITH_VIMBA
+        //all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
+    #endif
+        //all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
+        all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
+        //all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
+
+    return all_camera_serial_info;
+}
 
 #endif // STEREOCAMERASUPPORT_H

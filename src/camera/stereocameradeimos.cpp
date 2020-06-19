@@ -5,19 +5,22 @@
 
 #include "stereocameradeimos.h"
 
-bool StereoCameraDeimos::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings){
-
-    double exposure = inital_camera_settings.exposure;
-    int fps = inital_camera_settings.fps;
-    bool hdr = inital_camera_settings.hdr;
+bool StereoCameraDeimos::openCamera(){
+    if (isConnected()){
+        closeCamera();
+    }
+    double exposure = stereoCameraSettings_.exposure;
+    int fps = stereoCameraSettings_.fps;
+    bool hdr = stereoCameraSettings_.hdr;
     bool autoExpose;
-    if (inital_camera_settings.autoExpose == 1){
+    if (stereoCameraSettings_.autoExpose == 1){
         autoExpose = true;
     } else {
         autoExpose = false;
     }
-    this->camera_serial_info = camera_serial_info;
-    int usb_index = usb_index_from_serial(camera_serial_info.left_camera_serial);
+    // Get usb index of camera with selected serial
+    // use left serial as deimos only has a single connection so right and left are the same in serialinfo
+    int usb_index = usb_index_from_serial(stereoCameraSerialInfo_.left_camera_serial);
     if (usb_index >= 0) {
         openHID();
 
@@ -26,17 +29,11 @@ bool StereoCameraDeimos::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
         if (camera.isOpened()) {
             bool res = setFrameSize(752, 480);
 
-            toggleHDR(hdr);
-            enableAutoExpose(autoExpose);
+            enableHDR(hdr);
+            enableAutoExposure(autoExpose);
             setExposure(exposure);
-            changeFPS(fps);
+            setFPS(fps);
             getFrameRate();
-            getTemperature();
-
-            temperature_timer = new QTimer(parent());
-            temperature_timer->setInterval(1000);
-            //connect(temperature_timer, SIGNAL(timeout()), this, SLOT(getTemperature()));
-            temperature_timer->start();
 
             if (!res) {
                 camera.release();
@@ -47,6 +44,19 @@ bool StereoCameraDeimos::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
         }
     }
     return connected;
+}
+
+bool StereoCameraDeimos::closeCamera(){
+    if (connected){
+        if (camera.isOpened()) {
+            camera.release();
+            hid_close(deimos_device);
+            hid_exit();
+        }
+    }
+    connected = false;
+    emit disconnected();
+    //emit finished();
 }
 
 std::string StereoCameraDeimos::get_device_path_serial(IMoniker *pMoniker){
@@ -378,42 +388,7 @@ int StereoCameraDeimos::getExposure() {
     }
 }
 
-double StereoCameraDeimos::getTemperature(void){
-    std::vector<unsigned char> buffer(16);
-
-    buffer.at(1) = CAMERA_CONTROL_STEREO;
-    buffer.at(2) = GET_IMU_TEMP_DATA;
-
-    if (!send_hid(buffer, 2)) return -1;
-
-    if (!buffer.at(6)) {
-        return -1;
-    } else {
-        uint8_t msb = buffer.at(2);
-        uint8_t lsb = buffer.at(3);
-        double temp = (msb << 8) | lsb;
-
-        temp = ((temp - 20.0) / 16.0) + 21.0;
-        emit temperature_C(temp);
-
-        return temp;
-    }
-
-}
-
-void StereoCameraDeimos::adjustFPS(int fps){
-    changeFPS(fps);
-}
-
-void StereoCameraDeimos::toggleAutoExpose(bool enable){
-    enableAutoExpose(enable);
-}
-
-void StereoCameraDeimos::adjustExposure(double exposure){
-    setExposure(exposure);
-}
-
-bool StereoCameraDeimos::enableAutoExpose(bool enable) {
+bool StereoCameraDeimos::enableAutoExposure(bool enable) {
     if (enable)
         return setExposure(0.001);
     else
@@ -454,7 +429,7 @@ bool StereoCameraDeimos::setExposure(double exposure_milliseconds) {
     return false;
 }
 
-void StereoCameraDeimos::changeFPS(int fps){
+bool StereoCameraDeimos::setFPS(int fps){
     double fps_d;
     if (fps == 30){
         fps_d = 1;
@@ -463,9 +438,10 @@ void StereoCameraDeimos::changeFPS(int fps){
     }
     const std::lock_guard<std::mutex> lock(mtx);
     camera.set(CV_CAP_PROP_FPS, (double)fps_d);
+    return true;
 }
 
-bool StereoCameraDeimos::toggleHDR(bool enable){
+bool StereoCameraDeimos::enableHDR(bool enable){
     if (deimos_device == NULL) return false;
 
     std::vector<unsigned char> buffer;
@@ -546,19 +522,6 @@ void StereoCameraDeimos::getFrameRate() {
     qDebug() << "Frame rate: " << frame_rate;
 }
 
-void StereoCameraDeimos::disconnectCamera() {
-    if (connected){
-        if (camera.isOpened()) {
-            camera.release();
-            hid_close(deimos_device);
-            hid_exit();
-        }
-    }
-    connected = false;
-    emit disconnected();
-    //emit finished();
-}
-
 bool StereoCameraDeimos::capture() {
 
     if(capturing) return false;
@@ -591,8 +554,7 @@ bool StereoCameraDeimos::capture() {
         res = false;
     }
 
-    emit left_captured();
-    emit right_captured();
+    emit captured();
 
     capturing = false;
 
@@ -607,6 +569,6 @@ std::string StereoCameraDeimos::wchar_to_string(WCHAR * buffer) {
 
 StereoCameraDeimos::~StereoCameraDeimos(void) {
     if (connected){
-        disconnectCamera();
+        closeCamera();
     }
 }
