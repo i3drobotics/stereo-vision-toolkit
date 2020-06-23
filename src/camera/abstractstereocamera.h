@@ -67,9 +67,6 @@ class AbstractStereoCamera : public QObject {
     Q_OBJECT
 
 public:
-    explicit AbstractStereoCamera(QObject *parent = 0);
-
-    AbstractStereoMatcher *matcher = nullptr;
 
     //! Enum defined errors. This defines the type of error that occured.
     enum StereoCameraError { CAPTURE_ERROR, RECTIFY_ERROR, MATCH_ERROR };
@@ -101,36 +98,39 @@ public:
         std::string filename; // filename for video [only used for stereoCameraFromVideo]
     };
 
-    //! Convert between stereo camera type enum and string
-    std::string StereoCameraType2String(StereoCameraType camera_type);
-    //! Convert between string and camera type enum
-    StereoCameraType String2StereoCameraType(std::string camera_type);
+    explicit AbstractStereoCamera(StereoCameraSerialInfo serial_info,
+                                  StereoCameraSettings camera_settings,
+                                  QObject *parent = 0);
 
-    //! Setup camera parameters
-    /*! Define camera to use and inital camera setting. Should be run before 'openCamera' */
-    bool setCameraParams(StereoCameraSerialInfo serial_info,StereoCameraSettings camera_settings){
-        stereoCameraSerialInfo_ = serial_info;
-        stereoCameraSettings_ = camera_settings;
-    }
+    AbstractStereoMatcher *matcher = nullptr;
+
+    //! Convert between stereo camera type enum and string
+    static std::string StereoCameraType2String(StereoCameraType camera_type);
+    //! Convert between string and camera type enum
+    static StereoCameraType String2StereoCameraType(std::string camera_type);
+
+    StereoCameraSerialInfo getCameraSerialInfo(){return stereoCameraSerialInfo_;}
+
+    StereoCameraSettings getCameraSettings(){return stereoCameraSettings_;}
 
     //! List avaiable stereo camera systems
-    /*! This is a virtual function which should be implmented by a particular camera driver to only return camera of that type */
-    virtual std::vector<StereoCameraSerialInfo> listSystems(void) = 0;
+    /*! This function should be implmented by a particular camera driver to only return camera of that type */
+    static std::vector<StereoCameraSerialInfo> listSystems(void) {
+        std::vector<StereoCameraSerialInfo> empty_list;
+        return empty_list;
+    };
 
     //! Load known camera serials
     /*!
     * @param[in] camera_type Camera type of serials to read (usb/basler/tis)
     * @param[in] filename Camera serials parameter file (default is: camera_serials.ini)
     */
-    std::vector<StereoCameraSerialInfo> loadSerials(StereoCameraType camera_type, std::string filename=qApp->applicationDirPath().toStdString() + "/camera_serials.ini");
+    static std::vector<StereoCameraSerialInfo> loadSerials(StereoCameraType camera_type, std::string filename=qApp->applicationDirPath().toStdString() + "/camera_serials.ini");
 
     //! Assign the stereo camera object to a thread so as not to block the GUI. Typically called just after instantiation.
-    /*!
-    @param[in] thread Pointer to thread
-  */
     void assignThread(QThread *thread);
 
-    void finishThread();
+    void stopThread();
 
     //! Returns weather camera image capture is enabled
     bool isCapturing();
@@ -140,6 +140,9 @@ public:
 
     //! Returns whether rectification is being performed
     bool isRectifying();
+
+    //! Returns wheather video saving is being performed
+    bool isCapturingVideo() { return capturing_video; };
 
     //! Returns whether left and right images are being swapped
     bool isSwappingLeftRight();
@@ -215,9 +218,8 @@ public:
    * @sa setSavelocation(), videoStreamStop()
    * @param[out] fps The frame rate of the video recording
   */
-    bool videoStreamInit(QString filename = "", int fps = 0);
-    void videoStreamAddFrame(cv::Mat left, cv::Mat right);
-    void videoStreamStop();
+    bool videoStreamSetParams(QString filename = "", int fps = 0, int codec = CV_FOURCC('H', '2', '6', '4'), bool is_color = false);
+    bool videoStreamAddFrame(cv::Mat left, cv::Mat right);
 
     bool connected = false;
     float downsample_factor = 1;
@@ -272,6 +274,9 @@ signals:
     //! Indicates that the camera has disconnected
     void disconnected();
 
+    //! Indicates close of class for closing threads
+    void finished();
+
 public slots:
 
     //! Capture an image
@@ -280,19 +285,24 @@ public slots:
     * This is a virtual function which should be implmented by a particular camera driver */
     virtual bool captureSingle() = 0;
 
-    //! Open camera
-    /*! Start connection to camera
-     * This should only initalise the camera not start capturing. E.g. Start 3rd_party api's and setup default camera settings.
-     * 'setupCamera' MUST be called before running this funciton to make sure paramters are correctly defined.
-     * @return Return success or failer of closing the camera connection
-     * This is a virtual function which should be implmented by a particular camera driver */
-    virtual bool openCamera(void) = 0;
+    //! Capture a frame in continuous capture mode
+    /*! Trigger the capture of a frame in continous capture mode
+    * @return True if an image was captured successfully, false otherwise
+    * This is a virtual function which should be implmented by a particular camera driver */
+    //virtual bool captureContinuous() = 0;
 
     //! Enable/disable camera image capture
-    /*! Start and stop image capture from the camera
+    /*! Start and stop image capture from the camera (in thread)
      * @return Return success or failer of starting/stoping image capture
      * This is a virtual function which should be implmented by a particular camera driver */
     virtual bool enableCapture(bool enable) = 0;
+
+    //! Open camera
+    /*! Start connection to camera
+     * This should only initalise the camera not start capturing. E.g. Start 3rd_party api's and setup default camera settings.
+     * @return Return success or failer of closing the camera connection
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool openCamera(void) = 0;
 
     //! Close camera
     /*! Safely stop capture and disconnect the camera
@@ -340,6 +350,12 @@ public slots:
      * This is a virtual function which should be implmented by a particular camera driver */
     virtual bool setPacketSize(int) = 0;
 
+    bool startCapture(){return enableCapture(true);};
+    bool stopCapture(){return enableCapture(false);};
+
+    bool videoStreamEnable(bool enable);
+    bool videoStreamStart(){return videoStreamEnable(false);}
+    bool videoStreamStop(){return videoStreamEnable(false);}
 
     void setMatcher(AbstractStereoMatcher *matcher);
 
@@ -357,8 +373,6 @@ public slots:
     * @sa setSavelocation()
     */
     void saveImageTimestamped();
-
-    void videoStreamProcess(void);
 
     //! Enable or disable stereo matching
     void enableMatching(bool match);
@@ -380,7 +394,7 @@ public slots:
     void enableSaveDisparity(bool enable);
 
     //! Change downsample factor
-    void changeDownsampleFactor(int factor);
+    void setDownsampleFactor(int factor);
 
     //! Set the point cloud clipping distance closest to the camera (i.e. specify the closest distance to display)
     /*!
@@ -395,7 +409,7 @@ public slots:
     void setVisualZmax(double zmax);
 
     //! Toggle saving date in filename
-    void toggleDateInFilename(int state);
+    void enableDateInFilename(bool enable);
 
     //! Save the current 3D reconstruction to a .PLY file
     void savePointCloud();
@@ -415,9 +429,6 @@ public slots:
     }
 
 private slots:
-    void register_stereo_capture(void);
-    void try_capture();
-    void capture_and_process();
 
     //! Grab and process a frame from the camera
     /*!
@@ -430,12 +441,10 @@ private slots:
 private:
     qint64 frames = 0;
 
-    StereoCameraSettings stereoCameraSettings_;
-    StereoCameraSerialInfo stereoCameraSerialInfo_;
-
     bool includeDateInFilename = false;
     bool matching = false;
     bool rectifying = false;
+    bool capturing_video = false;
     bool swappingLeftRight = false;
     bool reprojecting = false;
     bool cuda_device_found = false;
@@ -512,6 +521,11 @@ private:
     cv::Mat l_camera_matrix;
     cv::Mat l_dist_coeffs;
     cv::Mat r_dist_coeffs;
+
+    int video_fps = 0;
+    int video_codec = CV_FOURCC('H', '2', '6', '4');
+    bool video_is_color = false;
+    std::string video_filename = "";
     cv::Mat video_frame;
 
     cv::Mat left_output;
@@ -527,6 +541,9 @@ protected:
     int image_height = 0;
     int image_bitdepth = 1;
 
+    StereoCameraSettings stereoCameraSettings_;
+    StereoCameraSerialInfo stereoCameraSerialInfo_;
+
     QElapsedTimer frametimer;
 
     bool rectification_valid = false;
@@ -535,6 +552,8 @@ protected:
     bool capturing = false;
 
     int grab_fail_count = 0;
+
+    QThread *thread_;
 
 };
 

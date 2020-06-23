@@ -96,13 +96,13 @@ private:
     int CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE = -2;
     int CAMERA_CONNECTION_CANCEL_EXIT_CODE = -3;
 
-    AbstractStereoCamera::stereoCameraSettings default_basler_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_tis_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_deimos_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_usb_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_video_init_settings;
-    AbstractStereoCamera::stereoCameraSettings current_camera_settings;
-    AbstractStereoCamera::stereoCameraSettings default_vimba_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_basler_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_tis_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_deimos_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_usb_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_video_init_settings;
+    AbstractStereoCamera::StereoCameraSettings current_camera_settings;
+    AbstractStereoCamera::StereoCameraSettings default_vimba_init_settings;
 
     QPixmap pmap_left;
     QPixmap pmap_right;
@@ -111,7 +111,7 @@ private:
 
     QFuture<void> qfuture_refreshcameralist;
 
-    QTimer* frame_timer;
+    //QTimer* frame_timer;
     QTimer* device_list_timer;
 
     ParamFile* parameters;
@@ -156,7 +156,7 @@ private:
 
     QVTKWidget* vtk_widget;
 
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> current_camera_serial_info_list;
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> current_camera_serial_info_list;
     std::vector<QSignalMapper*>* camera_button_signal_mapper_list;
 
     void setupMatchers();
@@ -174,9 +174,9 @@ private:
 public slots:
     void stereoCameraRelease(void);
     void updateDisplay(void);
-    void updateFPS(qint64);
+    void updateFrameTime(qint64);
     void updateFrameCount(qint64);
-    void toggleAcquire(void);
+    void enableCapture(bool);
     void singleShotClicked(void);
     void saveSingle(void);
     void displaySaved(QString fname);
@@ -188,7 +188,7 @@ public slots:
 
     int stereoCameraLoad(void);
 
-    int openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
+    int openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info);
     void cameraDeviceSelected(int index);
     void refreshCameraList(void);
     void refreshCameraListThreaded(void);
@@ -196,13 +196,13 @@ public slots:
     void startDeviceListTimer(void);
     void stopDeviceListTimer(void);
     void autoloadCameraTriggered();
-    void toggleAutoExpose(bool);
-    void toggleAutoGain(bool);
-    void toggleEnableBinning(bool enable);
-    void changeBinning(int binning);
-    void toggleFPS(bool enable);
-    void changeFPS(int fps);
-    void changePacketSize();
+    void enableAutoExpose(bool);
+    void enableAutoGain(bool);
+    void enableBinning(bool enable);
+    void setBinning(int binning);
+    void enableFPS(bool enable);
+    void setFPS(int fps);
+    void setPacketSize();
 
     void videoStreamLoad(void);
 

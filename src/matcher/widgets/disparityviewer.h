@@ -12,6 +12,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <abstractstereomatcher.h>
+#include <cvsupport.h>
 
 //!  Disparity Viewer
 /*!
@@ -34,7 +35,7 @@ signals:
     //! Emit when an image has been saved, including the filename
     void savedImage(QString filename);
     //! Emit when disparity save checkbox is toggled
-    void toggledDisparitySave(bool enable);
+    void disparitySaveCheckChanged(bool checked);
 
 public:
     explicit DisparityViewer(QWidget *parent = 0);
@@ -102,16 +103,5 @@ public slots:
     //void updateDisparityRange_spin(int val);
     //void updatePixmapRange();
 };
-
-//! Wrapper around cv::imwrite for saving in parallel
-/*!
-* Saves an image, can also be called sequentially.
-*
-* @param[in] fname Output filename
-* @param[in] src Image matrix
-*
-* @return True/false if the write was successful
-*/
-bool write_parallel(std::string fname, cv::Mat src);
 
 #endif // DISPARITYVIEWERCONTROLS_H
