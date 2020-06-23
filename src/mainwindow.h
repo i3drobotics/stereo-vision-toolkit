@@ -186,6 +186,14 @@ public slots:
     void disableWindow();
     void enableWindow();
 
+    void disableCameraActiveSettings(){toggleCameraActiveSettings(false);}
+    void enableCameraActiveSettings(){toggleCameraActiveSettings(true);}
+    void toggleCameraActiveSettings(bool enable);
+
+    void disableCameraPassiveSettings(){toggleCameraPassiveSettings(false);}
+    void enableCameraPassiveSettings(){toggleCameraPassiveSettings(true);}
+    void toggleCameraPassiveSettings(bool enable);
+
     int stereoCameraLoad(void);
 
     int openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info);
