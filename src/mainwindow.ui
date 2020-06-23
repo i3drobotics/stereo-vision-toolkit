@@ -363,7 +363,7 @@
             </size>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="tabCameraList">
             <attribute name="title">
@@ -726,28 +726,6 @@
                    </property>
                    <property name="value">
                     <double>5.000000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="2">
-                  <widget class="QCheckBox" name="binCheckBox">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Enable</string>
                    </property>
                   </widget>
                  </item>

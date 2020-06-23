@@ -236,7 +236,6 @@ void MainWindow::controlsInit(void) {
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSpinBox, SLOT(setDisabled(bool)));
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), ui->gainSpinBox, SLOT(setDisabled(bool)));
     connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), ui->fpsSpinBox, SLOT(setDisabled(bool)));
-    connect(ui->binCheckBox, SIGNAL(clicked(bool)), ui->binningSpinBox, SLOT(setEnabled(bool)));
 
     connect(ui->btnRefreshCameras, SIGNAL(clicked(bool)), this, SLOT(refreshCameraListThreaded()));
 
@@ -414,12 +413,9 @@ void MainWindow::stereoCameraInitWindow(void){
     if (default_binning != -1){
         ui->binningSpinBox->setEnabled(true);
         ui->binningSpinBox->setVisible(true);
-        ui->binCheckBox->setEnabled(true);
-        ui->binCheckBox->setVisible(true);
     } else {
         //default_binning = 1;
         ui->binningSpinBox->setVisible(false);
-        ui->binCheckBox->setVisible(false);
     }
     if (default_packetDelay != -1){
         ui->packetDelaySpinBox->setEnabled(true);
@@ -631,7 +627,6 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(updateDisparityAsync(void)));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(enableAutoExpose(bool)));
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableAutoGain(bool)));
-    connect(ui->binCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableBinning(bool)));
     connect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableHDR(bool)));
 
     connect(stereo_cam, SIGNAL(disconnected()), this, SLOT(stereoCameraRelease()));
@@ -647,6 +642,8 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
 
     enableWindow();
+    toggleCameraActiveSettings(true);
+    toggleCameraPassiveSettings(true);
 }
 
 void MainWindow::stereoCameraRelease(void) {
@@ -666,8 +663,6 @@ void MainWindow::stereoCameraRelease(void) {
     ui->enableHDRCheckbox->setDisabled(true);
     ui->enabledTriggeredCheckbox->setChecked(false);
     ui->enabledTriggeredCheckbox->setDisabled(true);
-    ui->binCheckBox->setDisabled(true);
-    ui->binCheckBox->setChecked(false);
 
     ui->enableStereo->setChecked(false);
     ui->captureButton->setChecked(false);
@@ -745,7 +740,6 @@ void MainWindow::stereoCameraRelease(void) {
                 SLOT(setDownsampleFactor(int)));
         disconnect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(enableAutoExpose(bool)));
         disconnect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableAutoGain(bool)));
-        disconnect(ui->binCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableBinning(bool)));
         disconnect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableHDR(bool)));
 
         disconnect(stereo_cam, SIGNAL(disconnected()), this, SLOT(stereoCameraRelease()));
@@ -1604,11 +1598,15 @@ void MainWindow::enableCapture(bool enable) {
         stereo_cam->startCapture();
         ui->statusBar->showMessage("Freerunning.");
         ui->captureButton->setIcon(awesome->icon(fa::pause, icon_options));
+        ui->captureButton->setChecked(true);
+        toggleCameraPassiveSettings(false);
     } else {
         // stop capture
         stereo_cam->stopCapture();
         ui->statusBar->showMessage("Paused.");
         ui->captureButton->setIcon(awesome->icon(fa::play, icon_options));
+        ui->captureButton->setChecked(false);
+        toggleCameraPassiveSettings(true);
    }
 }
 
@@ -1705,9 +1703,7 @@ void MainWindow::enableFPS(bool enable){
 
 void MainWindow::setFPS(int fps){
     int binning = 5;
-    if (ui->binCheckBox->isChecked()){
-        binning = ui->binningSpinBox->value();
-    }
+    binning = ui->binningSpinBox->value();
     if (gigeWarning(binning,fps)){
         stereo_cam->setFPS(fps);
         current_fps = fps;
@@ -1791,9 +1787,24 @@ void MainWindow::enableBinning(bool enable){
         progressBinning.setValue(100);
         progressBinning.close();
     } else {
-        ui->binCheckBox->setChecked(true);
         ui->binningSpinBox->setEnabled(true);
     }
+}
+
+void MainWindow::toggleCameraActiveSettings(bool enable){
+    ui->exposureSpinBox->setEnabled(enable);
+    ui->autoExposeCheck->setEnabled(enable);
+    ui->gainSpinBox->setEnabled(enable);
+    ui->autoGainCheckBox->setEnabled(enable);
+    ui->enableHDRCheckbox->setEnabled(enable);
+}
+
+void MainWindow::toggleCameraPassiveSettings(bool enable){
+    ui->fpsSpinBox->setEnabled(enable);
+    ui->enabledTriggeredCheckbox->setEnabled(enable);
+    ui->binningSpinBox->setEnabled(enable);
+    ui->packetDelaySpinBox->setEnabled(enable);
+    ui->packetSizeSpinBox->setEnabled(enable);
 }
 
 bool MainWindow::gigeWarning(int binning,int new_fps){
