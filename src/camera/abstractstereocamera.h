@@ -102,6 +102,8 @@ public:
                                   StereoCameraSettings camera_settings,
                                   QObject *parent = 0);
 
+    ~AbstractStereoCamera(void);
+
     AbstractStereoMatcher *matcher = nullptr;
 
     //! Convert between stereo camera type enum and string
@@ -143,6 +145,9 @@ public:
 
     //! Returns wheather video saving is being performed
     bool isCapturingVideo() { return capturing_video; };
+
+    //! Returns wheather video saving rectified or non recitifed images
+    bool isCapturingRectifiedVideo() { return capturing_rectified_video; };
 
     //! Returns whether left and right images are being swapped
     bool isSwappingLeftRight();
@@ -218,8 +223,8 @@ public:
    * @sa setSavelocation(), videoStreamStop()
    * @param[out] fps The frame rate of the video recording
   */
-    bool videoStreamSetParams(QString filename = "", int fps = 0, int codec = CV_FOURCC('H', '2', '6', '4'), bool is_color = false);
-    bool videoStreamAddFrame(cv::Mat left, cv::Mat right);
+    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = CV_FOURCC('H', '2', '6', '4'), bool is_color = false);
+    bool addVideoStreamFrame(cv::Mat left, cv::Mat right);
 
     bool connected = false;
     float downsample_factor = 1;
@@ -237,6 +242,9 @@ public:
 signals:
     //! Emitted when stereo pair has been captured
     void captured();
+
+    //! Emmited when first image stereo pair received
+    void first_image_ready(bool ready);
 
     //! Emitted on error. Enum output for error type
     void error(StereoCameraError stereo_error);
@@ -353,9 +361,9 @@ public slots:
     bool startCapture(){return enableCapture(true);};
     bool stopCapture(){return enableCapture(false);};
 
-    bool videoStreamEnable(bool enable);
-    bool videoStreamStart(){return videoStreamEnable(false);}
-    bool videoStreamStop(){return videoStreamEnable(false);}
+    bool enableVideoStream(bool enable);
+    bool startVideoStream(){return enableVideoStream(false);}
+    bool stopVideoStream(){return enableVideoStream(false);}
 
     void setMatcher(AbstractStereoMatcher *matcher);
 
@@ -379,6 +387,9 @@ public slots:
 
     //! Enable or disable image rectification
     void enableRectify(bool rectify);
+
+    //! Enable or disable saving rectified images in video capture
+    void enableCaptureRectifedVideo(bool rectify);
 
     //! Emable or disable disparity map reprojection to 3D
     void enableReproject(bool reproject);
@@ -445,6 +456,7 @@ private:
     bool matching = false;
     bool rectifying = false;
     bool capturing_video = false;
+    bool capturing_rectified_video = true;
     bool swappingLeftRight = false;
     bool reprojecting = false;
     bool cuda_device_found = false;
@@ -549,6 +561,7 @@ protected:
     bool rectification_valid = false;
     bool calibration_valid = false;
     bool captured_stereo = false;
+    bool first_image_received = false;
     bool capturing = false;
 
     int grab_fail_count = 0;

@@ -87,33 +87,17 @@ bool StereoCameraDeimos::captureSingle(){
 }
 
 void StereoCameraDeimos::captureThreaded(){
-    //futureWatcher = new QFutureWatcher<void>();
-    //connect(futureWatcher, SIGNAL(finished()), this, SLOT(captureThreaded()));
     future = QtConcurrent::run(this, &StereoCameraDeimos::captureSingle);
-    //futureWatcher->setFuture(future);
 }
 
 bool StereoCameraDeimos::enableCapture(bool enable){
     if (enable){
         //Start capture thread
-        //startThread();
-        //capture_timer->stop();
-        //connect(capture_timer, SIGNAL(timeout()), this, SLOT(captureSingleThreaded()));
-        /*
-        double timer_fps = 1.0f/(double)frame_rate;
-        float timer_time = 1000.0f * timer_fps;
-        int timer_rate = (int)timer_time;
-        */
-        //capture_timer->start();
         connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
         capturing = true;
         captureThreaded();
     } else {
         //Stop capture thread
-        //stopThread();
-        //capture_timer->stop();
-        //while(capture_timer->isActive());
-        //disconnect(capture_timer, SIGNAL(timeout()), this, SLOT(captureSingleThreaded()));
         disconnect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
         capturing = false;
     }
@@ -585,14 +569,12 @@ bool StereoCameraDeimos::setFrameSize(int width, int height) {
 
 bool StereoCameraDeimos::setFrame16(void) {
     bool res = false;
-    //const std::lock_guard<std::mutex> lock(mtx);
     res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
 
     return res;
 }
 
 void StereoCameraDeimos::getFrameRate() {
-    //const std::lock_guard<std::mutex> lock(mtx);
     int frame_rate_index = (int)camera.get(CV_CAP_PROP_FPS);
     if (frame_rate_index == 0){
         frame_rate = 60;
@@ -604,47 +586,6 @@ void StereoCameraDeimos::getFrameRate() {
     qDebug() << "Frame rate: " << frame_rate;
 }
 
-/*
-bool StereoCameraDeimos::capture() {
-
-    if(capturing) return false;
-
-    frametimer.restart();
-
-    captured_stereo = false;
-    capturing = true;
-
-    bool res = false;
-
-    //const std::lock_guard<std::mutex> lock(mtx);
-    if(connected && camera.grab()){
-        if(camera.retrieve(image_buffer)){
-
-            flip(image_buffer, image_buffer, 0);
-            split(image_buffer, channels);
-
-            left_raw = channels[1].clone();
-            right_raw = channels[2].clone();
-
-            res = true;
-
-        }else{
-            qDebug() << "Retrieve fail";
-            res = false;
-        }
-    }else{
-        qDebug() << "Grab fail";
-        res = false;
-    }
-
-    emit captured();
-
-    capturing = false;
-
-    return res;
-}
-*/
-
 std::string StereoCameraDeimos::wchar_to_string(WCHAR * buffer) {
     std::wstring ws(buffer);
     std::string buffer_s(ws.begin(), ws.end());
@@ -655,5 +596,4 @@ StereoCameraDeimos::~StereoCameraDeimos(void) {
     if (connected){
         closeCamera();
     }
-    stopThread();
 }

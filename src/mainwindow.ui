@@ -363,7 +363,7 @@
             </size>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="tabCameraList">
             <attribute name="title">
@@ -371,7 +371,23 @@
             </attribute>
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="0" column="0">
-              <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+              <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Connect to camera from the list below, then press the play button in the toolbar the start capturing</string>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>false</bool>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                 <property name="margin">
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
                  <item>

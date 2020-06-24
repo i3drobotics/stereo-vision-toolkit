@@ -135,6 +135,8 @@ MainWindow::MainWindow(QWidget* parent)
     pointCloudInit();
     setupMatchers();
 
+    hideCameraSettings(false);
+
 #ifdef WITH_FERVOR
     // Set the Fervor appcast url
     FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/master/Appcast.xml");
@@ -180,7 +182,7 @@ void MainWindow::enableWindow(){
 
     ui->captureButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
-    ui->saveButton->setEnabled(true);
+    //ui->saveButton->setEnabled(false);
     ui->toggleVideoButton->setEnabled(true);
     ui->actionCalibration_wizard->setEnabled(true);
 }
@@ -223,15 +225,11 @@ void MainWindow::statusBarInit(void) {
 void MainWindow::controlsInit(void) {
 
     ui->widgetSideSettings->setVisible(true);
-    showingSettings = true;
 
     connect(ui->captureButton, SIGNAL(clicked(bool)), this, SLOT(enableCapture(bool)));
-    connect(ui->singleShotButton, SIGNAL(clicked()), this,
-            SLOT(singleShotClicked()));
-    connect(ui->setSaveDirButton, SIGNAL(clicked()), this,
-            SLOT(setSaveDirectory()));
-    connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
-            SLOT(startVideoCapture(void)));
+    connect(ui->singleShotButton, SIGNAL(clicked()), this, SLOT(singleShotClicked()));
+    connect(ui->setSaveDirButton, SIGNAL(clicked()), this, SLOT(setSaveDirectory()));
+    connect(ui->toggleVideoButton, SIGNAL(clicked(bool)), this, SLOT(enableVideoCapture(bool)));
     connect(ui->actionLoad_calibration, SIGNAL(triggered(bool)),this, SLOT(setCalibrationFolder()));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSpinBox, SLOT(setDisabled(bool)));
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), ui->gainSpinBox, SLOT(setDisabled(bool)));
@@ -594,8 +592,8 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(setFPS(int)));
     connect(ui->binningSpinBox, SIGNAL(valueChanged(int)), this,
             SLOT(setBinning(int)));
-    connect(ui->packetSizeSpinBox, SIGNAL(valueChanged()), this,
-            SLOT(setPacketSize()));
+    connect(ui->packetSizeSpinBox, SIGNAL(valueChanged(int)), this,
+            SLOT(setPacketSize(int)));
     connect(ui->packetDelaySpinBox, SIGNAL(valueChanged(int)), stereo_cam,
             SLOT(setPacketDelay(int)));
 
@@ -610,6 +608,7 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(stereo_cam, SIGNAL(frametime(qint64)), this, SLOT(updateFrameTime(qint64)));
     connect(stereo_cam, SIGNAL(framecount(qint64)), this, SLOT(updateFrameCount(qint64)));
     connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(saveImageTimestamped()));
+    connect(stereo_cam, SIGNAL(first_image_ready(bool)), ui->saveButton, SLOT(setEnabled(bool)));
     connect(disparity_view, SIGNAL(disparitySaveCheckChanged(bool)), stereo_cam, SLOT(enableSaveDisparity(bool)));
     connect(stereo_cam, SIGNAL(savedImage(QString)), this,
             SLOT(displaySaved(QString)));
@@ -671,6 +670,9 @@ void MainWindow::stereoCameraRelease(void) {
 
     ui->toggleRectifyCheckBox->setChecked(false);
     ui->toggleSwapLeftRight->setChecked(false);
+
+    //TODO enable this when implimented
+    ui->toggleCalibrationDownsample->setVisible(false);
     ui->toggleCalibrationDownsample->setChecked(false);
 
     ui->tabWidget->setCurrentIndex(0);
@@ -695,7 +697,6 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.setValue(30);
 
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
-        //disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
 
         disconnect(ui->exposureSpinBox, SIGNAL(valueChanged(double)), stereo_cam,
                    SLOT(setExposure(double)));
@@ -718,7 +719,6 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(setFPS(int)));
 
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
-        //disconnect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay()));
         disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
                    SLOT(updateDisparityAsync(void)));
         disconnect(stereo_cam, SIGNAL(frametime(qint64)), this, SLOT(updateFrameTime(qint64)));
@@ -804,12 +804,7 @@ int MainWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_s
     cam_thread = new QThread;
 
     //StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS;
-
-
-
     //StereoCameraOpenCV* stereo_cam_cv = new StereoCameraOpenCV;
-
-    //StereoCameraBasler * stereo_cam_basler = new StereoCameraBasler;
 
 #ifdef WITH_VIMBA
     //StereoCameraVimba * stereo_cam_vimba = new StereoCameraVimba;
@@ -821,16 +816,17 @@ int MainWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_s
         cameras_connected = stereo_cam_deimos->openCamera();
         stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
         qDebug() << "Connecting to Deimos system";
-    }
-        /*
     } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
         current_camera_settings = default_basler_init_settings;
         if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
             current_camera_settings.isGige = 1;
         }
-        cameras_connected = stereo_cam_basler->initCamera(camera_serial_info,current_camera_settings);
+        StereoCameraBasler* stereo_cam_basler = new StereoCameraBasler(camera_serial_info,current_camera_settings);
+        cameras_connected = stereo_cam_basler->openCamera();
         stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_basler);
         qDebug() << "Connecting to Phobos system";
+    }
+        /*
     } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
         current_camera_settings = default_tis_init_settings;
         cameras_connected = stereo_cam_tis->initCamera(camera_serial_info,current_camera_settings);
@@ -1307,70 +1303,34 @@ void MainWindow::updateCloud() {
 
 }
 
+void MainWindow::enableVideoCapture(bool enable){
+    if (enable){
+        int vid_fps = current_fps;
+        if (current_fps == 0){
+            vid_fps = measured_fps;
+        }
+        stereo_cam->setVideoStreamParams("",vid_fps);
 
-void MainWindow::startVideoCapture(void) {
-    connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
-            SLOT(stopVideoCapture(void)));
-    disconnect(ui->toggleVideoButton, SIGNAL(clicked()), this,
-               SLOT(startVideoCapture(void)));
+        // Ask user if to record rectified frames
+        QMessageBox msgBox;
+        msgBox.setText(tr("Record recitifed frames if avaiable?"));
+        QAbstractButton* pButtonRect = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
+        QAbstractButton* pButtonNonRect = msgBox.addButton(tr("No"), QMessageBox::NoRole);
 
-    ui->toggleVideoButton->setIcon(awesome->icon(fa::stop, icon_options));
-    ui->statusBar->showMessage("Video capture started.");
+        msgBox.exec();
 
-    ui->actionAutoload_Camera->setEnabled(false);
-    ui->actionLoad_Video->setEnabled(false);
+        if (msgBox.clickedButton()==pButtonRect) {
+            stereo_cam->enableCaptureRectifedVideo(true);
+        } else if (msgBox.clickedButton()==pButtonNonRect) {
+            stereo_cam->enableCaptureRectifedVideo(false);
+        }
 
-    ui->captureButton->setEnabled(false);
-    ui->enableStereo->setEnabled(false);
-    ui->enableStereo->setChecked(false);
-    ui->singleShotButton->setEnabled(false);
-    ui->saveButton->setEnabled(false);
-
-    //TODO disable FPS camera controls when video is recording
-
-    //QTimer frame_timer = QTimer::singleShot(1, stereo_cam, SLOT(videoStreamStart()));
-    int vid_fps = current_fps;
-    if (current_fps == 0){
-        vid_fps = measured_fps;
+        ui->toggleVideoButton->setIcon(awesome->icon(fa::stop, icon_options));
+    } else {
+        ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
     }
-    stereo_cam->videoStreamSetParams("",vid_fps);
-    stereo_cam->videoStreamStart();
-    videoCaptureStarted = true;
-    //frame_timer->stop();
-    //frame_timer = new QTimer(this);
-    //frame_timer->setSingleShot(true);
-    //connect(frame_timer, SIGNAL(timeout()), stereo_cam , SLOT(videoStreamProcess()));
-    //frame_timer->start(1);
-}
 
-void MainWindow::stopVideoCapture(void) {
-    ui->statusBar->showMessage("Stopping video capture...");
-    //frame_timer->stop();
-    //while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
-    if (videoCaptureStarted)
-        stereo_cam->videoStreamStop();
-    ui->statusBar->showMessage("Stopped video capture.");
-
-    connect(ui->toggleVideoButton, SIGNAL(clicked()), this,
-            SLOT(startVideoCapture(void)));
-    disconnect(ui->toggleVideoButton, SIGNAL(clicked()), this,
-               SLOT(stopVideoCapture(void)));
-
-    ui->actionAutoload_Camera->setEnabled(true);
-    ui->actionLoad_Video->setEnabled(true);
-
-    ui->enableStereo->setEnabled(true);
-    ui->captureButton->setEnabled(true);
-    ui->captureButton->setIcon(awesome->icon(fa::pause, icon_options));
-    ui->singleShotButton->setEnabled(true);
-    ui->saveButton->setEnabled(true);
-
-    ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
-
-    //frame_timer = new QTimer(this);
-   // frame_timer->setSingleShot(true);
-    //connect(frame_timer, SIGNAL(timeout()), stereo_cam , SLOT(freerun()));
-   // frame_timer->start(1);
+    stereo_cam->enableVideoStream(enable);
 }
 
 void MainWindow::startCalibrationFromImages(void) {
@@ -1617,7 +1577,6 @@ void MainWindow::displaySaved(QString fname) {
 }
 
 void MainWindow::updateDisplay(void) {
-    updatingDisplay = true;
     cv::Mat left, right;
 
     if (cameras_connected){
@@ -1645,7 +1604,6 @@ void MainWindow::updateDisplay(void) {
     } else {
         qDebug() << "Cannot update display. Stereo camera missing.";
     }
-    updatingDisplay = false;
 }
 
 void MainWindow::setSaveDirectory(QString dir) {
@@ -1874,19 +1832,23 @@ void MainWindow::openHelp(){
     QDesktopServices::openUrl(QUrl(link));
 }
 
-void MainWindow::on_btnShowCameraSettings_clicked()
-{
-    showingSettings = !showingSettings;
-    ui->widgetSideSettings->setVisible(showingSettings);
-    if (showingSettings){
-        ui->btnShowCameraSettings->setVisible(false);
-        ui->disparityViewSettings->setVisible(false);
-        ui->btnHideCameraSettings->setVisible(true);
-    } else {
+void MainWindow::hideCameraSettings(bool hide){
+    if (hide){
+        ui->widgetSideSettings->setVisible(false);
         ui->btnShowCameraSettings->setVisible(true);
         ui->disparityViewSettings->setVisible(true);
         ui->btnHideCameraSettings->setVisible(false);
+    } else {
+        ui->widgetSideSettings->setVisible(true);
+        ui->btnShowCameraSettings->setVisible(false);
+        ui->disparityViewSettings->setVisible(false);
+        ui->btnHideCameraSettings->setVisible(true);
     }
+}
+
+void MainWindow::on_btnShowCameraSettings_clicked()
+{
+    hideCameraSettings(ui->widgetSideSettings->isVisible());
 }
 
 void MainWindow::on_btnHideCameraSettings_clicked()
@@ -1896,15 +1858,10 @@ void MainWindow::on_btnHideCameraSettings_clicked()
 
 void MainWindow::closeEvent(QCloseEvent *) {
     qDebug() << "Closing application";
-    if (videoCaptureStarted)
-        stereo_cam->videoStreamStop();
     stereoCameraRelease();
     qDebug() << "Waiting for device list timer to finish...";
     stopDeviceListTimer();
     while(device_list_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
-    //frame_timer->stop();
-    qDebug() << "Waiting for frame timer to finish...";
-    //while(frame_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
     // Close external windows
     if (calibration_dialog_used){
         calibration_dialog->close();

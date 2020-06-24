@@ -15,7 +15,6 @@
 #include <dshow.h>
 #include <hidapi/hidapi.h>
 #include <QThread>
-#include <mutex>          // std::mutex
 
 //!  Deimos camera control
 /*!
@@ -92,8 +91,6 @@ private:
     cv::Mat channels[3];
     double exposure;
 
-    QMutex mutex;
-    QFutureWatcher<void>* futureWatcher;
     QFuture<void> future;
 
     hid_device* deimos_device = NULL;
