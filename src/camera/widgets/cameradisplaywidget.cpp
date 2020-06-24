@@ -31,6 +31,7 @@ void CameraDisplayWidget::updateView(cv::Mat new_image){
 }
 
 void CameraDisplayWidget::setSize(int width, int height, int bit_depth) {
+    //TODO fix problem with recitifed images resizing incorrectly
     int image_size = width * height;
     int max_size = max_width * max_height;
 

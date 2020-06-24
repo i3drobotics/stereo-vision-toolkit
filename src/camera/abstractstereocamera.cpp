@@ -334,6 +334,10 @@ void AbstractStereoCamera::enableRectify(bool rectify) {
     rectifying = rectify && rectification_valid;
 }
 
+void AbstractStereoCamera::enableCaptureRectifedVideo(bool rectify) {
+    capturing_rectified_video = rectify;
+}
+
 void AbstractStereoCamera::enableSwapLeftRight(bool swap){
     swappingLeftRight = swap;
 }
@@ -555,6 +559,11 @@ void AbstractStereoCamera::process_stereo(void) {
         right_tmp.copyTo(left_raw);
     }
 
+    if (downsample_factor != 1){
+        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
+    }
+
     if (rectifying) {
         rectifyImages();
     } else {
@@ -565,13 +574,12 @@ void AbstractStereoCamera::process_stereo(void) {
     left_remapped.copyTo(left_output);
     right_remapped.copyTo(right_output);
 
-    if (downsample_factor != 1){
-        cv::resize(right_output,right_output,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(left_output,left_output,cv::Size(),downsample_factor,downsample_factor);
-    }
-
     if (capturing_video){
-        videoStreamAddFrame(left_output,right_output);
+        if (capturing_rectified_video){
+            addVideoStreamFrame(left_remapped,right_remapped);
+        } else {
+            addVideoStreamFrame(left_raw,right_raw);
+        }
     }
 
     if (matching) {
@@ -583,17 +591,22 @@ void AbstractStereoCamera::process_stereo(void) {
     }
 
     emit stereopair_processed();
+    if (!first_image_received){
+        first_image_received = true;
+        emit first_image_ready(true);
+    }
+
     emit frametime(frametimer.elapsed());
     frametimer.restart();
 }
 
-bool AbstractStereoCamera::videoStreamAddFrame(cv::Mat left, cv::Mat right){
+bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){
     cv::hconcat(left, right, video_frame);
     cv_video_writer->write(video_frame);
     return true;
 }
 
-bool AbstractStereoCamera::videoStreamEnable(bool enable){
+bool AbstractStereoCamera::enableVideoStream(bool enable){
     bool res;
     if (enable){
         //start video capture
@@ -610,11 +623,12 @@ bool AbstractStereoCamera::videoStreamEnable(bool enable){
             cv_video_writer->release();
             cv_video_writer = new cv::VideoWriter();
         }
+        res = true;
     }
     return res;
 }
 
-bool AbstractStereoCamera::videoStreamSetParams(QString filename, int fps, int codec, bool is_color){
+bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int codec, bool is_color){
     if (filename == "") {
         QDateTime dateTime = dateTime.currentDateTime();
         QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
@@ -627,4 +641,9 @@ bool AbstractStereoCamera::videoStreamSetParams(QString filename, int fps, int c
     video_codec = codec;
     video_is_color = is_color;
     return true;
+}
+
+AbstractStereoCamera::~AbstractStereoCamera(void){
+    stopThread();
+    enableVideoStream(false);
 }

@@ -39,7 +39,7 @@
 //#include "stereocamerafromvideo.h"
 //#include "stereocameraopencv.h"
 //#include "stereocameratis.h"
-//#include "stereocamerabasler.h"
+#include "stereocamerabasler.h"
 #ifdef WITH_VIMBA
 //    #include "stereocameravimba.h"
 #endif
@@ -87,10 +87,6 @@ private:
     int fps_measure_count = 0;
     int fps_measure_total = 0;
 
-    bool updatingDisplay = false;
-    bool showingSettings = false;
-    bool videoCaptureStarted = false;
-
     int CAMERA_CONNECTION_SUCCESS_EXIT_CODE = 0;
     int CAMERA_CONNECTION_FAILED_EXIT_CODE = -1;
     int CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE = -2;
@@ -136,6 +132,7 @@ private:
     int current_binning = 0;
     bool using_gige = false;
     bool first_cloud = true;
+    bool first_image = true;
 
     bool calibration_dialog_used = false;
     bool calibration_from_images_dialog_used = false;
@@ -211,6 +208,7 @@ public slots:
     void enableFPS(bool enable);
     void setFPS(int fps);
     void setPacketSize();
+    void hideCameraSettings(bool hide);
 
     void videoStreamLoad(void);
 
@@ -225,8 +223,9 @@ public slots:
 
     void doneCalibration(bool);
 
-    void startVideoCapture(void);
-    void stopVideoCapture(void);
+    void enableVideoCapture(bool enable);
+    void startVideoCapture(void){ enableVideoCapture(true); }
+    void stopVideoCapture(void){ enableVideoCapture(true); }
 
     void updateCloud(void);
     void enable3DViz(int);

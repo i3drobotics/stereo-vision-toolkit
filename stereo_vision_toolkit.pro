@@ -102,7 +102,7 @@ SOURCES += \
     abstractstereomatcher.cpp \
     camerabasler.cpp \
     cameraopencv.cpp \
-    #stereocamerabasler.cpp \
+    stereocamerabasler.cpp \
     #stereocameraopencv.cpp \
     #stereocameratis.cpp \
     #stereocamerafromvideo.cpp \
@@ -151,7 +151,7 @@ HEADERS += \
     abstractstereomatcher.h \
     camerabasler.h \
     cameraopencv.h \
-    #stereocamerabasler.h \
+    stereocamerabasler.h \
     #stereocameraopencv.h \
     #stereocameratis.h \
     #stereocamerafromvideo.h \
