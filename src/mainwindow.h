@@ -36,12 +36,12 @@
     #include "matcherwidgeti3drsgm.h"
 #endif
 #include "stereocameradeimos.h"
-//#include "stereocamerafromvideo.h"
-//#include "stereocameraopencv.h"
-//#include "stereocameratis.h"
+#include "stereocamerafromvideo.h"
+#include "stereocameraopencv.h"
+#include "stereocameratis.h"
 #include "stereocamerabasler.h"
 #ifdef WITH_VIMBA
-//    #include "stereocameravimba.h"
+    #include "stereocameravimba.h"
 #endif
 #include "stereocamerasupport.h"
 #include "qdevicebutton.h"
@@ -201,6 +201,7 @@ public slots:
     void startDeviceListTimer(void);
     void stopDeviceListTimer(void);
     void autoloadCameraTriggered();
+    void enableRectify(bool enable);
     void enableAutoExpose(bool);
     void enableAutoGain(bool);
     void enableBinning(bool enable);

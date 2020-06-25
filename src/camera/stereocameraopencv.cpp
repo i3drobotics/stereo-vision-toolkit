@@ -5,20 +5,23 @@
 
 #include "stereocameraopencv.h"
 
-bool StereoCameraOpenCV::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings){
-
-    double exposure = inital_camera_settings.exposure;
-    int fps = inital_camera_settings.fps;
-    bool hdr = inital_camera_settings.hdr;
+bool StereoCameraOpenCV::openCamera(){
+    if (isConnected()){
+        closeCamera();
+    }
+    double exposure = stereoCameraSettings_.exposure;
+    int fps = stereoCameraSettings_.fps;
+    bool hdr = stereoCameraSettings_.hdr;
     bool autoExpose;
-    if (inital_camera_settings.autoExpose == 1){
+    if (stereoCameraSettings_.autoExpose == 1){
         autoExpose = true;
     } else {
         autoExpose = false;
     }
-    this->camera_serial_info = camera_serial_info;
-    int usb_index_l = usb_index_from_serial(camera_serial_info.left_camera_serial);
-    int usb_index_r = usb_index_from_serial(camera_serial_info.right_camera_serial);
+    // Get usb index of camera with selected serial
+    // use left serial as deimos only has a single connection so right and left are the same in serialinfo
+    int usb_index_l = usb_index_from_serial(stereoCameraSerialInfo_.left_camera_serial);
+    int usb_index_r = usb_index_from_serial(stereoCameraSerialInfo_.right_camera_serial);
     if (usb_index_l >= 0 && usb_index_r >= 0) {
         openHID();
 
@@ -26,19 +29,13 @@ bool StereoCameraOpenCV::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
         camera_r = cv::VideoCapture(cv::CAP_DSHOW + usb_index_r);
 
         if (camera_l.isOpened() && camera_r.isOpened()) {
-            changeFPS(fps);
-            //TODO fix issue with incorrect frame rate being used
-            setFrameSize(1000, 1000);
-            getImageSize(camera_l,image_width,image_height,image_bitdepth);
-            emit update_size(image_width, image_height, image_bitdepth);
+            bool res = setFrameSize(752, 480);
 
-            toggleHDR(hdr);
-            enableAutoExpose(autoExpose);
+            enableHDR(hdr);
+            enableAutoExposure(autoExpose);
             setExposure(exposure);
+            setFPS(fps);
             getFrameRate();
-
-            //TODO check settings were set correctly
-            bool res = true;
 
             if (!res) {
                 camera_l.release();
@@ -50,6 +47,78 @@ bool StereoCameraOpenCV::initCamera(AbstractStereoCamera::stereoCameraSerialInfo
         }
     }
     return connected;
+}
+
+bool StereoCameraOpenCV::closeCamera(){
+    if (connected){
+        if (camera_l.isOpened()) {
+            camera_l.release();
+        }
+        if (camera_r.isOpened()) {
+            camera_r.release();
+        }
+        hid_close(cam_device_l);
+        hid_close(cam_device_r);
+        hid_exit();
+    }
+    connected = false;
+    emit disconnected();
+    return true;
+}
+
+bool StereoCameraOpenCV::captureSingle(){
+    bool res = false;
+    if(connected && camera_l.grab() && camera_r.grab()){
+        if(camera_l.retrieve(image_buffer_l) && camera_r.retrieve(image_buffer_r)){
+
+            //flip(image_buffer_l, image_buffer_l, 0);
+            //flip(image_buffer_r, image_buffer_r, 0);
+
+            left_raw = image_buffer_l.clone();
+            right_raw = image_buffer_r.clone();
+
+            if (left_raw.size().width != image_width || left_raw.size().height != image_height){
+                image_height = left_raw.size().height;
+                image_width = left_raw.size().width;
+                image_bitdepth = 1; //TODO get bit depth
+                emit update_size(image_width, image_height, image_bitdepth);
+                qDebug() << "Image size changed in incomming image";
+                qDebug() << "(" << image_width << "," << image_height << ")";
+            }
+
+            res = true;
+
+        }else{
+            qDebug() << "Retrieve fail";
+            res = false;
+            emit error(CAPTURE_ERROR);
+        }
+    }else{
+        qDebug() << "Grab fail";
+        res = false;
+        emit error(CAPTURE_ERROR);
+    }
+
+    emit captured();
+    return res;
+}
+
+void StereoCameraOpenCV::captureThreaded(){
+    future = QtConcurrent::run(this, &StereoCameraOpenCV::captureSingle);
+}
+
+bool StereoCameraOpenCV::enableCapture(bool enable){
+    if (enable){
+        //Start capture thread
+        connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
+        capturing = true;
+        captureThreaded();
+    } else {
+        //Stop capture thread
+        disconnect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
+        capturing = false;
+    }
+    return true;
 }
 
 std::string StereoCameraOpenCV::get_device_path_serial(IMoniker *pMoniker){
@@ -78,8 +147,8 @@ std::string StereoCameraOpenCV::get_device_path_serial(IMoniker *pMoniker){
 
             hr = pPropBag->Read(L"DevicePath", &var, 0);
 
-            BSTR device_path = var.bstrVal;
-            std::wstring device_path_wstr(device_path);
+            BSTR device_path_bstr = var.bstrVal;
+            std::wstring device_path_wstr(device_path_bstr);
             std::string device_path_str = std::string(device_path_wstr.begin(), device_path_wstr.end());
             device_path_serial = serial_from_device_path(device_path_str);
         }
@@ -93,9 +162,9 @@ std::string StereoCameraOpenCV::get_device_path_serial(IMoniker *pMoniker){
     return device_path_serial;
 }
 
-std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraOpenCV::listSystems(){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials(CAMERA_TYPE_USB);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraOpenCV::listSystems(){
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(CAMERA_TYPE_USB);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
 
     // Create the System Device Enumerator.
     ICreateDevEnum *pDevEnum;
@@ -207,22 +276,6 @@ void StereoCameraOpenCV::openHID(void) {
 }
 
 qint64 StereoCameraOpenCV::getSerial() {
-    /*
-    if (cam_device == NULL) return -1;
-
-    qint64 serial = 0;
-
-    std::vector<unsigned char> buffer;
-    buffer.resize(16);
-
-    buffer.at(1) = GETCAMERA_UNIQUEID;
-
-    if (!send_hid(buffer, 1)) {
-        serial = 0;
-    } else {
-        for (int i = 1, k = 3; i < 5; i++, k--) serial |= buffer[i] << (k * 8);
-    }
-    */
     qint64 serial = 1;
 
     return serial;
@@ -295,7 +348,7 @@ int StereoCameraOpenCV::usb_index_from_serial(std::string serial){
 }
 
 std::string StereoCameraOpenCV::serial_from_usb_index(int index){
-    // Create the System Device Enumerator.
+    /// Create the System Device Enumerator.
     ICreateDevEnum *pDevEnum;
     IEnumMoniker *pEnum;
     std::string usb_device_serial;
@@ -384,47 +437,10 @@ std::string StereoCameraOpenCV::serial_from_device_path(std::string usb_device_p
 }
 
 int StereoCameraOpenCV::getExposure() {
-    /*
-   *  Returns the current exposure time in uSeconds, or -1 if an error occurred.
-   */
-    /*
-
-    if (cam_device == NULL) return -1;
-
-    std::vector<unsigned char> buffer;
-    buffer.resize(16);
-
-    buffer.at(1) = CAMERA_CONTROL_STEREO;
-    buffer.at(2) = GET_EXPOSURE_VALUE;
-
-    if (!send_hid(buffer, 2)) return -1;
-
-    int exposure;
-
-    if (!buffer.at(10)) {
-        return -1;
-    } else {
-        exposure = ((int)buffer.at(2) << 24) + ((int)buffer.at(3) << 16) +
-                ((int)buffer.at(4) << 8) + (int)buffer.at(5);
-        return exposure;
-    }
-    */
-    return 0;
+   return 0;
 }
 
-void StereoCameraOpenCV::adjustFPS(int fps){
-    changeFPS(fps);
-}
-
-void StereoCameraOpenCV::toggleAutoExpose(bool enable){
-    enableAutoExpose(enable);
-}
-
-void StereoCameraOpenCV::adjustExposure(double exposure){
-    setExposure(exposure);
-}
-
-bool StereoCameraOpenCV::enableAutoExpose(bool enable) {
+bool StereoCameraOpenCV::enableAutoExposure(bool enable) {
     if (enable)
         return setExposure(0.001);
     else
@@ -432,75 +448,24 @@ bool StereoCameraOpenCV::enableAutoExpose(bool enable) {
 }
 
 bool StereoCameraOpenCV::setExposure(double exposure_milliseconds) {
-    /*
-    if (cam_device == NULL) return false;
-    if (exposure_milliseconds <= 0 || exposure_milliseconds > 1000) return false;
+    return false;
+}
 
-    std::vector<unsigned char> buffer;
-    buffer.resize(16);
-
-    buffer[1] = CAMERA_CONTROL_STEREO;
-    buffer[2] = SET_EXPOSURE_VALUE;
-
-    int exposure_val = exposure_milliseconds * 1000;
-
-    qDebug() << "Setting exposure to" << exposure_val;
-
-    buffer[3] = (char)((exposure_val >> 24) & 0xFF);
-    buffer[4] = (char)((exposure_val >> 16) & 0xFF);
-    buffer[5] = (char)((exposure_val >> 8) & 0xFF);
-    buffer[6] = (char)(exposure_val & 0xFF);
-
-    if (!send_hid(buffer, 2)){
-        qDebug() << "Failed to send exposure command";
+bool StereoCameraOpenCV::setFPS(int fps){
+    if (!isCapturing()){
+        double fps_d = fps;
+        camera_l.set(CV_CAP_PROP_FPS, (double)fps_d);
+        camera_r.set(CV_CAP_PROP_FPS, (double)fps_d);
+        return true;
+    } else {
+        qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";
         return false;
     }
-
-    if (getExposure() == exposure_val) {
-        if (exposure_val != 1) exposure = exposure_val;
-        return true;
-    }else{
-        qDebug() << "Exposure read back incorrect";
-    }
-
-    return false;
-    */
-    return false;
 }
 
-void StereoCameraOpenCV::changeFPS(int fps){
-    double fps_d = fps;
-    const std::lock_guard<std::mutex> lock(mtx);
-    camera_l.set(CV_CAP_PROP_FPS, (double)fps_d);
-    camera_r.set(CV_CAP_PROP_FPS, (double)fps_d);
-}
-
-bool StereoCameraOpenCV::toggleHDR(bool enable){
-    /*
-    if (cam_device == NULL) return false;
-
-    std::vector<unsigned char> buffer;
-    buffer.resize(4);
-
-    buffer.at(1) = CAMERA_CONTROL_STEREO;
-    buffer.at(2) = SET_HDR_MODE_STEREO;
-
-    if(enable){
-        buffer.at(3) = 1;
-    }else{
-        buffer.at(3) = 0;
-    }
-
-    if (!send_hid(buffer, 2)){
-        qDebug() << "Failed to send HDR command";
-        return false;
-    }else{
-        return true;
-    }
-    */
+bool StereoCameraOpenCV::enableHDR(bool enable){
     return false;
 }
-
 
 bool StereoCameraOpenCV::send_hid(hid_device* cam_device, std::vector<unsigned char> &buffer,
                                   size_t command_len) {
@@ -549,7 +514,6 @@ bool StereoCameraOpenCV::setFrameSize(int width, int height) {
 
 bool StereoCameraOpenCV::setFrame16(void) {
     bool res = false;
-    const std::lock_guard<std::mutex> lock(mtx);
     res = camera_l.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
     res &= camera_r.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
 
@@ -557,82 +521,9 @@ bool StereoCameraOpenCV::setFrame16(void) {
 }
 
 void StereoCameraOpenCV::getFrameRate() {
-    const std::lock_guard<std::mutex> lock(mtx);
     frame_rate = (int)camera_l.get(CV_CAP_PROP_FPS);
     //TODO check frame rate is the same in both cameras
     qDebug() << "Frame rate: " << frame_rate;
-}
-
-void StereoCameraOpenCV::disconnectCamera() {
-    if (connected){
-        if (camera_l.isOpened()) {
-            camera_l.release();
-        }
-        if (camera_r.isOpened()) {
-            camera_r.release();
-        }
-        hid_close(cam_device_l);
-        hid_close(cam_device_r);
-        hid_exit();
-    }
-    connected = false;
-    emit disconnected();
-}
-
-bool StereoCameraOpenCV::capture() {
-
-    if(capturing) return false;
-
-    frametimer.restart();
-
-    captured_stereo = false;
-    capturing = true;
-
-    bool res = false;
-
-    const std::lock_guard<std::mutex> lock(mtx);
-    if(connected && camera_l.grab() && camera_r.grab()){
-        if(camera_l.retrieve(image_buffer_l) && camera_r.retrieve(image_buffer_r)){
-
-            //flip(image_buffer_l, image_buffer_l, 0);
-            //flip(image_buffer_r, image_buffer_r, 0);
-
-            left_raw = image_buffer_l.clone();
-            right_raw = image_buffer_r.clone();
-
-            if (left_raw.size().width != image_width || left_raw.size().height != image_height){
-                image_height = left_raw.size().height;
-                image_width = left_raw.size().width;
-                image_bitdepth = 1; //TODO get bit depth
-                emit update_size(image_width, image_height, image_bitdepth);
-                qDebug() << "Image size changed in incomming image";
-                qDebug() << "(" << image_width << "," << image_height << ")";
-            }
-
-            res = true;
-
-        }else{
-            qDebug() << "Retrieve fail";
-            res = false;
-        }
-    }else{
-        qDebug() << "Grab fail";
-        res = false;
-    }
-
-    emit left_captured();
-    emit right_captured();
-
-    capturing = false;
-
-    return res;
-}
-
-void StereoCameraOpenCV::getImageSize(cv::VideoCapture camera, int &width, int &height, int &bitdepth){
-    const std::lock_guard<std::mutex> lock(mtx);
-    width = (int)camera.get(CV_CAP_PROP_FRAME_WIDTH);
-    height = (int)camera.get(CV_CAP_PROP_FRAME_WIDTH);
-    bitdepth = 1; //TODO get bit depth
 }
 
 std::string StereoCameraOpenCV::wchar_to_string(WCHAR * buffer) {
@@ -642,7 +533,7 @@ std::string StereoCameraOpenCV::wchar_to_string(WCHAR * buffer) {
 }
 
 StereoCameraOpenCV::~StereoCameraOpenCV(void) {
-    disconnectCamera();
+    if (connected){
+        closeCamera();
+    }
 }
-
-
