@@ -30,26 +30,6 @@ void DisparityViewer::assignThread(QThread *thread) {
     thread->start();
 }
 
-void DisparityViewer::saveImageTimestamped(void) {
-    QString fname;
-    QDateTime dateTime = dateTime.currentDateTime();
-    QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-
-    fname = QString("%1/%2").arg(save_directory).arg(date_string);
-
-    saveImage(fname);
-}
-
-void DisparityViewer::saveImage(QString fname) {
-    if (!colour_disparity.empty()){
-        QFuture<void> res_l = QtConcurrent::run(
-                    CVSupport::write_parallel, fname.toStdString() + "_disp_colourmap.png", colour_disparity);
-
-        res_l.waitForFinished();
-    }
-    emit savedImage(fname);
-}
-
 /*
 void DisparityViewer::updateDisparityRange_spin(int range){
     ui->disparityRangeSpinbox->setValue(range);

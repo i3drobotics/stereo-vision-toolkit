@@ -1139,7 +1139,6 @@ void MainWindow::stereoCameraInit() {
 
         if (save_directory != "") {
             stereo_cam->setSavelocation(save_directory);
-            disparity_view->setSavelocation(save_directory);
         }
 
         if (calibration_directory != ""){
@@ -1624,7 +1623,6 @@ void MainWindow::setSaveDirectory(QString dir) {
         save_directory = parameters->get_string("saveDir");
         if(stereo_cam)
             stereo_cam->setSavelocation(save_directory);
-        disparity_view->setSavelocation(save_directory);
     }
 }
 
