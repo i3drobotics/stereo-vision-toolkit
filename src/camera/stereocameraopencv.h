@@ -7,7 +7,6 @@
 #define STEREOCAMERAOPENCV_H
 
 #include <abstractstereocamera.h>
-
 // Correct for math.h warnings
 #define NOMINMAX
 //#define _MATH_DEFINES_DEFINED
@@ -17,18 +16,27 @@
 #include <QTimer>
 #include <mutex>          // std::mutex
 
-class StereoCameraOpenCV : public AbstractStereoCamera
+//!  OpenCV camera control
+/*!
+  Control of opencv camera and generation of 3D
+*/
+
+class StereoCameraOpenCV  : public AbstractStereoCamera
 {
 Q_OBJECT
 
 public:
-    explicit StereoCameraOpenCV(QObject *parent = 0) :
-                AbstractStereoCamera(parent)
-                {}
-    bool capture();
-    void disconnectCamera();
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
+
+    explicit StereoCameraOpenCV (AbstractStereoCamera::StereoCameraSerialInfo serial_info,
+                                AbstractStereoCamera::StereoCameraSettings camera_settings,
+                                QObject *parent = 0) :
+                AbstractStereoCamera(serial_info, camera_settings, parent){
+    }
+
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
+    static int usb_index_from_serial(std::string serial);
+    static std::string serial_from_usb_index(int index);
+
     bool setFrameSize(int width, int height);
     bool setFrame16(void);
     void getFrameRate(void);
@@ -36,47 +44,50 @@ public:
     void openHID();
 
     int getExposure();
-    void toggleAutoExpose(bool enable);
-    void adjustExposure(double exposure);
-    void adjustPacketSize(int){}
-    void toggleAutoGain(bool){} //TODO create auto gain setting function
-    void adjustGain(int){} //TODO create gain setting function
-    void adjustBinning(int){} //TODO create binning setting function
-    void toggleTrigger(bool){} //NA
-    void adjustFPS(int fps);
-
-    int usb_index_from_serial(std::string serial);
-    std::string serial_from_usb_index(int index);
 
     ~StereoCameraOpenCV(void);
 
 public slots:
-    bool setExposure(double exposure_time);
-    bool toggleHDR(bool enable);
-    bool enableAutoExpose(bool enable);
-    void changeFPS(int fps);
+    // Implimentations of virtual functions from parent class
+    bool openCamera();
+    bool closeCamera();
+    bool captureSingle();
+    bool enableCapture(bool enable);
+    bool setFPS(int fps);
+    bool setExposure(double exposure);
+    bool enableAutoExposure(bool enable);
+    bool setPacketSize(int){return false;} //NA
+    bool setPacketDelay(int){return false;} //NA
+    bool enableTrigger(bool){return false;} //NA
+    bool enableAutoGain(bool){return false;} //NA
+    bool setGain(int){return false;} //NA
+    bool setBinning(int){return false;} //NA
+
+    bool enableHDR(bool enable);
+    void captureThreaded();
 
 private:
+    static std::string serial_from_device_path(std::string usb_device_path);
+    static std::string get_device_path_serial(IMoniker *pMoniker);
+    static std::string wchar_to_string(WCHAR * buffer);
+
     cv::VideoCapture camera_r;
     cv::VideoCapture camera_l;
     cv::Mat image_buffer_r;
     cv::Mat image_buffer_l;
-    double exposure;
 
-    std::mutex mtx;
+    cv::Mat channels[3];
 
     hid_device* cam_device_r = NULL;
     hid_device* cam_device_l = NULL;
-    bool send_hid(hid_device* cam_device, std::vector<unsigned char> &buffer, size_t command_len);
-    std::string serial_from_device_path(std::string usb_device_path);
-    std::string get_device_path_serial(IMoniker *pMoniker);
 
-    std::string wchar_to_string(WCHAR * buffer);
+    double exposure;
+
+    QFuture<void> future;
+
+    bool send_hid(hid_device* cam_device, std::vector<unsigned char> &buffer, size_t command_len);
 
     qint64 getSerial(void);
-
-    void getImageSize(cv::VideoCapture camera, int &width, int &height, int &bitdepth);
-
 };
 
 #endif // STEREOCAMERAOPENCV_H
