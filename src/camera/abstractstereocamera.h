@@ -447,7 +447,9 @@ private slots:
     * @sa enableRectify(), enableMatching(), enableReproject()
     * Should be triggered after a image capture event
     */
-    void process_stereo(void);
+    void processStereo(void);
+
+    void imageSaved(bool);
 
 private:
     qint64 frames = 0;
@@ -464,6 +466,8 @@ private:
     bool savingDisparity = true;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloud;
     QString save_directory = ".";
+
+    QString file_save_directory = "";
 
     cv::VideoWriter *cv_video_writer;
 

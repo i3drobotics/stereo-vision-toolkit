@@ -19,7 +19,7 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
     }
 #endif
     //startThread();
-    connect(this, SIGNAL(captured()), this, SLOT(process_stereo()));
+    connect(this, SIGNAL(captured()), this, SLOT(processStereo()));
 }
 
 void AbstractStereoCamera::assignThread(QThread *thread){
@@ -127,32 +127,38 @@ void AbstractStereoCamera::saveImageTimestamped(void) {
     saveImage(fname);
 }
 
-void AbstractStereoCamera::saveImage(QString fname) {
+void AbstractStereoCamera::imageSaved(bool success){
+    emit savedImage(file_save_directory);
+}
 
+void AbstractStereoCamera::saveImage(QString fname) {
+    file_save_directory = fname;
+
+    cv::Mat left, right;
     if (rectifying) {
-        QFuture<void> rect_l = QtConcurrent::run(
-                    CVSupport::write_parallel, fname.toStdString() + "_l_rect.png", left_remapped);
-        QFuture<void> rect_r = QtConcurrent::run(
-                    CVSupport::write_parallel, fname.toStdString() + "_r_rect.png", right_remapped);
-        //TODO replace with futurewatcher
-        rect_l.waitForFinished();
-        rect_r.waitForFinished();
-    }else{
-        QFuture<void> res_l = QtConcurrent::run(
-                    CVSupport::write_parallel, fname.toStdString() + "_l.png", left_raw);
-        QFuture<void> res_r = QtConcurrent::run(
-                    CVSupport::write_parallel, fname.toStdString() + "_r.png", right_raw);
-        //TODO replace with futurewatcher
-        res_l.waitForFinished();
-        res_r.waitForFinished();
+        left_remapped.copyTo(left);
+        right_remapped.copyTo(right);
+    } else {
+        left_raw.copyTo(left);
+        right_raw.copyTo(right);
     }
+
+    QFuture<bool> rect_l = QtConcurrent::run(
+                CVSupport::write_parallel, fname.toStdString() + "_l_rect.png", left_remapped);
+    QFuture<bool> rect_r = QtConcurrent::run(
+                CVSupport::write_parallel, fname.toStdString() + "_r_rect.png", right_remapped);
+
+    QFutureWatcher<bool> futureWatcher_l, futureWatcher_r;
+    QObject::connect(&futureWatcher_l, SIGNAL(finished(bool)), this, SLOT(imageSaved(bool)));
+    QObject::connect(&futureWatcher_r, SIGNAL(finished(bool)), this, SLOT(imageSaved(bool)));;
+
+    futureWatcher_l.setFuture(rect_l);
+    futureWatcher_r.setFuture(rect_r);
 
     if(matching && savingDisparity){
         matcher->saveDisparity(fname + "_disp_raw.png");
         matcher->saveDisparityColormap(fname + "_disp_colormap.png");
     }
-
-    emit savedImage(fname);
 }
 
 void AbstractStereoCamera::setVisualZmin(double zmin){
@@ -546,7 +552,7 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
     qDebug() << "Changed matcher";
 }
 
-void AbstractStereoCamera::process_stereo(void) {
+void AbstractStereoCamera::processStereo(void) {
 
     frames++;
     emit framecount(frames);

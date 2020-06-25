@@ -102,7 +102,8 @@ SOURCES += \
     abstractstereomatcher.cpp \
     camerabasler.cpp \
     cameraopencv.cpp \
-    stereocamerabasler.cpp \
+    #stereocamerabasler.cpp \
+    stereocamerabaslerevents.cpp \
     stereocameraopencv.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
@@ -143,6 +144,7 @@ HEADERS += \
     asmopencv.h \
     abstractarduinocoms.h \
     cvsupport.h \
+    pylonsupport.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -151,7 +153,8 @@ HEADERS += \
     abstractstereomatcher.h \
     camerabasler.h \
     cameraopencv.h \
-    stereocamerabasler.h \
+    #stereocamerabasler.h \
+    stereocamerabaslerevents.h \
     stereocameraopencv.h \
     stereocameratis.h \
     stereocamerafromvideo.h \

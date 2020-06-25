@@ -31,6 +31,9 @@ bool StereoCameraTIS::closeCamera(){
         disconnect(left_camera, SIGNAL(grabError()), this, SLOT(leftGrabFailed()));
         disconnect(right_camera, SIGNAL(grabError()), this, SLOT(rightGrabFailed()));
 
+        disconnect(left_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
+        disconnect(right_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
+
         disconnect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
         disconnect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));
 
@@ -212,6 +215,9 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::StereoCameraSettings i
 
     connect(left_camera, SIGNAL(grabError()), this, SLOT(leftGrabFailed()));
     connect(right_camera, SIGNAL(grabError()), this, SLOT(rightGrabFailed()));
+
+    connect(left_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
+    connect(right_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
 
     connect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
     connect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));

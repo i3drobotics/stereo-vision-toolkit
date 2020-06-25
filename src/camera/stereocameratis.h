@@ -50,7 +50,7 @@ public slots:
     bool enableTrigger(bool enable);
     bool enableAutoGain(bool enable);
     bool setGain(int gain);
-    bool setBinning(int binning) {return false;} //NA
+    bool setBinning(int) {return false;} //NA
 
     void captureThreaded();
     void loadLeftSettings();
@@ -76,8 +76,8 @@ private:
     QList<int> widths;
     QList<int> heights;
 
-    bool grab_success_l = true;
-    bool grab_success_r = true;
+    bool grab_success_l = false;
+    bool grab_success_r = false;
 
     void setup_cameras(AbstractStereoCamera::StereoCameraSettings inital_camera_settings);
 

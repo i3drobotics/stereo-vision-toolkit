@@ -43,20 +43,6 @@ public:
     void setViewer(QLabel *viewer);
     void assignThread(QThread *thread);
 
-    //! Set the save directory
-    /*!
-    * @param dir Desired save directory, will attempt to create if it doesn't exist.
-    */
-    void setSavelocation(QString dir){
-
-        if(!QDir(dir).exists()){
-            auto saved = QDir(dir);
-            saved.mkpath(".");
-        }
-
-        save_directory = dir;
-    }
-
     double getMinDepth(){
         return min_depth_;
     }
@@ -71,7 +57,6 @@ public slots:
     void setMatcher(AbstractStereoMatcher *matcher);
     void setColourmap(int);
     void setCalibration(cv::Mat &Q, double baseline = 1.0, double focal = 1.0);
-    void saveImageTimestamped(void);
     void saveDisparityChanged(bool enable);
 
 private:
@@ -84,7 +69,6 @@ private:
     double focal = 4e-3;
     double pixel_size = 6e-6;
     QLabel *viewer;
-    //cv::Mat disparity;
     cv::Mat colour_disparity;
     AbstractStereoMatcher *matcher;
     bool processing_disparity;
@@ -95,7 +79,6 @@ private:
     double min_depth_ = -1;
     double max_depth_ = -1;
 
-    void saveImage(QString fname);
     float genZ(cv::Matx44d Q_, int x_index, int y_index, float d);
 
 public slots:

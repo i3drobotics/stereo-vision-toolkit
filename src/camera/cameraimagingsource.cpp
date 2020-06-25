@@ -1,18 +1,12 @@
 #include "cameraimagingsource.h"
 
 CameraImagingSource::CameraImagingSource(void){
-    saveFull = false;
-    saveEncoded = false;
-
     this->frameCounter = 0;
 }
 
 CameraImagingSource::CameraImagingSource(DShowLib::VideoCaptureDeviceItem device) {
   handle.closeDev();
   handle.openDev(device);
-
-  saveFull = false;
-  saveEncoded = false;
 
   this->frameCounter = 0;
 
@@ -160,19 +154,6 @@ void CameraImagingSource::toggleCapture(bool capture) {
   } else {
     stopCapture();
   }
-}
-
-void CameraImagingSource::saveFrame(QString fname) {
-  grabImage();
-  fname =
-      QString("/home/htp/%1_%2.png")
-          .arg(fname)
-          .arg(QDateTime::currentDateTime().toString("yyyyMMdd.hh.mm.ss.zzz"));
-  saveBitmap(fname);
-}
-
-void CameraImagingSource::saveBitmap(QString fname) {
-  frame_sink->getLastAcqMemBuffer()->save(fname.toStdString());
 }
 
 void CameraImagingSource::changeGain(int gain){
