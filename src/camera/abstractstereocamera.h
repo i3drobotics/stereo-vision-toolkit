@@ -13,7 +13,7 @@
 #include<memory>
 
 #include <opencv2/opencv.hpp>
-#ifdef CUDA
+#ifdef WITH_CUDA
 #include <opencv2/cudastereo.hpp>
 #include <opencv2/cudawarping.hpp>
 #endif
@@ -73,6 +73,8 @@ public:
     //! Enum defined camera type. This defines the type of camera being used.
     enum StereoCameraType { CAMERA_TYPE_DEIMOS, CAMERA_TYPE_USB, CAMERA_TYPE_BASLER_GIGE,
                             CAMERA_TYPE_BASLER_USB, CAMERA_TYPE_TIS, CAMERA_TYPE_VIMBA, CAMERA_TYPE_INVALID };
+
+    enum StereoCalibrationType { CALIBRATION_TYPE_YAML, CALIBRATION_TYPE_XML };
 
     //! Structure to hold camera settings
     struct StereoCameraSettings {
@@ -372,7 +374,28 @@ public slots:
     @param[in] directory The folder too check.
     @return True or false, depending on whether the parameters are valid.
     */
-    bool loadCalibration(QString directory);
+    bool loadCalibration(QString directory, StereoCalibrationType cal_type){
+        if (directory == "") return false;
+        bool res;
+        if (cal_type == CALIBRATION_TYPE_XML){
+            res = loadCalibrationXML(directory);
+        } else if (cal_type == CALIBRATION_TYPE_YAML){
+            res = loadCalibrationYaml(directory);
+        } else {
+            return false;
+        }
+
+        //TODO: scale calibration by downsample factor
+
+        enableRectify(res);
+        calibration_valid = res;
+
+        return res;
+    }
+
+    bool loadCalibrationYaml(QString directory);
+
+    bool loadCalibrationXML(QString directory);
 
     //! Save an image from the camera with a timestamped filename
     /*!
@@ -486,7 +509,9 @@ private:
   * @param[in] src_r Right image rectification map file
   * @return true/false whether the file was loaded successfully
   */
-    bool loadRectificationMaps(QString src_l, QString src_r);
+    bool loadXMLRectificationMaps(QString src_l, QString src_r);
+
+    void generateRectificationMaps(cv::Size image_size);
 
     //! Load camera intrinsic/extinrisc calibration files
     /*!
@@ -495,14 +520,16 @@ private:
   * @param[in] stereo_cal Stereo camera calibration parameter file
   * @return true/false whether the filse were loaded successfully
   */
-    bool loadCalibration(QString left_cal, QString right_cal,
+    bool loadCalibrationXMLFiles(QString left_cal, QString right_cal,
                          QString stereo_cal);
+
+    bool loadCalibrationYamlFiles(QString left_cal, QString right_cal);
 
     //! Rectify the current stereo image pair
     /*!
   * Note this will update the image matrices: #left_remapped and #right_remapped
   */
-    void rectifyImages(void);
+    bool rectifyImages(void);
 
     //! Wrapper around OpenCV rectify function for paralell calls.
     /*!
@@ -537,6 +564,13 @@ private:
     cv::Mat l_camera_matrix;
     cv::Mat l_dist_coeffs;
     cv::Mat r_dist_coeffs;
+    cv::Mat r_rect_mat;
+    cv::Mat l_rect_mat;
+    cv::Mat r_proj_mat;
+    cv::Mat l_proj_mat;
+
+    int cal_image_width;
+    int cal_image_height;
 
     int video_fps = 0;
     int video_codec = CV_FOURCC('H', '2', '6', '4');

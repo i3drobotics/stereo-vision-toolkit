@@ -183,6 +183,8 @@ public slots:
     void disableWindow();
     void enableWindow();
 
+    void error(AbstractStereoCamera::StereoCameraError error);
+
     void disableCameraActiveSettings(){toggleCameraActiveSettings(false);}
     void enableCameraActiveSettings(){toggleCameraActiveSettings(true);}
     void toggleCameraActiveSettings(bool enable);
@@ -206,9 +208,9 @@ public slots:
     void enableAutoGain(bool);
     void enableBinning(bool enable);
     void setBinning(int binning);
-    void enableFPS(bool enable);
+    void enableTrigger(bool enable);
     void setFPS(int fps);
-    void setPacketSize();
+    void setPacketSize(int packetSize);
     void hideCameraSettings(bool hide);
 
     void videoStreamLoad(void);

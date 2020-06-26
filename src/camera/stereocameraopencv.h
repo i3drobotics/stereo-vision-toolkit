@@ -9,7 +9,7 @@
 #include <abstractstereocamera.h>
 // Correct for math.h warnings
 #define NOMINMAX
-//#define _MATH_DEFINES_DEFINED
+#define _MATH_DEFINES_DEFINED
 #include <windows.h>
 #include <dshow.h>
 #include <hidapi/hidapi.h>

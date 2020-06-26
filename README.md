@@ -11,19 +11,16 @@ You can calibrate stereo cameras, acquire images and perform matching and 3D rec
 
 ![SVTK image acquisition tab](./docs/images/svtk_screenshot.png "SVTK Screenshot showing acquisition tab.")
 
-SVTK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any pre-rectified stereo video of the correct format (side-by-side) will work.
+SVTK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any usb camera pair or pre-rectified stereo video of the correct format (side-by-side) will work.
 
 Roadmap
 ---
 
 Currently SVTK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your I3DR stereo camera quickly. There are a number of features/improvements in development including:
 
-- More options for video handling
-- Assisted camera calibration and more detailed feedback
-- Support for sequential capture (e.g. file naming options)
-- Unit tests and other deployment issues
-- Better 3D visualisation support
+- More automated camera calibration (currently in beta)
 - Linux support
+- Unit tests and other deployment issues
 
 Stereo matching support
 ---
@@ -36,7 +33,7 @@ Please contact info@i3drobotics.com for requesting a license.
 Installation
 ---
 
-The software is currently Windows-only, but we are likely to add support for Linux in the future. Currently the only component that is reliant on Windows is camera discovery, which uses DirectShow.
+The software is currently Windows-only, but we are likely to add support for Linux in the future. Currently the only component that is reliant on Windows is some usb camera control, which uses DirectShow.
 
 This repository contains everything you need to build the software using MSVC 2015 (including pre-built dependencies.) You will also need an up to date installation of Qt 5 (tested using [Qt 5.10.1](https://download.qt.io/new_archive/qt/5.10/5.10.1/)) and the NVIDIA Cuda SDK. Building with MinGW should be possible, but you will need to build the dependencies yourself. You may also need the Windows SDK.
 
@@ -64,6 +61,12 @@ This application is under active development and it is likely that in the short 
 
 Feel free to send us pull requests!
 
-Notes
+License
 ---
 This code is provided under the MIT license, which essentially means it's open source, but we require you to add our copyright if you distribute it elsewhere.
+
+Developer zone
+---
+### Phobos control
+Arduino code for controlling Phobos cameras is provided in src/camera/camera_control.
+This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.

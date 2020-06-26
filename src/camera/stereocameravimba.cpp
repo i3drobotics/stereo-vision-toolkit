@@ -122,7 +122,7 @@ bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInf
     VmbErrorType err_r = camera_r->Open(VmbAccessModeFull);
 
     if (err_l == VmbErrorSuccess && err_r == VmbErrorSuccess){
-        int width, height, size, bitdepth;
+        int width, height, bitdepth;
         getImageSize(width,height,bitdepth);
         emit update_size(width, height, bitdepth);
 
@@ -327,6 +327,7 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraVimba::lis
 }
 
 bool StereoCameraVimba::enableAutoExposure(bool enable) {
+    //TODO set auto exposure
     return false;
 }
 
@@ -341,6 +342,7 @@ bool StereoCameraVimba::setBinning(int val){
 }
 
 bool StereoCameraVimba::setExposure(double exposure) {
+    //TODO set exposure
     return false;
 }
 

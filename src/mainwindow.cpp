@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget* parent)
     // TODO replace this by reading current value from camera
     default_basler_init_settings.exposure = 5;
     default_basler_init_settings.gain = 0;
-    default_basler_init_settings.fps = 30;
-    default_basler_init_settings.binning = -1;
+    default_basler_init_settings.fps = 10;
+    default_basler_init_settings.binning = 1;
     default_basler_init_settings.trigger = true;
     default_basler_init_settings.hdr = -1;
     default_basler_init_settings.autoExpose = false;
@@ -401,13 +401,6 @@ void MainWindow::stereoCameraInitWindow(void){
         default_gain = 0;
         ui->gainSpinBox->setVisible(false);
     }
-    if (default_fps != -1){
-        ui->fpsSpinBox->setEnabled(true);
-        ui->fpsSpinBox->setVisible(true);
-    } else {
-        default_fps = 5;
-        ui->fpsSpinBox->setVisible(false);
-    }
     if (default_binning != -1){
         ui->binningSpinBox->setEnabled(true);
         ui->binningSpinBox->setVisible(true);
@@ -451,6 +444,13 @@ void MainWindow::stereoCameraInitWindow(void){
     } else {
         default_trigger = false;
         ui->enabledTriggeredCheckbox->setVisible(false);
+    }
+    if (default_fps != -1){
+        ui->fpsSpinBox->setEnabled(true);
+        ui->fpsSpinBox->setVisible(true);
+    } else {
+        default_fps = 5;
+        ui->fpsSpinBox->setVisible(false);
     }
     if (default_iHdr != -1){
         if (default_iHdr == 1){
@@ -603,7 +603,9 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), right_view, SLOT(setSize(int, int, int)));
 
     connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
-            SLOT(enableFPS(bool)));
+            SLOT(enableTrigger(bool)));
+
+    connect(stereo_cam, SIGNAL(error(int)), this, SLOT(error(int)));
 
     connect(stereo_cam, SIGNAL(frametime(qint64)), this, SLOT(updateFrameTime(qint64)));
     connect(stereo_cam, SIGNAL(framecount(qint64)), this, SLOT(updateFrameCount(qint64)));
@@ -626,7 +628,7 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(updateDisparityAsync(void)));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(enableAutoExpose(bool)));
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableAutoGain(bool)));
-    connect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableHDR(bool)));
+    connect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableHDR(bool))); //Deimos only
 
     connect(stereo_cam, SIGNAL(disconnected()), this, SLOT(stereoCameraRelease()));
 
@@ -710,10 +712,10 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
                    SLOT(setFPS(int)));
         disconnect(ui->packetSizeSpinBox, SIGNAL(valueChanged(int)), this,
-                SLOT(setPacketSize()));
+                SLOT(setPacketSize(int)));
 
         disconnect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
-                   SLOT(enableFPS(bool)));
+                   SLOT(enableTrigger(bool)));
 
         // disconnect fps connection used in video
         disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(setFPS(int)));
@@ -740,7 +742,7 @@ void MainWindow::stereoCameraRelease(void) {
                 SLOT(setDownsampleFactor(int)));
         disconnect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(enableAutoExpose(bool)));
         disconnect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableAutoGain(bool)));
-        disconnect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableHDR(bool)));
+        disconnect(ui->enableHDRCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableHDR(bool))); //Deimos only
 
         disconnect(stereo_cam, SIGNAL(disconnected()), this, SLOT(stereoCameraRelease()));
 
@@ -1511,7 +1513,26 @@ void MainWindow::setCalibrationFolder(QString dir) {
 
     if(dir == "") return;
 
-    bool res = stereo_cam->loadCalibration(dir);
+    bool reset_capture = false;
+    if (stereo_cam->isCapturing()){
+        reset_capture = true;
+        stereo_cam->enableCapture(false);
+    }
+
+    // ask user for calibration type (xml or yaml)
+    QMessageBox msgBox;
+    msgBox.setText(tr("Load XML or YAML calibration?"));
+    QAbstractButton* pButtonXML = msgBox.addButton(tr("XML"), QMessageBox::YesRole);
+    QAbstractButton* pButtonYAML = msgBox.addButton(tr("YAML"), QMessageBox::NoRole);
+
+    msgBox.exec();
+
+    bool res;
+    if (msgBox.clickedButton()==pButtonXML) {
+        res = stereo_cam->loadCalibration(dir,AbstractStereoCamera::CALIBRATION_TYPE_XML);
+    } else if (msgBox.clickedButton()==pButtonYAML) {
+        res = stereo_cam->loadCalibration(dir,AbstractStereoCamera::CALIBRATION_TYPE_YAML);
+    }
 
     if(!res) {
         ui->enableStereo->setEnabled(false);
@@ -1529,6 +1550,10 @@ void MainWindow::setCalibrationFolder(QString dir) {
 
     ui->toggleRectifyCheckBox->setEnabled(res);
     ui->toggleRectifyCheckBox->setChecked(res);
+
+    if (reset_capture){
+        stereo_cam->enableCapture(true);
+    }
 
 }
 
@@ -1549,7 +1574,7 @@ void MainWindow::saveSingle(void) {
     stereo_cam->saveImageTimestamped();
 }
 
-void MainWindow::enableRectify(bool enable) {
+void MainWindow::enableRectify(bool enable) {   
     ui->toggleRectifyCheckBox->setChecked(enable);
     stereo_cam->enableRectify(enable);
 }
@@ -1642,41 +1667,18 @@ void MainWindow::enableAutoExpose(bool enable){
     }
 }
 
-void MainWindow::enableFPS(bool enable){
-    //if (gigeWarning(current_binning)){
-        //stereo_cam->toggleTrigger(enable);
-    //} else {
-    if (enable){
-        ui->enabledTriggeredCheckbox->setChecked(false);
-        ui->fpsSpinBox->setEnabled(true);
-    } else {
-        ui->enabledTriggeredCheckbox->setChecked(true);
-        ui->fpsSpinBox->setEnabled(false);
-        setFPS(ui->fpsSpinBox->value());
-    }
-    // TODO: re-enable this
-    //}
+void MainWindow::enableTrigger(bool enable){
+    ui->enabledTriggeredCheckbox->setChecked(enable);
+    stereo_cam->enableTrigger(enable);
+    setFPS(ui->fpsSpinBox->value());
 }
 
 void MainWindow::setFPS(int fps){
-    int binning = 5;
-    binning = ui->binningSpinBox->value();
-    if (gigeWarning(binning,fps)){
-        stereo_cam->setFPS(fps);
-        current_fps = fps;
-    } else {
-        disconnect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
-                   SLOT(setFPS(int)));
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        ui->fpsSpinBox->setValue(current_fps);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-        connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this,
-                SLOT(setFPS(int)));
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-    }
+    stereo_cam->setFPS(fps);
+    current_fps = fps;
 }
 
-void MainWindow::setPacketSize(){
+void MainWindow::setPacketSize(int packetSize){
     QProgressDialog progressPacketSize("Updating packet size...", "", 0, 100, this);
     progressPacketSize.setWindowTitle("SVT");
     progressPacketSize.setWindowModality(Qt::WindowModal);
@@ -1684,8 +1686,6 @@ void MainWindow::setPacketSize(){
     progressPacketSize.setMinimumDuration(0);
     progressPacketSize.setValue(30);
     QCoreApplication::processEvents();
-
-    int packetSize = ui->packetSizeSpinBox->value();
 
     stereo_cam->setPacketSize(packetSize);
 
@@ -1754,6 +1754,7 @@ void MainWindow::toggleCameraActiveSettings(bool enable){
     ui->gainSpinBox->setEnabled(enable);
     ui->autoGainCheckBox->setEnabled(enable);
     ui->enableHDRCheckbox->setEnabled(enable);
+    ui->actionLoad_calibration->setEnabled(enable);
 }
 
 void MainWindow::toggleCameraPassiveSettings(bool enable){
@@ -1853,6 +1854,12 @@ void MainWindow::on_btnShowCameraSettings_clicked()
 void MainWindow::on_btnHideCameraSettings_clicked()
 {
     on_btnShowCameraSettings_clicked();
+}
+
+void MainWindow::error(AbstractStereoCamera::StereoCameraError error){
+    if (error == AbstractStereoCamera::RECTIFY_ERROR){
+        enableRectify(false);
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {

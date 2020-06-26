@@ -13,7 +13,7 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
     cv_video_writer(new cv::VideoWriter())
 {
 
-#ifdef CUDA
+#ifdef WITH_CUDA
     if (cv::cuda::getCudaEnabledDeviceCount() > 0) {
         cuda_device_found = true;
     }
@@ -40,8 +40,8 @@ std::string AbstractStereoCamera::StereoCameraType2String(StereoCameraType camer
     switch(camera_type)
     {
         case CAMERA_TYPE_DEIMOS  : return "deimos"; break;
-        case CAMERA_TYPE_BASLER_GIGE  : return "basler_gige"; break;
-        case CAMERA_TYPE_BASLER_USB  : return "basler_usb"; break;
+        case CAMERA_TYPE_BASLER_GIGE  : return "baslergige"; break;
+        case CAMERA_TYPE_BASLER_USB  : return "baslerusb"; break;
         case CAMERA_TYPE_TIS  : return "tis"; break;
         case CAMERA_TYPE_VIMBA  : return "vimba"; break;
         default  : return ""; break;
@@ -53,9 +53,9 @@ AbstractStereoCamera::StereoCameraType AbstractStereoCamera::String2StereoCamera
         return CAMERA_TYPE_DEIMOS;
     } else if (camera_type.compare("usb") == 0){
         return CAMERA_TYPE_USB;
-    } else if (camera_type.compare("basler_gige") == 0){
+    } else if (camera_type.compare("baslergige") == 0){
         return CAMERA_TYPE_BASLER_GIGE;
-    } else if (camera_type.compare("basler_usb") == 0){
+    } else if (camera_type.compare("baslerusb") == 0){
         return CAMERA_TYPE_BASLER_USB;
     } else if (camera_type.compare("tis") == 0){
         return CAMERA_TYPE_TIS;
@@ -97,25 +97,6 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> AbstractStereoCamera::
     }
     return serials;
 }
-
-/*
-void AbstractStereoCamera::assignThread(QThread *thread) {
-    //m_thread = thread;
-    this->moveToThread(thread);
-    connect(this, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-}
-*/
-
-/*
-void AbstractStereoCamera::finishThread(){
-    //m_thread->quit();
-    //m_thread->deleteLater();
-    //emit finished();
-}
-*/
 
 void AbstractStereoCamera::saveImageTimestamped(void) {
     QString fname;
@@ -212,7 +193,6 @@ void AbstractStereoCamera::reproject3D() {
 
     pcl::PointXYZRGB point;
     uint32_t rgb = 0;
-    uchar col = 0;
 
     point.x = 0;
     point.y = 0;
@@ -384,7 +364,13 @@ cv::Mat AbstractStereoCamera::getLeftImage(void) { return left_raw.clone(); }
 
 cv::Mat AbstractStereoCamera::getRightImage(void) { return right_raw.clone(); }
 
-bool AbstractStereoCamera::loadRectificationMaps(QString src_l, QString src_r) {
+void AbstractStereoCamera::generateRectificationMaps(cv::Size image_size){
+    cv::initUndistortRectifyMap(l_camera_matrix,l_dist_coeffs,l_rect_mat,l_proj_mat,image_size,CV_32FC1,rectmapx_l,rectmapy_l);
+    cv::initUndistortRectifyMap(r_camera_matrix,r_dist_coeffs,r_rect_mat,r_proj_mat,image_size,CV_32FC1,rectmapx_r,rectmapy_r);
+    rectification_valid = true;
+}
+
+bool AbstractStereoCamera::loadXMLRectificationMaps(QString src_l, QString src_r) {
     int flags = cv::FileStorage::READ;
     bool res = true;
 
@@ -411,27 +397,37 @@ bool AbstractStereoCamera::loadRectificationMaps(QString src_l, QString src_r) {
     return res;
 }
 
-bool AbstractStereoCamera::loadCalibration(QString directory) {
-    if (directory == "") return false;
-
+bool AbstractStereoCamera::loadCalibrationYaml(QString directory){
     directory = QDir::cleanPath(directory);
 
-    if (!loadRectificationMaps(directory + "/left_rectification.xml",
-                               directory + "/right_rectification.xml")) {
-        rectification_valid = false;
-        qDebug() << "Couldn't find rectification maps";
+    if (!loadCalibrationYamlFiles(directory + "/left.yaml", directory + "/right.yaml")) {
+        qDebug() << "Couldn't load camera calibration";
         return false;
     }
+    return true;
+}
 
-    if (rectmapx_l.cols != image_width || rectmapx_r.cols != image_width ||
-            rectmapy_l.rows != image_height || rectmapy_r.rows != image_height) {
-        rectification_valid = false;
-        qDebug() << "Image size doesn't match rectification maps";
+bool AbstractStereoCamera::loadCalibrationXML(QString directory) {
+    directory = QDir::cleanPath(directory);
 
-        return false;
+    bool load_rectification = true;
+    if (load_rectification){
+        if (!loadXMLRectificationMaps(directory + "/left_rectification.xml", directory + "/right_rectification.xml")){
+            rectification_valid = false;
+            qDebug() << "Couldn't find rectification maps";
+            return false;
+        }
+        cal_image_width = rectmapx_l.cols;
+        cal_image_height = rectmapx_l.rows;
+        if (cal_image_width != image_width || rectmapx_r.cols != image_width ||
+                cal_image_height != image_height || rectmapy_r.rows != image_height) {
+            rectification_valid = false;
+            qDebug() << "Image size doesn't match rectification maps";
+
+            return false;
+        }
     }
-
-    if (!loadCalibration(directory + "/left_calibration.xml",
+    if (!loadCalibrationXMLFiles(directory + "/left_calibration.xml",
                          directory + "/right_calibration.xml",
                          directory + "/stereo_calibration.xml")) {
         qDebug() << "Couldn't load camera calibration";
@@ -439,15 +435,12 @@ bool AbstractStereoCamera::loadCalibration(QString directory) {
         return false;
     }
 
-    calibration_valid = true;
     rectification_valid = true;
-
-    enableRectify(true);
 
     return true;
 }
 
-bool AbstractStereoCamera::loadCalibration(QString left_cal, QString right_cal,
+bool AbstractStereoCamera::loadCalibrationXMLFiles(QString left_cal, QString right_cal,
                                            QString stereo_cal) {
     int flags = cv::FileStorage::READ;
 
@@ -488,13 +481,89 @@ bool AbstractStereoCamera::loadCalibration(QString left_cal, QString right_cal,
 
     fs_s.release();
 
-    //TODO: scale calibration by downsample factor
+    return true;
+}
+
+bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString right_cal) {
+    // implimented from (https://github.com/i3drobotics/pyStereo3D/blob/master/Stereo3D/Stereo3D/StereoCalibration.py)
+    int flags = cv::FileStorage::READ;
+
+    cv::FileStorage fs_l(left_cal.toStdString(), flags);
+
+    if (fs_l.isOpened()) {
+        fs_l["image_width"] >> cal_image_width;
+        fs_l["image_height"] >> cal_image_height;
+        fs_l["camera_matrix"] >> l_camera_matrix;
+        fs_l["distortion_coefficients"] >> l_dist_coeffs;
+        fs_l["rectification_matrix"] >> l_rect_mat;
+        fs_l["projection_matrix"] >> l_proj_mat;
+    } else {
+        return false;
+    }
+
+    fs_l.release();
+
+    if (cal_image_width != image_width || cal_image_height != image_height){
+        qDebug() << "Image size does not match calibrated image size";
+        return false;
+    }
+
+    cv::FileStorage fs_r(right_cal.toStdString(), flags);
+
+    int cal_r_image_width, cal_r_image_height;
+    if (fs_r.isOpened()) {
+        fs_r["image_width"] >> cal_r_image_width;
+        fs_r["image_height"] >> cal_r_image_height;
+        fs_r["camera_matrix"] >> r_camera_matrix;
+        fs_r["distortion_coefficients"] >> r_dist_coeffs;
+        fs_r["rectification_matrix"] >> r_rect_mat;
+        fs_r["projection_matrix"] >> r_proj_mat;
+    } else {
+        return false;
+    }
+
+    fs_r.release();
+
+    if (cal_r_image_width != image_width || cal_r_image_height != image_height){
+        qDebug() << "Image size does not match calibrated image size";
+        return false;
+    }
+
+    //calculate q
+    Q = cv::Mat::zeros(4, 4, CV_64F);
+    double cx = l_proj_mat.at<double>(0,2);
+    double cxr = r_proj_mat.at<double>(0,2);
+    double cy = l_proj_mat.at<double>(1,2);
+    double fx = l_camera_matrix.at<double>(0,0);
+    double fy = l_camera_matrix.at<double>(1,1);
+
+    double p14 = r_proj_mat.at<double>(0,3);
+    baseline = -p14 / fx;
+
+    double q33 = -(cx - cxr) / baseline;
+
+    Q.at<double>(0,0) = 1.0;
+    Q.at<double>(0,3) = cx;
+    Q.at<double>(1,1) = 1.0;
+    Q.at<double>(1,3) = -cy;
+    Q.at<double>(2,3) = fx;
+    Q.at<double>(3,2) = 1.0 / baseline;
+    Q.at<double>(3,3) = q33;
+
+    Q.convertTo(Q, CV_32F);
+
+    generateRectificationMaps(cv::Size(image_width,image_height));
 
     return true;
 }
 
-void AbstractStereoCamera::rectifyImages(void) {
-#ifdef CUDA
+
+bool AbstractStereoCamera::rectifyImages(void) {
+    if (cal_image_width != image_width || cal_image_height != image_height){
+        qDebug() << "Image size does not match calibrated image size";
+        return false;
+    }
+#ifdef WITH_CUDA
     if (cuda_device_found){
         cv::cuda::GpuMat d_left, d_right, d_left_remap, d_right_remap;
 
@@ -526,9 +595,10 @@ void AbstractStereoCamera::rectifyImages(void) {
 
         res_l.waitForFinished();
         res_r.waitForFinished();
-#ifdef CUDA
+#ifdef WITH_CUDA
     }
 #endif
+    return true;
 }
 
 void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
@@ -554,56 +624,63 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 
 void AbstractStereoCamera::processStereo(void) {
 
-    frames++;
-    emit framecount(frames);
+    if (isCapturing()){
+        frames++;
+        emit framecount(frames);
 
-    if (isSwappingLeftRight()){
-        cv::Mat right_tmp;
-        right_raw.copyTo(right_tmp);
+        if (isSwappingLeftRight()){
+            cv::Mat right_tmp;
+            right_raw.copyTo(right_tmp);
 
-        left_raw.copyTo(right_raw);
-        right_tmp.copyTo(left_raw);
-    }
+            left_raw.copyTo(right_raw);
+            right_tmp.copyTo(left_raw);
+        }
 
-    if (downsample_factor != 1){
-        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
-    }
+        if (downsample_factor != 1){
+            cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
+            cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
+        }
 
-    if (rectifying) {
-        rectifyImages();
-    } else {
-        left_raw.copyTo(left_remapped);
-        right_raw.copyTo(right_remapped);
-    }
-
-    left_remapped.copyTo(left_output);
-    right_remapped.copyTo(right_output);
-
-    if (capturing_video){
-        if (capturing_rectified_video){
-            addVideoStreamFrame(left_remapped,right_remapped);
+        if (rectifying) {
+            bool res = rectifyImages();
+            if (!res){
+                emit error(RECTIFY_ERROR);
+                left_raw.copyTo(left_remapped);
+                right_raw.copyTo(right_remapped);
+            }
         } else {
-            addVideoStreamFrame(left_raw,right_raw);
+            left_raw.copyTo(left_remapped);
+            right_raw.copyTo(right_remapped);
         }
-    }
 
-    if (matching) {
-        matcher->match();
-        if (reprojecting) {
-            reproject3D();
+        left_remapped.copyTo(left_output);
+        right_remapped.copyTo(right_output);
+
+        if (capturing_video){
+            if (capturing_rectified_video){
+                addVideoStreamFrame(left_remapped,right_remapped);
+            } else {
+                addVideoStreamFrame(left_raw,right_raw);
+            }
         }
-        emit matched();
-    }
 
-    emit stereopair_processed();
-    if (!first_image_received){
-        first_image_received = true;
-        emit first_image_ready(true);
-    }
+        if (matching) {
+            matcher->match();
+            if (reprojecting) {
+                reproject3D();
+            }
+            emit matched();
+        }
 
-    emit frametime(frametimer.elapsed());
-    frametimer.restart();
+        emit stereopair_processed();
+        if (!first_image_received){
+            first_image_received = true;
+            emit first_image_ready(true);
+        }
+
+        emit frametime(frametimer.elapsed());
+        frametimer.restart();
+    }
 }
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){
