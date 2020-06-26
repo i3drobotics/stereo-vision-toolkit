@@ -19,6 +19,7 @@ bool StereoCameraBasler::openCamera(){
     } else {
         trigger = false;
     }
+    hardware_triggered = trigger;
     int fps = stereoCameraSettings_.fps;;
     double exposure = stereoCameraSettings_.exposure;
     int gain = stereoCameraSettings_.gain;
@@ -264,27 +265,31 @@ bool StereoCameraBasler::setPacketDelay(int interPacketDelay)
 
 
 bool StereoCameraBasler::setFPS(int val){
-    try
-    {
-        float fps_f = (float)val;
-        for (size_t i = 0; i < cameras->GetSize(); ++i)
+    if (hardware_triggered){
+        camControl->updateFPS(val);
+    } else {
+        try
         {
-            cameras->operator[](i).Open();
-            if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
-                Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateAbs").SetValue(fps_f);
+            float fps_f = (float)val;
+            for (size_t i = 0; i < cameras->GetSize(); ++i)
+            {
+                cameras->operator[](i).Open();
+                if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
+                    Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateAbs").SetValue(fps_f);
+                }
+                if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
+                    Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRate").SetValue(fps_f);
+                }
+                return true;
             }
-            if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
-                Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRate").SetValue(fps_f);
-            }
-            return true;
         }
-    }
-    catch (const Pylon::GenericException &e)
-    {
-        // Error handling.
-        std::cerr << "An exception occurred." << std::endl
-                  << e.GetDescription() << std::endl;
-        return false;
+        catch (const Pylon::GenericException &e)
+        {
+            // Error handling.
+            std::cerr << "An exception occurred." << std::endl
+                      << e.GetDescription() << std::endl;
+            return false;
+        }
     }
 }
 
@@ -363,6 +368,7 @@ bool StereoCameraBasler::setBinning(int val){
 
 bool StereoCameraBasler::enableTrigger(bool enable){
     enableFPS(!enable);
+    hardware_triggered = enable;
     try
     {
         std::string enable_str = "Off";
@@ -468,71 +474,28 @@ bool StereoCameraBasler::captureSingle(){
                 cameras->operator[](0).RetrieveResult(max_timeout, ptrGrabResult_left, Pylon::TimeoutHandling_ThrowException);
                 cameras->operator[](1).RetrieveResult(max_timeout, ptrGrabResult_right, Pylon::TimeoutHandling_ThrowException);
 
-                if (ptrGrabResult_left == NULL || ptrGrabResult_right == NULL){
-                    qDebug() << "Camera grab pointer is null";
-                    res = false;
-                    emit error(CAPTURE_ERROR);
-                } else {
-                    if (ptrGrabResult_left->GrabSucceeded() && ptrGrabResult_right->GrabSucceeded())
-                    {
-                        int frameCols_l = ptrGrabResult_left->GetWidth();
-                        int frameRows_l = ptrGrabResult_left->GetHeight();
-                        int frameCols_r = ptrGrabResult_right->GetWidth();
-                        int frameRows_r = ptrGrabResult_right->GetHeight();
+                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_raw);
+                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_raw);
 
-                        if (frameCols_l == 0 || frameRows_l == 0 || frameCols_r == 0 || frameRows_r == 0){
-                            qDebug() << "Image buffer size is incorrect";
-                            res = false;
-                            emit error(CAPTURE_ERROR);
-                        } else {
-                            Pylon::CPylonImage pylonImage_left, pylonImage_right;
-                            formatConverter->Convert(pylonImage_left, ptrGrabResult_left);
-                            formatConverter->Convert(pylonImage_right, ptrGrabResult_right);
-                            cv::Mat image_left_temp = cv::Mat(frameRows_l, frameCols_l, CV_8UC1, static_cast<uchar *>(pylonImage_left.GetBuffer()));
-                            cv::Mat image_right_temp = cv::Mat(frameRows_r, frameCols_r, CV_8UC1, static_cast<uchar *>(pylonImage_right.GetBuffer()));
+                ptrGrabResult_left.Release();
+                ptrGrabResult_right.Release();
 
-                            if (image_left_temp.cols == 0 || image_left_temp.rows == 0 || image_right_temp.cols == 0 || image_right_temp.rows == 0){
-                                qDebug() << "Image result buffer size is incorrect";
-                                res = false;
-                                emit error(CAPTURE_ERROR);
-
-                            } else if ((image_left_temp.cols != image_right_temp.cols) || (image_left_temp.rows != image_right_temp.rows)){
-                                qDebug() << "Left and right images are different sizes but the MUST be equal for stereo matching";
-                                res = false;
-                                emit error(CAPTURE_ERROR);
-                            } else {
-                                image_left_temp.copyTo(left_raw);
-                                image_right_temp.copyTo(right_raw);
-                                res = true;
-                            }
-                            pylonImage_left.Release();
-                            pylonImage_right.Release();
-                        }
-                    }
-                    else
-                    {
-                        qDebug() << "Failed to grab left image.";
-                        qDebug() << "Error: " << ptrGrabResult_left->GetErrorCode() << " " << ptrGrabResult_left->GetErrorDescription();
-                        std::cerr << "Failed to grab left image." << std::endl;
-                        std::cerr << "Error: " << ptrGrabResult_left->GetErrorCode() << " " << ptrGrabResult_left->GetErrorDescription() << std::endl;
-
-                        qDebug() << "Failed to grab right image.";
-                        qDebug() << "Error: " << ptrGrabResult_right->GetErrorCode() << " " << ptrGrabResult_right->GetErrorDescription();
-                        std::cerr << "Failed to grab right image." << std::endl;
-                        std::cerr << "Error: " << ptrGrabResult_right->GetErrorCode() << " " << ptrGrabResult_right->GetErrorDescription() << std::endl;
-                        res = false;
-                        emit error(CAPTURE_ERROR);
-                    }
-                    ptrGrabResult_left.Release();
-                    ptrGrabResult_right.Release();
-                }
+                res = res_l && res_r;
             }
             else
             {
-                qDebug() << "Camera isn't grabbing images.";
-                std::cerr << "Camera isn't grabbing images." << std::endl;
-                res = false;
-                emit error(CAPTURE_ERROR);
+                qDebug() << "Camera isn't grabbing images. Will grab one";
+                Pylon::CGrabResultPtr ptrGrabResult_left,ptrGrabResult_right;
+                cameras->operator[](0).GrabOne( max_timeout, ptrGrabResult_left);
+                cameras->operator[](1).GrabOne( max_timeout, ptrGrabResult_right);
+
+                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_raw);
+                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_raw);
+
+                ptrGrabResult_left.Release();
+                ptrGrabResult_right.Release();
+
+                res = res_l && res_r;
             }
         } else {
             qDebug() << "Camera is not connected or is initalising";
@@ -590,6 +553,7 @@ bool StereoCameraBasler::closeCamera() {
         cameras->Close();
         cameras->operator[](0).Close();
         cameras->operator[](1).Close();
+        camControl->close();
     }
     connected = false;
     emit disconnected();

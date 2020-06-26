@@ -44,6 +44,11 @@ WITH_I3DRSGM {
     DEFINES += WITH_I3DRSGM
 }
 
+@#ifdef CUDA
+    message("CUDA enabled")
+    DEFINES += WITH_CUDA
+@#endif
+
 # To use Vimbda camera API (currently optional while being implimented)
 # add 'CONFIG+=WITH_VIMBA' to build arguments
 WITH_VIMBA {
@@ -102,8 +107,7 @@ SOURCES += \
     abstractstereomatcher.cpp \
     camerabasler.cpp \
     cameraopencv.cpp \
-    #stereocamerabasler.cpp \
-    stereocamerabaslerevents.cpp \
+    stereocamerabasler.cpp \
     stereocameraopencv.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
@@ -153,8 +157,7 @@ HEADERS += \
     abstractstereomatcher.h \
     camerabasler.h \
     cameraopencv.h \
-    #stereocamerabasler.h \
-    stereocamerabaslerevents.h \
+    stereocamerabasler.h \
     stereocameraopencv.h \
     stereocameratis.h \
     stereocamerafromvideo.h \

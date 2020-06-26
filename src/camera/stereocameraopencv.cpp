@@ -448,6 +448,7 @@ bool StereoCameraOpenCV::enableAutoExposure(bool enable) {
 }
 
 bool StereoCameraOpenCV::setExposure(double exposure_milliseconds) {
+    //TODO set exposure
     return false;
 }
 
@@ -464,6 +465,7 @@ bool StereoCameraOpenCV::setFPS(int fps){
 }
 
 bool StereoCameraOpenCV::enableHDR(bool enable){
+    //TODO set hdr
     return false;
 }
 

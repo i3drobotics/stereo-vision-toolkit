@@ -10,6 +10,7 @@
 #include <opencv2/opencv.hpp>
 #include <pylon/PylonIncludes.h>
 #include "arduinocommscameracontrol.h"
+#include "pylonsupport.h"
 
 //!  Stereo balser cameras
 /*!
@@ -56,6 +57,8 @@ private:
     QFuture<void> future;
 
     ArduinoCommsCameraControl* camControl;
+
+    bool hardware_triggered = false;
 
     Pylon::CInstantCameraArray *cameras;
     Pylon::CImageFormatConverter *formatConverter;

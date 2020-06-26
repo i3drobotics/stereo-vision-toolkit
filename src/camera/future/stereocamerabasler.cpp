@@ -3,7 +3,7 @@
 * Author: Ben Knight
 */
 
-#include "stereocamerabaslerevents.h"
+#include "stereocamerabasler.h"
 
 //see: https://github.com/basler/pypylon/blob/master/samples/grabmultiplecameras.py
 
@@ -543,8 +543,11 @@ bool StereoCameraBasler::closeCamera() {
         cameras->Close();
         cameras->operator[](0).Close();
         cameras->operator[](1).Close();
-        delete leftImageEventHandler;
-        delete rightImageEventHandler;
+
+        //cameras->operator[](0).RegisterImageEventHandler(leftImageEventHandler, Pylon::RegistrationMode_Append, Pylon::Cleanup_Delete);
+        //cameras->operator[](1).RegisterImageEventHandler(rightImageEventHandler, Pylon::RegistrationMode_Append, Pylon::Cleanup_Delete);
+        //delete leftImageEventHandler;
+        //delete rightImageEventHandler;
     }
     connected = false;
     emit disconnected();
