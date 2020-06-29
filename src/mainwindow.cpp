@@ -27,17 +27,29 @@ MainWindow::MainWindow(QWidget* parent)
     // define default settings for cameras
     // if the camera does not use the setting then should be set to -1
     // TODO replace this by reading current value from camera
-    default_basler_init_settings.exposure = 5;
-    default_basler_init_settings.gain = 0;
-    default_basler_init_settings.fps = 10;
-    default_basler_init_settings.binning = 1;
-    default_basler_init_settings.trigger = true;
-    default_basler_init_settings.hdr = -1;
-    default_basler_init_settings.autoExpose = false;
-    default_basler_init_settings.autoGain = false;
-    default_basler_init_settings.isGige = -1;
-    default_basler_init_settings.packetDelay = -1;
-    default_basler_init_settings.packetSize = -1; //TODO fix packet size problems
+    default_basler_usb_init_settings.exposure = 5;
+    default_basler_usb_init_settings.gain = 0;
+    default_basler_usb_init_settings.fps = 10;
+    default_basler_usb_init_settings.binning = 1;
+    default_basler_usb_init_settings.trigger = true;
+    default_basler_usb_init_settings.hdr = -1;
+    default_basler_usb_init_settings.autoExpose = false;
+    default_basler_usb_init_settings.autoGain = false;
+    default_basler_usb_init_settings.isGige = false;
+    default_basler_usb_init_settings.packetDelay = -1;
+    default_basler_usb_init_settings.packetSize = -1;
+
+    default_basler_gige_init_settings.exposure = 5;
+    default_basler_gige_init_settings.gain = 0;
+    default_basler_gige_init_settings.fps = 5;
+    default_basler_gige_init_settings.binning = 1;
+    default_basler_gige_init_settings.trigger = true;
+    default_basler_gige_init_settings.hdr = -1;
+    default_basler_gige_init_settings.autoExpose = false;
+    default_basler_gige_init_settings.autoGain = false;
+    default_basler_gige_init_settings.isGige = 1;
+    default_basler_gige_init_settings.packetDelay = 0;
+    default_basler_gige_init_settings.packetSize = 1500;
 
     default_vimba_init_settings.exposure = -1;
     default_vimba_init_settings.gain = -1;
@@ -168,6 +180,9 @@ void MainWindow::disableWindow(){
     ui->toggleVideoButton->setDisabled(true);
     ui->toggleRectifyCheckBox->setDisabled(true);
     ui->actionCalibration_wizard->setDisabled(true);
+
+    toggleCameraActiveSettings(false);
+    toggleCameraPassiveSettings(false);
 }
 
 void MainWindow::enableWindow(){
@@ -230,7 +245,7 @@ void MainWindow::controlsInit(void) {
     connect(ui->singleShotButton, SIGNAL(clicked()), this, SLOT(singleShotClicked()));
     connect(ui->setSaveDirButton, SIGNAL(clicked()), this, SLOT(setSaveDirectory()));
     connect(ui->toggleVideoButton, SIGNAL(clicked(bool)), this, SLOT(enableVideoCapture(bool)));
-    connect(ui->actionLoad_calibration, SIGNAL(triggered(bool)),this, SLOT(setCalibrationFolder()));
+    connect(ui->btnLoadCalibration, SIGNAL(clicked(bool)),this, SLOT(setCalibrationFolder()));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSpinBox, SLOT(setDisabled(bool)));
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), ui->gainSpinBox, SLOT(setDisabled(bool)));
     connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), ui->fpsSpinBox, SLOT(setDisabled(bool)));
@@ -510,9 +525,9 @@ void MainWindow::stereoCameraInitWindow(void){
     int min_packetDelay = -1;
     int step_packetDelay = 1;
 
-    int max_packetSize = 16404;
+    int max_packetSize = 9000;
     int min_packetSize = -1;
-    int step_packetSize = 1;
+    int step_packetSize = 4;
 
     AbstractStereoCamera::StereoCameraSerialInfo cam_info = stereo_cam->getCameraSerialInfo();
     if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
@@ -812,9 +827,10 @@ int MainWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_s
         stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
         qDebug() << "Connecting to Deimos system";
     } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
-        current_camera_settings = default_basler_init_settings;
         if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
-            current_camera_settings.isGige = 1;
+            current_camera_settings = default_basler_gige_init_settings;
+        } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
+            current_camera_settings = default_basler_usb_init_settings;
         }
         StereoCameraBasler* stereo_cam_basler = new StereoCameraBasler(camera_serial_info,current_camera_settings);
         cameras_connected = stereo_cam_basler->openCamera();
@@ -1143,9 +1159,9 @@ void MainWindow::stereoCameraInit() {
             stereo_cam->setSavelocation(save_directory);
         }
 
-        if (calibration_directory != ""){
-            setCalibrationFolder(calibration_directory);
-        }
+        //if (calibration_directory != ""){
+        //    setCalibrationFolder(calibration_directory);
+        //}
 
         double focal =  stereo_cam->fx;
         double baseline = stereo_cam->baseline;
@@ -1554,7 +1570,6 @@ void MainWindow::setCalibrationFolder(QString dir) {
     if (reset_capture){
         stereo_cam->enableCapture(true);
     }
-
 }
 
 void MainWindow::statusMessageTimeout(void) {
@@ -1754,7 +1769,7 @@ void MainWindow::toggleCameraActiveSettings(bool enable){
     ui->gainSpinBox->setEnabled(enable);
     ui->autoGainCheckBox->setEnabled(enable);
     ui->enableHDRCheckbox->setEnabled(enable);
-    ui->actionLoad_calibration->setEnabled(enable);
+    ui->btnLoadCalibration->setEnabled(enable);
 }
 
 void MainWindow::toggleCameraPassiveSettings(bool enable){
@@ -1856,9 +1871,31 @@ void MainWindow::on_btnHideCameraSettings_clicked()
     on_btnShowCameraSettings_clicked();
 }
 
-void MainWindow::error(AbstractStereoCamera::StereoCameraError error){
+void MainWindow::error(int error){
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Stereo Vision Toolkit");
+    std::string msgBoxMsg;
     if (error == AbstractStereoCamera::RECTIFY_ERROR){
         enableRectify(false);
+        ui->statusBar->showMessage("Failed to apply calibration.");
+        msgBoxMsg = "Failed to apply calibration to images received. Calibration requires images of the same size as calibrated. Fix this an re-load calibration.";
+        msgBox.setText(msgBoxMsg.c_str());
+        msgBox.exec();
+    } else if (error == AbstractStereoCamera::CAPTURE_ERROR){
+        ui->statusBar->showMessage("Failed to capture image from cameras.");
+    } else if (error == AbstractStereoCamera::MATCH_ERROR){
+        ui->statusBar->showMessage("Failed to run stereo match on images.");
+    } else if  (error == AbstractStereoCamera::CONNECT_ERROR){
+        ui->statusBar->showMessage("Failed to connect to camera.");
+        msgBoxMsg = "Failed to connect to camera.";
+        msgBox.setText(msgBoxMsg.c_str());
+        msgBox.exec();
+    } else if (error == AbstractStereoCamera::TIMEOUT_ERROR){
+        stereoCameraRelease();
+        ui->statusBar->showMessage("Lost too many camera frames.");
+        msgBoxMsg = "Lost too many camera frames, camera was closed.";
+        msgBox.setText(msgBoxMsg.c_str());
+        msgBox.exec();
     }
 }
 

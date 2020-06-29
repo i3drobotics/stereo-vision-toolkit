@@ -62,25 +62,35 @@ bool StereoCameraDeimos::closeCamera(){
 bool StereoCameraDeimos::captureSingle(){
     bool res = false;
     if(connected && camera.grab()){
-        if(camera.retrieve(image_buffer)){
+        if (camera.grab()){
+            if(camera.retrieve(image_buffer)){
 
-            flip(image_buffer, image_buffer, 0);
-            split(image_buffer, channels);
+                flip(image_buffer, image_buffer, 0);
+                split(image_buffer, channels);
 
-            left_raw = channels[1].clone();
-            right_raw = channels[2].clone();
+                left_raw = channels[1].clone();
+                right_raw = channels[2].clone();
 
-            res = true;
+                res = true;
 
-        }else{
-            qDebug() << "Retrieve fail";
+            }else{
+                qDebug() << "Retrieve fail";
+                res = false;
+            }
+        } else {
+            qDebug() << "Grab fail";
             res = false;
-            emit error(CAPTURE_ERROR);
         }
     }else{
-        qDebug() << "Grab fail";
+        qDebug() << "Cannot grab image. Camera is not connected";
         res = false;
-        emit error(CAPTURE_ERROR);
+        closeCamera();
+    }
+    if (!res){
+        send_error(CAPTURE_ERROR);
+        emit captured_fail();
+    } else {
+        emit captured_success();
     }
     emit captured();
     return res;
@@ -493,6 +503,7 @@ bool StereoCameraDeimos::setFPS(int fps){
             fps_d = 0;
         }
         camera.set(CV_CAP_PROP_FPS, fps_d);
+        frame_rate = fps;
         return true;
     } else {
         qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";

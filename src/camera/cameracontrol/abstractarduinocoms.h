@@ -37,6 +37,10 @@ private:
     qint64 m_bytesWritten = 0;
     QTimer *m_timer;
 
+protected:
+    QSerialPortInfo m_serialPortInfo;
+    int m_baudrate = 115200;
+
 signals:
 
 };

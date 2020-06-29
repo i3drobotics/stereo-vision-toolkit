@@ -239,18 +239,21 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::StereoCameraSettings i
 
 void StereoCameraTIS::leftGrabFailed(){
     grab_success_l = false;
-    emit error(CAPTURE_ERROR);
+    send_error(CAPTURE_ERROR);
+    emit captured_fail();
 }
 
 void StereoCameraTIS::rightGrabFailed(){
     grab_success_r = false;
-    emit error(CAPTURE_ERROR);
+    send_error(CAPTURE_ERROR);
+    emit captured_fail();
 }
 
 void StereoCameraTIS::leftCaptured(){
     grab_success_l = true;
     if (grab_success_r && grab_success_l){
         emit captured();
+        emit captured_success();
         grab_success_r = false;
         grab_success_l = false;
     }
@@ -308,6 +311,7 @@ bool StereoCameraTIS::setFPS(int fps){
         double fps_d = fps;
         left_camera->setFrameRate(fps_d);
         right_camera->setFrameRate(fps_d);
+        frame_rate = fps;
         return true;
     } else {
         qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";

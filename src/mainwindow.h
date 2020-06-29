@@ -92,7 +92,8 @@ private:
     int CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE = -2;
     int CAMERA_CONNECTION_CANCEL_EXIT_CODE = -3;
 
-    AbstractStereoCamera::StereoCameraSettings default_basler_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_basler_gige_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_basler_usb_init_settings;
     AbstractStereoCamera::StereoCameraSettings default_tis_init_settings;
     AbstractStereoCamera::StereoCameraSettings default_deimos_init_settings;
     AbstractStereoCamera::StereoCameraSettings default_usb_init_settings;
@@ -183,7 +184,7 @@ public slots:
     void disableWindow();
     void enableWindow();
 
-    void error(AbstractStereoCamera::StereoCameraError error);
+    void error(int error);
 
     void disableCameraActiveSettings(){toggleCameraActiveSettings(false);}
     void enableCameraActiveSettings(){toggleCameraActiveSettings(true);}

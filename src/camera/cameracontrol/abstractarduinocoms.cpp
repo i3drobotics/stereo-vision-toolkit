@@ -19,6 +19,8 @@ std::vector<QSerialPortInfo> AbstractArduinoComs::getSerialDevices(){
 }
 
 bool AbstractArduinoComs::open(QSerialPortInfo serial_port_info,int baudrate){
+    m_baudrate = baudrate;
+    m_serialPortInfo = serial_port_info;
     m_timer->setSingleShot(true);
     m_serialPort->setPort(serial_port_info);
     m_serialPort->setBaudRate(baudrate);
@@ -88,15 +90,20 @@ void AbstractArduinoComs::write(const QString &writeData)
 void AbstractArduinoComs::close(){
     connected = false;
 
-    if (m_serialPort->isOpen()){
-        m_serialPort->close();
+    if (m_serialPort){
+        disconnect(m_serialPort, &QSerialPort::bytesWritten,
+                this, &AbstractArduinoComs::handleBytesWritten);
+        disconnect(m_serialPort, &QSerialPort::errorOccurred,
+                this, &AbstractArduinoComs::handleError);
+        disconnect(m_timer, &QTimer::timeout, this, &AbstractArduinoComs::handleTimeout);
+
+        if (m_serialPort->isOpen()){
+            m_serialPort->close();
+            // TODO fix error:
+            /*  ASSERT failure in QCoreApplication::sendEvent:
+                "Cannot send events to objects owned by a different thread.
+                Current thread 0x0x15363d27ff0. Receiver '' (of type 'QSerialPort') was
+                created in thread 0x0x15354d90f50" */
+        }
     }
-
-    disconnect(m_serialPort, &QSerialPort::bytesWritten,
-            this, &AbstractArduinoComs::handleBytesWritten);
-    disconnect(m_serialPort, &QSerialPort::errorOccurred,
-            this, &AbstractArduinoComs::handleError);
-    disconnect(m_timer, &QTimer::timeout, this, &AbstractArduinoComs::handleTimeout);
 }
-
-
