@@ -129,6 +129,7 @@ class CameraImagingSource : public QObject {
 
  public slots:
   void grabImage(void);
+  void grabSingle(void);
   void startCapture(void);
   void stopCapture(void);
   void setup(int width, int height, int fps = -1);
