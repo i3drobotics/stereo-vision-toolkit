@@ -69,7 +69,7 @@ class AbstractStereoCamera : public QObject {
 public:
 
     //! Enum defined errors. This defines the type of error that occured.
-    enum StereoCameraError { CAPTURE_ERROR, RECTIFY_ERROR, MATCH_ERROR };
+    enum StereoCameraError { CONNECT_ERROR, CAPTURE_ERROR, TIMEOUT_ERROR, RECTIFY_ERROR, MATCH_ERROR };
     //! Enum defined camera type. This defines the type of camera being used.
     enum StereoCameraType { CAMERA_TYPE_DEIMOS, CAMERA_TYPE_USB, CAMERA_TYPE_BASLER_GIGE,
                             CAMERA_TYPE_BASLER_USB, CAMERA_TYPE_TIS, CAMERA_TYPE_VIMBA, CAMERA_TYPE_INVALID };
@@ -245,11 +245,17 @@ signals:
     //! Emitted when stereo pair has been captured
     void captured();
 
+    //! Emmited when captured successfully
+    void captured_success();
+
+    //! Emmited when capture failed
+    void captured_fail();
+
     //! Emmited when first image stereo pair received
     void first_image_ready(bool ready);
 
-    //! Emitted on error. Enum output for error type
-    void error(StereoCameraError stereo_error);
+    //! Emitted on error. Enum output for error type (See StereoCameraError enum for type of error)
+    void error(int error_index);
 
     //! Emitted when stereo pair has been rectified
     void rectified();
@@ -474,6 +480,10 @@ private slots:
 
     void imageSaved(bool);
 
+    void resetFailFrameCount(void){
+        failed_frames = 0;
+    }
+
 private:
     qint64 frames = 0;
 
@@ -584,6 +594,10 @@ private:
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 5;
 
+    //TODO replace with frame timeout timer
+    int max_failed_frames = 5;
+    int failed_frames = 0;
+
 protected:
 
     int frame_rate = 30;
@@ -602,10 +616,19 @@ protected:
     bool first_image_received = false;
     bool capturing = false;
 
-    int grab_fail_count = 0;
-
     QThread *thread_;
 
+    //! Convert from enum to int for sending error signal
+    void send_error(StereoCameraError stereo_error){
+        if (stereo_error == CAPTURE_ERROR){
+            failed_frames += 1;
+            if (failed_frames > max_failed_frames){
+                send_error(TIMEOUT_ERROR);
+            }
+        }
+        int error_index = stereo_error;
+        emit error(error_index);
+    }
 };
 
 #endif  // ABSTRACTSTEREOCAMERA_H

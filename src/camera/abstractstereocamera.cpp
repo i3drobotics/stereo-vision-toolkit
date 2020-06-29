@@ -19,7 +19,8 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
     }
 #endif
     //startThread();
-    connect(this, SIGNAL(captured()), this, SLOT(processStereo()));
+    connect(this, SIGNAL(captured_success()), this, SLOT(processStereo()));
+    connect(this, SIGNAL(captured_success()), this, SLOT(resetFailFrameCount()));
 }
 
 void AbstractStereoCamera::assignThread(QThread *thread){
@@ -644,7 +645,7 @@ void AbstractStereoCamera::processStereo(void) {
         if (rectifying) {
             bool res = rectifyImages();
             if (!res){
-                emit error(RECTIFY_ERROR);
+                send_error(RECTIFY_ERROR);
                 left_raw.copyTo(left_remapped);
                 right_raw.copyTo(right_remapped);
             }

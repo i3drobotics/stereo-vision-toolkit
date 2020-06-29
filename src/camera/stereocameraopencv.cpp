@@ -68,37 +68,45 @@ bool StereoCameraOpenCV::closeCamera(){
 
 bool StereoCameraOpenCV::captureSingle(){
     bool res = false;
-    if(connected && camera_l.grab() && camera_r.grab()){
-        if(camera_l.retrieve(image_buffer_l) && camera_r.retrieve(image_buffer_r)){
+    if(connected){
+        if (camera_l.grab() && camera_r.grab()){
+            if(camera_l.retrieve(image_buffer_l) && camera_r.retrieve(image_buffer_r)){
 
-            //flip(image_buffer_l, image_buffer_l, 0);
-            //flip(image_buffer_r, image_buffer_r, 0);
+                //flip(image_buffer_l, image_buffer_l, 0);
+                //flip(image_buffer_r, image_buffer_r, 0);
 
-            left_raw = image_buffer_l.clone();
-            right_raw = image_buffer_r.clone();
+                left_raw = image_buffer_l.clone();
+                right_raw = image_buffer_r.clone();
 
-            if (left_raw.size().width != image_width || left_raw.size().height != image_height){
-                image_height = left_raw.size().height;
-                image_width = left_raw.size().width;
-                image_bitdepth = 1; //TODO get bit depth
-                emit update_size(image_width, image_height, image_bitdepth);
-                qDebug() << "Image size changed in incomming image";
-                qDebug() << "(" << image_width << "," << image_height << ")";
+                if (left_raw.size().width != image_width || left_raw.size().height != image_height){
+                    image_height = left_raw.size().height;
+                    image_width = left_raw.size().width;
+                    image_bitdepth = 1; //TODO get bit depth
+                    emit update_size(image_width, image_height, image_bitdepth);
+                    qDebug() << "Image size changed in incomming image";
+                    qDebug() << "(" << image_width << "," << image_height << ")";
+                }
+
+                res = true;
+
+            }else{
+                qDebug() << "Retrieve fail";
+                res = false;
             }
-
-            res = true;
-
-        }else{
-            qDebug() << "Retrieve fail";
+        } else {
+            qDebug() << "Grab fail";
             res = false;
-            emit error(CAPTURE_ERROR);
         }
     }else{
-        qDebug() << "Grab fail";
+        qDebug() << "Cannot grab image. Camera is not connected.";
         res = false;
-        emit error(CAPTURE_ERROR);
     }
-
+    if (!res){
+        send_error(CAPTURE_ERROR);
+        emit captured_fail();
+    } else {
+        emit captured_success();
+    }
     emit captured();
     return res;
 }
@@ -457,6 +465,7 @@ bool StereoCameraOpenCV::setFPS(int fps){
         double fps_d = fps;
         camera_l.set(CV_CAP_PROP_FPS, (double)fps_d);
         camera_r.set(CV_CAP_PROP_FPS, (double)fps_d);
+        frame_rate = fps;
         return true;
     } else {
         qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";

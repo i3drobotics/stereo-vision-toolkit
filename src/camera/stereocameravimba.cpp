@@ -180,7 +180,7 @@ bool StereoCameraVimba::captureSingle(){
                             captureErr_l = VmbErrorInvalidValue;
                             captureErr_r = VmbErrorInvalidValue;
                             qDebug() << "Invalid pixel format";
-                            emit error(CAPTURE_ERROR);
+                            res = false;
                         }
                         else
                         {
@@ -215,21 +215,20 @@ bool StereoCameraVimba::captureSingle(){
                         }
                     } else {
                         qDebug() << "Failed to get pixel format";
-                        emit error(CAPTURE_ERROR);
+                        res = false;
                     }
                 } else {
                     qDebug() << "Failed to acquire frame or incomplete";
-                    emit error(CAPTURE_ERROR);
+                    res = false;
                 }
             } else {
                 qDebug() << "Failed to acquire image";
-                emit error(CAPTURE_ERROR);
+                res = false;
             }
         } else {
             qDebug() << "Camera is not connected or is initalising";
             std::cerr << "Camera is not connected or is initalising" << std::endl;
             res = false;
-            emit error(CAPTURE_ERROR);
         }
     }
     catch (...)
@@ -240,7 +239,12 @@ bool StereoCameraVimba::captureSingle(){
         //          << e.GetDescription() << std::endl;
         qDebug() << "Failed to grab camera";
         res = false;
-        emit error(CAPTURE_ERROR);
+    }
+    if (!res){
+        send_error(CAPTURE_ERROR);
+        emit captured_fail();
+    } else {
+        emit captured_success();
     }
     emit captured();
     return res;
@@ -356,6 +360,7 @@ bool StereoCameraVimba::setFPS(int fps){
         AVT::VmbAPI::CameraPtr pCamera;
         //apiController_.GetCamera(cameraID_l,pCamera);
         //pCamera->GetFeatureByName("Exposure",)
+        frame_rate = fps;
         return true;
     } else {
         qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";

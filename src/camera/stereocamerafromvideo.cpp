@@ -72,8 +72,12 @@ bool StereoCameraFromVideo::captureSingle(){
                 .copyTo(right_raw);
 
         frame_timer.restart();
+    }
+    if (!res){
+        send_error(CAPTURE_ERROR);
+        emit captured_fail();
     } else {
-        emit error(CAPTURE_ERROR);
+        emit captured_success();
     }
     emit captured();
     return res;
@@ -104,6 +108,7 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraFromVideo:
 
 bool StereoCameraFromVideo::setFPS(int fps){
     if (!isCapturing()){
+        frame_rate = fps;
         video_fps = fps;
         return true;
     } else {
