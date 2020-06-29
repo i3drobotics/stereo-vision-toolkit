@@ -1,9 +1,9 @@
-#define CAMERA_TRIGGER_1 12
-#define CAMERA_TRIGGER_2 12
+#define CAMERA_TRIGGER_1 3 //Phobos USB uses pin 12 / Phobos GigE uses pin 3 
+#define CAMERA_TRIGGER_2 2 //Phobos USB uses pin 12 / Phobos GigE uses pin 2
 
 double frame_delay;      // amount of time between triggered (1/fps)
 int trigger_time = 10;   // time for trigger to be registered by camera
-double fps = 3;          // inital fps
+double fps = 5;          // inital fps
 String inString = "";    // string to hold input
 
 void setup() {
