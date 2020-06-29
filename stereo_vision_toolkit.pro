@@ -44,10 +44,10 @@ WITH_I3DRSGM {
     DEFINES += WITH_I3DRSGM
 }
 
-@#ifdef CUDA
+WITH_CUDA {
     message("CUDA enabled")
     DEFINES += WITH_CUDA
-@#endif
+}
 
 # To use Vimbda camera API (currently optional while being implimented)
 # add 'CONFIG+=WITH_VIMBA' to build arguments
@@ -255,9 +255,9 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
     LIBS += -lopencv_ximgproc341d -lopencv_core341d -lopencv_highgui341d -lopencv_calib3d341d -lopencv_videoio341d -lopencv_imgproc341d -lopencv_imgcodecs341d
-    @#ifdef CUDA
-    LIBS += -lopencv_cudastereo341d -lopencv_cudawarping341d
-    @#endif
+    WITH_CUDA {
+        LIBS += -lopencv_cudastereo341d -lopencv_cudawarping341d
+    }
 }else {
     message("Release mode")
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
@@ -267,9 +267,9 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
     LIBS += -lopencv_ximgproc341 -lopencv_core341 -lopencv_highgui341 -lopencv_calib3d341 -lopencv_videoio341 -lopencv_imgproc341 -lopencv_imgcodecs341
-    @#ifdef CUDA
-    LIBS += -lopencv_cudastereo341 -lopencv_cudawarping341
-    @#endif
+    WITH_CUDA {
+        LIBS += -lopencv_cudastereo341 -lopencv_cudawarping341
+    }
 }
 
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
