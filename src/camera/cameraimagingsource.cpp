@@ -284,6 +284,12 @@ double CameraImagingSource::getExposure() {
   return pAbsVal.get()->getValue();
 }
 
+void CameraImagingSource::grabSingle(){
+    // TODO fix this
+    handle.setSinkType(frame_sink);
+    auto result = frame_sink->snapImagesAsync(1);
+}
+
 void CameraImagingSource::grabImage() {
 
   if (!handle.isLive()){

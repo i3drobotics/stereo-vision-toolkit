@@ -63,6 +63,8 @@ public slots:
 private:
     bool setCameras(AbstractStereoCamera::StereoCameraSettings inital_camera_settings, CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right);
 
+    void checkStereoCapture();
+
     CameraImagingSource *left_camera;
     CameraImagingSource *right_camera;
 
@@ -78,6 +80,9 @@ private:
 
     bool grab_success_l = false;
     bool grab_success_r = false;
+
+    bool grab_finish_l = false;
+    bool grab_finish_r = false;
 
     void setup_cameras(AbstractStereoCamera::StereoCameraSettings inital_camera_settings);
 

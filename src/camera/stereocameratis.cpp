@@ -53,7 +53,14 @@ bool StereoCameraTIS::closeCamera(){
 }
 
 bool StereoCameraTIS::captureSingle(){
-    emit stereo_grab();
+    if (!capturing){
+        left_camera->startCapture();
+        right_camera->startCapture();
+        left_camera->grabSingle();
+        right_camera->grabSingle();
+    } else {
+        emit stereo_grab();
+    }
     return true;
 }
 
@@ -65,8 +72,6 @@ bool StereoCameraTIS::enableCapture(bool enable){
     if (enable){
         //Start capture thread
         emit start_capture();
-        grab_success_r = false;
-        grab_success_l = false;
         connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
         capturing = true;
         captureThreaded();
@@ -74,6 +79,7 @@ bool StereoCameraTIS::enableCapture(bool enable){
         //Stop capture thread
         disconnect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
         capturing = false;
+        emit stop_capture();
     }
     return true;
 }
@@ -238,33 +244,42 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::StereoCameraSettings i
 }
 
 void StereoCameraTIS::leftGrabFailed(){
+    grab_finish_l = true;
     grab_success_l = false;
-    send_error(CAPTURE_ERROR);
-    emit captured_fail();
+    checkStereoCapture();
 }
 
 void StereoCameraTIS::rightGrabFailed(){
+    grab_finish_r = true;
     grab_success_r = false;
-    send_error(CAPTURE_ERROR);
-    emit captured_fail();
+    checkStereoCapture();
 }
 
 void StereoCameraTIS::leftCaptured(){
+    grab_finish_l = true;
     grab_success_l = true;
-    if (grab_success_r && grab_success_l){
-        emit captured();
-        emit captured_success();
-        grab_success_r = false;
-        grab_success_l = false;
-    }
+    checkStereoCapture();
 }
 
 void StereoCameraTIS::rightCaptured(){
+    grab_finish_r = true;
     grab_success_r = true;
-    if (grab_success_r && grab_success_l){
-        emit captured();
+    checkStereoCapture();
+}
+
+void StereoCameraTIS::checkStereoCapture(){
+    if (grab_finish_l && grab_finish_r){
+        if (grab_success_r && grab_success_l){
+            emit captured_success();
+        } else {
+            emit captured_fail();
+            send_error(CAPTURE_ERROR);
+        }
+        grab_finish_r = false;
+        grab_finish_l = false;
         grab_success_r = false;
         grab_success_l = false;
+        emit captured();
     }
 }
 

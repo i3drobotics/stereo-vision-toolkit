@@ -161,7 +161,8 @@ MainWindow::MainWindow(QWidget* parent)
     FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
 
 #endif
-    startDeviceListTimer();
+    refreshCameraListThreaded();
+    //startDeviceListTimer();
 }
 
 void MainWindow::disableWindow(){
@@ -802,7 +803,8 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.close();
         QCoreApplication::processEvents();
 
-        startDeviceListTimer();
+        refreshCameraListThreaded();
+        //startDeviceListTimer();
     }
     resetStatusBar();
 }
@@ -924,7 +926,12 @@ void MainWindow::refreshCameraListThreaded(){
 }
 
 void MainWindow::refreshCameraList(){
+    ui->gridLayoutCameraList->setEnabled(false);
+    QCoreApplication::processEvents();
+    QElapsedTimer task_timer;
+    task_timer.start();
     current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList();
+    qDebug() << "Time to get device list: " << task_timer.elapsed();
     emit cameraListUpdated();
 }
 
@@ -1017,6 +1024,9 @@ void MainWindow::refreshCameraListGUI(){
             i++;
         }
     }
+
+    ui->gridLayoutCameraList->setEnabled(true);
+    QCoreApplication::processEvents();
 }
 
 void MainWindow::cameraDeviceSelected(int index){
@@ -1064,10 +1074,12 @@ void MainWindow::cameraDeviceSelected(int index){
                 i++;
             }
         } else {
-            startDeviceListTimer();
+            refreshCameraListThreaded();
+            //startDeviceListTimer();
         }
     } else {
-        startDeviceListTimer();
+        refreshCameraListThreaded();
+        //startDeviceListTimer();
     }
 }
 
