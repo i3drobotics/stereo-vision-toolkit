@@ -625,63 +625,61 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 
 void AbstractStereoCamera::processStereo(void) {
 
-    if (isCapturing()){
-        frames++;
-        emit framecount(frames);
+    frames++;
+    emit framecount(frames);
 
-        if (isSwappingLeftRight()){
-            cv::Mat right_tmp;
-            right_raw.copyTo(right_tmp);
+    if (isSwappingLeftRight()){
+        cv::Mat right_tmp;
+        right_raw.copyTo(right_tmp);
 
-            left_raw.copyTo(right_raw);
-            right_tmp.copyTo(left_raw);
-        }
+        left_raw.copyTo(right_raw);
+        right_tmp.copyTo(left_raw);
+    }
 
-        if (downsample_factor != 1){
-            cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
-            cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
-        }
+    if (downsample_factor != 1){
+        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
+    }
 
-        if (rectifying) {
-            bool res = rectifyImages();
-            if (!res){
-                send_error(RECTIFY_ERROR);
-                left_raw.copyTo(left_remapped);
-                right_raw.copyTo(right_remapped);
-            }
-        } else {
+    if (rectifying) {
+        bool res = rectifyImages();
+        if (!res){
+            send_error(RECTIFY_ERROR);
             left_raw.copyTo(left_remapped);
             right_raw.copyTo(right_remapped);
         }
-
-        left_remapped.copyTo(left_output);
-        right_remapped.copyTo(right_output);
-
-        if (capturing_video){
-            if (capturing_rectified_video){
-                addVideoStreamFrame(left_remapped,right_remapped);
-            } else {
-                addVideoStreamFrame(left_raw,right_raw);
-            }
-        }
-
-        if (matching) {
-            matcher->match();
-            if (reprojecting) {
-                reproject3D();
-            }
-            emit matched();
-        }
-
-        emit stereopair_processed();
-        if (!first_image_received){
-            first_image_received = true;
-            emit first_image_ready(true);
-        }
-
-        emit frametime(frametimer.elapsed());
-        frametimer.restart();
+    } else {
+        left_raw.copyTo(left_remapped);
+        right_raw.copyTo(right_remapped);
     }
+
+    left_remapped.copyTo(left_output);
+    right_remapped.copyTo(right_output);
+
+    if (capturing_video){
+        if (capturing_rectified_video){
+            addVideoStreamFrame(left_remapped,right_remapped);
+        } else {
+            addVideoStreamFrame(left_raw,right_raw);
+        }
+    }
+
+    if (matching) {
+        matcher->match();
+        if (reprojecting) {
+            reproject3D();
+        }
+        emit matched();
+    }
+
+    emit stereopair_processed();
+    if (!first_image_received){
+        first_image_received = true;
+        emit first_image_ready(true);
+    }
+
+    emit frametime(frametimer.elapsed());
+    frametimer.restart();
 }
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){

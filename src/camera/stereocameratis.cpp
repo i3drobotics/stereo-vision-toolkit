@@ -17,6 +17,9 @@ bool StereoCameraTIS::openCamera(){
 
     if (left_camera_tmp->open(left_serial) && right_camera_tmp->open(right_serial)) {
         connected = setCameras(stereoCameraSettings_,left_camera_tmp,right_camera_tmp,new Listener(), new Listener());
+        // TODO remove these when single capture works
+        left_camera->startCapture();
+        right_camera->startCapture();
     } else {
         connected = false;
     }
@@ -25,6 +28,9 @@ bool StereoCameraTIS::openCamera(){
 
 bool StereoCameraTIS::closeCamera(){
     if (connected){
+        // TODO remove this when single capture works
+        emit stop_capture();
+
         disconnect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(leftCaptured()));
         disconnect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(rightCaptured()));
 
@@ -54,10 +60,8 @@ bool StereoCameraTIS::closeCamera(){
 
 bool StereoCameraTIS::captureSingle(){
     if (!capturing){
-        left_camera->startCapture();
-        right_camera->startCapture();
-        left_camera->grabSingle();
-        right_camera->grabSingle();
+        //TODO replace with single capture when it works
+        emit stereo_grab();
     } else {
         emit stereo_grab();
     }
@@ -71,27 +75,64 @@ void StereoCameraTIS::captureThreaded(){
 bool StereoCameraTIS::enableCapture(bool enable){
     if (enable){
         //Start capture thread
-        emit start_capture();
-        connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
         capturing = true;
+        //emit start_capture();
+        //left_camera->startCapture();
+        //right_camera->startCapture();
+        connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
         captureThreaded();
     } else {
         //Stop capture thread
         disconnect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
         capturing = false;
-        emit stop_capture();
+        //emit stop_capture();
     }
     return true;
+}
+
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTIS::listSystemsQuick(DShowLib::Grabber* handle){
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TIS);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
+
+    /* Get number of cameras */
+    auto devices = handle->getAvailableVideoCaptureDevices();
+
+    for (auto& known_serial_info : known_serial_infos) {
+        bool left_found = false;
+        bool right_found = false;
+        qint64 left_serial;
+        qint64 right_serial;
+        //find left
+        for (auto& device : *devices) {
+            device.getSerialNumber(left_serial);
+            if (QString::number(left_serial).toStdString() == known_serial_info.left_camera_serial){
+                left_found = true;
+                break;
+            }
+        }
+        if (left_found){
+            //find right
+            for (auto& device : *devices) {
+                device.getSerialNumber(right_serial);
+                if (QString::number(right_serial).toStdString() == known_serial_info.right_camera_serial){
+                    right_found = true;
+                    break;
+                }
+            }
+        }
+        if (left_found && right_found){ //only add if both cameras found
+            connected_serial_infos.push_back(known_serial_info);
+        }
+    }
+    return connected_serial_infos;
 }
 
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTIS::listSystems(){
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TIS);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
-    /* Get number of cameras */
-    DShowLib::InitLibrary();
 
     DShowLib::Grabber handle;
-
+    /* Get number of cameras */
     auto devices = handle.getAvailableVideoCaptureDevices();
 
     for (auto& known_serial_info : known_serial_infos) {

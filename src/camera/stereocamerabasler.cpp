@@ -154,7 +154,6 @@ bool StereoCameraBasler::openCamera(){
 }
 
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::listSystems(void){
-    Pylon::PylonInitialize();
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_gige = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_usb = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_USB);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos;
@@ -170,9 +169,6 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::li
     Pylon::DeviceInfoList_t devices;
     tlFactory.EnumerateDevices(devices);
 
-    Pylon::CInstantCameraArray all_cameras(devices.size());
-    Pylon::CDeviceInfo info;
-
     std::string DEVICE_CLASS_GIGE = "BaslerGigE";
     std::string DEVICE_CLASS_USB = "BaslerUsb";
 
@@ -180,22 +176,17 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::li
     std::vector<std::string> connected_serials;
     //TODO add generic way to recognise i3dr cameras whilst still being
     //able to make sure the correct right and left cameras are selected together
-    for (size_t i = 0; i < all_cameras.GetSize(); ++i)
+    for (size_t i = 0; i < devices.size(); ++i)
     {
-        all_cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
-        std::string device_class = std::string(all_cameras[i].GetDeviceInfo().GetDeviceClass());
-        std::string device_name = std::string(all_cameras[i].GetDeviceInfo().GetUserDefinedName());
-        std::string device_serial = std::string(all_cameras[i].GetDeviceInfo().GetSerialNumber());
-        //if (device_name.find("i3dr") != std::string::npos) {
+        std::string device_class = std::string(devices[i].GetDeviceClass());
+        std::string device_name = std::string(devices[i].GetUserDefinedName());
+        std::string device_serial = std::string(devices[i].GetSerialNumber());
         if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
             connected_serials.push_back(device_serial);
             connected_camera_names.push_back(device_name);
         } else {
             qDebug() << "Unsupported basler class: " << device_class.c_str();
         }
-        //} else {
-        //    qDebug() << "Unsupported basler camera with name: " << device_name.c_str();
-        //}
     }
 
     for (auto& known_serial_info : known_serial_infos) {
@@ -626,5 +617,4 @@ bool StereoCameraBasler::closeCamera() {
 }
 
 StereoCameraBasler::~StereoCameraBasler() {
-    Pylon::PylonTerminate();
 }

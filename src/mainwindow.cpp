@@ -12,6 +12,12 @@ MainWindow::MainWindow(QWidget* parent)
     QCoreApplication::setApplicationName("Stereo Vision Toolkit");
     setWindowTitle(QCoreApplication::applicationName());
 
+    // Required outside of the camera class definitions as 'list_systems' is slow otherwise
+    // due to it having to re-initalise api's
+    Pylon::PylonInitialize();
+    DShowLib::InitLibrary();
+    tisgrabber = new DShowLib::Grabber();
+
     ui->imageViewTab->raise();
     ui->tabWidget->lower();
 
@@ -161,8 +167,8 @@ MainWindow::MainWindow(QWidget* parent)
     FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
 
 #endif
-    refreshCameraListThreaded();
-    //startDeviceListTimer();
+    //refreshCameraListThreaded();
+    startDeviceListTimer();
 }
 
 void MainWindow::disableWindow(){
@@ -803,8 +809,8 @@ void MainWindow::stereoCameraRelease(void) {
         progressClose.close();
         QCoreApplication::processEvents();
 
-        refreshCameraListThreaded();
-        //startDeviceListTimer();
+        //refreshCameraListThreaded();
+        startDeviceListTimer();
     }
     resetStatusBar();
 }
@@ -930,10 +936,10 @@ void MainWindow::refreshCameraList(){
     QCoreApplication::processEvents();
     QElapsedTimer task_timer;
     task_timer.start();
-    current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList();
+    current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList(tisgrabber);
     qDebug() << "Time to get device list: " << task_timer.elapsed();
-    //emit cameraListUpdated();
-    refreshCameraListGUI();
+    emit cameraListUpdated();
+    //refreshCameraListGUI();
 }
 
 void MainWindow::refreshCameraListGUI(){
@@ -1075,12 +1081,12 @@ void MainWindow::cameraDeviceSelected(int index){
                 i++;
             }
         } else {
-            refreshCameraListThreaded();
-            //startDeviceListTimer();
+            //refreshCameraListThreaded();
+            startDeviceListTimer();
         }
     } else {
-        refreshCameraListThreaded();
-        //startDeviceListTimer();
+        //refreshCameraListThreaded();
+        startDeviceListTimer();
     }
 }
 
@@ -1807,6 +1813,6 @@ void MainWindow::closeEvent(QCloseEvent *) {
 }
 
 MainWindow::~MainWindow() {
-    //stereoCameraRelease();
+    Pylon::PylonTerminate();
     delete ui;
 }
