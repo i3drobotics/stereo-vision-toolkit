@@ -20,6 +20,7 @@
 #include <QString>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QStandardItemModel>
 
 // Point Cloud Library
 #include <pcl/point_cloud.h>
@@ -44,8 +45,6 @@
     #include "stereocameravimba.h"
 #endif
 #include "stereocamerasupport.h"
-#include "qdevicebutton.h"
-#include "qdevicedialog.h"
 
 #include <disparityviewer.h>
 #include "calibratefromimagesdialog.h"
@@ -60,17 +59,17 @@
 
 #include "math.h"
 
-//!  Main Window
-/*!
-  QT Main Window of application
-*/
-
 using namespace std;
 using namespace cv;
 
 namespace Ui {
 class MainWindow;
 }
+
+//!  Main Window
+/*!
+  QT Main Window of application
+*/
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -194,8 +193,6 @@ public slots:
     void enableCameraPassiveSettings(){toggleCameraPassiveSettings(true);}
     void toggleCameraPassiveSettings(bool enable);
 
-    int stereoCameraLoad(void);
-
     int openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info);
     void cameraDeviceSelected(int index);
     void refreshCameraList(void);
@@ -203,7 +200,6 @@ public slots:
     void refreshCameraListGUI(void);
     void startDeviceListTimer(void);
     void stopDeviceListTimer(void);
-    void autoloadCameraTriggered();
     void enableRectify(bool enable);
     void enableAutoExpose(bool);
     void enableAutoGain(bool);

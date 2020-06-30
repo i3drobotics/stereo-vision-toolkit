@@ -932,7 +932,8 @@ void MainWindow::refreshCameraList(){
     task_timer.start();
     current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList();
     qDebug() << "Time to get device list: " << task_timer.elapsed();
-    emit cameraListUpdated();
+    //emit cameraListUpdated();
+    refreshCameraListGUI();
 }
 
 void MainWindow::refreshCameraListGUI(){
@@ -1083,82 +1084,6 @@ void MainWindow::cameraDeviceSelected(int index){
     }
 }
 
-int MainWindow::stereoCameraLoad(void) {
-    cameras_connected = false;
-    int exit_code = -4;
-
-    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> all_camera_serial_info = StereoCameraSupport::getStereoDeviceList();
-
-    AbstractStereoCamera::StereoCameraSerialInfo chosen_camera_serial_info;
-    bool camera_chosen = false;
-
-    int total_systems_found = all_camera_serial_info.size();
-
-    if (total_systems_found > 0){
-        // more than 1 stereo system found
-        // user picks which camera system to use
-        QMessageBox msgBoxDevType;
-        msgBoxDevType.setText(tr("Multiple devices found. What type of device are you using:"));
-
-        QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_100.png");
-        QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_100.png");
-        QPixmap pixmapCamera(":/mainwindow/images/camera_square_100.png");
-
-        QMessageBox msgBoxDevSelect;
-        msgBoxDevSelect.setText(tr("Select which stereo system to use: "));
-        std::vector<QAbstractButton*> pButtons;
-        for (std::vector<AbstractStereoCamera::StereoCameraSerialInfo>::iterator it = all_camera_serial_info.begin() ; it != all_camera_serial_info.end(); ++it){
-            AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info = *it;
-            QDeviceButton* pButtonDev = new QDeviceButton();
-            if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
-                std::string camera_str = "Deimos \n" + camera_serial_info.i3dr_serial;
-                pButtonDev->setText(camera_str.c_str());
-                pButtonDev->setPixmap(pixmapDeimos);
-            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
-                std::string camera_str = "Phobos \n" + camera_serial_info.i3dr_serial;
-                pButtonDev->setText(camera_str.c_str());
-                pButtonDev->setPixmap(pixmapPhobos);
-            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
-                std::string camera_str = "Titania \n" + camera_serial_info.i3dr_serial;
-                pButtonDev->setText(camera_str.c_str());
-                pButtonDev->setPixmap(pixmapCamera);
-            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
-                std::string camera_str = "Generic \n" + camera_serial_info.i3dr_serial;
-                pButtonDev->setText(camera_str.c_str());
-                pButtonDev->setPixmap(pixmapCamera);
-            }
-            msgBoxDevSelect.addButton(pButtonDev,QMessageBox::YesRole);
-            pButtons.push_back(pButtonDev);
-        }
-        QPushButton* pButtonCancel = msgBoxDevSelect.addButton(tr("Cancel"), QMessageBox::RejectRole);
-        msgBoxDevSelect.exec();
-
-        if (msgBoxDevSelect.clickedButton() == pButtonCancel){
-            return CAMERA_CONNECTION_CANCEL_EXIT_CODE;
-        } else {
-            // get serial info camera chosen with button press
-            for (std::vector<QAbstractButton*>::iterator it = pButtons.begin() ; it != pButtons.end(); ++it){
-                int index = it - pButtons.begin();
-                if (msgBoxDevSelect.clickedButton()==*it) {
-                    chosen_camera_serial_info = all_camera_serial_info.at(index);
-                    camera_chosen = true;
-                    break;
-                }
-            }
-        }
-    } else {
-        camera_chosen = false;
-    }
-
-    if (camera_chosen) {
-        // connect to chosen camera
-        exit_code = openCamera(chosen_camera_serial_info);
-    } else {
-        exit_code = CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE; // no camera chosen
-    }
-    return (exit_code);
-}
-
 void MainWindow::stereoCameraInit() {
     if (cameras_connected) {
         save_directory = parameters->get_string("saveDir");
@@ -1202,52 +1127,6 @@ void MainWindow::stopDeviceListTimer() {
     QObject::disconnect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
     device_list_timer->stop();
     ui->btnRefreshCameras->setEnabled(false);
-}
-
-void MainWindow::autoloadCameraTriggered() {
-    stereoCameraRelease();
-    int stereo_camera_exit_code = stereoCameraLoad();
-    if (stereo_camera_exit_code == CAMERA_CONNECTION_SUCCESS_EXIT_CODE){
-        //re-enable tabs as camera confirmed as connected
-        enableWindow();
-        ui->toggleVideoButton->setEnabled(true);
-    } else if (stereo_camera_exit_code == CAMERA_CONNECTION_FAILED_EXIT_CODE){
-        //Display warning messagebox as program does not function correctly if no camera is connected
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Stereo Vision Toolkit");
-        std::string msgBoxMsg;
-        AbstractStereoCamera::StereoCameraSerialInfo cam_info = stereo_cam->getCameraSerialInfo();
-        if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
-            // notice to user if using gige as can become locked if not closed correctly
-            // suggest power cycling to unlock the device
-            msgBoxMsg = "Failed to connect to cameras. Some features will not work as expected. GigE camera may be locked if closed incorrectly, try power cycling the camera system.";
-        } else {
-            msgBoxMsg = "Failed to connect to cameras. Some features will not work as expected.";
-        }
-        msgBox.setText(msgBoxMsg.c_str());
-        msgBox.exec();
-    } else if (stereo_camera_exit_code == CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE){
-        //Display warning messagebox as program does not function correctly if no camera is connected
-        /*
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Stereo Vision Toolkit");
-        msgBox.setText("No recognised cameras connected. Some features may not work as expected.");
-        msgBox.exec();
-        */
-        ui->statusBar->showMessage("No cameras found.");
-    } else if (stereo_camera_exit_code == CAMERA_CONNECTION_CANCEL_EXIT_CODE){
-        //Display warning messagebox as program does not function correctly if no camera is connected
-        /*
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Stereo Vision Toolkit");
-        msgBox.setText("No camera system selected. Some features may not work as expected.");
-        msgBox.exec();
-        */
-        ui->statusBar->showMessage("No cameras found.");
-    } else {
-        // should never happen
-        qDebug() << "Undefined exit code in 'stereoCameraLoad()'";
-    }
 }
 
 void MainWindow::videoStreamLoad(void) {
