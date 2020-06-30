@@ -11,6 +11,10 @@
     #include "stereocameravimba.h"
 #endif
 
+//!  Stereo camera support
+/*!
+  Support class for using stereo cameras.
+*/
 class StereoCameraSupport
 {
 

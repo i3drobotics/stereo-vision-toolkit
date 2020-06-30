@@ -38,6 +38,10 @@ namespace AVT {
 namespace VmbAPI {
 namespace Examples {
 
+//!  API controller
+/*!
+  Vimba API controller
+*/
 class ApiController
 {
   public:

@@ -15,8 +15,11 @@
 #include <iostream>
 #include <string>
 
-// Replace this with callback https://www.theimagingsource.com/support/documentation/ic-imaging-control-cpp/Callback.htm
-
+//!  Imaging source listener
+/*!
+  Grabber listener of imaging source camera
+  TODO: Replace this with callback https://www.theimagingsource.com/support/documentation/ic-imaging-control-cpp/Callback.htm
+*/
 class Listener : public QObject, public DShowLib::GrabberListener {
   Q_OBJECT
  signals:
@@ -69,6 +72,10 @@ class Listener : public QObject, public DShowLib::GrabberListener {
   }
 };
 
+//!  Camera imaging source
+/*!
+  Control and capture of imaging source camera
+*/
 class CameraImagingSource : public QObject {
   Q_OBJECT
  public:

@@ -8,6 +8,10 @@
 #include <QTextStream>
 #include <QTimer>
 
+//!  Arduino comms
+/*!
+  Commuicate with arduino via serial (QSerialPort)
+*/
 class AbstractArduinoComs : public QObject
 {
     Q_OBJECT

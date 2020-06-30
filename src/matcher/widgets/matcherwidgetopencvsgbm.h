@@ -10,14 +10,14 @@
 #include <matcheropencvsgbm.h>
 #include <opencv2/opencv.hpp>
 
+namespace Ui {
+class MatcherWidgetOpenCVSGBM;
+}
+
 //!  OpenCV's SGBM QT Widget
 /*!
   QT widget for OpenCV's SGBM controls
 */
-
-namespace Ui {
-class MatcherWidgetOpenCVSGBM;
-}
 
 class MatcherWidgetOpenCVSGBM : public MatcherWidget {
   Q_OBJECT
