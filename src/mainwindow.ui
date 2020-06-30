@@ -414,6 +414,12 @@
                </item>
                <item>
                 <widget class="QScrollArea" name="scrollArea">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
@@ -422,6 +428,9 @@
                  </property>
                  <property name="verticalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOn</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
                  </property>
                  <property name="widgetResizable">
                   <bool>true</bool>
@@ -1682,14 +1691,6 @@
     <enum>Qt::LeftToRight</enum>
    </property>
   </widget>
-  <action name="actionLoad_calibration">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Load calibration</string>
-   </property>
-  </action>
   <action name="actionCalibration_wizard">
    <property name="enabled">
     <bool>false</bool>
@@ -1706,16 +1707,6 @@
   <action name="actionCalibrate_from_images">
    <property name="text">
     <string>Calibrate from images</string>
-   </property>
-  </action>
-  <action name="actionAutoload_Camera">
-   <property name="text">
-    <string>Change Device</string>
-   </property>
-  </action>
-  <action name="actionLoad_Video">
-   <property name="text">
-    <string>Load Video</string>
    </property>
   </action>
   <action name="actionDocumentation">

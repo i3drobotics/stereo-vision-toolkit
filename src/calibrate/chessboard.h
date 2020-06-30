@@ -10,14 +10,20 @@
 #include <QObject>
 #include <opencv2/opencv.hpp>
 
-//!  Class for chessboard detection
-/*!
-  Detection and refinement of chessboard (also known as checkerboard) detection using openCV
-*/
-
+/**
+ * @brief Class for chessboard detection
+ * @brief Detection and refinement of chessboard (also known as checkerboard) detection using openCV
+ */
 class Chessboard : public QObject {
   Q_OBJECT
  public:
+ /**
+  * @brief Construct a new Chessboard object
+  * 
+  * @param parent 
+  * @param pattern 
+  * @param imsize 
+  */
   explicit Chessboard(QObject *parent = 0, cv::Size pattern = cv::Size(0, 0),
                       cv::Size imsize = cv::Size(0, 0));
   double min_horizontal_tilt = -0.1;

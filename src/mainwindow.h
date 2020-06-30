@@ -153,6 +153,8 @@ private:
 
     QVTKWidget* vtk_widget;
 
+    DShowLib::Grabber* tisgrabber;
+
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> current_camera_serial_info_list;
     std::vector<QSignalMapper*>* camera_button_signal_mapper_list;
 

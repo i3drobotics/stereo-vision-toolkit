@@ -28,6 +28,7 @@ public:
     }
 
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystemsQuick(DShowLib::Grabber* handle);
 
     ~StereoCameraTIS(void);
 
