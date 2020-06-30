@@ -1,8 +1,8 @@
-#ifndef QMATCHERI3DRSGM_H
-#define QMATCHERI3DRSGM_H
+#ifndef MATCHERI3DRSGM_H
+#define MATCHERI3DRSGM_H
 
 #include <abstractstereomatcher.h>
-#include <matcheri3drsgm.h>
+#include <i3drsgm.h>
 #include <QDir>
 #include <QDebug>
 #include <QStandardPaths>
@@ -15,15 +15,15 @@
   Qt wrapper around Stereo matcher using I3DR's SGM algorithm
 */
 
-class QMatcherI3DRSGM : public AbstractStereoMatcher {
+class MatcherI3DRSGM : public AbstractStereoMatcher {
     Q_OBJECT
 public:
-    explicit QMatcherI3DRSGM(QObject *parent = 0)
+    explicit MatcherI3DRSGM(QObject *parent = 0)
         : AbstractStereoMatcher(parent) {
         init();
     }
 
-    ~QMatcherI3DRSGM(void){}
+    ~MatcherI3DRSGM(void){}
 
     void parseConfig(std::string input_file);
     int getErrorDisparity();
@@ -54,7 +54,7 @@ public:
     bool getSubpixel(void){return this->i3drsgm->getSubpixel(); }
     int getDisparityShift(void){return this->i3drsgm->getDisparityShift(); }
 
-    void setNoDataValue(int val);
+    void setDisparityError(int val);
     void enableCPU(bool enable);
 
     void forwardMatch();
@@ -67,7 +67,7 @@ private:
 
     void init();
 
-    MatcherI3DRSGM * i3drsgm;
+    I3DRSGM * i3drsgm;
 };
 
-#endif  // QMATCHERI3DRSGM_H
+#endif  // MATCHERI3DRSGM_H

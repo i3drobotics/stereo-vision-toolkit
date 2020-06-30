@@ -9,7 +9,7 @@
 MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent)
     : MatcherWidget(parent), ui(new Ui::MatcherWidgetI3DRSGM) {
     ui->setupUi(this);
-    matcher = new QMatcherI3DRSGM(this);
+    matcher = new MatcherI3DRSGM(this);
 
     connect(ui->blockSizeSlider, SIGNAL(valueChanged(int)), this,
             SLOT(updateBlockSize(int)));

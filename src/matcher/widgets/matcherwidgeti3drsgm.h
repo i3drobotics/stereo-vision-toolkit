@@ -7,16 +7,16 @@
 #define MATCHERWIDGETI3DRSGM_H
 
 #include <matcherwidget.h>
-#include <qmatcheri3drsgm.h>
-
-//!  OpenCV's Block Matcher QT Widget
-/*!
-  QT widget for OpenCV's Block Matcher controls
-*/
+#include <matcheri3drsgm.h>
 
 namespace Ui {
 class MatcherWidgetI3DRSGM;
 }
+
+//!  I3DR's SGM QT Widget
+/*!
+  QT widget for I3DR's SGM controls
+*/
 
 class MatcherWidgetI3DRSGM : public MatcherWidget {
   Q_OBJECT
@@ -49,7 +49,7 @@ public slots:
 
  private:
   Ui::MatcherWidgetI3DRSGM *ui;
-  QMatcherI3DRSGM* matcher;
+  MatcherI3DRSGM* matcher;
   int block_size;
   int min_disparity;
   int disparity_range;
