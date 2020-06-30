@@ -13,6 +13,7 @@ var searchData=
   ['checksizediff_300',['checkSizeDiff',['../class_calibration_dialog.html#a8c8cfc0cd000b520f8ecb021058f9cfa',1,'CalibrationDialog']]],
   ['checkskewdiff_301',['checkSkewDiff',['../class_calibration_dialog.html#a166c69f5aef9d49c9b344aea40155411',1,'CalibrationDialog']]],
   ['checkxydiff_302',['checkXYDiff',['../class_calibration_dialog.html#ac363503c93334c1e34f4d5e48a91be1c',1,'CalibrationDialog']]],
-  ['closecamera_303',['closeCamera',['../class_abstract_stereo_camera.html#a3602516e045385a56e60631d8d96457b',1,'AbstractStereoCamera']]],
-  ['creatematcher_304',['createMatcher',['../class_i3_d_r_s_g_m.html#a14f4f28a9c9743834740876fee1238a9',1,'I3DRSGM']]]
+  ['chessboard_303',['Chessboard',['../class_chessboard.html#a422d312bd00059b1c3947276dbd8a765',1,'Chessboard']]],
+  ['closecamera_304',['closeCamera',['../class_abstract_stereo_camera.html#a3602516e045385a56e60631d8d96457b',1,'AbstractStereoCamera']]],
+  ['creatematcher_305',['createMatcher',['../class_i3_d_r_s_g_m.html#a14f4f28a9c9743834740876fee1238a9',1,'I3DRSGM']]]
 ];
