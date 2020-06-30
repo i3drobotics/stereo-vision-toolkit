@@ -14,14 +14,14 @@
 #include <abstractstereomatcher.h>
 #include <cvsupport.h>
 
+namespace Ui {
+class DisparityViewer;
+}
+
 //!  Disparity Viewer
 /*!
   QT Widget for displaying disparity images
 */
-
-namespace Ui {
-class DisparityViewer;
-}
 
 class DisparityViewer : public QWidget
 {

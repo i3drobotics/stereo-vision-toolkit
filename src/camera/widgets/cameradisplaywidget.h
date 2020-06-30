@@ -8,14 +8,14 @@
 #include <opencv2/opencv.hpp>
 #include "asmopencv.h"
 
+namespace Ui {
+class CameraDisplayWidget;
+}
+
 //!  Camera display widget
 /*!
   QT Widget for displaying camera feed
 */
-
-namespace Ui {
-class CameraDisplayWidget;
-}
 
 class CameraDisplayWidget : public QWidget
 {

@@ -4,6 +4,10 @@
 #include <opencv2/opencv.hpp>
 #include <pylon/PylonIncludes.h>
 
+//!  Pylon support
+/*!
+  Support class for using pylon api. Includes functions for easy use of pylon api.
+*/
 class PylonSupport
 {
 public:

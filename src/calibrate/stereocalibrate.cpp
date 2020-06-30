@@ -9,7 +9,7 @@ StereoCalibrate::StereoCalibrate(QObject* parent,
                                  AbstractStereoCamera* stereoCamera)
     : QObject(parent) {
     this->stereo_camera = stereoCamera;
-    cal_dialog = new calibrateconfirmdialog();
+    cal_dialog = new CalibrateConfirmDialog();
 
     if (stereoCamera) {
         image_size = cv::Size(stereoCamera->getWidth(), stereoCamera->getHeight());

@@ -3,6 +3,10 @@
 
 #include "abstractarduinocoms.h"
 
+//!  Arduino comms camera control
+/*!
+  Commuicate with arduino for camera control via serial (QSerialPort)
+*/
 class ArduinoCommsCameraControl : public AbstractArduinoComs
 {
 public:

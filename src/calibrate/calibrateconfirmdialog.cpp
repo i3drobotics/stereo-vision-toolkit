@@ -6,15 +6,15 @@
 #include "calibrateconfirmdialog.h"
 #include "ui_calibrateconfirmdialog.h"
 
-calibrateconfirmdialog::calibrateconfirmdialog(QWidget *parent)
-    : QDialog(parent), ui(new Ui::calibrateconfirmdialog) {
+CalibrateConfirmDialog::CalibrateConfirmDialog(QWidget *parent)
+    : QDialog(parent), ui(new Ui::CalibrateConfirmDialog) {
   ui->setupUi(this);
 
 }
 
-calibrateconfirmdialog::~calibrateconfirmdialog() { delete ui; }
+CalibrateConfirmDialog::~CalibrateConfirmDialog() { delete ui; }
 
-void calibrateconfirmdialog::updateLeft(const cv::Mat &camera_matrix, const cv::Mat &distortion,
+void CalibrateConfirmDialog::updateLeft(const cv::Mat &camera_matrix, const cv::Mat &distortion,
                                    const double &rms) {
 
    double focal_x = camera_matrix.at<double>(0, 0);
@@ -37,7 +37,7 @@ void calibrateconfirmdialog::updateLeft(const cv::Mat &camera_matrix, const cv::
    ui->left_intrinsic->setEnabled(true);
 }
 
-void calibrateconfirmdialog::updateRight(const cv::Mat &camera_matrix, const cv::Mat &distortion,
+void CalibrateConfirmDialog::updateRight(const cv::Mat &camera_matrix, const cv::Mat &distortion,
                                     const double &rms) {
 
     double focal_x = camera_matrix.at<double>(0, 0);
@@ -61,7 +61,7 @@ void calibrateconfirmdialog::updateRight(const cv::Mat &camera_matrix, const cv:
    ui->right_intrinsic->setEnabled(true);
 }
 
-void calibrateconfirmdialog::updateStereo(const cv::Mat Q, const double &rms) {
+void CalibrateConfirmDialog::updateStereo(const cv::Mat Q, const double &rms) {
 
    auto cx = QString::number(-Q.at<double>(0,3), 'f', 2);
    auto cy = QString::number(-Q.at<double>(1,3), 'f', 2);
@@ -75,18 +75,18 @@ void calibrateconfirmdialog::updateStereo(const cv::Mat Q, const double &rms) {
    ui->stereo_parameters->setEnabled(true);
 }
 
-void calibrateconfirmdialog::setNumberImages(int number_images){
+void CalibrateConfirmDialog::setNumberImages(int number_images){
     ui->left_progress->setMaximum(number_images);
     ui->right_progress->setMaximum(number_images);
 }
 
 
-void calibrateconfirmdialog::updateLeftProgress(int number_done) {
+void CalibrateConfirmDialog::updateLeftProgress(int number_done) {
     ui->left_progress->setValue(number_done);
     update();
 }
 
-void calibrateconfirmdialog::updateRightProgress(int number_done) {
+void CalibrateConfirmDialog::updateRightProgress(int number_done) {
     ui->right_progress->setValue(number_done);
     update();
 }

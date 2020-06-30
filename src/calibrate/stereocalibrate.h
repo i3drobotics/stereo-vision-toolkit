@@ -60,7 +60,7 @@ class StereoCalibrate : public QObject {
 
   QLabel* left_view;
   QLabel* right_view;
-  calibrateconfirmdialog* cal_dialog;
+  CalibrateConfirmDialog* cal_dialog;
   AbstractStereoCamera* stereo_camera;
   std::vector<Chessboard*> board_orientations;
   std::vector<cv::Mat> left_images;

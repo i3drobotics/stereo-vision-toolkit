@@ -3,7 +3,10 @@
 
 #include <opencv2/opencv.hpp>
 
-
+//!  CV Support
+/*!
+  Support class for using openCV
+*/
 class CVSupport
 {
 public:
