@@ -428,8 +428,7 @@ win32 {
 
 # Copy documentation to build folder
 COPIES += helpDocs
-helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/help/*.html, true)
-helpDocs.files += $$files($$_PRO_FILE_PWD_/docs/help/*.png, true)
+helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/app/*.pdf, true)
 helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 
 # Fervor autoupdater

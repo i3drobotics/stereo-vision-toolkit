@@ -1740,7 +1740,7 @@ void MainWindow::updateFrameTime(qint64 time) {
 }
 
 void MainWindow::openHelp(){
-    QString link = QCoreApplication::applicationDirPath() + "/docs/help/index.html";
+    QString link = QCoreApplication::applicationDirPath() + "/docs/help/UserGuide.pdf";
     QDesktopServices::openUrl(QUrl(link));
 }
 
