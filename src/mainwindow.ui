@@ -352,7 +352,7 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>320</width>
+             <width>340</width>
              <height>0</height>
             </size>
            </property>
@@ -427,7 +427,7 @@
                   </size>
                  </property>
                  <property name="verticalScrollBarPolicy">
-                  <enum>Qt::ScrollBarAlwaysOn</enum>
+                  <enum>Qt::ScrollBarAsNeeded</enum>
                  </property>
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -440,7 +440,7 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>273</width>
+                    <width>310</width>
                     <height>193</height>
                    </rect>
                   </property>
@@ -541,7 +541,7 @@
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>Change camera device settings below. Some settings cannot be updated while the camera is capturing. Press the pause button to enable these settings.</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change camera device settings below. &lt;br&gt;Some settings cannot be updated while the camera is capturing. Press the pause button to enable these settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="wordWrap">
                   <bool>true</bool>
