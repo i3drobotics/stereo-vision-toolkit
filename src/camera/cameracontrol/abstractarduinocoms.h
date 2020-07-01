@@ -8,6 +8,10 @@
 #include <QTextStream>
 #include <QTimer>
 
+//!  Arduino comms
+/*!
+  Commuicate with arduino via serial (QSerialPort)
+*/
 class AbstractArduinoComs : public QObject
 {
     Q_OBJECT
@@ -36,6 +40,10 @@ private:
     QTextStream m_standardOutput;
     qint64 m_bytesWritten = 0;
     QTimer *m_timer;
+
+protected:
+    QSerialPortInfo m_serialPortInfo;
+    int m_baudrate = 115200;
 
 signals:
 

@@ -1,8 +1,7 @@
 /*
-* Copyright I3D Robotics Ltd, 2020
-* Author: Ben Knight
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
 */
-
 
 #ifndef STEREOCAMERAVIMBA_H
 #define STEREOCAMERAVIMBA_H
@@ -18,61 +17,51 @@
   Control of stereo pair of vimba cameras and generation of 3D
 */
 
-class StereoCameraVimba : public AbstractStereoCamera
+class StereoCameraVimba  : public AbstractStereoCamera
 {
 Q_OBJECT
 
 public:
-    explicit StereoCameraVimba(QObject *parent = 0) :
-                AbstractStereoCamera(parent),
-                apiController(AVT::VmbAPI::Examples::ApiController())
-                {
-        apiControllerStatus = apiController.StartUp();
+
+    explicit StereoCameraVimba (AbstractStereoCamera::StereoCameraSerialInfo serial_info,
+                                AbstractStereoCamera::StereoCameraSettings camera_settings,
+                                QObject *parent = 0) :
+                AbstractStereoCamera(serial_info, camera_settings, parent),
+                apiController_(AVT::VmbAPI::Examples::ApiController()){
+        apiControllerStatus_ = apiController_.StartUp();
     }
-    bool capture();
-    void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    void toggleAutoExpose(bool enable);
-    void adjustExposure(double val);
-    void toggleAutoGain(bool enable);
-    void adjustGain(int val);
-    void adjustBinning(int val);
-    void toggleTrigger(bool enable);
-    void adjustFPS(int val);
-    void adjustPacketSize(int val){} //NA
+
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
 
     ~StereoCameraVimba(void);
 
 public slots:
-    bool setExposure(double val);
-    bool setGain(int val);
-    void changeFPS(int val);
-    void changeBinning(int val);
-    void enableTrigger(bool enable);
-    bool enableAutoExpose(bool enable);
+    // Implimentations of virtual functions from parent class
+    bool openCamera();
+    bool closeCamera();
+    bool captureSingle();
+    bool enableCapture(bool enable);
+    bool setFPS(int fps);
+    bool setExposure(double exposure);
+    bool enableAutoExposure(bool enable);
+    bool setPacketSize(int){return false;} //NA
+    bool setPacketDelay(int){return false;} //NA
+    bool enableTrigger(bool enable);
     bool enableAutoGain(bool enable);
+    bool setGain(int gain);
+    bool setBinning(int binning);
+
+    void captureThreaded();
 
 private:
-    AVT::VmbAPI::Examples::ApiController apiController;
+    QFuture<void> future;
+
+    AVT::VmbAPI::Examples::ApiController apiController_;
     AVT::VmbAPI::CameraPtr camera_l, camera_r;
 
-    int m_binning;
-    int m_iTrigger;
-    int m_fps;
+    bool setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps);
 
-    VmbErrorType apiControllerStatus;
-
-    QFuture<bool> qfuture_capture;
-
-    void setBinning(int val);
-    void setFPS(int val);
-    void enableFPS(bool enable);
-    void setTrigger(bool enable);
-
-    bool grab();
-
-    bool setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps);
+    VmbErrorType apiControllerStatus_;
 
     void getImageSize(int &width, int &height, int &bitdepth);
 };

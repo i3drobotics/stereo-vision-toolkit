@@ -20,6 +20,7 @@
 #include <QString>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QStandardItemModel>
 
 // Point Cloud Library
 #include <pcl/point_cloud.h>
@@ -44,8 +45,6 @@
     #include "stereocameravimba.h"
 #endif
 #include "stereocamerasupport.h"
-#include "qdevicebutton.h"
-#include "qdevicedialog.h"
 
 #include <disparityviewer.h>
 #include "calibratefromimagesdialog.h"
@@ -60,17 +59,17 @@
 
 #include "math.h"
 
-//!  Main Window
-/*!
-  QT Main Window of application
-*/
-
 using namespace std;
 using namespace cv;
 
 namespace Ui {
 class MainWindow;
 }
+
+//!  Main Window
+/*!
+  QT Main Window of application
+*/
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -87,22 +86,19 @@ private:
     int fps_measure_count = 0;
     int fps_measure_total = 0;
 
-    bool updatingDisplay = false;
-    bool showingSettings = false;
-    bool videoCaptureStarted = false;
-
     int CAMERA_CONNECTION_SUCCESS_EXIT_CODE = 0;
     int CAMERA_CONNECTION_FAILED_EXIT_CODE = -1;
     int CAMERA_CONNECTION_NO_CAMERA_EXIT_CODE = -2;
     int CAMERA_CONNECTION_CANCEL_EXIT_CODE = -3;
 
-    AbstractStereoCamera::stereoCameraSettings default_basler_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_tis_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_deimos_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_usb_init_settings;
-    AbstractStereoCamera::stereoCameraSettings default_video_init_settings;
-    AbstractStereoCamera::stereoCameraSettings current_camera_settings;
-    AbstractStereoCamera::stereoCameraSettings default_vimba_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_basler_gige_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_basler_usb_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_tis_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_deimos_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_usb_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_video_init_settings;
+    AbstractStereoCamera::StereoCameraSettings current_camera_settings;
+    AbstractStereoCamera::StereoCameraSettings default_vimba_init_settings;
 
     QPixmap pmap_left;
     QPixmap pmap_right;
@@ -111,7 +107,7 @@ private:
 
     QFuture<void> qfuture_refreshcameralist;
 
-    QTimer* frame_timer;
+    //QTimer* frame_timer;
     QTimer* device_list_timer;
 
     ParamFile* parameters;
@@ -128,8 +124,6 @@ private:
     CameraDisplayWidget *left_matcher_view;
     CameraDisplayWidget *right_view;
 
-    StereoCameraSupport *stereoCamSupport;
-
     std::vector<QPushButton> deviceListButtons;
 
     bool cameras_connected = false;
@@ -138,6 +132,7 @@ private:
     int current_binning = 0;
     bool using_gige = false;
     bool first_cloud = true;
+    bool first_image = true;
 
     bool calibration_dialog_used = false;
     bool calibration_from_images_dialog_used = false;
@@ -158,7 +153,9 @@ private:
 
     QVTKWidget* vtk_widget;
 
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> current_camera_serial_info_list;
+    DShowLib::Grabber* tisgrabber;
+
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> current_camera_serial_info_list;
     std::vector<QSignalMapper*>* camera_button_signal_mapper_list;
 
     void setupMatchers();
@@ -176,10 +173,9 @@ private:
 public slots:
     void stereoCameraRelease(void);
     void updateDisplay(void);
-    void updateFPS(qint64);
-    void updateTemperature(double temperature);
+    void updateFrameTime(qint64);
     void updateFrameCount(qint64);
-    void toggleAcquire(void);
+    void enableCapture(bool);
     void singleShotClicked(void);
     void saveSingle(void);
     void displaySaved(QString fname);
@@ -189,23 +185,32 @@ public slots:
     void disableWindow();
     void enableWindow();
 
-    int stereoCameraLoad(void);
+    void error(int error);
 
-    int openCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info);
+    void disableCameraActiveSettings(){toggleCameraActiveSettings(false);}
+    void enableCameraActiveSettings(){toggleCameraActiveSettings(true);}
+    void toggleCameraActiveSettings(bool enable);
+
+    void disableCameraPassiveSettings(){toggleCameraPassiveSettings(false);}
+    void enableCameraPassiveSettings(){toggleCameraPassiveSettings(true);}
+    void toggleCameraPassiveSettings(bool enable);
+
+    int openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info);
     void cameraDeviceSelected(int index);
     void refreshCameraList(void);
     void refreshCameraListThreaded(void);
     void refreshCameraListGUI(void);
     void startDeviceListTimer(void);
     void stopDeviceListTimer(void);
-    void autoloadCameraTriggered();
-    void toggleAutoExpose(bool);
-    void toggleAutoGain(bool);
-    void toggleEnableBinning(bool enable);
-    void changeBinning(int binning);
-    void toggleFPS(bool enable);
-    void changeFPS(int fps);
-    void changePacketSize();
+    void enableRectify(bool enable);
+    void enableAutoExpose(bool);
+    void enableAutoGain(bool);
+    void enableBinning(bool enable);
+    void setBinning(int binning);
+    void enableTrigger(bool enable);
+    void setFPS(int fps);
+    void setPacketSize(int packetSize);
+    void hideCameraSettings(bool hide);
 
     void videoStreamLoad(void);
 
@@ -220,8 +225,9 @@ public slots:
 
     void doneCalibration(bool);
 
-    void startVideoCapture(void);
-    void stopVideoCapture(void);
+    void enableVideoCapture(bool enable);
+    void startVideoCapture(void){ enableVideoCapture(true); }
+    void stopVideoCapture(void){ enableVideoCapture(true); }
 
     void updateCloud(void);
     void enable3DViz(int);

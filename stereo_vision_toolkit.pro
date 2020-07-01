@@ -7,13 +7,14 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.2.10
+VERSION = 1.3.0
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
 QT += core gui concurrent widgets xml network quick serialport
 
 #QT version > 5.6 required for using openssl 1.0.2j
+#QT version > 5.12.4 uses newer openssl 1.1.1g
 !versionAtLeast(QT_VERSION, 5.6.0):
 versionAtLeast(QT_VERSION, 5.6.0){
     versionAtLeast(QT_VERSION, 5.12.4){
@@ -27,21 +28,31 @@ versionAtLeast(QT_VERSION, 5.6.0){
     error("Use at least Qt version 5.6.0")
 }
 
+# Application name
 TARGET = StereoVisionToolkit
-DEFINES += WITH_FERVOR
-DEFINES += FV_APP_NAME
-FV_APP_NAME = $$TARGET
-
+# Application type
 TEMPLATE = app vcapp
 
 CONFIG += warn_on
 CONFIG += doc
+
+# Setup FEVOR defines
+DEFINES += WITH_FERVOR
+DEFINES += FV_APP_NAME
+FV_APP_NAME = $$TARGET
 
 # To use I3DRSGM
 # add 'CONFIG+=WITH_I3DRSGM' to build arguments
 WITH_I3DRSGM {
     message("I3DRSGM enabled")
     DEFINES += WITH_I3DRSGM
+}
+
+# To use CUDA
+# add 'CONFIG+=WITH_CUDA' to build arguments
+WITH_CUDA {
+    message("CUDA enabled")
+    DEFINES += WITH_CUDA
 }
 
 # To use Vimbda camera API (currently optional while being implimented)
@@ -51,6 +62,7 @@ WITH_VIMBA {
     DEFINES += WITH_VIMBA
 }
 
+# Define resources
 RC_FILE = icon.rc
 
 RESOURCES += \
@@ -59,6 +71,7 @@ RESOURCES += \
 
 include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
 
+# Define search paths for files
 VPATH += $$_PRO_FILE_PWD_/src
 VPATH += $$_PRO_FILE_PWD_/src/camera
 VPATH += $$_PRO_FILE_PWD_/src/matcher
@@ -86,13 +99,12 @@ WITH_I3DRSGM {
     INCLUDEPATH += $$_PRO_FILE_PWD_/i3drsgm/src
 }
 
+# Define source files
 SOURCES += \
     arduinocommscameracontrol.cpp \
     main.cpp\
     mainwindow.cpp \
     calibrationdialog.cpp \
-    qdevicedialog.cpp \
-    qdevicebutton.cpp \
     abstractarduinocoms.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
@@ -106,7 +118,6 @@ SOURCES += \
     stereocameraopencv.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
-    stereocamerasupport.cpp \
     matcheropencvblock.cpp \
     matcherwidgetopencvblock.cpp \
     matcheropencvsgbm.cpp \
@@ -117,32 +128,33 @@ SOURCES += \
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp \
     virtualcam.cpp
-
+# Deimos source file is windows only for directshow
 win32 {
     SOURCES += stereocameradeimos.cpp
 }
-
+# Optional vimba source files (as currently in development)
 WITH_VIMBA {
     SOURCES += \
         stereocameravimba.cpp \
         ApiController.cpp
 }
-
+# Optional I3RSGM matcher source files
 WITH_I3DRSGM {
     SOURCES += \
         matcherwidgeti3drsgm.cpp \
-        qmatcheri3drsgm.cpp \
-        matcheri3drsgm.cpp
+        matcheri3drsgm.cpp \
+        i3drsgm.cpp
 }
 
+# Define header files
 HEADERS += \
     arduinocommscameracontrol.h \
     mainwindow.h \
     calibrationdialog.h \
-    qdevicedialog.h \
-    qdevicebutton.h \
     asmopencv.h \
     abstractarduinocoms.h \
+    cvsupport.h \
+    pylonsupport.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -166,24 +178,24 @@ HEADERS += \
     cameradisplaywidget.h \
     cameraimagingsource.h \
     virtualcam.h
-
+# Deimos header file is windows only for directshow
 win32 {
     HEADERS += stereocameradeimos.h
 }
-
+# Optional vimba header files (as currently in development)
 WITH_VIMBA {
     HEADERS += \
         stereocameravimba.h \
         ApiController.h
 }
-
+# Optional I3DRSGM matcher header files
 WITH_I3DRSGM {
     HEADERS += \
         matcherwidgeti3drsgm.h \
-        qmatcheri3drsgm.h \
-        matcheri3drsgm.h
+        matcheri3drsgm.h \
+        i3drsgm.h
 }
-
+# Define application window forms
 FORMS += \
     mainwindow.ui \
     calibrationdialog.ui \
@@ -193,7 +205,7 @@ FORMS += \
     matcherwidgetopencvsgbm.ui \
     disparityviewer.ui \
     cameradisplaywidget.ui
-
+# Optional I3DRSGM window form
 WITH_I3DRSGM {
     FORMS += matcherwidgeti3drsgm.ui
 }
@@ -229,6 +241,7 @@ macx {
     error(mac system detected. Cannot continue)
 }
 
+# Define include folders for libraries
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/opencv/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/VTK/include/vtk-7.0"
@@ -240,7 +253,9 @@ INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/yaml-cpp/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/dshow/include"
 
+# Define libaries
 CONFIG(debug, debug|release) {
+    # Define debug only libraries
     message("Debug mode")
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
@@ -249,10 +264,12 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
     LIBS += -lopencv_ximgproc341d -lopencv_core341d -lopencv_highgui341d -lopencv_calib3d341d -lopencv_videoio341d -lopencv_imgproc341d -lopencv_imgcodecs341d
-    @#ifdef CUDA
-    LIBS += -lopencv_cudastereo341d -lopencv_cudawarping341d
-    @#endif
+    # Optional CUDA libraries
+    WITH_CUDA {
+        LIBS += -lopencv_cudastereo341d -lopencv_cudawarping341d
+    }
 }else {
+    # Define release only libraries
     message("Release mode")
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
@@ -261,17 +278,18 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
     LIBS += -lopencv_ximgproc341 -lopencv_core341 -lopencv_highgui341 -lopencv_calib3d341 -lopencv_videoio341 -lopencv_imgproc341 -lopencv_imgcodecs341
-    @#ifdef CUDA
-    LIBS += -lopencv_cudastereo341 -lopencv_cudawarping341
-    @#endif
+    # Optional CUDA libraries
+    WITH_CUDA {
+        LIBS += -lopencv_cudastereo341 -lopencv_cudawarping341
+    }
 }
 
+# Define libraries
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
 LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
-LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/dshow/lib/x64" -lstrmbasd -lstrmbase
 
 WITH_VIMBA {
-    # vimba library and include files
+    # Vimba library and include files
     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/vimba/"
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaC/Lib/Win64/" -lVimbaC
     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
@@ -289,12 +307,16 @@ WITH_I3DRSGM {
 LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
 
 win32 {
+    # Directshow libraries
+    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/dshow/lib/x64" -lstrmbasd -lstrmbase
     # Directshow class IDs
     LIBS += -lstrmiids
 }
 
+# Define fonts
 DISTFILES += $$_PRO_FILE_PWD_/resources/fonts/fontawesome-webfont.ttf
 
+# Define target
 isEmpty(TARGET_EXT) {
     win32 {
         TARGET_CUSTOM_EXT = .exe
@@ -307,7 +329,7 @@ isEmpty(TARGET_EXT) {
 }
 
 win32 {
-    # Define dlls to copy to build folder
+    # Define dlls to copy to build folder (windows only)
     EXTRA_FILES += \
         $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
@@ -317,6 +339,7 @@ win32 {
         $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
         $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll
 
+    # Copy openssl dlls depending on version using
     WITH_OPENSSL_102j {
         EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.0.2j/Win64/bin/*.dll, true)
     }
@@ -349,7 +372,7 @@ win32 {
     EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.msi, true)
     EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
 
-    #TODO add pylon drivers for linux and mac
+    # I3DRSGM dlls
     WITH_I3DRSGM {
         EXTRA_FILES += \
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/bin/*.dll, true) \
@@ -357,6 +380,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/param/*.param, true)
     }
 
+    # Vimba dlls
     WITH_VIMBA {
         EXTRA_FILES += \
             $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaC.dll \
@@ -404,8 +428,7 @@ win32 {
 
 # Copy documentation to build folder
 COPIES += helpDocs
-helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/help/*.html, true)
-helpDocs.files += $$files($$_PRO_FILE_PWD_/docs/help/*.png, true)
+helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/app/*.pdf, true)
 helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 
 # Fervor autoupdater

@@ -46,6 +46,11 @@
 #error Some of QImage's formats are endian-dependant. This file assumes little endian. See comment at top of header.
 #endif
 
+//!  Convert between OpenCV and QT
+/*!
+  Functions for converting between opencv and qt
+*/
+
 namespace ASM {
     // NOTE: This does not cover all cases - it should be easy to add new ones as required.
     inline QImage  cvMatToQImage( const cv::Mat &inMat )

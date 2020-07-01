@@ -13,10 +13,12 @@
 #include<memory>
 
 #include <opencv2/opencv.hpp>
-#ifdef CUDA
+#ifdef WITH_CUDA
 #include <opencv2/cudastereo.hpp>
 #include <opencv2/cudawarping.hpp>
 #endif
+
+#include "cvsupport.h"
 
 // Point Cloud Library
 #include <pcl/point_cloud.h>
@@ -40,103 +42,42 @@
   An abstract class to process stereo images from arbitrary cameras. This class should not be used directly,
   instead you should subclass it (e.g. StereoCameraDeimos()). The bare minimum is to implment a capture function
   that will capture a stereo pair from your camera.
+
+  Listed below are the required functions to impliment in the subclass.
+  public:
+    - listSystems
+  public slots:
+    - captureSingle
+    - openCamera
+    - enableCapture
+    - closeCamera
+    - enableAutoExposure
+    - setExposure
+    - enableAutoGain
+    - setGain
+    - setBinning
+    - enableTrigger
+    - setFPS
+    - setPacketSize
+
+   See the function definition for details on implimentation.
 */
+
 class AbstractStereoCamera : public QObject {
     Q_OBJECT
 
-signals:
-    //! Emmitted when point cloud is saved
-    void pointCloudSaveStatus(QString);
-
-    //! Emitted when a frame has been captured and processed
-    void acquired();
-
-    //! Emitted after a frame has been processed to indicate the current framerate
-    void fps(qint64);
-
-    //! Emitted when an image has been saved
-    void savedImage();
-
-    //! Indicates that the camera has finished acquiring
-    void finished();
-
-    //! Indicates that the camera has disconnected
-    void disconnected();
-
-    //! Indicates the current frame count
-    void framecount(qint64);
-
-    //! Emit when an image has been saved, including the filename
-    void savedImage(QString filename);
-
-    //! Emitted when an image has been matched
-    void matched();
-
-    //! Emitted when a disparity map has been reprojected to a point cloud
-    void reprojected();
-
-    //! Emitted when a camera has captured an image, typically used in sub-classes
-    void captured();
-
-    //! Emitted when the left camera captures an image
-    void left_captured();
-
-    //! Emitted when the right camera captures an image
-    void right_captured();
-
-    //! Emitted when a stereo pair is processed
-    void stereopair_processed();
-
-    //! Emitted when the frame size of a camera changes
-    void update_size(int width, int height, int bitdepth);
-
-#ifdef CUDA
-    //! Emitted if the host system is found to have a CUDA-capable graphics card installed
-    void haveCuda();
-#endif
-    //! Indicates the internal temperature of the camera in Celcius
-    void temperature_C(double);
-
-    void stereo_grab();
-
-    void stereopair_captured();
-
 public:
-    explicit AbstractStereoCamera(QObject *parent = nullptr);
 
-    AbstractStereoMatcher *matcher = nullptr;
+    //! Enum defined errors. This defines the type of error that occured.
+    enum StereoCameraError { CONNECT_ERROR, CAPTURE_ERROR, TIMEOUT_ERROR, RECTIFY_ERROR, MATCH_ERROR };
+    //! Enum defined camera type. This defines the type of camera being used.
+    enum StereoCameraType { CAMERA_TYPE_DEIMOS, CAMERA_TYPE_USB, CAMERA_TYPE_BASLER_GIGE,
+                            CAMERA_TYPE_BASLER_USB, CAMERA_TYPE_TIS, CAMERA_TYPE_VIMBA, CAMERA_TYPE_INVALID };
 
-    const static std::string CAMERA_TYPE_DEIMOS;
-    const static std::string CAMERA_TYPE_USB;
-    const static std::string CAMERA_TYPE_BASLER_GIGE;
-    const static std::string CAMERA_TYPE_BASLER_USB;
-    const static std::string CAMERA_TYPE_TIS;
-    const static std::string CAMERA_TYPE_VIMBA;
+    enum StereoCalibrationType { CALIBRATION_TYPE_YAML, CALIBRATION_TYPE_XML };
 
-    virtual void toggleAutoExpose(bool) = 0;
-    virtual void adjustExposure(double) = 0;
-
-    virtual void toggleAutoGain(bool) = 0;
-    virtual void adjustGain(int) = 0;
-
-    virtual void adjustBinning(int) = 0;
-
-    virtual void toggleTrigger(bool) = 0;
-    virtual void adjustFPS(int) = 0;
-
-    virtual void adjustPacketSize(int) = 0;
-
-    float downsample_factor = 1;
-
-    struct stereoCameraSerialInfo {
-        std::string left_camera_serial;
-        std::string right_camera_serial;
-        std::string camera_type; // type of camera: CAMERA_TYPE_DEIMOS/CAMERA_TYPE_BASLER/CAMERA_TYPE_TIS
-        std::string i3dr_serial; // defined i3dr serial for camera pair
-        std::string filename; // filename for video [only used for stereoCameraFromVideo]
-    };
-
-    struct stereoCameraSettings {
+    //! Structure to hold camera settings
+    struct StereoCameraSettings {
         double exposure;
         int gain;
         int fps;
@@ -150,41 +91,65 @@ public:
         int packetSize;
     };
 
-    stereoCameraSerialInfo camera_serial_info;
+    //! Structure to hold stereo camera information
+    struct StereoCameraSerialInfo {
+        std::string left_camera_serial;
+        std::string right_camera_serial;
+        StereoCameraType camera_type; // type of camera
+        std::string i3dr_serial; // defined i3dr serial for camera pair
+        std::string filename; // filename for video [only used for stereoCameraFromVideo]
+    };
+
+    explicit AbstractStereoCamera(StereoCameraSerialInfo serial_info,
+                                  StereoCameraSettings camera_settings,
+                                  QObject *parent = 0);
+
+    ~AbstractStereoCamera(void);
+
+    AbstractStereoMatcher *matcher = nullptr;
+
+    //! Convert between stereo camera type enum and string
+    static std::string StereoCameraType2String(StereoCameraType camera_type);
+    //! Convert between string and camera type enum
+    static StereoCameraType String2StereoCameraType(std::string camera_type);
+
+    StereoCameraSerialInfo getCameraSerialInfo(){return stereoCameraSerialInfo_;}
+
+    StereoCameraSettings getCameraSettings(){return stereoCameraSettings_;}
+
+    //! List avaiable stereo camera systems
+    /*! This function should be implmented by a particular camera driver to only return camera of that type */
+    static std::vector<StereoCameraSerialInfo> listSystems(void) {
+        std::vector<StereoCameraSerialInfo> empty_list;
+        return empty_list;
+    };
 
     //! Load known camera serials
     /*!
-  * @param[in] camera_type Camera type of serials to read (usb/basler/tis)
-  * @param[in] filename Camera serials parameter file (default is: camera_serials.ini)
-  */
-    std::vector<stereoCameraSerialInfo> loadSerials(std::string camera_type, std::string filename=qApp->applicationDirPath().toStdString() + "/camera_serials.ini");
-
-    bool connected = false;
-
-    virtual bool initCamera(stereoCameraSerialInfo,stereoCameraSettings) = 0;
+    * @param[in] camera_type Camera type of serials to read (usb/basler/tis)
+    * @param[in] filename Camera serials parameter file (default is: camera_serials.ini)
+    */
+    static std::vector<StereoCameraSerialInfo> loadSerials(StereoCameraType camera_type, std::string filename=qApp->applicationDirPath().toStdString() + "/camera_serials.ini");
 
     //! Assign the stereo camera object to a thread so as not to block the GUI. Typically called just after instantiation.
-    /*!
-    @param[in] thread Pointer to thread
-  */
     void assignThread(QThread *thread);
 
-    void finishThread();
+    void stopThread();
 
-    //! Returns whether the camera is currently capturing or processing a frame
+    //! Returns weather camera image capture is enabled
     bool isCapturing();
-
-    //! Returns whether the camera is currently acquiring images (in general)
-    bool isAcquiring();
-
-    //! Returns whether the video is currently storing frames. Can be used to check if video has closed
-    bool isCapturingVideo();
 
     //! Returns whether matching is enabled
     bool isMatching();
 
     //! Returns whether rectification is being performed
     bool isRectifying();
+
+    //! Returns wheather video saving is being performed
+    bool isCapturingVideo() { return capturing_video; };
+
+    //! Returns wheather video saving rectified or non recitifed images
+    bool isCapturingRectifiedVideo() { return capturing_rectified_video; };
 
     //! Returns whether left and right images are being swapped
     bool isSwappingLeftRight();
@@ -260,11 +225,11 @@ public:
    * @sa setSavelocation(), videoStreamStop()
    * @param[out] fps The frame rate of the video recording
   */
-    bool videoStreamInit(QString filename = "", int fps = 0);
-    void videoStreamStop();
+    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = CV_FOURCC('H', '2', '6', '4'), bool is_color = false);
+    bool addVideoStreamFrame(cv::Mat left, cv::Mat right);
 
-    virtual ~AbstractStereoCamera(void) = 0;
-    virtual std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems(void) = 0;
+    bool connected = false;
+    float downsample_factor = 1;
 
     cv::Mat left_remapped;
     cv::Mat right_remapped;
@@ -276,7 +241,137 @@ public:
 
     cv::Mat stereo_reprojected;
 
+signals:
+    //! Emitted when stereo pair has been captured
+    void captured();
+
+    //! Emmited when captured successfully
+    void captured_success();
+
+    //! Emmited when capture failed
+    void captured_fail();
+
+    //! Emmited when first image stereo pair received
+    void first_image_ready(bool ready);
+
+    //! Emitted on error. Enum output for error type (See StereoCameraError enum for type of error)
+    void error(int error_index);
+
+    //! Emitted when stereo pair has been rectified
+    void rectified();
+
+    //! Emitted when an image has been matched
+    void matched();
+
+    //! Emitted when a disparity map has been reprojected to a point cloud
+    void reprojected();
+
+    //! Emitted when a stereo pair is processed
+    void stereopair_processed();
+
+    //! Emitted after a frame has been processed to indicate the process time (fps = 1000/frametime)
+    void frametime(qint64 time);
+
+    //! Emitted after a frame has been processed to indicates the current frame count
+    void framecount(qint64 count);
+
+    //! Emitted when the frame size of a camera changes
+    void update_size(int width, int height, int bitdepth);
+
+    //! Emitted when an image has been saved
+    void savedImage();
+
+    //! Emitted when an image has been saved, including the filename
+    void savedImage(QString filename);
+
+    //! Emmitted when point cloud is saved
+    void pointCloudSaveStatus(QString);
+
+    //! Indicates that the camera has disconnected
+    void disconnected();
+
+    //! Indicates close of class for closing threads
+    void finished();
+
 public slots:
+
+    //! Capture an image
+    /*! Trigger the capture of a single image
+    * @return True if an image was captured successfully, false otherwise
+    * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool captureSingle() = 0;
+
+    //! Capture a frame in continuous capture mode
+    /*! Trigger the capture of a frame in continous capture mode
+    * @return True if an image was captured successfully, false otherwise
+    * This is a virtual function which should be implmented by a particular camera driver */
+    //virtual bool captureContinuous() = 0;
+
+    //! Enable/disable camera image capture
+    /*! Start and stop image capture from the camera (in thread)
+     * @return Return success or failer of starting/stoping image capture
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool enableCapture(bool enable) = 0;
+
+    //! Open camera
+    /*! Start connection to camera
+     * This should only initalise the camera not start capturing. E.g. Start 3rd_party api's and setup default camera settings.
+     * @return Return success or failer of closing the camera connection
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool openCamera(void) = 0;
+
+    //! Close camera
+    /*! Safely stop capture and disconnect the camera
+     * @return Return success or failer of closing the camera connection
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool closeCamera(void) = 0;
+
+    //! Enable/disable camera auto exposure
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool enableAutoExposure(bool) = 0;
+
+    //! Adjust camera exposure
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool setExposure(double) = 0;
+
+    //! Enable/disable camera auto gain
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool enableAutoGain(bool) = 0;
+
+    //! Adjust camera gain
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool setGain(int) = 0;
+
+    //! Adjust camera binning
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool setBinning(int) = 0;
+
+    //! Enable/disable camera hardware trigger (disabled = software trigger)
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool enableTrigger(bool) = 0;
+
+    //! Adjust camera FPS
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool setFPS(int) = 0;
+
+    //! Adjust camera packet size (GigE cameras only but defined here for access)
+    /*! @return Return sucess or failer of changing the setting
+     * This is a virtual function which should be implmented by a particular camera driver */
+    virtual bool setPacketSize(int) = 0;
+
+    bool startCapture(){return enableCapture(true);};
+    bool stopCapture(){return enableCapture(false);};
+
+    bool enableVideoStream(bool enable);
+    bool startVideoStream(){return enableVideoStream(false);}
+    bool stopVideoStream(){return enableVideoStream(false);}
 
     void setMatcher(AbstractStereoMatcher *matcher);
 
@@ -284,54 +379,46 @@ public slots:
     /*!
     @param[in] directory The folder too check.
     @return True or false, depending on whether the parameters are valid.
-  */
-    bool loadCalibration(QString directory);
+    */
+    bool loadCalibration(QString directory, StereoCalibrationType cal_type){
+        if (directory == "") return false;
+        bool res;
+        if (cal_type == CALIBRATION_TYPE_XML){
+            res = loadCalibrationXML(directory);
+        } else if (cal_type == CALIBRATION_TYPE_YAML){
+            res = loadCalibrationYaml(directory);
+        } else {
+            return false;
+        }
 
-    //! Acquire a single frame from the camera and then pause
-    void singleShot(void);
+        //TODO: scale calibration by downsample factor
 
-    //! Place the camera in freerun mode (continuous acquisition
-    void freerun(void);
+        enableRectify(res);
+        calibration_valid = res;
 
-    //! Pause the camera (note this may not actually pause acquisition, but halts frame requests)
-    void pause();
+        return res;
+    }
 
-    //! Capture an image
-    /*!
-   * This is a virtual function which should be implmented by a particular camera driver.
-   *
-   * @return True if an image was captured successfully, false otherwise
-  */
-    virtual bool capture(void) = 0;
+    bool loadCalibrationYaml(QString directory);
 
-    //! Disconnect camera
-    /*!
-   * This is a virtual function which should be implmented by a particular camera driver to close
-   * the connection to the camera/s
-  */
-    virtual void disconnectCamera(void) = 0;
+    bool loadCalibrationXML(QString directory);
 
     //! Save an image from the camera with a timestamped filename
     /*!
-   *  The timestamp format is: yyyyMMdd_hhmmss_zzz (year, month, day, hour, minute, second, millisecond)
-   *
-   * @sa setSavelocation()
-  */
+    *  The timestamp format is: yyyyMMdd_hhmmss_zzz (year, month, day, hour, minute, second, millisecond)
+    *
+    * @sa setSavelocation()
+    */
     void saveImageTimestamped();
-
-    void videoStreamProcess(void);
-
-    //! Start or stop capturing an image
-    void enableCapture(bool capture);
-
-    //! Start or stop capturing images
-    void enableAcquire(bool acquire);
 
     //! Enable or disable stereo matching
     void enableMatching(bool match);
 
     //! Enable or disable image rectification
     void enableRectify(bool rectify);
+
+    //! Enable or disable saving rectified images in video capture
+    void enableCaptureRectifedVideo(bool rectify);
 
     //! Emable or disable disparity map reprojection to 3D
     void enableReproject(bool reproject);
@@ -347,7 +434,7 @@ public slots:
     void enableSaveDisparity(bool enable);
 
     //! Change downsample factor
-    void changeDownsampleFactor(int factor);
+    void setDownsampleFactor(int factor);
 
     //! Set the point cloud clipping distance closest to the camera (i.e. specify the closest distance to display)
     /*!
@@ -362,7 +449,7 @@ public slots:
     void setVisualZmax(double zmax);
 
     //! Toggle saving date in filename
-    void toggleDateInFilename(int state);
+    void enableDateInFilename(bool enable);
 
     //! Save the current 3D reconstruction to a .PLY file
     void savePointCloud();
@@ -382,43 +469,43 @@ public slots:
     }
 
 private slots:
-    void register_stereo_capture(void);
-    void try_capture();
-    void capture_and_process();
 
     //! Grab and process a frame from the camera
     /*!
-    * This will perform an image capture, followed by optional rectification, matching and reprojection
+    * This will perform an rectification, matching and reprojection if enabled.
     * @sa enableRectify(), enableMatching(), enableReproject()
+    * Should be triggered after a image capture event
     */
-    void process_stereo(void);
+    void processStereo(void);
+
+    void imageSaved(bool);
+
+    void resetFailFrameCount(void){
+        failed_frames = 0;
+    }
 
 private:
     qint64 frames = 0;
 
-    //QThread *m_thread;
-
     bool includeDateInFilename = false;
-    bool acquiring = false;
     bool matching = false;
     bool rectifying = false;
+    bool capturing_video = false;
+    bool capturing_rectified_video = true;
     bool swappingLeftRight = false;
     bool reprojecting = false;
-    bool has_cuda = false;
+    bool cuda_device_found = false;
     bool downsamplingCalibration = true;
     bool savingDisparity = true;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloud;
     QString save_directory = ".";
 
-    bool captured_left = false;
-    bool captured_right = false;
-
-    cv::Mat video_frame;
+    QString file_save_directory = "";
 
     cv::VideoWriter *cv_video_writer;
 
-    //! Block until a capture has finished
-    void finishCapture(void);
+    //! Block until a steroe processing has finished
+    void stereo_process_finished(void);
 
     //! Save an image
     /*!
@@ -432,7 +519,9 @@ private:
   * @param[in] src_r Right image rectification map file
   * @return true/false whether the file was loaded successfully
   */
-    bool loadRectificationMaps(QString src_l, QString src_r);
+    bool loadXMLRectificationMaps(QString src_l, QString src_r);
+
+    void generateRectificationMaps(cv::Size image_size);
 
     //! Load camera intrinsic/extinrisc calibration files
     /*!
@@ -441,14 +530,16 @@ private:
   * @param[in] stereo_cal Stereo camera calibration parameter file
   * @return true/false whether the filse were loaded successfully
   */
-    bool loadCalibration(QString left_cal, QString right_cal,
+    bool loadCalibrationXMLFiles(QString left_cal, QString right_cal,
                          QString stereo_cal);
+
+    bool loadCalibrationYamlFiles(QString left_cal, QString right_cal);
 
     //! Rectify the current stereo image pair
     /*!
   * Note this will update the image matrices: #left_remapped and #right_remapped
   */
-    void rectifyImages(void);
+    bool rectifyImages(void);
 
     //! Wrapper around OpenCV rectify function for paralell calls.
     /*!
@@ -483,12 +574,29 @@ private:
     cv::Mat l_camera_matrix;
     cv::Mat l_dist_coeffs;
     cv::Mat r_dist_coeffs;
+    cv::Mat r_rect_mat;
+    cv::Mat l_rect_mat;
+    cv::Mat r_proj_mat;
+    cv::Mat l_proj_mat;
+
+    int cal_image_width;
+    int cal_image_height;
+
+    int video_fps = 0;
+    int video_codec = CV_FOURCC('H', '2', '6', '4');
+    bool video_is_color = false;
+    std::string video_filename = "";
+    cv::Mat video_frame;
 
     cv::Mat left_output;
     cv::Mat right_output;
 
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 5;
+
+    //TODO replace with frame timeout timer
+    int max_failed_frames = 5;
+    int failed_frames = 0;
 
 protected:
 
@@ -497,32 +605,30 @@ protected:
     int image_height = 0;
     int image_bitdepth = 1;
 
+    StereoCameraSettings stereoCameraSettings_;
+    StereoCameraSerialInfo stereoCameraSerialInfo_;
+
     QElapsedTimer frametimer;
 
     bool rectification_valid = false;
     bool calibration_valid = false;
     bool captured_stereo = false;
+    bool first_image_received = false;
     bool capturing = false;
 
-    int grab_fail_count = 0;
+    QThread *thread_;
 
-protected slots:
-    void register_right_capture(void);
-    void register_left_capture(void);
-
+    //! Convert from enum to int for sending error signal
+    void send_error(StereoCameraError stereo_error){
+        if (stereo_error == CAPTURE_ERROR){
+            failed_frames += 1;
+            if (failed_frames > max_failed_frames){
+                send_error(TIMEOUT_ERROR);
+            }
+        }
+        int error_index = stereo_error;
+        emit error(error_index);
+    }
 };
-
-inline AbstractStereoCamera::~AbstractStereoCamera() { emit finished(); }
-
-//! Wrapper around cv::imwrite for saving in parallel
-/*!
-* Saves an image, can also be called sequentially.
-*
-* @param[in] fname Output filename
-* @param[in] src Image matrix
-*
-* @return True/false if the write was successful
-*/
-bool write_parallel(std::string fname, cv::Mat src);
 
 #endif  // ABSTRACTSTEREOCAMERA_H

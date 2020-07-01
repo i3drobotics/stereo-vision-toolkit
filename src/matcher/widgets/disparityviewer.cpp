@@ -10,42 +10,16 @@ DisparityViewer::DisparityViewer(QWidget *parent)
     : QWidget(parent), ui(new Ui::DisparityViewer) {
     ui->setupUi(this);
 
-    /*
-  connect(ui->disparityRangeSpinbox, SIGNAL(valueChanged(int)),
-          this, SLOT(updateDisparityRange_spin(int)));
-  connect(ui->disparityRangeSlider, SIGNAL(sliderMoved(int)),
-          this, SLOT(updateDisparityRange_slide(int)));
-
-  connect(ui->minDisparitySlider, SIGNAL(sliderMoved(int)),
-          ui->minDisparitySpinbox, SLOT(setValue(int)));
-
-  connect(ui->minDisparitySpinbox, SIGNAL(valueChanged(int)),
-          ui->minDisparitySlider, SLOT(setValue(int)));
-
-  connect(ui->minDisparitySlider, SIGNAL(sliderMoved(int)), this,
-          SLOT(updatePixmapRange()));
-
-  connect(ui->minDisparitySpinbox, SIGNAL(valueChanged(int)), this,
-          SLOT(updatePixmapRange()));
-          */
-
     connect(ui->colourmapComboBox, SIGNAL(currentIndexChanged(int)), this,
             SLOT(setColourmap(int)));
 
     connect(ui->checkBoxSaveDisparity, SIGNAL(checked(bool)), this, SLOT(saveDisparityChanged(bool)));
 
     ui->colourmapComboBox->setCurrentIndex(colourmap);
-
-    /*
-  ui->disparityRangeSpinbox->setValue(disparity_range);
-  ui->disparityRangeSlider->setValue(disparity_range);
-  ui->minDisparitySlider->setValue(min_disparity);
-  ui->minDisparitySpinbox->setValue(min_disparity);
-  */
 }
 
 void DisparityViewer::saveDisparityChanged(bool enable){
-    emit toggledDisparitySave(enable);
+    emit disparitySaveCheckChanged(enable);
 }
 
 void DisparityViewer::assignThread(QThread *thread) {
@@ -54,26 +28,6 @@ void DisparityViewer::assignThread(QThread *thread) {
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
-}
-
-void DisparityViewer::saveImageTimestamped(void) {
-    QString fname;
-    QDateTime dateTime = dateTime.currentDateTime();
-    QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-
-    fname = QString("%1/%2").arg(save_directory).arg(date_string);
-
-    saveImage(fname);
-}
-
-void DisparityViewer::saveImage(QString fname) {
-    if (!colour_disparity.empty()){
-        QFuture<void> res_l = QtConcurrent::run(
-                    write_parallel, fname.toStdString() + "_disp_colourmap.png", colour_disparity);
-
-        res_l.waitForFinished();
-    }
-    emit savedImage(fname);
 }
 
 /*
@@ -309,16 +263,6 @@ void DisparityViewer::updateDisparity() {
 
     processing_disparity = false;
 }
-/*
-bool write_parallel(std::string fname, cv::Mat src) {
-  std::vector<int> params;
-  int compression_level = 9;
-  params.push_back(cv::IMWRITE_PNG_COMPRESSION);
-  params.push_back(compression_level);
-
-  return cv::imwrite(fname, src, params);
-}
-*/
 
 DisparityViewer::~DisparityViewer() {
     delete ui;

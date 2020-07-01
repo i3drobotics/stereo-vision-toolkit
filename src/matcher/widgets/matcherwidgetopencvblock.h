@@ -10,14 +10,14 @@
 #include <matcheropencvblock.h>
 #include <opencv2/opencv.hpp>
 
+namespace Ui {
+class MatcherWidgetOpenCVBlock;
+}
+
 //!  OpenCV's Block Matcher QT Widget
 /*!
   QT widget for OpenCV's Block Matcher controls
 */
-
-namespace Ui {
-class MatcherWidgetOpenCVBlock;
-}
 
 class MatcherWidgetOpenCVBlock : public MatcherWidget {
   Q_OBJECT

@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #ifndef STEREOCAMERATIS_H
 #define STEREOCAMERATIS_H
 
@@ -10,50 +15,57 @@
   Control of Imaging Source stereo pair and generation of 3D
 */
 
-class StereoCameraTIS : public AbstractStereoCamera
+class StereoCameraTIS   : public AbstractStereoCamera
 {
-
 Q_OBJECT
 
+public:
+
+    explicit StereoCameraTIS (AbstractStereoCamera::StereoCameraSerialInfo serial_info,
+                                AbstractStereoCamera::StereoCameraSettings camera_settings,
+                                QObject *parent = 0) :
+                AbstractStereoCamera(serial_info, camera_settings, parent){
+    }
+
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystemsQuick(DShowLib::Grabber* handle);
+
+    ~StereoCameraTIS(void);
+
 signals:
+    void stereo_grab();
     void start_capture();
-    void stereopair_captured();
+    void stop_capture();
 
 public slots:
+    // Implimentations of virtual functions from parent class
+    bool openCamera();
+    bool closeCamera();
+    bool captureSingle();
+    bool enableCapture(bool enable);
+    bool setFPS(int fps);
+    bool setExposure(double exposure);
+    bool enableAutoExposure(bool enable);
+    bool setPacketSize(int){return false;} //NA
+    bool setPacketDelay(int){return false;} //NA
+    bool enableTrigger(bool enable);
+    bool enableAutoGain(bool enable);
+    bool setGain(int gain);
+    bool setBinning(int) {return false;} //NA
+
+    void captureThreaded();
     void loadLeftSettings();
     void loadRightSettings();
-    void enableTrigger(bool enable);
-    void setExposure(double exposure);
-    void setGain(int gain);
-    void enableAutoExpose(bool enable);
-    void enableAutoGain(bool enable);
-    void changeFPS(int fps);
     void leftGrabFailed();
     void rightGrabFailed();
     void leftCaptured();
     void rightCaptured();
 
-public:
-    explicit StereoCameraTIS(QObject *parent = 0) :
-                AbstractStereoCamera(parent)
-                {}
-    bool capture();
-    void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
-    bool setCameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings, CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    void toggleAutoExpose(bool enable);
-    void adjustExposure(double exposure);
-    void toggleAutoGain(bool enable);
-    void adjustGain(int gain);
-    void adjustBinning(int){}; //TODO create binning setting function
-    void toggleTrigger(bool enable);
-    void adjustFPS(int fps);
-    void adjustPacketSize(int){}
-
-    ~StereoCameraTIS(void);
-
 private:
+    bool setCameras(AbstractStereoCamera::StereoCameraSettings inital_camera_settings, CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right);
+
+    void checkStereoCapture();
+
     CameraImagingSource *left_camera;
     CameraImagingSource *right_camera;
 
@@ -67,10 +79,15 @@ private:
     QList<int> widths;
     QList<int> heights;
 
-    bool grab_success_l = true;
-    bool grab_success_r = true;
+    bool grab_success_l = false;
+    bool grab_success_r = false;
 
-    void setup_cameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
+    bool grab_finish_l = false;
+    bool grab_finish_r = false;
+
+    void setup_cameras(AbstractStereoCamera::StereoCameraSettings inital_camera_settings);
+
+    QFuture<void> future;
 };
 
-#endif // STEREOCAMERATIS_H
+#endif // STEREOCAMERAOPENCV_H

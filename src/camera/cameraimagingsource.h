@@ -15,6 +15,11 @@
 #include <iostream>
 #include <string>
 
+//!  Imaging source listener
+/*!
+  Grabber listener of imaging source camera
+  TODO: Replace this with callback https://www.theimagingsource.com/support/documentation/ic-imaging-control-cpp/Callback.htm
+*/
 class Listener : public QObject, public DShowLib::GrabberListener {
   Q_OBJECT
  signals:
@@ -26,34 +31,25 @@ class Listener : public QObject, public DShowLib::GrabberListener {
   void frameTime(uint);
 
  private:
-  QString saveFolder = ".";
-  QString suffix = "";
-  QString folderLabel = "stereo";
-  bool save_files = false;
   bool need_grab = false;
   void* output_buffer = nullptr;
   QElapsedTimer timer;
 
  public slots:
-  void enableSave(bool enable) { save_files = enable; }
 
   void requestGrab() { need_grab = true; }
 
-  void setSuffix(QString text) { suffix = text; }
-
   void setOutputBuffer(void* buffer){ output_buffer = buffer;}
-
-  void setSaveFolder(QString folder, QString label) { saveFolder = folder; folderLabel = label;}
 
  public:
   explicit Listener(QObject* parent = 0) : QObject(parent) {}
   ~Listener(void) {}
 
-  void deviceLost(DShowLib::Grabber& /* caller */){
+  void deviceLost(DShowLib::Grabber& ){
     emit deviceDisconnected();
   }
 
-  void frameReady(DShowLib::Grabber& /* caller */,
+  void frameReady(DShowLib::Grabber& ,
                   smart_ptr<DShowLib::MemBuffer> pBuffer, DWORD FrameNumber) {
     pBuffer->lock();
 
@@ -63,30 +59,7 @@ class Listener : public QObject, public DShowLib::GrabberListener {
 
     emit grabbed((void*) frame_data);
 
-    if (need_grab || save_files) {
-      QDateTime timestamp(QDateTime::currentDateTime());
-      QString fname;
-      QString subfolder;
-
-      subfolder = QString("%1/%2/%3/%4/%5")
-                      .arg(saveFolder)
-                      .arg(timestamp.toString("yyyyMMdd"))
-                      .arg(timestamp.toString("hh"))
-                      .arg(folderLabel)
-                      .arg(suffix);
-
-      QDir dir(subfolder);
-      if (!dir.exists()) {
-        dir.mkpath(".");
-      }
-
-      fname = QString("%1/%2_%3.tiff")
-                  .arg(subfolder)
-                  .arg(timestamp.toString("yyyyMMdd.hh.mm.ss.zzz"))
-                  .arg(suffix);
-
-      DShowLib::saveToFileTIFF(*pBuffer.get(), fname.toStdString());
-
+    if (need_grab) {
       need_grab = false;
     }
 
@@ -99,6 +72,10 @@ class Listener : public QObject, public DShowLib::GrabberListener {
   }
 };
 
+//!  Camera imaging source
+/*!
+  Control and capture of imaging source camera
+*/
 class CameraImagingSource : public QObject {
   Q_OBJECT
  public:
@@ -115,12 +92,8 @@ class CameraImagingSource : public QObject {
   char* estring;
 
   double frameRate = -1;
-  double temperature = 0;
 
   DShowLib::Grabber handle;
-
-  bool saveFull = false;
-  bool saveEncoded = false;
 
   void enableAutoExposure(bool enable);
   void enableAutoGain(bool enable);
@@ -132,7 +105,6 @@ class CameraImagingSource : public QObject {
   int result = -1;
   int bitDepth = -1;
   int colourMode = -1;
-  bool capturing = false;
 
   int imageBufferID = 0;
   QTimer* timer = nullptr;
@@ -164,6 +136,7 @@ class CameraImagingSource : public QObject {
 
  public slots:
   void grabImage(void);
+  void grabSingle(void);
   void startCapture(void);
   void stopCapture(void);
   void setup(int width, int height, int fps = -1);
@@ -174,9 +147,6 @@ class CameraImagingSource : public QObject {
 
   void setFrameRate(double);
   double getFrameRate(void);
-
-  void saveFrame(QString);
-  void saveBitmap(QString fname);
 
   double getExposure();
 
