@@ -47,8 +47,8 @@ class AbstractStereoMatcher : public QObject {
  public slots:
    //!  Set images for matching
    /*!
-   * @param[in] left Left image
-   * @param[in] right Right image
+   * \param left Left image
+   * \param right Right image
    */
   void setImages(cv::Mat* left, cv::Mat* right);
 

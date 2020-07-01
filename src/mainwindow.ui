@@ -59,14 +59,14 @@
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <property name="sizeConstraint">
        <enum>QLayout::SetMinimumSize</enum>
       </property>
       <item>
-       <widget class="QPushButton" name="pauseButton">
+       <widget class="QPushButton" name="captureButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
@@ -102,6 +102,9 @@
           <width>25</width>
           <height>25</height>
          </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -239,6 +242,9 @@
           <height>25</height>
          </size>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -289,7 +295,7 @@
       </item>
      </layout>
     </item>
-    <item row="1" column="0">
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1">
       <property name="topMargin">
        <number>0</number>
@@ -346,7 +352,7 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>320</width>
+             <width>340</width>
              <height>0</height>
             </size>
            </property>
@@ -365,53 +371,149 @@
             </attribute>
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="0" column="0">
-              <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+              <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,0">
+               <property name="bottomMargin">
+                <number>5</number>
+               </property>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
-                 <item>
-                  <widget class="QPushButton" name="btnRefreshCameras">
-                   <property name="text">
-                    <string>Refresh List</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Connect to camera from the list below</string>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>false</bool>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                 <property name="margin">
+                  <number>2</number>
+                 </property>
+                </widget>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="layoutCameraList">
-                 <item>
-                  <layout class="QGridLayout" name="gridLayoutCameraList"/>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="lblNoCameras">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>No cameras found</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_2">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
+                <widget class="QPushButton" name="btnRefreshCameras">
+                 <property name="text">
+                  <string>Refresh List</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Or load a stereo video using 'Load Video' button</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnLoadVideo">
+                 <property name="text">
+                  <string>Load Video</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QScrollArea" name="scrollArea">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>400</height>
+                  </size>
+                 </property>
+                 <property name="verticalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAsNeeded</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="widgetResizable">
+                  <bool>true</bool>
+                 </property>
+                 <widget class="QWidget" name="layoutCameraList">
+                  <property name="geometry">
+                   <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>310</width>
+                    <height>193</height>
+                   </rect>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                   <item>
+                    <widget class="QLabel" name="lblNoCameras">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>No cameras found</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QGridLayout" name="gridLayoutCameraList">
+                     <property name="bottomMargin">
+                      <number>10</number>
+                     </property>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_2">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="lblLoadCalibration">
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load stereo calibration from xml or yaml files. &lt;br/&gt;Create these calibration files using the tools in the calibration menu.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnLoadCalibration">
+                 <property name="text">
+                  <string>Load Calibration</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </item>
@@ -423,7 +525,7 @@
             </attribute>
             <layout class="QHBoxLayout" name="horizontalLayout_6">
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0">
+              <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0">
                <property name="topMargin">
                 <number>0</number>
                </property>
@@ -431,7 +533,26 @@
                 <number>0</number>
                </property>
                <item>
-                <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,1,1" columnminimumwidth="0,0,0">
+                <widget class="QLabel" name="label_5">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change camera device settings below. &lt;br&gt;Some settings cannot be updated while the camera is capturing. Press the pause button to enable these settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                 <property name="margin">
+                  <number>3</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0">
                  <property name="sizeConstraint">
                   <enum>QLayout::SetDefaultConstraint</enum>
                  </property>
@@ -450,7 +571,55 @@
                  <property name="verticalSpacing">
                   <number>5</number>
                  </property>
-                 <item row="2" column="1">
+                 <item row="2" column="2">
+                  <widget class="QCheckBox" name="autoExposeCheck">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Auto</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="9" column="0">
+                  <spacer name="horizontalSpacer_6">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="3" column="1">
+                  <widget class="QSpinBox" name="gainSpinBox">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
                   <widget class="QSpinBox" name="fpsSpinBox">
                    <property name="enabled">
                     <bool>false</bool>
@@ -484,21 +653,30 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="7" column="1">
-                  <spacer name="horizontalSpacer_7">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="lblGain">
+                   <property name="minimumSize">
                     <size>
-                     <width>40</width>
-                     <height>20</height>
+                     <width>0</width>
+                     <height>0</height>
                     </size>
                    </property>
-                  </spacer>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Gain</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="1" column="1">
-                  <widget class="QSpinBox" name="gainSpinBox">
+                 <item row="7" column="1">
+                  <widget class="QSpinBox" name="packetDelaySpinBox">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
@@ -508,9 +686,79 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="maximum">
+                    <number>10000</number>
+                   </property>
                   </widget>
                  </item>
-                 <item row="2" column="0">
+                 <item row="5" column="0">
+                  <widget class="QLabel" name="lblHDR">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>HDR</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="7" column="0">
+                  <widget class="QLabel" name="lblPacketDelay">
+                   <property name="toolTip">
+                    <string extracomment="Delay between right and left images for increased performance on slow connections"/>
+                   </property>
+                   <property name="text">
+                    <string>Packet Delay</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="8" column="0">
+                  <widget class="QLabel" name="lblPacketSize">
+                   <property name="text">
+                    <string>Packet Size</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="8" column="1">
+                  <widget class="QSpinBox" name="packetSizeSpinBox">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimum">
+                    <number>1500</number>
+                   </property>
+                   <property name="maximum">
+                    <number>9000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>4</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
                   <widget class="QLabel" name="lblFPS">
                    <property name="minimumSize">
                     <size>
@@ -532,8 +780,21 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="5" column="1">
-                  <widget class="QSpinBox" name="packetDelaySpinBox">
+                 <item row="9" column="2">
+                  <spacer name="horizontalSpacer_8">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="4" column="2">
+                  <widget class="QCheckBox" name="enabledTriggeredCheckbox">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
@@ -543,9 +804,40 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Trigger</string>
+                   </property>
                   </widget>
                  </item>
-                 <item row="4" column="1">
+                 <item row="5" column="1">
+                  <widget class="QCheckBox" name="enableHDRCheckbox">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Enable</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="1">
                   <widget class="QSpinBox" name="binningSpinBox">
                    <property name="enabled">
                     <bool>false</bool>
@@ -572,24 +864,33 @@
                     <number>1</number>
                    </property>
                    <property name="maximum">
-                    <number>3</number>
+                    <number>4</number>
                    </property>
                   </widget>
                  </item>
-                 <item row="7" column="0">
-                  <spacer name="horizontalSpacer_6">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
+                 <item row="6" column="0">
+                  <widget class="QLabel" name="lblBinning">
+                   <property name="minimumSize">
                     <size>
-                     <width>40</width>
-                     <height>20</height>
+                     <width>0</width>
+                     <height>0</height>
                     </size>
                    </property>
-                  </spacer>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Binning</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
                  </item>
-                 <item row="0" column="0">
+                 <item row="2" column="0">
                   <widget class="QLabel" name="lblExposure">
                    <property name="minimumSize">
                     <size>
@@ -611,51 +912,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="2">
-                  <widget class="QCheckBox" name="enabledTriggeredCheckbox">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Trigger</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="lblHDR">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>HDR</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
+                 <item row="3" column="2">
                   <widget class="QCheckBox" name="autoGainCheckBox">
                    <property name="enabled">
                     <bool>false</bool>
@@ -677,7 +934,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="1">
+                 <item row="2" column="1">
                   <widget class="QDoubleSpinBox" name="exposureSpinBox">
                    <property name="enabled">
                     <bool>false</bool>
@@ -716,37 +973,15 @@
                     <double>1000.000000000000000</double>
                    </property>
                    <property name="singleStep">
-                    <double>0.100000000000000</double>
+                    <double>0.250000000000000</double>
                    </property>
                    <property name="value">
                     <double>5.000000000000000</double>
                    </property>
                   </widget>
                  </item>
-                 <item row="4" column="2">
-                  <widget class="QCheckBox" name="binCheckBox">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Enable</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="7" column="2">
-                  <spacer name="horizontalSpacer_8">
+                 <item row="9" column="1">
+                  <spacer name="horizontalSpacer_7">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -757,127 +992,6 @@
                     </size>
                    </property>
                   </spacer>
-                 </item>
-                 <item row="6" column="1">
-                  <widget class="QSpinBox" name="packetSizeSpinBox">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="lblPacketSize">
-                   <property name="text">
-                    <string>Packet Size</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="lblGain">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Gain</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="lblBinning">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Binning</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="0">
-                  <widget class="QLabel" name="lblPacketDelay">
-                   <property name="text">
-                    <string>Packet Delay</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QCheckBox" name="enableHDRCheckbox">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Enable</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QCheckBox" name="autoExposeCheck">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Auto</string>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                </item>
@@ -1547,7 +1661,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionLoad_Video"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -1560,7 +1673,6 @@
     <property name="title">
      <string>Calibration</string>
     </property>
-    <addaction name="actionLoad_calibration"/>
     <addaction name="actionCalibration_wizard"/>
     <addaction name="actionCalibrate_from_images"/>
    </widget>
@@ -1579,11 +1691,6 @@
     <enum>Qt::LeftToRight</enum>
    </property>
   </widget>
-  <action name="actionLoad_calibration">
-   <property name="text">
-    <string>Load calibration</string>
-   </property>
-  </action>
   <action name="actionCalibration_wizard">
    <property name="enabled">
     <bool>false</bool>
@@ -1600,16 +1707,6 @@
   <action name="actionCalibrate_from_images">
    <property name="text">
     <string>Calibrate from images</string>
-   </property>
-  </action>
-  <action name="actionAutoload_Camera">
-   <property name="text">
-    <string>Change Device</string>
-   </property>
-  </action>
-  <action name="actionLoad_Video">
-   <property name="text">
-    <string>Load Video</string>
    </property>
   </action>
   <action name="actionDocumentation">

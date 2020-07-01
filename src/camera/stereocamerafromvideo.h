@@ -7,6 +7,7 @@
 #define STEREOCAMERAFROMVIDEO_H
 
 #include <abstractstereocamera.h>
+#include <QThread>
 
 //!  Stereo video feed
 /*!
@@ -15,39 +16,49 @@
 
 class StereoCameraFromVideo : public AbstractStereoCamera
 {
-
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    explicit StereoCameraFromVideo(QObject *parent = 0) :
-                AbstractStereoCamera(parent)
-                {}
-    bool capture();
-    void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    void toggleAutoExpose(bool){} //NA
-    void adjustExposure(double){} //NA
-    void toggleAutoGain(bool){} //NA
-    void adjustGain(int){} //NA
-    void adjustBinning(int){} //NA
-    void toggleTrigger(bool){} //NA
-    void adjustFPS(int val);
-    void adjustPacketSize(int){}
+
+    explicit StereoCameraFromVideo(AbstractStereoCamera::StereoCameraSerialInfo serial_info,
+                                AbstractStereoCamera::StereoCameraSettings camera_settings,
+                                QObject *parent = 0) :
+                AbstractStereoCamera(serial_info, camera_settings, parent){
+    }
+
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
+
+    ~StereoCameraFromVideo(void);
+
 public slots:
+    // Implimentations of virtual functions from parent class
+    bool openCamera();
+    bool closeCamera();
+    bool captureSingle();
+    bool enableCapture(bool enable);
+    bool setFPS(int fps);
+    bool setExposure(double){return false;} //NA
+    bool enableAutoExposure(bool){return false;} //NA
+    bool setPacketSize(int){return false;} //NA
+    bool setPacketDelay(int){return false;} //NA
+    bool enableTrigger(bool){return false;} //NA
+    bool enableAutoGain(bool){return false;} //NA
+    bool setGain(int){return false;} //NA
+    bool setBinning(int){return false;} //NA
+
+    void captureThreaded();
     void setPosition(int position);
-    bool enableAutoExpose(bool enable);
-private:
-    cv::VideoCapture stream;
-    cv::Mat image_buffer;
-    std::string stream_file;
-    bool stream_valid = false;
-    double number_frames;
-    QElapsedTimer frame_timer;
 
 signals:
     void videoPosition(int);
-};
 
+private:
+    QFuture<void> future;
+    cv::VideoCapture stream;
+    cv::Mat image_buffer;
+    double number_frames;
+    QElapsedTimer frame_timer;
+    double video_fps;
+};
 
 #endif // STEREOCAMERAFROMVIDEO_H

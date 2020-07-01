@@ -433,7 +433,6 @@ bool CameraBasler::capture(void)
                                 qDebug() << "cols: " << image.cols << " rows: " << image.rows;
                                 res = false;
                             } else {
-                                //emit captured();
                                 res = true;
                             }
                             pylonImage.Release();

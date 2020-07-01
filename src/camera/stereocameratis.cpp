@@ -1,30 +1,138 @@
+/*
+* Copyright I3D Robotics Ltd, 2017
+* Author: Josh Veitch-Michaelis
+*/
+
 #include "stereocameratis.h"
 
-bool StereoCameraTIS::initCamera(AbstractStereoCamera::stereoCameraSerialInfo camera_serial_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings){
-    //TODO use inital camera settings input
-
-    this->camera_serial_info = camera_serial_info;
+bool StereoCameraTIS::openCamera(){
+    if (isConnected()){
+        closeCamera();
+    }
     auto left_camera_tmp = new CameraImagingSource();
     auto right_camera_tmp = new CameraImagingSource();
 
-    std::string left_serial = camera_serial_info.left_camera_serial;
-    std::string right_serial = camera_serial_info.right_camera_serial;
+    std::string left_serial = stereoCameraSerialInfo_.left_camera_serial;
+    std::string right_serial = stereoCameraSerialInfo_.right_camera_serial;
 
     if (left_camera_tmp->open(left_serial) && right_camera_tmp->open(right_serial)) {
-        return setCameras(inital_camera_settings,left_camera_tmp,right_camera_tmp,new Listener(), new Listener());
+        connected = setCameras(stereoCameraSettings_,left_camera_tmp,right_camera_tmp,new Listener(), new Listener());
+        // TODO remove these when single capture works
+        left_camera->startCapture();
+        right_camera->startCapture();
     } else {
-        return false;
+        connected = false;
     }
+    return connected;
 }
 
-std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraTIS::listSystems(){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TIS);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> connected_serial_infos;
+bool StereoCameraTIS::closeCamera(){
+    if (connected){
+        // TODO remove this when single capture works
+        emit stop_capture();
+
+        disconnect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(leftCaptured()));
+        disconnect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(rightCaptured()));
+
+        disconnect(left_camera, SIGNAL(grabError()), this, SLOT(leftGrabFailed()));
+        disconnect(right_camera, SIGNAL(grabError()), this, SLOT(rightGrabFailed()));
+
+        disconnect(left_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
+        disconnect(right_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
+
+        disconnect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
+        disconnect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));
+
+        disconnect(this, SIGNAL(stop_capture(void)), left_camera, SLOT(stopCapture(void)));
+        disconnect(this, SIGNAL(stop_capture(void)), right_camera, SLOT(stopCapture(void)));
+
+        disconnect(this, SIGNAL(stereo_grab(void)), left_camera, SLOT(grabImage(void)));
+        disconnect(this, SIGNAL(stereo_grab(void)), right_camera, SLOT(grabImage(void)));
+
+        left_camera->close();
+        right_camera->close();
+    }
+    connected = false;
+
+    emit disconnected();
+    return false;
+}
+
+bool StereoCameraTIS::captureSingle(){
+    if (!capturing){
+        //TODO replace with single capture when it works
+        emit stereo_grab();
+    } else {
+        emit stereo_grab();
+    }
+    return true;
+}
+
+void StereoCameraTIS::captureThreaded(){
+    future = QtConcurrent::run(this, &StereoCameraTIS::captureSingle);
+}
+
+bool StereoCameraTIS::enableCapture(bool enable){
+    if (enable){
+        //Start capture thread
+        capturing = true;
+        //emit start_capture();
+        //left_camera->startCapture();
+        //right_camera->startCapture();
+        connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
+        captureThreaded();
+    } else {
+        //Stop capture thread
+        disconnect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
+        capturing = false;
+        //emit stop_capture();
+    }
+    return true;
+}
+
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTIS::listSystemsQuick(DShowLib::Grabber* handle){
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TIS);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
+
     /* Get number of cameras */
-    DShowLib::InitLibrary();
+    auto devices = handle->getAvailableVideoCaptureDevices();
+
+    for (auto& known_serial_info : known_serial_infos) {
+        bool left_found = false;
+        bool right_found = false;
+        qint64 left_serial;
+        qint64 right_serial;
+        //find left
+        for (auto& device : *devices) {
+            device.getSerialNumber(left_serial);
+            if (QString::number(left_serial).toStdString() == known_serial_info.left_camera_serial){
+                left_found = true;
+                break;
+            }
+        }
+        if (left_found){
+            //find right
+            for (auto& device : *devices) {
+                device.getSerialNumber(right_serial);
+                if (QString::number(right_serial).toStdString() == known_serial_info.right_camera_serial){
+                    right_found = true;
+                    break;
+                }
+            }
+        }
+        if (left_found && right_found){ //only add if both cameras found
+            connected_serial_infos.push_back(known_serial_info);
+        }
+    }
+    return connected_serial_infos;
+}
+
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTIS::listSystems(){
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TIS);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
 
     DShowLib::Grabber handle;
-
+    /* Get number of cameras */
     auto devices = handle.getAvailableVideoCaptureDevices();
 
     for (auto& known_serial_info : known_serial_infos) {
@@ -57,29 +165,16 @@ std::vector<AbstractStereoCamera::stereoCameraSerialInfo> StereoCameraTIS::listS
     return connected_serial_infos;
 }
 
-/*
-bool StereoCameraTIS::autoConnect(){
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> camera_serials = listSystems();
+bool StereoCameraTIS::setCameras(AbstractStereoCamera::StereoCameraSettings inital_camera_settings, CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right){
+    this->left_camera = camera_left;
+    this->right_camera = camera_right;
+    this->left_listener = listener_left;
+    this->right_listener = listener_right;
 
-    if (camera_serials.size() > 0){
+    setup_cameras(inital_camera_settings);
 
-        auto left_camera_tmp = new CameraImagingSource();
-        auto right_camera_tmp = new CameraImagingSource();
-
-        std::string left_serial = camera_serials.at(0).left_camera_serial;
-        std::string right_serial = camera_serials.at(0).right_camera_serial;
-
-        if (left_camera_tmp->open(left_serial) && right_camera_tmp->open(right_serial)) {
-            assert(left_camera_tmp->getSerial() == left_serial);
-            assert(right_camera_tmp->getSerial() == right_serial);
-
-            setCameras(left_camera_tmp, right_camera_tmp,new Listener(),new Listener());
-            return true;
-        }
-    }
-    return false;
+    return true;
 }
-*/
 
 QList<qint64> StereoCameraTIS::load_serials(QString filename) {
     QList<qint64> serials;
@@ -111,18 +206,7 @@ QList<qint64> StereoCameraTIS::load_serials(QString filename) {
     return serials;
 }
 
-bool StereoCameraTIS::setCameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings, CameraImagingSource *camera_left, CameraImagingSource *camera_right, Listener *listener_left, Listener *listener_right){
-    this->left_camera = camera_left;
-    this->right_camera = camera_right;
-    this->left_listener = listener_left;
-    this->right_listener = listener_right;
-
-    setup_cameras(inital_camera_settings);
-
-    return true;
-}
-
-void StereoCameraTIS::setup_cameras(AbstractStereoCamera::stereoCameraSettings inital_camera_settings){
+void StereoCameraTIS::setup_cameras(AbstractStereoCamera::StereoCameraSettings inital_camera_settings){
 
     QThread* left_camera_thread = new QThread();
     left_camera->assignThread(left_camera_thread);
@@ -179,54 +263,65 @@ void StereoCameraTIS::setup_cameras(AbstractStereoCamera::stereoCameraSettings i
     connect(left_camera, SIGNAL(grabError()), this, SLOT(leftGrabFailed()));
     connect(right_camera, SIGNAL(grabError()), this, SLOT(rightGrabFailed()));
 
+    connect(left_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
+    connect(right_listener, SIGNAL(deviceDisconnected(void)), this, SLOT(closeCamera(void)));
+
     connect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
     connect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));
+
+    connect(this, SIGNAL(stop_capture(void)), left_camera, SLOT(stopCapture(void)));
+    connect(this, SIGNAL(stop_capture(void)), right_camera, SLOT(stopCapture(void)));
 
     connect(this, SIGNAL(stereo_grab(void)), left_camera, SLOT(grabImage(void)));
     connect(this, SIGNAL(stereo_grab(void)), right_camera, SLOT(grabImage(void)));
 
-    left_camera->setTrigger(trigger);
-    right_camera->setTrigger(trigger);
-
-    left_camera->enableAutoExposure(autoExpose);
-    right_camera->enableAutoExposure(autoExpose);
-
-    left_camera->changeExposure(exposure);
-    right_camera->changeExposure(exposure);
-
-    left_camera->enableAutoGain(autoGain);
-    right_camera->enableAutoGain(autoGain);
-
-    left_camera->changeGain(gain);
-    right_camera->changeGain(gain);
+    enableTrigger(trigger);
+    enableAutoExposure(autoExpose);
+    setExposure(exposure);
+    enableAutoGain(autoGain);
+    setGain(gain);
 
     connected = true;
-
-    emit start_capture();
 }
 
 void StereoCameraTIS::leftGrabFailed(){
+    grab_finish_l = true;
     grab_success_l = false;
-    //connected = false;
-    emit register_left_capture();
-    //disconnectCamera();
+    checkStereoCapture();
 }
 
 void StereoCameraTIS::rightGrabFailed(){
+    grab_finish_r = true;
     grab_success_r = false;
-    //connected = false;
-    emit register_right_capture();
-    //disconnectCamera();
+    checkStereoCapture();
 }
 
 void StereoCameraTIS::leftCaptured(){
+    grab_finish_l = true;
     grab_success_l = true;
-    emit register_left_capture();
+    checkStereoCapture();
 }
 
 void StereoCameraTIS::rightCaptured(){
+    grab_finish_r = true;
     grab_success_r = true;
-    emit register_right_capture();
+    checkStereoCapture();
+}
+
+void StereoCameraTIS::checkStereoCapture(){
+    if (grab_finish_l && grab_finish_r){
+        if (grab_success_r && grab_success_l){
+            emit captured_success();
+        } else {
+            emit captured_fail();
+            send_error(CAPTURE_ERROR);
+        }
+        grab_finish_r = false;
+        grab_finish_l = false;
+        grab_success_r = false;
+        grab_success_l = false;
+        emit captured();
+    }
 }
 
 void StereoCameraTIS::loadLeftSettings(){
@@ -237,104 +332,51 @@ void StereoCameraTIS::loadRightSettings(){
     right_camera->showProperties();
 }
 
-void StereoCameraTIS::enableTrigger(bool enable){
-    if (connected){
-        left_camera->setTrigger(enable);
-        right_camera->setTrigger(enable);
-    }
+bool StereoCameraTIS::enableTrigger(bool enable){
+    left_camera->setTrigger(enable);
+    right_camera->setTrigger(enable);
+    return true;
 }
 
-void StereoCameraTIS::changeFPS(int fps){
-    left_camera->setFrameRate((double)fps);
-    right_camera->setFrameRate((double)fps);
-}
-
-void StereoCameraTIS::toggleTrigger(bool enable){
-    enableTrigger(enable);
-}
-void StereoCameraTIS::adjustFPS(int fps){
-    changeFPS(fps);
-}
-
-void StereoCameraTIS::toggleAutoExpose(bool enable){
-    enableAutoExpose(enable);
-}
-
-void StereoCameraTIS::enableAutoExpose(bool enable){
+bool StereoCameraTIS::enableAutoExposure(bool enable) {
     left_camera->enableAutoExposure(enable);
     right_camera->enableAutoExposure(enable);
+    return true;
 }
 
-void StereoCameraTIS::setExposure(double exposure){
-    left_camera->changeExposure(exposure);
-    right_camera->changeExposure(exposure);
-}
-
-void StereoCameraTIS::adjustExposure(double exposure){
-    setExposure(exposure);
-}
-
-void StereoCameraTIS::toggleAutoGain(bool enable){
-    enableAutoGain(enable);
-}
-
-void StereoCameraTIS::adjustGain(int gain){
-    setGain(gain);
-}
-
-void StereoCameraTIS::setGain(int gain) {
-    left_camera->changeGain(gain);
-    right_camera->changeGain(gain);
-}
-
-void StereoCameraTIS::enableAutoGain(bool enable){
+bool StereoCameraTIS::enableAutoGain(bool enable){
     left_camera->enableAutoGain(enable);
     right_camera->enableAutoGain(enable);
+    return true;
 }
 
-bool StereoCameraTIS::capture(){
+bool StereoCameraTIS::setGain(int gain) {
+    left_camera->changeGain(gain);
+    right_camera->changeGain(gain);
+    return true;
+}
 
-    frametimer.restart();
+bool StereoCameraTIS::setExposure(double exposure) {
+    left_camera->changeExposure(exposure);
+    right_camera->changeExposure(exposure);
+    return true;
+}
 
-    capturing = true;
-    captured_stereo = false;
-
-    /* Asynchronous grab */
-    emit stereo_grab();
-
-    capturing = false;
-
-    if (!grab_success_l || !grab_success_r){
-        emit register_right_capture();
-        emit register_left_capture();
+bool StereoCameraTIS::setFPS(int fps){
+    if (!isCapturing()){
+        double fps_d = fps;
+        left_camera->setFrameRate(fps_d);
+        right_camera->setFrameRate(fps_d);
+        frame_rate = fps;
+        return true;
+    } else {
+        qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";
+        return false;
     }
-
-    return grab_success_l && grab_success_r;
 }
 
-void StereoCameraTIS::disconnectCamera(){
+StereoCameraTIS::~StereoCameraTIS(void) {
     if (connected){
-        disconnect((Listener*) left_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(leftCaptured()));
-        disconnect((Listener*) right_camera->getListener(), SIGNAL(grabbed(void*)), this, SLOT(rightCaptured()));
-
-        disconnect(left_camera, SIGNAL(grabError()), this, SLOT(leftGrabFailed()));
-        disconnect(right_camera, SIGNAL(grabError()), this, SLOT(rightGrabFailed()));
-
-        disconnect(this, SIGNAL(start_capture(void)), left_camera, SLOT(startCapture(void)));
-        disconnect(this, SIGNAL(start_capture(void)), right_camera, SLOT(startCapture(void)));
-
-        disconnect(this, SIGNAL(stereo_grab(void)), left_camera, SLOT(grabImage(void)));
-        disconnect(this, SIGNAL(stereo_grab(void)), right_camera, SLOT(grabImage(void)));
-
-        //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-
-        left_camera->close();
-        right_camera->close();
+        closeCamera();
     }
-    connected = false;
-
-    emit disconnected();
-}
-
-StereoCameraTIS::~StereoCameraTIS(){
 }

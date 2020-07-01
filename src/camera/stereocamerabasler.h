@@ -3,14 +3,14 @@
 * Author: Ben Knight
 */
 
-
 #ifndef STEREOCAMERABASLER_H
 #define STEREOCAMERABASLER_H
 
-#include <opencv2/opencv.hpp>
 #include <abstractstereocamera.h>
+#include <opencv2/opencv.hpp>
 #include <pylon/PylonIncludes.h>
 #include "arduinocommscameracontrol.h"
+#include "pylonsupport.h"
 
 //!  Stereo balser cameras
 /*!
@@ -22,61 +22,50 @@ class StereoCameraBasler : public AbstractStereoCamera
 Q_OBJECT
 
 public:
-    explicit StereoCameraBasler(QObject *parent = 0) :
-                AbstractStereoCamera(parent)
-                {}
-    bool capture();
-    void disconnectCamera();
-    bool initCamera(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,AbstractStereoCamera::stereoCameraSettings inital_camera_settings);
-    std::vector<AbstractStereoCamera::stereoCameraSerialInfo> listSystems();
-    void toggleAutoExpose(bool enable);
-    void adjustExposure(double val);
-    void toggleAutoGain(bool enable);
-    void adjustGain(int val);
-    void adjustBinning(int val);
-    void adjustPacketSize(int val);
-    void toggleTrigger(bool enable);
+
+    explicit StereoCameraBasler(AbstractStereoCamera::StereoCameraSerialInfo serial_info,
+                                AbstractStereoCamera::StereoCameraSettings camera_settings,
+                                QObject *parent = 0) :
+                AbstractStereoCamera(serial_info, camera_settings, parent){
+        Pylon::PylonInitialize();
+    }
+
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
 
     ~StereoCameraBasler(void);
 
 public slots:
-    bool setExposure(double val);
-    bool setGain(int val);
-    void setPacketDelay(int val);
-    void adjustFPS(int val);
-    void changeFPS(int val);
-    void changeBinning(int val);
-    void changePacketSize(int val);
-    void enableTrigger(bool enable);
-    bool enableAutoExpose(bool enable);
-    bool enableAutoGain(bool enable);
+    // Implimentations of virtual functions from parent class
+    bool openCamera();
+    bool closeCamera();
+    bool captureSingle();
+    bool enableCapture(bool enable);
+    bool setFPS(int fps);
+    bool setExposure(double exposure);
+    bool enableAutoExposure(bool enable);
+    bool setPacketSize(int);
+    bool setPacketDelay(int);
+    bool enableTrigger(bool);
+    bool enableAutoGain(bool);
+    bool setGain(int);
+    bool setBinning(int);
+
+    void captureThreaded();
+    bool enableFPS(bool enable);
 
 private:
-
-    Pylon::CInstantCameraArray *cameras;
-    Pylon::CImageFormatConverter *formatConverter;
-    int m_binning;
-    int m_iTrigger;
-    int m_fps;
-    int m_packet_size;
-
-    //bool grab_success = true;
-
-    QFuture<bool> qfuture_capture;
+    QFuture<void> future;
 
     ArduinoCommsCameraControl* camControl;
 
-    void setBinning(int val);
-    void setPacketSize(int val);
-    void setFPS(int val);
-    void enableFPS(bool enable);
-    void setTrigger(bool enable);
+    bool hardware_triggered = false;
+
+    Pylon::CInstantCameraArray *cameras;
+    Pylon::CImageFormatConverter *formatConverter;
 
     bool grab();
-
-    bool setupCameras(AbstractStereoCamera::stereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps, int iPacketSize);
-
     void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth);
 };
 
 #endif //STEREOCAMERABASLER_H
+
