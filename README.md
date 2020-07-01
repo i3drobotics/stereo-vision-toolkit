@@ -9,7 +9,7 @@ I3DR's stereo vision toolkit is an application provided for testing of stereo ca
 
 You can calibrate stereo cameras, acquire images and perform matching and 3D reconstruction. You can save raw stereo video to capture a scene and then replay it in the software to fine tune matching parameters.
 
-![SVTK image acquisition tab](./docs/images/svtk_screenshot.png "SVTK Screenshot showing acquisition tab.")
+![SVTK image acquisition tab](./docs/github/images/svtk_screenshot.png "SVTK Screenshot showing acquisition tab.")
 
 SVTK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any usb camera pair or pre-rectified stereo video of the correct format (side-by-side) will work.
 
@@ -26,7 +26,7 @@ Stereo matching support
 ---
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
-![SVTK matching an outdoor scene using SGM](./docs/images/svtk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
+![SVTK matching an outdoor scene using SGM](./docs/github/images/svtk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
 I3DR's own 3D matching algorithm (I3DRSGM) can be built into this application however the files required are not included directly in this repository. This is because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in the submodule i3drsgm. However, releases are built with I3DRSGM support. 
 Please contact info@i3drobotics.com for requesting a license. 
 
