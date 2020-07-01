@@ -12,7 +12,7 @@ set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION "10.0.17763.132" CACHE STRING INTER
 # #
 # #-------------------------------------------------
 
-# VERSION = 1.2.5
+# VERSION = 1.3.0
 # DEFINES += FV_APP_VERSION
 # FV_APP_VERSION = $$VERSION
 
@@ -30,15 +30,32 @@ endif()
 if (WITH_FERVOR)
 	add_definitions(-DWITH_FERVOR)
 	#TODO: add fervor sub_directory
+
+    #TODO: choose openssl version based on qt version
+    # #QT version > 5.6 required for using openssl 1.0.2j
+    # #QT version > 5.12.4 uses newer openssl 1.1.1g
+    # !versionAtLeast(QT_VERSION, 5.6.0):
+    # versionAtLeast(QT_VERSION, 5.6.0){
+    #     versionAtLeast(QT_VERSION, 5.12.4){
+    #         CONFIG += WITH_OPENSSL_111g
+    #         message("Building with OpenSSL 1.1.1g")
+    #     } else {
+    #         CONFIG += WITH_OPENSSL_102j
+    #         message("Building with OpenSSL 1.0.2j")
+    #     }
+    # } else {
+    #     error("Use at least Qt version 5.6.0")
+    # }
 endif()
 
 # QT += core gui concurrent widgets xml network quick
 set(CMAKE_PREFIX_PATH
     ${CMAKE_PREFIX_PATH}
     # Use QT from 3rd_party folder (saves the need to install QT)
-    ${PROJECT_SOURCE_DIR}/3rd_party/qt5.10.1
+    ${PROJECT_SOURCE_DIR}/3rd_party/qt-5.14.2
 )
-find_package(Qt5 COMPONENTS Core Gui Concurrent Widgets Xml Network Quick REQUIRED)
+
+find_package(Qt5 COMPONENTS Core Gui Concurrent Widgets Xml Network Quick Serialport REQUIRED)
 add_definitions( ${QT_DEFINITIONS} )
 
 set(CMAKE_AUTOMOC ON)
@@ -54,7 +71,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # CONFIG += warn_on
 # CONFIG += doc
 
-# # To use I3DR's pro stereo matcher
+# # To use I3DRSGM
 # # add 'CONFIG+=WITH_I3DRSGM' to build arguments
 # WITH_I3DRSGM {
     # message("I3DRSGM enabled")
@@ -65,6 +82,32 @@ if(NOT DEFINED WITH_I3DRSGM)
 endif()
 if (WITH_I3DRSGM)
 	add_definitions(-DWITH_I3DRSGM)
+endif()
+
+# To use CUDA
+# add 'CONFIG+=WITH_CUDA' to build arguments
+# WITH_CUDA {
+#     message("CUDA enabled")
+#     DEFINES += WITH_CUDA
+# }
+if(NOT DEFINED WITH_CUDA)
+	option(WITH_CUDA "Use OpenCV CUDA functions" OFF)
+endif()
+if (WITH_CUDA)
+	add_definitions(-WITH_CUDA)
+endif()
+
+# To use Vimbda camera API (currently optional while being implimented)
+# add 'CONFIG+=WITH_VIMBA' to build arguments
+# WITH_VIMBA {
+#     message("VIMBA enabled")
+#     DEFINES += WITH_VIMBA
+# }
+if(NOT DEFINED WITH_VIMBA)
+	option(WITH_VIMBA "Enable Vimba camera support (in development)" OFF)
+endif()
+if (WITH_VIMBA)
+	add_definitions(-WITH_VIMBA)
 endif()
 
 # RC_FILE = icon.rc
@@ -88,6 +131,13 @@ include_directories(${QTAWESOME_DIR})
 # INCLUDEPATH += $$_PRO_FILE_PWD_/src
 include_directories(
 	${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/camera
+    ${PROJECT_SOURCE_DIR}/src/matcher
+    ${PROJECT_SOURCE_DIR}/src/calibrate
+    ${PROJECT_SOURCE_DIR}/src/camera/widgets
+    ${PROJECT_SOURCE_DIR}/src/matcher/widgets
+    ${PROJECT_SOURCE_DIR}/src/camera/virtualcam
+    ${PROJECT_SOURCE_DIR}/src/camera/cameracontrol
 )
 
 # WITH_I3DRSGM {
@@ -96,6 +146,16 @@ include_directories(
 if (WITH_I3DRSGM)
 	include_directories(
 		${PROJECT_SOURCE_DIR}/i3drsgm/src
+	)
+endif()
+
+# WITH_VIMBA {
+#     VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
+#     INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/vimba
+# }
+if (WITH_VIMBA)
+	include_directories(
+		${PROJECT_SOURCE_DIR}/src/camera/vimba
 	)
 endif()
 
@@ -130,35 +190,35 @@ endif()
 set(SOURCES
 	${SOURCES}
     src/main.cpp
-    src/qdevicedialog.cpp
-    src/qdevicebutton.cpp
     src/paramfile.cpp
+    src/camera/cameracontrol/arduinocommscameracontrol.cpp
 )
 set(UI_SOURCES
 	${UI_SOURCES}
     src/mainwindow.cpp
-    src/calibrationdialog.cpp
-    src/stereocalibrate.cpp
-    src/chessboard.cpp
-    src/calibrateconfirmdialog.cpp
-    src/calibratefromimagesdialog.cpp
-    src/abstractstereocamera.cpp
-    src/abstractstereomatcher.cpp
-    src/camerabasler.cpp
-    src/cameraopencv.cpp
-    src/stereocamerabasler.cpp
-    src/stereocamerabasler2.cpp
-    src/stereocameraopencv.cpp
-    src/stereocameratis.cpp
-    src/stereocamerafromvideo.cpp
-    src/matcheropencvblock.cpp
-    src/matcherwidgetopencvblock.cpp
-    src/matcheropencvsgbm.cpp
-    src/matcherwidget.cpp
-    src/matcherwidgetopencvsgbm.cpp
-    src/disparityviewer.cpp
-    src/cameradisplaywidget.cpp
-    src/cameraimagingsource.cpp
+    src/camera/cameracontrol/abstractarduinocoms.cpp
+    src/calibrate/calibrationdialog.cpp
+    src/calibrate/stereocalibrate.cpp
+    src/calibrate/chessboard.cpp
+    src/calibrate/calibrateconfirmdialog.cpp
+    src/calibrate/calibratefromimagesdialog.cpp
+    src/camera/abstractstereocamera.cpp
+    src/matcher/abstractstereomatcher.cpp
+    src/camera/camerabasler.cpp
+    src/camera/cameraopencv.cpp
+    src/camera/stereocamerabasler.cpp
+    src/camera/stereocameraopencv.cpp
+    src/camera/stereocameratis.cpp
+    src/camera/stereocamerafromvideo.cpp
+    src/matcher/matcheropencvblock.cpp
+    src/matcher/widgets/matcherwidgetopencvblock.cpp
+    src/matcher/matcheropencvsgbm.cpp
+    src/matcher/widgets/matcherwidget.cpp
+    src/matcher/widgets/matcherwidgetopencvsgbm.cpp
+    src/matcher/widgets/disparityviewer.cpp
+    src/camera/widgets/cameradisplaywidget.cpp
+    src/camera/cameraimagingsource.cpp
+    src/camera/virtualcam/virtualcam.cpp
 )
 
 # win32 {
@@ -167,7 +227,7 @@ set(UI_SOURCES
 if(WIN32)
 	set(SOURCES
 		${SOURCES}
-		src/stereocameradeimos.cpp
+		src/camera/stereocameradeimos.cpp
 	)
 endif()
 
@@ -179,10 +239,28 @@ endif()
         # $$_PRO_FILE_PWD_/i3drsgm/src/matcheri3drsgm.cpp
 # }
 if (WITH_I3DRSGM)
+    set(UI_SOURCES
+	    ${UI_SOURCES}
+        src/matcher/widgets/matcherwidgeti3drsgm.cpp
+    )
 	set(SOURCES
 		${SOURCES}
-		i3drsgm/src/matcherwidgeti3drsgm.cpp
-		i3drsgm/src/matcheri3drsgm.cpp
+		src/matcher/matcheri3drsgm.cpp
+        i3drsgm/src/i3drsgm.cpp
+	)
+endif()
+
+# Optional vimba source files (as currently in development)
+# WITH_VIMBA {
+#     SOURCES += \
+#         stereocameravimba.cpp \
+#         ApiController.cpp
+# }
+if (WITH_VIMBA)
+	set(SOURCES
+		${SOURCES}
+		src/camera/stereocameravimba.cpp
+        src/camera/vimba/ApiController.cpp
 	)
 endif()
 
@@ -217,37 +295,40 @@ endif()
 
 set(HEADERS
     ${HEADERS}
-    src/qdevicedialog.h
-    src/qdevicebutton.h
     src/asmopencv.h
     src/paramfile.h
+    src/cvsupport.h
+    src/camera/pylonsupport.h
+    src/camera/cameracontrol/arduinocommscameracontrol.h
+    src/camera/stereocamerasupport.h
 )
 
 set(MOC_HEADERS
 	${MOC_HEADERS}
 	src/mainwindow.h
-    src/calibrationdialog.h
-    src/stereocalibrate.h
-    src/chessboard.h
-    src/calibrateconfirmdialog.h
-    src/calibratefromimagesdialog.h
-    src/abstractstereocamera.h
-    src/abstractstereomatcher.h
-    src/camerabasler.h
-    src/cameraopencv.h
-    src/stereocamerabasler.h
-    src/stereocamerabasler2.h
-    src/stereocameraopencv.h
-    src/stereocameratis.h
-    src/stereocamerafromvideo.h
-    src/matcheropencvblock.h
-    src/matcherwidgetopencvblock.h
-    src/matcheropencvsgbm.h
-    src/matcherwidget.h
-    src/matcherwidgetopencvsgbm.h
-    src/disparityviewer.h
-    src/cameradisplaywidget.h
-    src/cameraimagingsource.h
+    src/camera/cameracontrol/abstractarduinocoms.h
+    src/calibrate/calibrationdialog.h
+    src/calibrate/stereocalibrate.h
+    src/calibrate/chessboard.h
+    src/calibrate/calibrateconfirmdialog.h
+    src/calibrate/calibratefromimagesdialog.h
+    src/camera/abstractstereocamera.h
+    src/matcher/abstractstereomatcher.h
+    src/camera/camerabasler.h
+    src/camera/cameraopencv.h
+    src/camera/stereocamerabasler.h
+    src/camera/stereocameraopencv.h
+    src/camera/stereocameratis.h
+    src/camera/stereocamerafromvideo.h
+    src/matcher/matcheropencvblock.h
+    src/matcher/widgets/matcherwidgetopencvblock.h
+    src/matcher/matcheropencvsgbm.h
+    src/matcher/widgets/matcherwidget.h
+    src/matcher/widgets/matcherwidgetopencvsgbm.h
+    src/matcher/widgets/disparityviewer.h
+    src/camera/widgets/cameradisplaywidget.h
+    src/camera/cameraimagingsource.h
+    src/camera/virtualcam/virtualcam.h
 )
 
 # win32 {
@@ -256,7 +337,7 @@ set(MOC_HEADERS
 if(WIN32)
 	set(MOC_HEADERS
 		${MOC_HEADERS}
-		src/stereocameradeimos.h
+		src/camera/stereocameradeimos.h
 	)
 endif()
 
@@ -270,8 +351,22 @@ endif()
 if(WITH_I3DRSGM)
 	set(MOC_HEADERS
 		${MOC_HEADERS}
-		i3drsgm/src/matcherwidgeti3drsgm.h
-		i3drsgm/src/matcheri3drsgm.h
+		src/matcher/widgets/matcherwidgeti3drsgm.h
+		src/matcher/matcheri3drsgm.h
+	)
+endif()
+
+# Optional vimba header files (as currently in development)
+#WITH_VIMBA {
+#    HEADERS += \
+#        stereocameravimba.h \
+#        ApiController.h
+#}
+if (WITH_VIMBA)
+	set(SOURCES
+		${MOC_HEADERS}
+		src/camera/stereocameravimba.h
+        src/camera/vimba/ApiController.h
 	)
 endif()
 
@@ -366,9 +461,13 @@ set(OpenCV_LIBS
 	${OpenCV_LIB_DIR}/opencv_videoio341.lib
 	${OpenCV_LIB_DIR}/opencv_imgproc341.lib
 	${OpenCV_LIB_DIR}/opencv_imgcodecs341.lib
-	${OpenCV_LIB_DIR}/opencv_cudastereo341.lib
-	${OpenCV_LIB_DIR}/opencv_cudawarping341.lib
 )
+if (WITH_CUDA)
+    set(OpenCV_LIBS
+        ${OpenCV_LIB_DIR}/opencv_cudastereo341.lib
+        ${OpenCV_LIB_DIR}/opencv_cudawarping341.lib
+    )
+endif()
 set(PCL_LIB_DIR ${PROJECT_SOURCE_DIR}/3rd_party/pcl/lib)
 set(PCL_LIBS
 	${PCL_LIB_DIR}/pcl_visualization_release.lib
@@ -422,6 +521,15 @@ if (WITH_I3DRSGM)
 	)
 	set(EXTRA_FILES ${EXTRA_FILES} ${I3DR_DLL_FILES})
 endif()
+
+# WITH_VIMBA {
+#     # Vimba library and include files
+#     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/vimba/"
+#     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaC/Lib/Win64/" -lVimbaC
+#     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
+#     LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Lib/Win64/" -lVimbaImageTransform
+# }
+# TODO Cmake version of this
 
 # # Required for PCL
 # LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
