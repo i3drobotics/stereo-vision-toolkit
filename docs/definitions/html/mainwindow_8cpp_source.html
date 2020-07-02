@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('mainwindow_8cpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +81,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="headertitle">
 <div class="title">mainwindow.cpp</div>  </div>
@@ -1889,6 +1905,7 @@ $(function() {
 <div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;    <span class="keyword">delete</span> ui;</div>
 <div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a0d63f01457d134b1f83d7c6c11e42010"><div class="ttname"><a href="class_abstract_stereo_camera.html#a0d63f01457d134b1f83d7c6c11e42010">AbstractStereoCamera::enableMatching</a></div><div class="ttdeci">void enableMatching(bool match)</div><div class="ttdoc">Enable or disable stereo matching.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00318">abstractstereocamera.cpp:318</a></div></div>
 <div class="ttc" id="aclass_calibrate_from_images_dialog_html_a34af5e3a9537cfe4785c4f24c6a3460d"><div class="ttname"><a href="class_calibrate_from_images_dialog.html#a34af5e3a9537cfe4785c4f24c6a3460d">CalibrateFromImagesDialog::getPatternRows</a></div><div class="ttdeci">int getPatternRows()</div><div class="ttdoc">Get number of rows in pattern.</div><div class="ttdef"><b>Definition:</b> <a href="calibratefromimagesdialog_8cpp_source.html#l00073">calibratefromimagesdialog.cpp:73</a></div></div>
 <div class="ttc" id="aclass_calibrate_from_images_dialog_html_a24c5370b3f7e38b0b591169976b2036f"><div class="ttname"><a href="class_calibrate_from_images_dialog.html#a24c5370b3f7e38b0b591169976b2036f">CalibrateFromImagesDialog::getSaveROS</a></div><div class="ttdeci">bool getSaveROS()</div><div class="ttdoc">Get if saving ROS calibration files.</div><div class="ttdef"><b>Definition:</b> <a href="calibratefromimagesdialog_8cpp_source.html#l00081">calibratefromimagesdialog.cpp:81</a></div></div>
@@ -1952,10 +1969,13 @@ $(function() {
 <div class="ttc" id="aclass_main_window_html_ae98d00a93bc118200eeef9f9bba1dba7"><div class="ttname"><a href="class_main_window.html#ae98d00a93bc118200eeef9f9bba1dba7">MainWindow::~MainWindow</a></div><div class="ttdeci">~MainWindow()</div><div class="ttdoc">Destroy the Main Window object.</div><div class="ttdef"><b>Definition:</b> <a href="mainwindow_8cpp_source.html#l01815">mainwindow.cpp:1815</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_ac299030bbbc8a7445140ca419c94a558"><div class="ttname"><a href="class_abstract_stereo_camera.html#ac299030bbbc8a7445140ca419c94a558">AbstractStereoCamera::saveImageTimestamped</a></div><div class="ttdeci">void saveImageTimestamped()</div><div class="ttdoc">Save an image from the camera with a timestamped filename.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00102">abstractstereocamera.cpp:102</a></div></div>
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 2 2020 12:33:18 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.18
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>mainwindow.cpp</b></li>
+    <li class="footer">Generated on Thu Jul 2 2020 14:45:05 for Stereo Vision Toolkit by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.18 </li>
+  </ul>
+</div>
 </body>
 </html>

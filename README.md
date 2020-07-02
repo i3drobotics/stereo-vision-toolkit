@@ -1,13 +1,11 @@
-GitHub Page
----
-For details on code definitions and a user guide see the [github page](https://i3drobotics.github.io/stereo-vision-toolkit/)
+# Stereo Vision Toolkit
 
-Releases
----
-See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for pre-compliled builds (Windows x64). 
+[Software Website](https://i3drobotics.github.io/stereo-vision-toolkit/)
 
-About
----
+## Latest Release
+Download the latest release v1.3 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.0/StereoVisionToolkit-1.3.0-Win64.exe)
+
+## About
 
 I3DR's stereo vision toolkit is an application provided for testing of stereo cameras and gathering of 3D data.
 
@@ -17,8 +15,7 @@ You can calibrate stereo cameras, acquire images and perform matching and 3D rec
 
 SVTK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any usb camera pair or pre-rectified stereo video of the correct format (side-by-side) will work.
 
-Roadmap
----
+## Roadmap
 
 Currently SVTK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your I3DR stereo camera quickly. There are a number of features/improvements in development including:
 
@@ -26,16 +23,15 @@ Currently SVTK is a useful and functional tool for exploring stereo imaging, and
 - Linux support
 - Unit tests and other deployment issues
 
-Stereo matching support
----
+## Stereo matching support
+
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
 ![SVTK matching an outdoor scene using SGM](./docs/github/images/svtk_screenshot_match.png "SVTK used to process an outdoor scene from a stereo video.")
 I3DR's own 3D matching algorithm (I3DRSGM) can be built into this application however the files required are not included directly in this repository. This is because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in the submodule i3drsgm. However, releases are built with I3DRSGM support. 
 Please contact info@i3drobotics.com for requesting a license. 
 
-Installation
----
+## Installation
 
 The software is currently Windows-only, but we are likely to add support for Linux in the future. Currently the only component that is reliant on Windows is some usb camera control, which uses DirectShow.
 
@@ -45,32 +41,34 @@ Of course you can also link to your own pre-compiled versions of the dependencie
 
 Installation should be as simple as importing the `.pro` file into Qt Creator and building. The required dlls should copy automatically to the build folder. If the program immediately crashes in Qt Creator, suspect a missing DLL (try running directly from the build folder.)
 
-Usage
----
+## Usage
 
 The software has three tabs: image acquisition, stereo matching and 3D visualisation. This is a typical stereo pipeline: images are acquired, optionally rectified, matched and then projected to 3D. You can save images, disparity maps and point clouds (to PLY format). Disparity maps are saved as 16-bit integer images for convenience, so divide by 256 to get sub-pixel measurements.
 
-3rd Party Content
----
+## 3rd Party Content
+
 The project uses OpenCV for image processing, PCL and VTK for point cloud visualisation and hidapi for camera control. PCL requires Boost and Eigen which are included here. These dependencies are provided in accordance with their respective licenses which may be found in the license folder. We also use FontAwesome for icons via QtAwesome, along with QDarkStyle.
 
 There is limited usage of CUDA for certain image processing steps (e.g. rectification).
 
 This repository is used for internal development and so we include both debug and release libraries and DLLs. This makes for quite a large repository for a rather small codebase (around 500MB), so be warned.
 
-Development
----
+## Development
 
 This application is under active development and it is likely that in the short term there may be breaking changes to classes, or significant changes to the GUI. Documentation will follow shortly. Have a look at the project milestones for more information.
 
 Feel free to send us pull requests!
 
-License
----
+## License
+
 This code is provided under the MIT license, which essentially means it's open source, but we require you to add our copyright if you distribute it elsewhere.
 
-Developer zone
----
+## Previous Releases
+
+See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
+
+## Developer zone
+
 ### Phobos control
 Arduino code for controlling Phobos cameras is provided in src/camera/camera_control.
 This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.

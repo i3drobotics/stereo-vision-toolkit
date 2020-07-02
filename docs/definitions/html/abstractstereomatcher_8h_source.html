@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('abstractstereomatcher_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +81,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_c5758bf4325b56ad294e80c02eb3ad04.html">matcher</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="headertitle">
 <div class="title">abstractstereomatcher.h</div>  </div>
@@ -180,6 +196,7 @@ $(function() {
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="preprocessor">#endif  // ABSTRACTSTEREOMATCHER_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
 <div class="ttc" id="aclass_abstract_stereo_matcher_html_a124604c16466bac10a308436dd2f07db"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a124604c16466bac10a308436dd2f07db">AbstractStereoMatcher::assignThread</a></div><div class="ttdeci">void assignThread(QThread *thread)</div><div class="ttdoc">Move matcher to a new thread.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00012">abstractstereomatcher.cpp:12</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_matcher_html_a87525ed38b36c37d2eda34c0e2d321d7"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a87525ed38b36c37d2eda34c0e2d321d7">AbstractStereoMatcher::getErrorDisparity</a></div><div class="ttdeci">virtual int getErrorDisparity(void)=0</div><div class="ttdoc">Returns what value is assigned to pixels with invalid disparities (e.g. -10000)</div></div>
 <div class="ttc" id="aclass_abstract_stereo_matcher_html_a80c14c977bd44695d1142eaef8abdcb3"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a80c14c977bd44695d1142eaef8abdcb3">AbstractStereoMatcher::saveDisparity</a></div><div class="ttdeci">void saveDisparity(QString filename)</div><div class="ttdoc">Save the disparity map.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00052">abstractstereomatcher.cpp:52</a></div></div>
@@ -199,10 +216,13 @@ $(function() {
 <div class="ttc" id="aclass_abstract_stereo_matcher_html_a3e1d35e2aed668657aa9441c5b563d2d"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a3e1d35e2aed668657aa9441c5b563d2d">AbstractStereoMatcher::getRighttImage</a></div><div class="ttdeci">cv::Mat * getRighttImage(void)</div><div class="ttdoc">Get a pointer to the right image.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00114">abstractstereomatcher.h:114</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_matcher_html_a4e4338b72a4f36ce0d0c3a2f5b2b6cb1"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a4e4338b72a4f36ce0d0c3a2f5b2b6cb1">AbstractStereoMatcher::saveDisparityColormap</a></div><div class="ttdeci">void saveDisparityColormap(QString filename)</div><div class="ttdoc">Save the disparity map as normalised colormap.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00062">abstractstereomatcher.cpp:62</a></div></div>
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 2 2020 12:33:18 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.18
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_c5758bf4325b56ad294e80c02eb3ad04.html">matcher</a></li><li class="navelem"><b>abstractstereomatcher.h</b></li>
+    <li class="footer">Generated on Thu Jul 2 2020 14:45:05 for Stereo Vision Toolkit by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.18 </li>
+  </ul>
+</div>
 </body>
 </html>
