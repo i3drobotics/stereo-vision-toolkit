@@ -1,7 +1,13 @@
-/*
-* Copyright I3D Robotics Ltd, 2020
-* Author: Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
-*/
+/**
+ * @file main.cpp
+ * @authors Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
+ * @brief 
+ * @version 1.3
+ * @date 2020-07-02
+ * 
+ * @copyright Copyright (c) I3D Robotics Ltd, 2020
+ * 
+ */
 
 #include <QApplication>
 #include <QFile>

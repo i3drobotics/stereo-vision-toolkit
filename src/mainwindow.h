@@ -66,21 +66,27 @@ namespace Ui {
 class MainWindow;
 }
 
-//!  Main Window
-/*!
-  QT Main Window of application
-*/
-
+/**
+ * @brief QT Main Window of application
+ */
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
+    /**
+    * @brief Construct a new Main Window object
+    * 
+    * @param parent 
+    */
     explicit MainWindow(QWidget* parent = nullptr);
+    /**
+     * @brief Destroy the Main Window object
+     * 
+     */
     ~MainWindow();
 
 private:
     Ui::MainWindow* ui;
-
     QThread* cam_thread;
 
     int fps_measure_count = 0;
