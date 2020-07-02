@@ -89,9 +89,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><b>QPixmapToCvMat</b>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Convert between OpenCV and QT. </p>
-<p>Functions to convert between OpenCV's cv::Mat and Qt's QImage and QPixmap.</p>
-<p>Author: Andy Maloney</p>
-<p>Source: <a href="https://asmaloney.com/2013/11/code/converting-between-cvmat-and-qimage-or-qpixmap">https://asmaloney.com/2013/11/code/converting-between-cvmat-and-qimage-or-qpixmap</a> </p>
+<p>Functions to convert between OpenCV's cv::Mat and Qt's QImage and QPixmap. </p>
 <h2><a class="anchor" id="autotoc_md0"></a>
 Endianness</h2>
 <p>Although not totally clear from the docs, some of QImage's formats we use here are endian-dependent. For example:</p>
@@ -99,11 +97,11 @@ Endianness</h2>
 <p>Big Endian QImage::Format_ARGB32 the bytes are ordered: A R G B QImage::Format_RGB32 the bytes are ordered: (255) R G B QImage::Format_RGB888 the bytes are ordered: R G B</p>
 <p>Notice that Format_RGB888 is the same regardless of endianness. Since OpenCV expects (B G R) we need to swap the channels for this format.</p>
 <p>This is why some conversions here swap red and blue and others do not.</p>
-<p>This code assumes little endian. It would be possible to add conversions for big endian machines though. If you are using such a machine, please feel free to submit a pull request on the GitHub page. </p>
+<p>This code assumes little endian. It would be possible to add conversions for big endian machines though. If you are using such a machine, please feel free to submit a pull request on the GitHub page. (<a href="https://github.com/asmaloney/asmOpenCV">https://github.com/asmaloney/asmOpenCV</a>) </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 2 2020 11:48:48 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 2 2020 12:33:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
