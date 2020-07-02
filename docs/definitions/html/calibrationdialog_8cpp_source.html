@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('calibrationdialog_8cpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +81,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_78b64f2f30040831534be8fffdbc5b44.html">calibrate</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="headertitle">
 <div class="title">calibrationdialog.cpp</div>  </div>
@@ -528,6 +544,7 @@ $(function() {
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <span class="keyword">delete</span> <a class="code" href="class_calibration_dialog.html#a2e0aaab49968d5d75f554d7dc2d530b5">ui</a>;</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
 <div class="ttc" id="aclass_calibration_dialog_html_a2e0aaab49968d5d75f554d7dc2d530b5"><div class="ttname"><a href="class_calibration_dialog.html#a2e0aaab49968d5d75f554d7dc2d530b5">CalibrationDialog::ui</a></div><div class="ttdeci">Ui::CalibrationDialog * ui</div><div class="ttdoc">QT UI dialog.</div><div class="ttdef"><b>Definition:</b> <a href="calibrationdialog_8h_source.html#l00059">calibrationdialog.h:59</a></div></div>
 <div class="ttc" id="aclass_calibration_dialog_html_a948a07a91bf0903b2667948150a11aaf"><div class="ttname"><a href="class_calibration_dialog.html#a948a07a91bf0903b2667948150a11aaf">CalibrationDialog::selectOutputPath</a></div><div class="ttdeci">void selectOutputPath()</div><div class="ttdoc">Select output path (opens folder dialog)</div><div class="ttdef"><b>Definition:</b> <a href="calibrationdialog_8cpp_source.html#l00381">calibrationdialog.cpp:381</a></div></div>
 <div class="ttc" id="aclass_calibration_dialog_html_ab6b4f214c10acc3610aeadec0f5d5c96"><div class="ttname"><a href="class_calibration_dialog.html#ab6b4f214c10acc3610aeadec0f5d5c96">CalibrationDialog::m_scale</a></div><div class="ttdeci">double m_scale</div><div class="ttdoc">Downsample amount (from image size measurement)</div><div class="ttdef"><b>Definition:</b> <a href="calibrationdialog_8h_source.html#l00108">calibrationdialog.h:108</a></div></div>
@@ -581,10 +598,13 @@ $(function() {
 <div class="ttc" id="aclass_calibration_dialog_html_ac363503c93334c1e34f4d5e48a91be1c"><div class="ttname"><a href="class_calibration_dialog.html#ac363503c93334c1e34f4d5e48a91be1c">CalibrationDialog::checkXYDiff</a></div><div class="ttdeci">bool checkXYDiff(cv::RotatedRect left_rot_rect, cv::RotatedRect right_rot_rect)</div><div class="ttdoc">Check XY is different enough.</div><div class="ttdef"><b>Definition:</b> <a href="calibrationdialog_8cpp_source.html#l00244">calibrationdialog.cpp:244</a></div></div>
 <div class="ttc" id="aclass_calibration_dialog_html_a529b15cac57b479a7e7cf41269311041"><div class="ttname"><a href="class_calibration_dialog.html#a529b15cac57b479a7e7cf41269311041">CalibrationDialog::CalibrationDialog</a></div><div class="ttdeci">CalibrationDialog(AbstractStereoCamera *stereo_cam, QWidget *parent=0)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="calibrationdialog_8cpp_source.html#l00009">calibrationdialog.cpp:9</a></div></div>
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 2 2020 12:33:16 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.18
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_78b64f2f30040831534be8fffdbc5b44.html">calibrate</a></li><li class="navelem"><b>calibrationdialog.cpp</b></li>
+    <li class="footer">Generated on Thu Jul 2 2020 14:45:04 for Stereo Vision Toolkit by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.18 </li>
+  </ul>
+</div>
 </body>
 </html>
