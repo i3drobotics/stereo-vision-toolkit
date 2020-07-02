@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2020
+* Author: Ben Knight (bknight@i3drobotics.com)
+*/
+
 #include "abstractarduinocoms.h"
 
 AbstractArduinoComs::AbstractArduinoComs(QObject *parent) : QObject(parent)

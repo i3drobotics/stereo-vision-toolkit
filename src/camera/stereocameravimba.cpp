@@ -1,6 +1,6 @@
 /*
-* Copyright I3D Robotics Ltd, 2017
-* Author: Josh Veitch-Michaelis
+* Copyright I3D Robotics Ltd, 2020
+* Author: Ben Knight (bknight@i3drobotics.com)
 */
 
 #include "stereocameravimba.h"

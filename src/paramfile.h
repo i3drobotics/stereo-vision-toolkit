@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2020
+* Author: Josh Veitch-Michaelis
+*/
+
 #ifndef PARAMFILE_H
 #define PARAMFILE_H
 

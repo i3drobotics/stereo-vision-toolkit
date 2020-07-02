@@ -1,7 +1,7 @@
 /*
- * Copyright I3D Robotics Ltd, 2017
- * Author: Josh Veitch-Michaelis
- */
+* Copyright I3D Robotics Ltd, 2020
+* Author: Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
+*/
 
 #ifndef CALIBRATECONFIRMDIALOG_H
 #define CALIBRATECONFIRMDIALOG_H
@@ -13,10 +13,11 @@ namespace Ui {
 class CalibrateConfirmDialog;
 }
 
-//!  Calibration confirmation dialog
-/*!
-  A dialog view to display camera calibration results and progress.
-*/
+/**
+ * @brief Calibration confirmation dialog
+
+ A dialog view to display camera calibration results and progress.
+ */
 class CalibrateConfirmDialog : public QDialog {
   Q_OBJECT
 

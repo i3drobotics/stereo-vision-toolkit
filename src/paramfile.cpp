@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2020
+* Author: Josh Veitch-Michaelis
+*/
+
 #include <QDomDocument>
 #include <QDebug>
 #include "paramfile.h"

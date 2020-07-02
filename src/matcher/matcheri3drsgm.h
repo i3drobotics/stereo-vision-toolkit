@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2020
+* Author: Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
+*/
+
 #ifndef MATCHERI3DRSGM_H
 #define MATCHERI3DRSGM_H
 
