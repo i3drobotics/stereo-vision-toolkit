@@ -30,13 +30,12 @@ var NAVTREE =
     [ "Roadmap", "index.html#autotoc_md4", null ],
     [ "Stereo matching support", "index.html#autotoc_md5", null ],
     [ "Installation", "index.html#autotoc_md6", null ],
-    [ "Usage", "index.html#autotoc_md7", null ],
-    [ "3rd Party Content", "index.html#autotoc_md8", null ],
-    [ "Development", "index.html#autotoc_md9", null ],
-    [ "License", "index.html#autotoc_md10", null ],
-    [ "Previous Releases", "index.html#autotoc_md11", null ],
-    [ "Developer zone", "index.html#autotoc_md12", [
-      [ "Phobos control", "index.html#autotoc_md13", null ]
+    [ "Development", "index.html#autotoc_md7", null ],
+    [ "License", "index.html#autotoc_md8", null ],
+    [ "Previous Releases", "index.html#autotoc_md9", null ],
+    [ "Developer zone", "index.html#autotoc_md10", [
+      [ "3rd Party Content", "index.html#autotoc_md11", null ],
+      [ "Phobos control", "index.html#autotoc_md12", null ]
     ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ]
