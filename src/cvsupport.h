@@ -1,6 +1,12 @@
-/*
- * Copyright I3D Robotics Ltd, 2020
- * Author: Ben Knight (bknight@i3drobotics.com)
+/*!
+ * @file cvsupport.h
+ * @authors Ben Knight (bknight@i3drobotics.com)
+ * @brief Support class for using openCV
+ * @version 1.3
+ * @date 2020-07-02
+ * 
+ * @copyright Copyright (c) I3D Robotics Ltd, 2020
+ * 
  */
 
 #ifndef CVSUPPORT_H
@@ -8,22 +14,22 @@
 
 #include <opencv2/opencv.hpp>
 
-//!  CV Support
-/*!
-  Support class for using openCV
-*/
+/**
+ * @brief Support class for using openCV
+ */
 class CVSupport
 {
 public:
-    //! Wrapper around cv::imwrite for saving in parallel
-    /*!
-    * Saves an image, can also be called sequentially.
-    *
-    * @param[in] fname Output filename
-    * @param[in] src Image matrix
-    *
-    * @return True/false if the write was successful
-    */
+    /**
+     * @brief Wrapper around cv::imwrite for saving in parallel
+     * 
+     * Saves an image, can also be called sequentially.
+     * 
+     * @param[in] fname Output filename
+     * @param[in] src Image matrix
+     *
+     * @return True/false if the write was successful
+     */
     static bool write_parallel(std::string fname, cv::Mat src)
     {
         std::vector<int> params;
