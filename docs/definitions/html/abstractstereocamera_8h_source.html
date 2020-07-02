@@ -71,8 +71,8 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* Copyright I3D Robotics Ltd, 2017</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* Author: Josh Veitch-Michaelis</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">* Copyright I3D Robotics Ltd, 2020</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">* Author: Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#ifndef ABSTRACTSTEREOCAMERA_H</span></div>
@@ -90,7 +90,7 @@ $(function() {
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;opencv2/cudawarping.hpp&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;cvsupport.h&quot;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cvsupport_8h.html">cvsupport.h</a>&quot;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">// Point Cloud Library</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;pcl/point_cloud.h&gt;</span></div>
@@ -571,6 +571,7 @@ $(function() {
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a850e0dc1d6859b97262232989c98a6a4"><div class="ttname"><a href="class_abstract_stereo_camera.html#a850e0dc1d6859b97262232989c98a6a4">AbstractStereoCamera::setDownsampleFactor</a></div><div class="ttdeci">void setDownsampleFactor(int factor)</div><div class="ttdoc">Change downsample factor.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00341">abstractstereocamera.cpp:341</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_aead672b93cc71df538e0cc9b6f764879"><div class="ttname"><a href="class_abstract_stereo_camera.html#aead672b93cc71df538e0cc9b6f764879">AbstractStereoCamera::isCapturingVideo</a></div><div class="ttdeci">bool isCapturingVideo()</div><div class="ttdoc">Returns wheather video saving is being performed.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00149">abstractstereocamera.h:149</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a836d30b79a6f4846d5e83e244146d20c"><div class="ttname"><a href="class_abstract_stereo_camera.html#a836d30b79a6f4846d5e83e244146d20c">AbstractStereoCamera::getBitDepth</a></div><div class="ttdeci">int getBitDepth(void)</div><div class="ttdoc">Get the image bitdepth.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00212">abstractstereocamera.h:212</a></div></div>
+<div class="ttc" id="acvsupport_8h_html"><div class="ttname"><a href="cvsupport_8h.html">cvsupport.h</a></div><div class="ttdoc">Support class for using openCV.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a8c8cd4829401f67888358932f66af9e9"><div class="ttname"><a href="class_abstract_stereo_camera.html#a8c8cd4829401f67888358932f66af9e9">AbstractStereoCamera::loadXMLRectificationMaps</a></div><div class="ttdeci">bool loadXMLRectificationMaps(QString src_l, QString src_r)</div><div class="ttdoc">Load rectification maps from calibration files.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00374">abstractstereocamera.cpp:374</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a3d09b66be2f4c53280d4328ff5409881"><div class="ttname"><a href="class_abstract_stereo_camera.html#a3d09b66be2f4c53280d4328ff5409881">AbstractStereoCamera::disconnected</a></div><div class="ttdeci">void disconnected()</div><div class="ttdoc">Indicates that the camera has disconnected.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_aad356af22f5ec7412c68c3ba6db9a625"><div class="ttname"><a href="class_abstract_stereo_camera.html#aad356af22f5ec7412c68c3ba6db9a625">AbstractStereoCamera::setPacketSize</a></div><div class="ttdeci">virtual bool setPacketSize(int)=0</div><div class="ttdoc">Adjust camera packet size (GigE cameras only but defined here for access)</div></div>
@@ -588,7 +589,7 @@ $(function() {
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a061a7db8a9267f004f171230d1dbaa32"><div class="ttname"><a href="class_abstract_stereo_camera.html#a061a7db8a9267f004f171230d1dbaa32">AbstractStereoCamera::StereoCameraType</a></div><div class="ttdeci">StereoCameraType</div><div class="ttdoc">Enum defined camera type. This defines the type of camera being used.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00074">abstractstereocamera.h:74</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 2 2020 11:48:40 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 2 2020 12:33:16 for Stereo Vision Toolkit by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
