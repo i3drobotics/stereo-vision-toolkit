@@ -1,6 +1,6 @@
 GitHub Page
 ---
-For details on code definitions and a user guide see the [github page](i3drobotics.github.io/stereo-vision-toolkit)
+For details on code definitions and a user guide see the [github page](https://i3drobotics.github.io/stereo-vision-toolkit/)
 
 Releases
 ---
