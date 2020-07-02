@@ -1,6 +1,6 @@
 /*
-* Copyright I3D Robotics Ltd, 2017
-* Author: Josh Veitch-Michaelis
+* Copyright I3D Robotics Ltd, 2020
+* Author: Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
 */
 
 #include "chessboard.h"

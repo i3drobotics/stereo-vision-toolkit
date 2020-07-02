@@ -1,12 +1,10 @@
+/*
+ * Author: Andy Maloney (asmaloney@gmail.com)
+ * Source: https://asmaloney.com/2013/11/code/converting-between-cvmat-and-qimage-or-qpixmap
+ */
+
 #ifndef ASM_OPENCV_H
 #define ASM_OPENCV_H
-
-/**
-   Functions to convert between OpenCV's cv::Mat and Qt's QImage and QPixmap.
-
-   Andy Maloney
-   https://asmaloney.com/2013/11/code/converting-between-cvmat-and-qimage-or-qpixmap
-**/
 
 #include <QDebug>
 #include <QImage>
@@ -16,7 +14,13 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/imgproc/types_c.h"
 
-/*
+/**
+ * @brief Convert between OpenCV and QT
+
+ Functions to convert between OpenCV's cv::Mat and Qt's QImage and QPixmap.
+ */
+
+/**
    Endianness
    ---
 
@@ -40,16 +44,13 @@
 
    This code assumes little endian. It would be possible to add conversions for
    big endian machines though. If you are using such a machine, please feel free
-   to submit a pull request on the GitHub page.
-*/
+   to submit a pull request on the GitHub page. 
+   (https://github.com/asmaloney/asmOpenCV)
+
+ */
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
 #error Some of QImage's formats are endian-dependant. This file assumes little endian. See comment at top of header.
 #endif
-
-//!  Convert between OpenCV and QT
-/*!
-  Functions for converting between opencv and qt
-*/
 
 namespace ASM {
     // NOTE: This does not cover all cases - it should be easy to add new ones as required.

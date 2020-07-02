@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2020
+* Author: Ben Knight (bknight@i3drobotics.com)
+*/
+
 #ifndef PYLONSUPPORT_H
 #define PYLONSUPPORT_H
 

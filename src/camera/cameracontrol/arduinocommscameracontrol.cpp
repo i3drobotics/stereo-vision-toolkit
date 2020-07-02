@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2020
+* Author: Ben Knight (bknight@i3drobotics.com)
+*/
+
 #include "arduinocommscameracontrol.h"
 
 void ArduinoCommsCameraControl::updateFPS(int fps){

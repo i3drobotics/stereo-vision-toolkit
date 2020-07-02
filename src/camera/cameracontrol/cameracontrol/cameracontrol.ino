@@ -1,3 +1,8 @@
+/*
+* Copyright I3D Robotics Ltd, 2020
+* Author: Ben Knight (bknight@i3drobotics.com)
+*/
+
 #define CAMERA_TRIGGER_1 3 //Phobos USB uses pin 12 / Phobos GigE uses pin 3 
 #define CAMERA_TRIGGER_2 2 //Phobos USB uses pin 12 / Phobos GigE uses pin 2
 
