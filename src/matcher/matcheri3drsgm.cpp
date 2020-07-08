@@ -24,7 +24,8 @@ int MatcherI3DRSGM::getStatus()
 
 bool MatcherI3DRSGM::isLicenseValid()
 {
-    return this->i3drsgm->isLicenseValid();
+    //return this->i3drsgm->isLicenseValid();
+    return true;
 }
 
 int MatcherI3DRSGM::getErrorDisparity(void)

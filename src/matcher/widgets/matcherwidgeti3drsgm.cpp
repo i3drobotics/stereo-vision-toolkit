@@ -20,9 +20,8 @@ MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent)
     connect(ui->disparityRangeSlider, SIGNAL(valueChanged(int)), this,
             SLOT(updateDisparityRange(int)));
 
-    //TODO add advanced options for matcher
-    //connect(ui->pyramidLevelSlider, SIGNAL(sliderMoved(int)), this,
-    //        SLOT(updatePyramidLevel(int)));
+    connect(ui->pyramidLevelSlider, SIGNAL(valueChanged(int)), this,
+            SLOT(updatePyramidLevel(int)));
 
     connect(ui->interpolateCheck, SIGNAL(toggled(bool)), this,
               SLOT(enableInterpolatation(bool)));
@@ -36,8 +35,10 @@ MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent)
     updateMinDisparity(ui->minDisparitySlider->value());
     updateDisparityRange(ui->disparityRangeSlider->value());
     enableInterpolatation(ui->interpolateCheck->isChecked());
+    negative_disparity = ui->minDisparitySlider->value() <= 0;
+    ui->checkBoxNegativeDisparity->setChecked(negative_disparity);
 
-    updatePyramidLevel(6);
+    updatePyramidLevel(ui->pyramidLevelSlider->value());
     matcher->enableOcclusionDetection(false);
     matcher->enableOccInterpol(false);
 }
@@ -57,7 +58,7 @@ void MatcherWidgetI3DRSGM::enableNegativeDisparity(bool enable){
 }
 
 void MatcherWidgetI3DRSGM::updatePyramidLevel(int level) {
-    //ui->prefilterSizeLabel->setNum(level);
+    ui->pyramidLevelLabel->setNum(level);
     matcher->maxPyramid(level);
 }
 
@@ -78,11 +79,16 @@ void MatcherWidgetI3DRSGM::enableInterpolatation(bool enable) {
 void MatcherWidgetI3DRSGM::setImageWidth(int width) { image_width = width; }
 
 void MatcherWidgetI3DRSGM::updateMinDisparity(int min_disparity) {
-    ui->minDisparityLabel->setNum(min_disparity);
     this->min_disparity = min_disparity;
-
-    double shift_p = (double)min_disparity / 20;
-    matcher->setDisparityShift(shift_p);
+    if (negative_disparity){
+        ui->minDisparityLabel->setNum(-min_disparity);
+        double shift_p = (double)min_disparity / 20;
+        matcher->setDisparityShift(shift_p);
+    } else {
+        ui->minDisparityLabel->setNum(min_disparity);
+        double shift_p = (double)min_disparity / 20;
+        matcher->setDisparityShift(shift_p);
+    }
 }
 
 void MatcherWidgetI3DRSGM::updateDisparityRange(int range) {

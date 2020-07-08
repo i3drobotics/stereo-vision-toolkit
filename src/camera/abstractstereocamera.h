@@ -6,7 +6,7 @@
 #ifndef ABSTRACTSTEREOCAMERA_H
 #define ABSTRACTSTEREOCAMERA_H
 
-//#define _USE_MATH_DEFINES
+//#define _USE_MATH_DEFINE
 
 #include <abstractstereomatcher.h>
 
