@@ -4,3 +4,10 @@ Doxyfile.bak
 *.tmp
 .vscode/
 installer/Output/*
+/3rdparty/i3drsgm-1.0.2/token.txt
+/3rdparty/i3drsgm-1.0.2/i3drsgm
+/3rdparty/i3drsgm-1.0.2/i3drsgm-1.0.2.exe
+/3rdparty/opencv-3.4.10/opencv
+/3rdparty/opencv-3.4.10/opencv-3.4.10-vc14_vc15.exe
+/3rdparty/boost-1.66.0/boost_1_66_0
+/3rdparty/boost-1.66.0/boost_1_66_0.tar.gz

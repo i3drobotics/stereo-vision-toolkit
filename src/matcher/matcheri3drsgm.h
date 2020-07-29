@@ -7,7 +7,7 @@
 #define MATCHERI3DRSGM_H
 
 #include <abstractstereomatcher.h>
-#include <i3drsgm.h>
+#include <I3DRSGM/i3drsgm.h>
 #include <QDir>
 #include <QDebug>
 #include <QStandardPaths>

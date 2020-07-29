@@ -48,13 +48,6 @@ WITH_I3DRSGM {
     DEFINES += WITH_I3DRSGM
 }
 
-# To use CUDA
-# add 'CONFIG+=WITH_CUDA' to build arguments
-WITH_CUDA {
-    message("CUDA enabled")
-    DEFINES += WITH_CUDA
-}
-
 # To use Vimbda camera API (currently optional while being implimented)
 # add 'CONFIG+=WITH_VIMBA' to build arguments
 WITH_VIMBA {
@@ -92,11 +85,6 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
 WITH_VIMBA {
     VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
     INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/vimba
-}
-
-WITH_I3DRSGM {
-    VPATH += $$_PRO_FILE_PWD_/i3drsgm/src
-    INCLUDEPATH += $$_PRO_FILE_PWD_/i3drsgm/src
 }
 
 # Define source files
@@ -142,8 +130,7 @@ WITH_VIMBA {
 WITH_I3DRSGM {
     SOURCES += \
         matcherwidgeti3drsgm.cpp \
-        matcheri3drsgm.cpp \
-        i3drsgm.cpp
+        matcheri3drsgm.cpp
 }
 
 # Define header files
@@ -192,8 +179,7 @@ WITH_VIMBA {
 WITH_I3DRSGM {
     HEADERS += \
         matcherwidgeti3drsgm.h \
-        matcheri3drsgm.h \
-        i3drsgm.h
+        matcheri3drsgm.h
 }
 # Define application window forms
 FORMS += \
@@ -242,73 +228,65 @@ macx {
 }
 
 # Define include folders for libraries
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/opencv/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/VTK/include/vtk-7.0"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/PCL/include/pcl-1.8"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/eigen"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/hidapi/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/tis/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/yaml-cpp/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/dshow/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/VTK/include/vtk-7.0"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/PCL/include/pcl-1.8"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/eigen"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/hidapi/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/tis/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/yaml-cpp/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/pylon/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/dshow/include"
 
 # Define libaries
 CONFIG(debug, debug|release) {
     # Define debug only libraries
     message("Debug mode")
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/debug" -lhidapi
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/debug" -lTIS_UDSHL11d_x64
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pcl/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vtk/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/debug" -lhidapi
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
-    LIBS += -lopencv_ximgproc341d -lopencv_core341d -lopencv_highgui341d -lopencv_calib3d341d -lopencv_videoio341d -lopencv_imgproc341d -lopencv_imgcodecs341d
-    # Optional CUDA libraries
-    WITH_CUDA {
-        LIBS += -lopencv_cudastereo341d -lopencv_cudawarping341d
-    }
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/lib" -lopencv_world3410d
 }else {
     # Define release only libraries
     message("Release mode")
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/release" -lhidapi
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/release" -lTIS_UDSHL11_x64
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pcl/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vtk/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/release" -lhidapi
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
-    LIBS += -lopencv_ximgproc341 -lopencv_core341 -lopencv_highgui341 -lopencv_calib3d341 -lopencv_videoio341 -lopencv_imgproc341 -lopencv_imgcodecs341
-    # Optional CUDA libraries
-    WITH_CUDA {
-        LIBS += -lopencv_cudastereo341 -lopencv_cudawarping341
-    }
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/lib" -lopencv_world3410
 }
 
 # Define libraries
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
-LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
+LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0/stage/lib"
 
 WITH_VIMBA {
     # Vimba library and include files
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/vimba/"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaC/Lib/Win64/" -lVimbaC
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Lib/Win64/" -lVimbaImageTransform
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/vimba/"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vimba/VimbaC/Lib/Win64/" -lVimbaC
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vimba/VimbaImageTransform/Lib/Win64/" -lVimbaImageTransform
 }
 
 WITH_I3DRSGM {
     # I3DRSGM library and include files
-    LIBS += -L"$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/include"
-    DEPENDPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/lib/" -lI3DRSGM
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/include"
+    # PhobosIntegration library and include files (required for I3DRSGM)
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/phobosIntegration-1.0.54/include"
 }
 
 # Basler library files
-LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
+LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pylon/lib/x64"
 
 win32 {
     # Directshow libraries
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/dshow/lib/x64" -lstrmbasd -lstrmbase
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/dshow/lib/x64" -lstrmbasd -lstrmbase
     # Directshow class IDs
     LIBS += -lstrmiids
 }
@@ -331,65 +309,65 @@ isEmpty(TARGET_EXT) {
 win32 {
     # Define dlls to copy to build folder (windows only)
     EXTRA_FILES += \
-        $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true) \
-        $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
-        $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll
+        $$files($$_PRO_FILE_PWD_/3rdparty/opengl/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rdparty/cuda/bin/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rdparty/pylon/bin/x64/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rdparty/pylon/dep/x64/*.dll, true) \
+        $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
+        $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
+        $$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/bin/opencv_ffmpeg3410_64.dll
 
     # Copy openssl dlls depending on version using
     WITH_OPENSSL_102j {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.0.2j/Win64/bin/*.dll, true)
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.0.2j/Win64/bin/*.dll, true)
     }
     WITH_OPENSSL_111g {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.1.1g/Win64/bin/*.dll, true)
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
     }
 
     CONFIG( debug, debug|release ) {
         # Debug only dlls
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/debug/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/debug/*.dll, true) \
-            $$_PRO_FILE_PWD_/3rd_party/png/libpng16d.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tbb/tbb_debug.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11d_x64.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/debug/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/debug/*.dll, true)
+            $$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/bin/opencv_world3410d.dll \
+            $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/debug/*.dll, true) \
+            $$_PRO_FILE_PWD_/3rdparty/png/libpng16d.dll \
+            $$_PRO_FILE_PWD_/3rdparty/tbb/tbb_debug.dll \
+            $$_PRO_FILE_PWD_/3rdparty/tis/bin/TIS_UDSHL11d_x64.dll \
+            $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/debug/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/debug/*.dll, true)
     } else {
         # Release only dlls
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/release/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/release/*.dll, true) \
-            $$_PRO_FILE_PWD_/3rd_party/png/libpng16.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11_x64.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/release/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/release/*.dll, true)
+            $$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/bin/opencv_world3410.dll \
+            $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/release/*.dll, true) \
+            $$_PRO_FILE_PWD_/3rdparty/png/libpng16.dll \
+            $$_PRO_FILE_PWD_/3rdparty/tis/bin/TIS_UDSHL11_x64.dll \
+            $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/release/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/release/*.dll, true)
     }
 
     # Define drivers to copy to build folder
-    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.msi, true)
-    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/drivers/*.msi, true)
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/drivers/*.bat, true)
 
     # I3DRSGM dlls
     WITH_I3DRSGM {
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/bin/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/param/*.param, true)
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/bin/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/bin/*.param, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
     }
 
     # Vimba dlls
     WITH_VIMBA {
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaC.dll \
-            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Bin/Win64/VimbaImageTransform.dll \
-            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaC.dll \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaImageTransform/Bin/Win64/VimbaImageTransform.dll \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
 
         CONFIG( debug, debug|release ) {
             # Debug only dlls
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
         }
     }
 

@@ -55,7 +55,7 @@ private:
     void init(void);
     void setupDefaultMatcher(void);
 
-    bool wls_filter = false;
+    //bool wls_filter = false;
     double wls_lambda = 8000;
     double wls_sigma = 1.5;
 };
