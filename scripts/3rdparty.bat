@@ -33,7 +33,7 @@ if "%option_uninstall%"=="true" (
     set "script_params=--uninstall"
 )
 
-if "%option_uninstall%"=="true" (
+if "%option_with_i3drsgm%"=="true" (
     :: install i3drsgm (also install phobos-integration dependency but not opencv)
     call ..\3rdparty\i3drsgm-1.0.2\setup_i3drsgm.bat %script_params% --with-phobos-integration
 )
