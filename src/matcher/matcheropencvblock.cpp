@@ -87,7 +87,8 @@ void MatcherOpenCVBlock::forwardMatch() {
 
   try {
     matcher->compute(*left, *right, disparity_lr);
-
+    //NOTE: Removed to try and not use ximageproc
+    /*
     if(wls_filter){
         backwardMatch();
         cv::Mat disparity_filter;
@@ -100,6 +101,8 @@ void MatcherOpenCVBlock::forwardMatch() {
     }else{
         disparity_lr.convertTo(disparity_lr, CV_32F);
     }
+    */
+   disparity_lr.convertTo(disparity_lr, CV_32F);
 
   } catch (...) {
     qDebug() << "Error in OpenCV block match parameters";
@@ -107,8 +110,9 @@ void MatcherOpenCVBlock::forwardMatch() {
 }
 
 void MatcherOpenCVBlock::backwardMatch() {
-    auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
-    right_matcher->compute(*right, *left, disparity_rl);
+    //NOTE: Removed to try and not use ximageproc
+    //auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
+    //right_matcher->compute(*right, *left, disparity_rl);
 }
 
 void MatcherOpenCVBlock::saveParams() {

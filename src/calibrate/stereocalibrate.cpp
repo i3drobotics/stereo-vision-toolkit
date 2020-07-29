@@ -440,10 +440,10 @@ bool StereoCalibrate::findCorners(cv::Mat image,
 
 void StereoCalibrate::overlayImage(cv::Mat& image, Chessboard* board,
                                    bool found, bool valid) {
-    CvScalar red(255, 0, 0, 255);
-    CvScalar green(0, 255, 0, 255);
-    CvScalar blue(0, 0, 255, 255);
-    CvScalar overlayColour = red;
+    cv::Scalar red(255, 0, 0, 255);
+    cv::Scalar green(0, 255, 0, 255);
+    cv::Scalar blue(0, 0, 255, 255);
+    cv::Scalar overlayColour = red;
 
     // cv::drawChessboardCorners(image, pattern_size, board->board_points, found);
 

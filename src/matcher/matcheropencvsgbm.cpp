@@ -75,7 +75,8 @@ void MatcherOpenCVSGBM::forwardMatch() {
 
   try {
     matcher->compute(*left, *right, disparity_lr);
-
+    //NOTE: Removed to try and not use ximageproc
+    /*
     if(wls_filter){
         backwardMatch();
         cv::Mat disparity_filter;
@@ -89,7 +90,8 @@ void MatcherOpenCVSGBM::forwardMatch() {
 
         disparity_lr.convertTo(disparity_lr, CV_32F);
     }
-
+    */
+    disparity_lr.convertTo(disparity_lr, CV_32F);
 
   } catch (...) {
     qDebug() << "Error in SGBM match parameters";
@@ -97,8 +99,11 @@ void MatcherOpenCVSGBM::forwardMatch() {
 }
 
 void MatcherOpenCVSGBM::backwardMatch() {
+  //NOTE: Removed to try and not use ximageproc
+  /*
   auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
   right_matcher->compute(*right, *left, disparity_rl);
+  */
 }
 
 void MatcherOpenCVSGBM::saveParams() {

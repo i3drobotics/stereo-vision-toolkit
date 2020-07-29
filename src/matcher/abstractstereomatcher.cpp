@@ -71,7 +71,8 @@ void AbstractStereoMatcher::saveDisparityColormap(QString filename) {
 }
 
 void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
-
+    //NOTE: Removed to try and not use ximageproc
+    /*
     backwardMatch();
 
     cv::Mat difference = disparity_rl - disparity_lr;
@@ -80,6 +81,7 @@ void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
         if( abs(difference.at<float>(i)) < threshold) continue;
         else disparity_lr.at<float>(i) = min_disparity;
     }
+    */
 }
 
 void AbstractStereoMatcher::match() {
