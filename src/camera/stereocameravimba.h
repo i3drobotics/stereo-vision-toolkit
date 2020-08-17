@@ -8,9 +8,9 @@
 
 #include <opencv2/opencv.hpp>
 #include <abstractstereocamera.h>
-#include <VimbaCPP/include/VimbaCPP.h>
+#include <cameravimba.h>
 
-#include "ApiController.h"
+#include <VimbaCPP/Include/VimbaCPP.h>
 
 //!  Stereo vimba cameras
 /*!
@@ -26,13 +26,10 @@ public:
     explicit StereoCameraVimba (AbstractStereoCamera::StereoCameraSerialInfo serial_info,
                                 AbstractStereoCamera::StereoCameraSettings camera_settings,
                                 QObject *parent = 0) :
-                AbstractStereoCamera(serial_info, camera_settings, parent),
-                apiController_(AVT::VmbAPI::Examples::ApiController()){
-        apiControllerStatus_ = apiController_.StartUp();
+        AbstractStereoCamera(serial_info, camera_settings, parent), sys(VimbaSystem::GetInstance()){
     }
 
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
-
     ~StereoCameraVimba(void);
 
 public slots:
@@ -56,14 +53,12 @@ public slots:
 private:
     QFuture<void> future;
 
-    AVT::VmbAPI::Examples::ApiController apiController_;
-    AVT::VmbAPI::CameraPtr camera_l, camera_r;
+    CameraVimba* camera_left;
+    CameraVimba* camera_right;
+    VimbaSystem &sys;
 
     bool setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps);
 
-    VmbErrorType apiControllerStatus_;
-
-    void getImageSize(int &width, int &height, int &bitdepth);
 };
 
 #endif //STEREOCAMERAVIMBA_H
