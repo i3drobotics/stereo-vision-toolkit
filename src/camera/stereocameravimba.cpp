@@ -49,15 +49,21 @@ bool StereoCameraVimba::closeCamera(){
     return true;
 }
 
-bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps){
+bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, bool trigger, int iFps){
     std::string camera_left_serial = CSI_cam_info.left_camera_serial;
     std::string camera_right_serial = CSI_cam_info.right_camera_serial;
 
     camera_left = new CameraVimba();
     camera_right = new CameraVimba();
 
-    bool error = camera_left->initCamera(camera_left_serial, iBinning, iTrigger >= 0, iFps);
-    error &= camera_right->initCamera(camera_right_serial, iBinning, iTrigger >= 0, iFps);
+    bool error = camera_left->initCamera(camera_left_serial, iBinning, trigger , iFps);
+    error &= camera_right->initCamera(camera_right_serial, iBinning, trigger, iFps);
+
+    if(!error){
+        int height, width, bitdepth;
+        camera_left->getImageSize(height, width, bitdepth);
+        emit update_size(width, height, bitdepth);
+    }
 
     return error;
 }
@@ -65,16 +71,19 @@ bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInf
 bool StereoCameraVimba::captureSingle(){
     bool left_res = camera_left->capture();
     bool right_res = camera_right->capture();
+    bool res = false;
 
     if(left_res && right_res){
-        left_raw = camera_left->getImage()->clone();
-        right_raw = camera_right->getImage()->clone();
-        emit captured();
-        return true;
+        camera_left->getImage()->copyTo(left_raw);
+        camera_right->getImage()->copyTo(right_raw);
+        emit captured_success();
+        res = true;
     }else{
         emit captured_fail();
-        return false;
+        res = false;
     }
+    emit captured();
+    return res;
 }
 
 void StereoCameraVimba::captureThreaded(){

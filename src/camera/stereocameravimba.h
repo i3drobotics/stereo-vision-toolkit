@@ -57,7 +57,7 @@ private:
     CameraVimba* camera_right;
     VimbaSystem &sys;
 
-    bool setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps);
+    bool setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, bool trigger, int iFps);
 
 };
 
