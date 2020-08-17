@@ -16,8 +16,11 @@ void CameraVimba::assignThread(QThread *thread)
 
 void CameraVimba::close() {
 
+    qDebug() << "Closing camera";
+
     if (connected){
         camera->EndCapture();
+        camera->StopContinuousImageAcquisition();
         camera->Close();
     }
 
@@ -32,7 +35,6 @@ bool CameraVimba::initCamera(std::string camera_serial,int binning, bool trigger
     this->fps = fps;
     connected = false;
 
-    // Create an instant camera object with the camera device found first.
     CameraPtrVector cameras;
     system.GetCameras(cameras);
 
@@ -62,23 +64,18 @@ bool CameraVimba::initCamera(std::string camera_serial,int binning, bool trigger
 
     if (error == VmbErrorSuccess){
 
-        //setBinning(binning);
-        //enableTrigger(trigger);
-        //changeFPS(fps);
+        // Currently binning is not supported
+        //bool error = setBinning(binning);
+        bool success = enableTrigger(trigger);
+        if(!success)
+            qDebug() << "Failed to set trigger mode";
 
-        qDebug() << "Attempting to start capture";
+        success = changeFPS(fps);
+        if(!success)
+            qDebug() << "Failed to set FPS";
 
-        auto capture_status = camera->StartCapture();
+        connected = true;
 
-        if(capture_status == VmbErrorSuccess){
-            connected = true;
-        }else{
-            if(capture_status == VmbErrorInvalidAccess){
-                qDebug() << "Access error";
-                camera->Close();
-            }
-            qDebug() << "Failed to start capture";
-        }
 
     } else {
         qDebug() << "Failed to open camera";
@@ -118,7 +115,7 @@ VmbError_t CameraVimba::getBoolFeature(std::string name, bool res){
          feature->GetValue(res);
     }
 
-    return res;
+    return error;
 }
 
 VmbError_t CameraVimba::getDoubleFeature(std::string name, double res){
@@ -129,7 +126,7 @@ VmbError_t CameraVimba::getDoubleFeature(std::string name, double res){
          feature->GetValue(res);
     }
 
-    return res;
+    return error;
 }
 
 void CameraVimba::getImageSize(int &width, int &height, int &bitdepth)
@@ -323,6 +320,9 @@ bool CameraVimba::capture(void)
                 res = false;
             }
         } else {
+            if(capture_err == VmbErrorTimeout && trigger){
+                qDebug() << "Waiting for trigger?";
+            }
             qDebug() << "Failed to acquire image";
             res = false;
         }

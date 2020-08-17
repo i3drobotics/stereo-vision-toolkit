@@ -54,9 +54,9 @@ private:
     enum format {Y800, Y16};
     format image_format;
     bool connected = false;
-    int binning;
-    bool trigger;
-    int fps;
+    int binning = 1;
+    bool trigger = false;
+    int fps = 30;
     std::string camera_serial;
     int max_timeout = 2000;
 
