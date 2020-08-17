@@ -94,6 +94,7 @@ SOURCES += \
     mainwindow.cpp \
     calibrationdialog.cpp \
     abstractarduinocoms.cpp \
+    src/camera/cameravimba.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -142,6 +143,7 @@ HEADERS += \
     abstractarduinocoms.h \
     cvsupport.h \
     pylonsupport.h \
+    src/camera/cameravimba.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -264,12 +266,11 @@ CONFIG(debug, debug|release) {
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
 LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0/stage/lib"
 
+
 WITH_VIMBA {
     # Vimba library and include files
     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/vimba/"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vimba/VimbaC/Lib/Win64/" -lVimbaC
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vimba/VimbaImageTransform/Lib/Win64/" -lVimbaImageTransform
 }
 
 WITH_I3DRSGM {
@@ -361,9 +362,13 @@ win32 {
     # Vimba dlls
     WITH_VIMBA {
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaC.dll \
-            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaImageTransform/Bin/Win64/VimbaImageTransform.dll \
-            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaC/Bin/Win64/VimbaC.dll \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/clallserial.dll \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/VimbaCLConfigTL.cti \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/VimbaCLConfigTL.xml \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaUSBTL/Bin/Win64/VimbaUSBTL.cti \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaUSBTL/Bin/Win64/VimbaUSBTL.xml \
 
         CONFIG( debug, debug|release ) {
             # Debug only dlls

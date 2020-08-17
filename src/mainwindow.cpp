@@ -57,15 +57,15 @@ MainWindow::MainWindow(QWidget* parent)
     default_basler_gige_init_settings.packetDelay = 0;
     default_basler_gige_init_settings.packetSize = 1500;
 
-    default_vimba_init_settings.exposure = -1;
-    default_vimba_init_settings.gain = -1;
-    default_vimba_init_settings.fps = -1;
-    default_vimba_init_settings.binning = -1;
-    default_vimba_init_settings.trigger = -1;
+    default_vimba_init_settings.exposure = 5;
+    default_vimba_init_settings.gain = 0;
+    default_vimba_init_settings.fps = 5;
+    default_vimba_init_settings.binning = 1;
+    default_vimba_init_settings.trigger = false;
     default_vimba_init_settings.hdr = -1;
-    default_vimba_init_settings.autoExpose = -1;
-    default_vimba_init_settings.autoGain = -1;
-    default_vimba_init_settings.isGige = -1;
+    default_vimba_init_settings.autoExpose = true;
+    default_vimba_init_settings.autoGain = true;
+    default_vimba_init_settings.isGige = false;
 
     default_tis_init_settings.exposure = 5;
     default_tis_init_settings.gain = 0;
@@ -147,7 +147,17 @@ MainWindow::MainWindow(QWidget* parent)
 
     statusBarInit();
 
-    //disable tabs untill camera is connected to prevent crashes
+#ifdef WITH_VIMBA
+    // Start the Vimba API in one place.
+    VimbaSystem &system = VimbaSystem::GetInstance();
+    auto err = system.Startup();
+
+    if(err != VmbErrorSuccess){
+        qDebug() << "Failed to start VIMBA";
+    }
+#endif
+
+    //disable tabs until camera is connected to prevent crashes
     disableWindow();
     controlsInit();
     pointCloudInit();
@@ -1814,5 +1824,10 @@ void MainWindow::closeEvent(QCloseEvent *) {
 
 MainWindow::~MainWindow() {
     Pylon::PylonTerminate();
+#ifdef WITH_VIMBA
+    // Close the Vimba API here.
+    VimbaSystem &system = VimbaSystem::GetInstance();
+    system.Shutdown();
+#endif
     delete ui;
 }
