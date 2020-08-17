@@ -32,7 +32,7 @@ bool StereoCameraVimba::openCamera(){
         autoGain = false;
     }
 
-    bool connected = setupCameras(stereoCameraSerialInfo_,binning,trigger,fps);
+    connected = setupCameras(stereoCameraSerialInfo_,binning,trigger,fps);
 
     enableAutoGain(autoGain);
     enableAutoExposure(autoExpose);
@@ -57,9 +57,21 @@ bool StereoCameraVimba::closeCamera(){
 void StereoCameraVimba::getImageSize(int &width, int &height, int &bitdepth)
 {
     //get image size
-    VmbInt64_t h, w;
-    VmbErrorType err_h = apiController_.GetFeatureIntValue(camera_l,"Height",h);
-    VmbErrorType err_w = apiController_.GetFeatureIntValue(camera_l,"Width",w);
+    VmbInt64_t h = 0, w= 0;
+    VmbErrorType err_h = VmbErrorSuccess;
+    VmbErrorType err_w = VmbErrorSuccess;
+
+    AVT::VmbAPI::FeaturePtr pFeature;
+    VmbErrorType    result;
+
+    err_h = camera_l.get()->GetFeatureByName( "Height", pFeature );
+    if( err_h == VmbErrorSuccess )
+        pFeature.get()->GetValue(h);
+
+    err_w = camera_l.get()->GetFeatureByName( "Width", pFeature );
+    if( err_w == VmbErrorSuccess )
+        pFeature.get()->GetValue(w);
+
     if (err_h == VmbErrorSuccess && err_w == VmbErrorSuccess){
         height = (int) h;
         width = (int) w;
@@ -74,7 +86,8 @@ bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInf
     //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
 
     // find vimba systems connected
-    AVT::VmbAPI::CameraPtrVector all_cameras = apiController_.GetCameraList();
+    AVT::VmbAPI::CameraPtrVector all_cameras;
+    system.GetCameras(all_cameras);
     std::string camera_left_serial = CSI_cam_info.left_camera_serial;
     std::string camera_right_serial = CSI_cam_info.right_camera_serial;
     bool cameraLeftFind = false;
@@ -116,8 +129,6 @@ bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInf
     }
 
     // open cameras
-    //VmbErrorType err_l = apiController_.OpenCamera(cameraID_l);
-    //VmbErrorType err_r = apiController_.OpenCamera(cameraID_r);
     VmbErrorType err_l = camera_l->Open(VmbAccessModeFull);
     VmbErrorType err_r = camera_r->Open(VmbAccessModeFull);
 
@@ -272,11 +283,14 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraVimba::lis
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(CAMERA_TYPE_VIMBA);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
 
-    AVT::VmbAPI::Examples::ApiController apiController = AVT::VmbAPI::Examples::ApiController();
+    //AVT::VmbAPI::Examples::ApiController apiController = AVT::VmbAPI::Examples::ApiController();
     //VmbErrorType apiControllerStatus = apiController.StartUp();
 
     // find vimba systems connected
-    AVT::VmbAPI::CameraPtrVector all_cameras = apiController.GetCameraList();
+    AVT::VmbAPI::CameraPtrVector all_cameras;
+    AVT::VmbAPI::VimbaSystem &system = AVT::VmbAPI::VimbaSystem::GetInstance();
+    system.Startup();
+    system.GetCameras(all_cameras);
 
     std::vector<std::string> connected_camera_names;
     std::vector<std::string> connected_serials;
@@ -390,5 +404,5 @@ StereoCameraVimba::~StereoCameraVimba(void) {
     if (connected){
         closeCamera();
     }
-    apiController_.ShutDown();
+    system.Shutdown();
 }
