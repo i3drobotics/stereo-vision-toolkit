@@ -48,7 +48,12 @@ public slots:
     bool setGain(int gain);
     bool setBinning(int binning);
 
-    void captureThreaded();
+private slots:
+    void leftGrabFailed(void);
+    void rightGrabFailed(void);
+    void leftCaptured(void);
+    void rightCaptured(void);
+    void checkStereoCapture(void);
 
 private:
     QFuture<void> future;
@@ -57,8 +62,17 @@ private:
     CameraVimba* camera_right;
     VimbaSystem &sys;
 
+    bool grab_success_l = false;
+    bool grab_success_r = false;
+
+    bool grab_finish_l = false;
+    bool grab_finish_r = false;
+
     bool setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, bool trigger, int iFps);
 
+signals:
+    void start_capture();
+    void stop_capture();
 };
 
 #endif //STEREOCAMERAVIMBA_H

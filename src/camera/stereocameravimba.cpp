@@ -56,49 +56,116 @@ bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInf
     camera_left = new CameraVimba();
     camera_right = new CameraVimba();
 
-    bool error = camera_left->initCamera(camera_left_serial, iBinning, trigger , iFps);
-    error &= camera_right->initCamera(camera_right_serial, iBinning, trigger, iFps);
+    QThread* left_camera_thread = new QThread();
+    camera_left->assignThread(left_camera_thread);
 
-    if(!error){
+    QThread* right_camera_thread = new QThread();
+    camera_right->assignThread(right_camera_thread);
+
+    bool success = camera_left->initCamera(camera_left_serial, iBinning, trigger , iFps);
+    success &= camera_right->initCamera(camera_right_serial, iBinning, trigger, iFps);
+
+    if(success){
         int height, width, bitdepth;
         camera_left->getImageSize(height, width, bitdepth);
         emit update_size(width, height, bitdepth);
     }
 
-    return error;
+    connect(this, SIGNAL(start_capture()), camera_left, SLOT(startCapture()));
+    connect(this, SIGNAL(stop_capture()), camera_right, SLOT(startCapture()));
+    connect(this, SIGNAL(start_capture()), camera_left, SLOT(stopCapture()));
+    connect(this, SIGNAL(stop_capture()), camera_right, SLOT(stopCapture()));
+
+    return success;
 }
 
 bool StereoCameraVimba::captureSingle(){
-    bool left_res = camera_left->capture();
-    bool right_res = camera_right->capture();
+
+    camera_left->stopCapture();
+    camera_right->stopCapture();
+
+    auto future_left = QtConcurrent::run(camera_left, &CameraVimba::capture);
+    auto future_right = QtConcurrent::run(camera_right, &CameraVimba::capture);
+
+    future_left.waitForFinished();
+    future_right.waitForFinished();
+
     bool res = false;
 
-    if(left_res && right_res){
-        camera_left->getImage()->copyTo(left_raw);
-        camera_right->getImage()->copyTo(right_raw);
+    if(future_left.result() && future_right.result()){
+        camera_left->getImage(left_raw);
+        camera_right->getImage(right_raw);
         emit captured_success();
         res = true;
     }else{
         emit captured_fail();
+        qDebug() << "Capture failed";
         res = false;
     }
+
     emit captured();
     return res;
 }
 
-void StereoCameraVimba::captureThreaded(){
-    future = QtConcurrent::run(this, &StereoCameraVimba::captureSingle);
+void StereoCameraVimba::leftGrabFailed(){
+    grab_finish_l = true;
+    grab_success_l = false;
+    checkStereoCapture();
+}
+
+void StereoCameraVimba::rightGrabFailed(){
+    grab_finish_r = true;
+    grab_success_r = false;
+    checkStereoCapture();
+}
+
+void StereoCameraVimba::leftCaptured(){
+    grab_finish_l = true;
+    grab_success_l = true;
+    camera_left->getImage(left_raw);
+    checkStereoCapture();
+}
+
+void StereoCameraVimba::rightCaptured(){
+    grab_finish_r = true;
+    grab_success_r = true;
+    camera_right->getImage(right_raw);
+    checkStereoCapture();
+}
+
+void StereoCameraVimba::checkStereoCapture(){
+    if (grab_finish_l && grab_finish_r){
+        if (grab_success_r && grab_success_l){
+            emit captured_success();
+        } else {
+            emit captured_fail();
+            send_error(CAPTURE_ERROR);
+        }
+        grab_finish_r = false;
+        grab_finish_l = false;
+        grab_success_r = false;
+        grab_success_l = false;
+
+        emit captured();
+    }
 }
 
 bool StereoCameraVimba::enableCapture(bool enable){
+    qDebug() << "Enabling capture";
+
     if (enable){
-        //Start capture thread
-        connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
+        // Connect callbacks
+        connect(camera_left, SIGNAL(captured()), this, SLOT(leftCaptured()));
+        connect(camera_right, SIGNAL(captured()), this, SLOT(rightCaptured()));
+        camera_left->startCapture();
+        camera_right->startCapture();
         capturing = true;
-        captureThreaded();
     } else {
-        //Stop capture thread
-        disconnect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
+        // Disconnect callbacks
+        disconnect(camera_left, SIGNAL(captured()), this, SLOT(leftCaptured()));
+        disconnect(camera_right, SIGNAL(captured()), this, SLOT(rightCaptured()));
+        camera_left->stopCapture();
+        camera_right->stopCapture();
         capturing = false;
     }
     return true;
@@ -209,8 +276,8 @@ bool StereoCameraVimba::enableAutoGain(bool enable){
 bool StereoCameraVimba::setFPS(int fps){
     if (!isCapturing()){
 
-        camera_left->setFPS(fps);
-        camera_right->setFPS(fps);
+        camera_left->changeFPS(fps);
+        camera_right->changeFPS(fps);
 
         //TODO this frame rate should be set by the camera's internal calculation
         frame_rate = fps;
@@ -226,6 +293,7 @@ bool StereoCameraVimba::enableTrigger(bool enable){
 }
 
 StereoCameraVimba::~StereoCameraVimba(void) {
+    emit stop_capture();
     camera_left->close();
     camera_right->close();
 }

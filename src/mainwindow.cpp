@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     default_vimba_init_settings.exposure = 5;
     default_vimba_init_settings.gain = 0;
-    default_vimba_init_settings.fps = 5;
+    default_vimba_init_settings.fps = 30;
     default_vimba_init_settings.binning = 1;
     default_vimba_init_settings.trigger = false;
     default_vimba_init_settings.hdr = -1;
