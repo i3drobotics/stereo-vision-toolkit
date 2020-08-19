@@ -18,11 +18,8 @@ void CameraVimba::close() {
 
     qDebug() << "Closing camera";
 
-    if (connected){
-        camera->EndCapture();
-        camera->StopContinuousImageAcquisition();
-        camera->Close();
-    }
+    stopCapture();
+    camera->Close();
 
     connected = false;
 }
@@ -75,8 +72,6 @@ bool CameraVimba::initCamera(std::string camera_serial,int binning, bool trigger
             qDebug() << "Failed to set FPS";
 
         frame_observer = shared_ptr<FrameObserver>(new FrameObserver(camera));
-        connect(frame_observer.get(), SIGNAL( frameReady(int) ), this, SLOT( onFrame(int) ) );
-
         connected = true;
 
     } else {
@@ -96,6 +91,7 @@ void CameraVimba::startCapture(void){
     if(res != VmbErrorSuccess){
         qDebug() << "Couldn't start capture!" << res;
     }else{
+        connect(frame_observer.get(), SIGNAL( frameReady(int) ), this, SLOT( onFrame(int) ) );
         capturing = true;
     }
 }
@@ -104,6 +100,7 @@ void CameraVimba::stopCapture(void){
     if(!capturing) return;
 
     camera->StopContinuousImageAcquisition();
+    disconnect(frame_observer.get(), SIGNAL( frameReady(int) ), this, SLOT( onFrame(int) ) );
     capturing = false;
 }
 
@@ -393,9 +390,16 @@ bool CameraVimba::enableAutoGain(bool enable)
 
 bool CameraVimba::setGain(int gain)
 {
+
+    enableAutoGain(false);
+
     FeaturePtr feature;
     camera.get()->GetFeatureByName("Gain", feature);
-    auto error = feature->SetValue(gain);
+
+    double min_gain, max_gain;
+    feature->GetRange(min_gain, max_gain);
+
+    auto error = feature->SetValue(max_gain*static_cast<double>(gain)/100.0);
 
     return error == VmbErrorSuccess;
 }
@@ -502,4 +506,5 @@ bool CameraVimba::getImage(cv::Mat &out) {
 CameraVimba::~CameraVimba(void)
 {
     close();
+    emit finished();
 }

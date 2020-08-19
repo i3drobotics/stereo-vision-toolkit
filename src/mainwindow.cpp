@@ -1807,11 +1807,20 @@ void MainWindow::error(int error){
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {
-    qDebug() << "Closing application";
+    qDebug() << "Releasing cameras...";
     stereoCameraRelease();
-    qDebug() << "Waiting for device list timer to finish...";
+
+    qDebug() << "Closing application...";
     stopDeviceListTimer();
     while(device_list_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+
+#ifdef WITH_VIMBA
+    // Close the Vimba API here.
+    VimbaSystem &system = VimbaSystem::GetInstance();
+    system.Shutdown();
+    qDebug() << "Shutting down VIMBA";
+#endif
+
     // Close external windows
     if (calibration_dialog_used){
         calibration_dialog->close();
@@ -1823,11 +1832,7 @@ void MainWindow::closeEvent(QCloseEvent *) {
 }
 
 MainWindow::~MainWindow() {
+    qDebug() << "Shutting down Pylon";
     Pylon::PylonTerminate();
-#ifdef WITH_VIMBA
-    // Close the Vimba API here.
-    VimbaSystem &system = VimbaSystem::GetInstance();
-    system.Shutdown();
-#endif
     delete ui;
 }

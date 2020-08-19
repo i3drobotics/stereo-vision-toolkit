@@ -38,12 +38,9 @@ bool StereoCameraVimba::openCamera(){
 }
 
 bool StereoCameraVimba::closeCamera(){
-    if (connected){
-        //close vimba camera
-        //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-        camera_left->close();
-        camera_right->close();
-    }
+    camera_left->close();
+    camera_right->close();
+
     connected = false;
     emit disconnected();
     return true;
@@ -293,7 +290,6 @@ bool StereoCameraVimba::enableTrigger(bool enable){
 }
 
 StereoCameraVimba::~StereoCameraVimba(void) {
-    emit stop_capture();
-    camera_left->close();
-    camera_right->close();
+    // Cameras will clean up themselves;
+    return;
 }
