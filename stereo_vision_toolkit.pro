@@ -35,6 +35,8 @@ TEMPLATE = app vcapp
 
 CONFIG += warn_on
 CONFIG += doc
+CONFIG -= debug_and_release
+CONFIG -= debug_and_release_target
 
 # Setup FEVOR defines
 DEFINES += WITH_FERVOR
@@ -50,10 +52,8 @@ WITH_I3DRSGM {
 
 # To use Vimbda camera API (currently optional while being implimented)
 # add 'CONFIG+=WITH_VIMBA' to build arguments
-WITH_VIMBA {
-    message("VIMBA enabled")
-    DEFINES += WITH_VIMBA
-}
+message("VIMBA enabled")
+DEFINES += WITH_VIMBA
 
 # Define resources
 RC_FILE = icon.rc
@@ -124,8 +124,7 @@ win32 {
 # Optional vimba source files (as currently in development)
 WITH_VIMBA {
     SOURCES += \
-        stereocameravimba.cpp \
-        ApiController.cpp
+        stereocameravimba.cpp
 }
 # Optional I3RSGM matcher source files
 WITH_I3DRSGM {
@@ -174,8 +173,7 @@ win32 {
 # Optional vimba header files (as currently in development)
 WITH_VIMBA {
     HEADERS += \
-        stereocameravimba.h \
-        ApiController.h
+        stereocameravimba.h
 }
 # Optional I3DRSGM matcher header files
 WITH_I3DRSGM {
@@ -399,9 +397,9 @@ QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 CONFIG += file_copies
 COPIES += extraFiles
 win32 {
-    extraFiles.files = $${EXTRA_FILES}
+#    extraFiles.files = $${EXTRA_FILES}
 }
-extraFiles.path = $${DEPLOY_FOLDER}
+#extraFiles.path = $${DEPLOY_FOLDER}
 
 # Install drivers
 win32 {
