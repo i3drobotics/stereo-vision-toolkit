@@ -14,7 +14,7 @@ set option_clean=false
 set option_uninstall=false
 set option_token=false
 set option_with_opencv=false
-set option_with_phobos_integration=false
+set option_with_phobos_integration=true
 set token=""
 
 :: find options in arguments
