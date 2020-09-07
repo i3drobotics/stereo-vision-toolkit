@@ -117,18 +117,23 @@ void AbstractStereoCamera::saveImage(QString fname) {
     file_save_directory = fname;
 
     cv::Mat left, right;
+    std::string filename_r, filename_l;
     if (rectifying) {
+        filename_l = fname.toStdString() + "_l_rect.png";
+        filename_r = fname.toStdString() + "_r_rect.png";
         left_remapped.copyTo(left);
         right_remapped.copyTo(right);
     } else {
+        filename_l = fname.toStdString() + "_l.png";
+        filename_r = fname.toStdString() + "_r.png";
         left_raw.copyTo(left);
         right_raw.copyTo(right);
     }
 
     QFuture<bool> rect_l = QtConcurrent::run(
-                CVSupport::write_parallel, fname.toStdString() + "_l_rect.png", left_remapped);
+                CVSupport::write_parallel, filename_l, left);
     QFuture<bool> rect_r = QtConcurrent::run(
-                CVSupport::write_parallel, fname.toStdString() + "_r_rect.png", right_remapped);
+                CVSupport::write_parallel, filename_r, right);
 
     QFutureWatcher<bool> futureWatcher_l, futureWatcher_r;
     QObject::connect(&futureWatcher_l, SIGNAL(finished(bool)), this, SLOT(imageSaved(bool)));
