@@ -549,7 +549,7 @@ bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString ri
     double q33 = -(cx - cxr) / baseline;
 
     Q.at<double>(0,0) = 1.0;
-    Q.at<double>(0,3) = cx;
+    Q.at<double>(0,3) = -cx;
     Q.at<double>(1,1) = 1.0;
     Q.at<double>(1,3) = -cy;
     Q.at<double>(2,3) = fx;
