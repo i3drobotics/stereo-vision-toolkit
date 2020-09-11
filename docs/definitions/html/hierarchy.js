@@ -11,6 +11,7 @@ var hierarchy =
     [ "ParamFile", "class_param_file.html", null ],
     [ "PylonSupport", "class_pylon_support.html", null ],
     [ "QDialog", null, [
+      [ "AboutDialog", "class_about_dialog.html", null ],
       [ "CalibrateConfirmDialog", "class_calibrate_confirm_dialog.html", null ],
       [ "CalibrateFromImagesDialog", "class_calibrate_from_images_dialog.html", null ],
       [ "CalibrationDialog", "class_calibration_dialog.html", null ]
