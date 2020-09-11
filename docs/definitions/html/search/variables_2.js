@@ -1,7 +1,10 @@
 var searchData=
 [
-  ['left_5ffile_5fmodel_470',['left_file_model',['../class_calibrate_from_images_dialog.html#ac818751bc1c3acc6bbda1c419296ab01',1,'CalibrateFromImagesDialog']]],
-  ['left_5fimage_5flist_471',['left_image_list',['../class_calibrate_from_images_dialog.html#a13f9f6565ebcd5e08b718fcb5d16f745',1,'CalibrateFromImagesDialog::left_image_list()'],['../class_calibration_dialog.html#a94307b37f1f0ddc71974c9c9e6326e21',1,'CalibrationDialog::left_image_list()']]],
-  ['left_5fmask_472',['left_mask',['../class_calibrate_from_images_dialog.html#aeea077726c41001c14abf34044fc72a6',1,'CalibrateFromImagesDialog']]],
-  ['left_5fpath_473',['left_path',['../class_calibrate_from_images_dialog.html#abbaa1cdf9153e316014e614a9168ab63',1,'CalibrateFromImagesDialog']]]
+  ['m_5fscale_399',['m_scale',['../class_calibration_dialog.html#ab6b4f214c10acc3610aeadec0f5d5c96',1,'CalibrationDialog']]],
+  ['max_5fsize_400',['max_size',['../class_calibration_dialog.html#aee1cc069e3d347a27cc0c0cbd39b1bb8',1,'CalibrationDialog']]],
+  ['max_5fx_5fskew_401',['max_x_skew',['../class_calibration_dialog.html#ae10ea3409086c5881cdb91a6642b5786',1,'CalibrationDialog']]],
+  ['max_5fy_5fskew_402',['max_y_skew',['../class_calibration_dialog.html#a4f3e83d44c1a7bc05bcf892cb93d5d2d',1,'CalibrationDialog']]],
+  ['min_5fsize_403',['min_size',['../class_calibration_dialog.html#ac862b563846738e7f75b04c984a4d3f9',1,'CalibrationDialog']]],
+  ['min_5fx_5fskew_404',['min_x_skew',['../class_calibration_dialog.html#a79d91219623b7585b1f8a0fef613d098',1,'CalibrationDialog']]],
+  ['min_5fy_5fskew_405',['min_y_skew',['../class_calibration_dialog.html#aab6e400b543390d0aeee8eafd977f8ef',1,'CalibrationDialog']]]
 ];

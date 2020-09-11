@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['ui_500',['ui',['../class_calibrate_confirm_dialog.html#ad97976740de1126a474ca44187634e2e',1,'CalibrateConfirmDialog::ui()'],['../class_calibrate_from_images_dialog.html#ac3198e751dad3897244cee671eae0fdc',1,'CalibrateFromImagesDialog::ui()'],['../class_calibration_dialog.html#a2e0aaab49968d5d75f554d7dc2d530b5',1,'CalibrationDialog::ui()']]]
+  ['y_5fhighest_420',['y_highest',['../class_calibration_dialog.html#ab801731639c2927faff9638a63fa02cd',1,'CalibrationDialog']]],
+  ['y_5flowest_421',['y_lowest',['../class_calibration_dialog.html#a1679af00a9810492a7af172f70afb98d',1,'CalibrationDialog']]]
 ];

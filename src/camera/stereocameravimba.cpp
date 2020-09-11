@@ -33,6 +33,10 @@ bool StereoCameraVimba::openCamera(){
     }
 
     this->connected = setupCameras(stereoCameraSerialInfo_,binning,trigger,fps);
+    enableAutoGain(autoGain);
+    enableAutoExposure(autoExpose);
+    setExposure(exposure);
+    setGain(gain);
 
     return connected;
 }
@@ -214,6 +218,7 @@ bool StereoCameraVimba::setFPS(int fps){
 
         //TODO this frame rate should be set by the camera's internal calculation
         frame_rate = fps;
+        return true;
     } else {
         qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";
         return false;

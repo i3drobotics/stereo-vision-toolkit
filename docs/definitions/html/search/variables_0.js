@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['disparity_5frange_467',['disparity_range',['../class_i3_d_r_s_g_m.html#a0acb9a3be6fb767cc1d1555788068458',1,'I3DRSGM']]]
+  ['image_5fheight_393',['image_height',['../class_calibration_dialog.html#a65364ac277002665f07807046fca134f',1,'CalibrationDialog']]],
+  ['image_5fwidth_394',['image_width',['../class_calibration_dialog.html#a9620718260cd2c5f0847f38a26c4aaec',1,'CalibrationDialog']]]
 ];

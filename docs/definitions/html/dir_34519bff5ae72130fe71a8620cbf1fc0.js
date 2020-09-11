@@ -13,6 +13,8 @@ var dir_34519bff5ae72130fe71a8620cbf1fc0 =
     [ "cameraimagingsource.h", "cameraimagingsource_8h_source.html", null ],
     [ "cameraopencv.cpp", "cameraopencv_8cpp_source.html", null ],
     [ "cameraopencv.h", "cameraopencv_8h_source.html", null ],
+    [ "cameravimba.cpp", "cameravimba_8cpp_source.html", null ],
+    [ "cameravimba.h", "cameravimba_8h_source.html", null ],
     [ "pylonsupport.h", "pylonsupport_8h_source.html", null ],
     [ "stereocamerabasler.cpp", "stereocamerabasler_8cpp_source.html", null ],
     [ "stereocamerabasler.h", "stereocamerabasler_8h_source.html", null ],
