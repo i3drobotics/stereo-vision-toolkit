@@ -65,11 +65,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_api_controller_8cpp_source.html",
-"class_abstract_stereo_matcher.html#a4e4338b72a4f36ce0d0c3a2f5b2b6cb1",
-"class_camera_imaging_source.html#acde0871eec58104112b975cf6f5817c7",
-"class_main_window.html#a7134e8888348e4d343f7469a9d17b31b",
-"class_matcher_widget_open_c_v_s_g_b_m.html#ae1ec0170a9823bf302c118fe736a9cc5",
-"class_stereo_camera_t_i_s.html#a1de325241a0aa899fa7971c928b99b78"
+"class_abstract_stereo_matcher.html#a2b1a5e9841f39988686450b1f1721032",
+"class_camera_imaging_source.html#ab8add967ab0f93b16b351a492c815101",
+"class_main_window.html#a56967251ec8f41ca47fa2eb04b640258",
+"class_matcher_widget_open_c_v_s_g_b_m.html#a894a5cbe9aa8f8e076a02c4a25f4ddc5",
+"class_stereo_camera_open_c_v.html#ade377c9124299421e82a6a9cb5ef82fa"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

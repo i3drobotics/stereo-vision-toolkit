@@ -7,6 +7,7 @@ var annotated_dup =
         ] ]
       ] ]
     ] ],
+    [ "AboutDialog", "class_about_dialog.html", "class_about_dialog" ],
     [ "AbstractArduinoComs", "class_abstract_arduino_coms.html", "class_abstract_arduino_coms" ],
     [ "AbstractStereoCamera", "class_abstract_stereo_camera.html", "class_abstract_stereo_camera" ],
     [ "AbstractStereoMatcher", "class_abstract_stereo_matcher.html", "class_abstract_stereo_matcher" ],

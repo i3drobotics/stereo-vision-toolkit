@@ -262,6 +262,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>pointCloudSaveStatus<
 <tr class="memitem:a4037900bbe42daa151e96ba5c96c8f62"><td class="memItemLeft" align="right" valign="top"><a id="a4037900bbe42daa151e96ba5c96c8f62"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>openHelp</b> ()</td></tr>
 <tr class="separator:a4037900bbe42daa151e96ba5c96c8f62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06bcc3ac679ebab877652fc0d69744ea"><td class="memItemLeft" align="right" valign="top"><a id="a06bcc3ac679ebab877652fc0d69744ea"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>openAbout</b> ()</td></tr>
+<tr class="separator:a06bcc3ac679ebab877652fc0d69744ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
@@ -452,6 +455,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>first_cloud</b> = tru
 <tr class="memitem:a840c5c349087a263fbb131f2de6802d8"><td class="memItemLeft" align="right" valign="top"><a id="a840c5c349087a263fbb131f2de6802d8"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>first_image</b> = true</td></tr>
 <tr class="separator:a840c5c349087a263fbb131f2de6802d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01d720f8e05e211f40bb9b9f358fd2ea"><td class="memItemLeft" align="right" valign="top"><a id="a01d720f8e05e211f40bb9b9f358fd2ea"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>about_dialog_used</b> = false</td></tr>
+<tr class="separator:a01d720f8e05e211f40bb9b9f358fd2ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d8eda85e40c236f71c860ddd6ff2037"><td class="memItemLeft" align="right" valign="top"><a id="a6d8eda85e40c236f71c860ddd6ff2037"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>calibration_dialog_used</b> = false</td></tr>
 <tr class="separator:a6d8eda85e40c236f71c860ddd6ff2037"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -473,6 +479,9 @@ boost::shared_ptr&lt; pcl::visualization::PCLVisualizer &gt;&#160;</td><td class
 <tr class="memitem:a33e4f58b7c37cc7c2e24f9915eed1fe4"><td class="memItemLeft" align="right" valign="top"><a id="a33e4f58b7c37cc7c2e24f9915eed1fe4"></a>
 pcl::PointCloud&lt; pcl::PointXYZRGB &gt;::Ptr&#160;</td><td class="memItemRight" valign="bottom"><b>cloud</b></td></tr>
 <tr class="separator:a33e4f58b7c37cc7c2e24f9915eed1fe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9171fe40642baa6a7516acc73357b544"><td class="memItemLeft" align="right" valign="top"><a id="a9171fe40642baa6a7516acc73357b544"></a>
+<a class="el" href="class_about_dialog.html">AboutDialog</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>about_dialog</b></td></tr>
+<tr class="separator:a9171fe40642baa6a7516acc73357b544"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2de669a1e1ffbbd7a1583d0dd5633ec"><td class="memItemLeft" align="right" valign="top"><a id="af2de669a1e1ffbbd7a1583d0dd5633ec"></a>
 <a class="el" href="class_calibration_dialog.html">CalibrationDialog</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>calibration_dialog</b></td></tr>
 <tr class="separator:af2de669a1e1ffbbd7a1583d0dd5633ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -501,7 +510,7 @@ std::vector&lt; QSignalMapper * &gt; *&#160;</td><td class="memItemRight" valign
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>QT Main Window of application. </p>
 
-<p class="definition">Definition at line <a class="el" href="mainwindow_8h_source.html#l00072">72</a> of file <a class="el" href="mainwindow_8h_source.html">mainwindow.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mainwindow_8h_source.html#l00074">74</a> of file <a class="el" href="mainwindow_8h_source.html">mainwindow.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a996c5a2b6f77944776856f08ec30858d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a996c5a2b6f77944776856f08ec30858d">&#9670;&nbsp;</a></span>MainWindow()</h2>
@@ -549,7 +558,7 @@ std::vector&lt; QSignalMapper * &gt; *&#160;</td><td class="memItemRight" valign
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="class_main_window.html">MainWindow</a></li>
-    <li class="footer">Generated on Fri Sep 11 2020 15:51:27 for Stereo Vision Toolkit by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
+    <li class="footer">Generated on Fri Sep 11 2020 16:30:42 for Stereo Vision Toolkit by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.20 </li>
   </ul>
 </div>
 </body>
