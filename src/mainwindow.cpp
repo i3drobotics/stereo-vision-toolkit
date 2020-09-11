@@ -1750,7 +1750,7 @@ void MainWindow::updateFrameTime(qint64 time) {
 }
 
 void MainWindow::openHelp(){
-    QString link = QCoreApplication::applicationDirPath() + "/docs/help/UserGuide.pdf";
+    QString link = "https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf";
     QDesktopServices::openUrl(QUrl(link));
 }
 
