@@ -101,6 +101,7 @@ SOURCES += \
     arduinocommscameracontrol.cpp \
     main.cpp\
     mainwindow.cpp \
+    aboutdialog.cpp \
     calibrationdialog.cpp \
     abstractarduinocoms.cpp \
     src/camera/cameravimba.cpp \
@@ -147,6 +148,7 @@ WITH_I3DRSGM {
 HEADERS += \
     arduinocommscameracontrol.h \
     mainwindow.h \
+    aboutdialog.h \
     calibrationdialog.h \
     asmopencv.h \
     abstractarduinocoms.h \
@@ -195,13 +197,15 @@ WITH_I3DRSGM {
 # Define application window forms
 FORMS += \
     mainwindow.ui \
+    aboutdialog.ui \
     calibrationdialog.ui \
     calibrateconfirmdialog.ui \
     calibratefromimagesdialog.ui \
     matcherwidgetopencvblock.ui \
     matcherwidgetopencvsgbm.ui \
     disparityviewer.ui \
-    cameradisplaywidget.ui
+    cameradisplaywidget.ui \
+    src/aboutdialog.ui
 # Optional I3DRSGM window form
 WITH_I3DRSGM {
     FORMS += matcherwidgeti3drsgm.ui

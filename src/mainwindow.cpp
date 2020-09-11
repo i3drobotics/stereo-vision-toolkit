@@ -117,6 +117,10 @@ MainWindow::MainWindow(QWidget* parent)
 
     //frame_timer = new QTimer(this);
 
+    about_dialog = new AboutDialog(this);
+    QString version_name = QString("Stereo Vision Toolkit v")+QString(FV_APP_VERSION);
+    about_dialog->setVersion(version_name);
+
     /* Calibration */
     connect(ui->actionCalibration_wizard, SIGNAL(triggered(bool)), this,
             SLOT(startAutoCalibration()));
@@ -124,6 +128,8 @@ MainWindow::MainWindow(QWidget* parent)
             SLOT(startCalibrationFromImages()));
     connect(ui->actionDocumentation, SIGNAL(triggered(bool)), this,
             SLOT(openHelp()));
+    connect(ui->actionAbout, SIGNAL(triggered(bool)), this,
+            SLOT(openAbout()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), QApplication::instance(),
             SLOT(quit()));
     connect(this, SIGNAL(cameraListUpdated(void)), this, SLOT(refreshCameraListGUI(void)));
@@ -1758,6 +1764,11 @@ void MainWindow::openHelp(){
     QDesktopServices::openUrl(QUrl(link));
 }
 
+void MainWindow::openAbout(){
+    about_dialog->show();
+    about_dialog_used = true;
+}
+
 void MainWindow::hideCameraSettings(bool hide){
     if (hide){
         ui->widgetSideSettings->setVisible(false);
@@ -1817,6 +1828,7 @@ void MainWindow::closeEvent(QCloseEvent *) {
     stopDeviceListTimer();
     while(device_list_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
     // Close external windows
+    about_dialog->close();
     if (calibration_dialog_used){
         calibration_dialog->close();
     }
