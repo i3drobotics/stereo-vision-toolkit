@@ -31,6 +31,8 @@
 #include <QVTKWidget.h>
 #include <vtkRenderWindow.h>
 
+#include "aboutdialog.h"
+
 #include "matcherwidgetopencvblock.h"
 #include "matcherwidgetopencvsgbm.h"
 #ifdef WITH_I3DRSGM
@@ -140,6 +142,7 @@ private:
     bool first_cloud = true;
     bool first_image = true;
 
+    bool about_dialog_used = false;
     bool calibration_dialog_used = false;
     bool calibration_from_images_dialog_used = false;
 
@@ -151,6 +154,7 @@ private:
     boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
 
+    AboutDialog* about_dialog;
     CalibrationDialog* calibration_dialog;
     CalibrateFromImagesDialog* calibration_images_dialog;
 
@@ -242,6 +246,8 @@ public slots:
     void pointCloudSaveStatus(QString);
 
     void openHelp();
+
+    void openAbout();
 
 protected:
     void closeEvent(QCloseEvent *event);
