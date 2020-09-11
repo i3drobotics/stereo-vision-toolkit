@@ -32,12 +32,7 @@ bool StereoCameraVimba::openCamera(){
         autoGain = false;
     }
 
-    connected = setupCameras(stereoCameraSerialInfo_,binning,trigger,fps);
-
-    enableAutoGain(autoGain);
-    enableAutoExposure(autoExpose);
-    setExposure(exposure);
-    setGain(gain);
+    this->connected = setupCameras(stereoCameraSerialInfo_,binning,trigger,fps);
 
     return connected;
 }
@@ -46,216 +41,46 @@ bool StereoCameraVimba::closeCamera(){
     if (connected){
         //close vimba camera
         //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-        VmbErrorType err_l = camera_l->Close();
-        VmbErrorType err_r = camera_r->Close();
+        camera_left->close();
+        camera_right->close();
     }
     connected = false;
     emit disconnected();
     return true;
 }
 
-void StereoCameraVimba::getImageSize(int &width, int &height, int &bitdepth)
-{
-    //get image size
-    VmbInt64_t h = 0, w= 0;
-    VmbErrorType err_h = VmbErrorSuccess;
-    VmbErrorType err_w = VmbErrorSuccess;
-
-    AVT::VmbAPI::FeaturePtr pFeature;
-    VmbErrorType    result;
-
-    err_h = camera_l.get()->GetFeatureByName( "Height", pFeature );
-    if( err_h == VmbErrorSuccess )
-        pFeature.get()->GetValue(h);
-
-    err_w = camera_l.get()->GetFeatureByName( "Width", pFeature );
-    if( err_w == VmbErrorSuccess )
-        pFeature.get()->GetValue(w);
-
-    if (err_h == VmbErrorSuccess && err_w == VmbErrorSuccess){
-        height = (int) h;
-        width = (int) w;
-        bitdepth = 1; //TODO get bit depth
-    } else {
-        qDebug() << "Failed to get width / height";
-    }
-}
-
-bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, int iTrigger, int iFps){
-    //this->connected = false;
-    //disconnect(this, SIGNAL(acquired()), this, SLOT(capture()));
-
-    // find vimba systems connected
-    AVT::VmbAPI::CameraPtrVector all_cameras;
-    system.GetCameras(all_cameras);
+bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInfo CSI_cam_info,int iBinning, bool trigger, int iFps){
     std::string camera_left_serial = CSI_cam_info.left_camera_serial;
     std::string camera_right_serial = CSI_cam_info.right_camera_serial;
-    bool cameraLeftFind = false;
-    for (size_t i = 0; i < all_cameras.size(); ++i)
-    {
-        std::string device_serial;
-        all_cameras[i]->GetSerialNumber(device_serial);
-        if (device_serial == camera_left_serial)
-        {
-            //all_cameras[i]->GetID(cameraID_l);
-            camera_l = all_cameras[i];
-            cameraLeftFind = true;
-            break;
-        }
-    }
 
-    if (!cameraLeftFind){
-        std::cerr << "Failed to find left camera with serial: " << camera_left_serial << std::endl;
-        return false;
-    }
+    camera_left = new CameraVimba();
+    camera_right = new CameraVimba();
 
-    bool cameraRightFind = false;
-    for (size_t i = 0; i < all_cameras.size(); ++i)
-    {
-        std::string device_serial;
-        all_cameras[i]->GetSerialNumber(device_serial);
-        if (device_serial == camera_right_serial)
-        {
-            //all_cameras[i]->GetID(cameraID_r);
-            camera_r = all_cameras[i];
-            cameraRightFind = true;
-            break;
-        }
-    }
+    bool error = camera_left->initCamera(camera_left_serial, iBinning, trigger , iFps);
+    error &= camera_right->initCamera(camera_right_serial, iBinning, trigger, iFps);
 
-    if (!cameraRightFind){
-        std::cerr << "Failed to find right camera with serial: " << camera_right_serial << std::endl;
-        return false;
-    }
-
-    // open cameras
-    VmbErrorType err_l = camera_l->Open(VmbAccessModeFull);
-    VmbErrorType err_r = camera_r->Open(VmbAccessModeFull);
-
-    if (err_l == VmbErrorSuccess && err_r == VmbErrorSuccess){
-        int width, height, bitdepth;
-        getImageSize(width,height,bitdepth);
+    if(!error){
+        int height, width, bitdepth;
+        camera_left->getImageSize(height, width, bitdepth);
         emit update_size(width, height, bitdepth);
-
-        if (iBinning > 0){
-            setBinning(iBinning);
-        }
-        if (iTrigger >= 0){
-            bool trigger;
-            if (iTrigger == 0){
-                trigger = false;
-            } else {
-                trigger = true;
-            }
-            enableTrigger(trigger);
-        }
-
-        if (iFps > 0){
-            setFPS(iFps);
-        }
-        return true;
-    } else {
-        qDebug() << "Failed to open camera";
-        return false;
     }
+
+    return error;
 }
 
 bool StereoCameraVimba::captureSingle(){
+    bool left_res = camera_left->capture();
+    bool right_res = camera_right->capture();
     bool res = false;
-    try
-    {
-        if (this->connected){
-            // get image from cameras
-            AVT::VmbAPI::FramePtr pFrame_l, pFrame_r;
-            VmbErrorType captureErr_l, captureErr_r;
-            VmbFrameStatusType status_l, status_r = VmbFrameStatusIncomplete;
-            captureErr_l = camera_l->AcquireSingleImage( pFrame_l, 5000 );
-            captureErr_r = camera_r->AcquireSingleImage( pFrame_r, 5000 );
-            if ( captureErr_l == VmbErrorSuccess && captureErr_r == VmbErrorSuccess )
-            {
-                captureErr_l = pFrame_l->GetReceiveStatus( status_l );
-                captureErr_r = pFrame_r->GetReceiveStatus( status_r );
-                if (     captureErr_l == VmbErrorSuccess
-                     && status_l == VmbFrameStatusComplete &&
-                         captureErr_r == VmbErrorSuccess
-                        && status_r == VmbFrameStatusComplete)
-                {
-                    VmbPixelFormatType ePixelFormat_l,ePixelFormat_r = VmbPixelFormatMono8;
-                    captureErr_l = pFrame_l->GetPixelFormat( ePixelFormat_l );
-                    captureErr_r = pFrame_r->GetPixelFormat( ePixelFormat_r );
-                    if ( captureErr_l == VmbErrorSuccess)
-                    {
-                        if (    ( ePixelFormat_l != VmbPixelFormatMono8 )
-                                &&  ( ePixelFormat_r != VmbPixelFormatMono8 ))
-                        {
-                            captureErr_l = VmbErrorInvalidValue;
-                            captureErr_r = VmbErrorInvalidValue;
-                            qDebug() << "Invalid pixel format";
-                            res = false;
-                        }
-                        else
-                        {
-                            VmbUint32_t nImageSize = 0;
-                            captureErr_l = pFrame_l->GetImageSize( nImageSize );
-                            if ( captureErr_l == VmbErrorSuccess )
-                            {
-                                VmbUint32_t nWidth = 0;
-                                captureErr_l = pFrame_l->GetWidth( nWidth );
-                                if ( captureErr_l == VmbErrorSuccess )
-                                {
-                                    VmbUint32_t nHeight = 0;
-                                    captureErr_l = pFrame_l->GetHeight( nHeight );
-                                    if ( captureErr_l == VmbErrorSuccess )
-                                    {
-                                        VmbUchar_t *pImage_l,*pImage_r  = NULL;
-                                        captureErr_l = pFrame_l->GetImage( pImage_l );
-                                        captureErr_r = pFrame_r->GetImage( pImage_r );
-                                        if ( captureErr_l == VmbErrorSuccess
-                                             &&  captureErr_r == VmbErrorSuccess )
-                                        {
-                                            cv::Mat image_left_temp = cv::Mat(nHeight, nWidth, CV_8UC1, pImage_l );
-                                            cv::Mat image_right_temp = cv::Mat(nHeight, nWidth, CV_8UC1, pImage_r );
-                                            image_left_temp.copyTo(left_raw);
-                                            image_right_temp.copyTo(right_raw);
-                                            res = true;
-                                        }
-                                    }
-                                }
-                            }
 
-                        }
-                    } else {
-                        qDebug() << "Failed to get pixel format";
-                        res = false;
-                    }
-                } else {
-                    qDebug() << "Failed to acquire frame or incomplete";
-                    res = false;
-                }
-            } else {
-                qDebug() << "Failed to acquire image";
-                res = false;
-            }
-        } else {
-            qDebug() << "Camera is not connected or is initalising";
-            std::cerr << "Camera is not connected or is initalising" << std::endl;
-            res = false;
-        }
-    }
-    catch (...)
-    {
-        // Error handling.
-        //qDebug() << "An exception occurred." << e.GetDescription();
-        //std::cerr << "An exception occurred." << std::endl
-        //          << e.GetDescription() << std::endl;
-        qDebug() << "Failed to grab camera";
-        res = false;
-    }
-    if (!res){
-        send_error(CAPTURE_ERROR);
-        emit captured_fail();
-    } else {
+    if(left_res && right_res){
+        camera_left->getImage()->copyTo(left_raw);
+        camera_right->getImage()->copyTo(right_raw);
         emit captured_success();
+        res = true;
+    }else{
+        emit captured_fail();
+        res = false;
     }
     emit captured();
     return res;
@@ -280,17 +105,29 @@ bool StereoCameraVimba::enableCapture(bool enable){
 }
 
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraVimba::listSystems(){
+
+    using namespace AVT::VmbAPI;
+
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(CAMERA_TYPE_VIMBA);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
 
-    //AVT::VmbAPI::Examples::ApiController apiController = AVT::VmbAPI::Examples::ApiController();
-    //VmbErrorType apiControllerStatus = apiController.StartUp();
+    // NB you need to explicitly state the left hand type, otherwise
+    // you'll get weird private constructor errors - don't use auto
 
-    // find vimba systems connected
-    AVT::VmbAPI::CameraPtrVector all_cameras;
-    AVT::VmbAPI::VimbaSystem &system = AVT::VmbAPI::VimbaSystem::GetInstance();
-    system.Startup();
-    system.GetCameras(all_cameras);
+    VimbaSystem& system = VimbaSystem::GetInstance();
+    CameraPtrVector all_cameras;
+
+    auto err = system.GetCameras( all_cameras );            // Fetch all cameras known to Vimba
+    if( err != VmbErrorSuccess ){
+        qDebug() << "Could not list cameras. Error code: " << err << "\n";
+        return connected_serial_infos;
+    }
+
+    qDebug() << "Cameras found: " << all_cameras.size() <<"\n\n";
+
+    if(all_cameras.size() == 0){
+        return connected_serial_infos;
+    }
 
     std::vector<std::string> connected_camera_names;
     std::vector<std::string> connected_serials;
@@ -345,37 +182,38 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraVimba::lis
 }
 
 bool StereoCameraVimba::enableAutoExposure(bool enable) {
-    //TODO set auto exposure
-    return false;
+    return camera_left->enableAutoExposure(enable) &&
+           camera_right->enableAutoExposure(enable);
 }
 
-bool StereoCameraVimba::setGain(int val) {
-    //TODO set gain
-    return false;
+bool StereoCameraVimba::setGain(int gain) {
+    return camera_left->setGain(gain) &&
+           camera_right->setGain(gain);
 }
 
 bool StereoCameraVimba::setBinning(int val){
-    //TODO set binning
-    return false;
+    return camera_left->setBinning(val) &&
+           camera_right->setBinning(val);
 }
 
 bool StereoCameraVimba::setExposure(double exposure) {
-    //TODO set exposure
-    return false;
+    return camera_left->setExposure(exposure) &&
+           camera_right->setExposure(exposure);
 }
 
 bool StereoCameraVimba::enableAutoGain(bool enable){
-    //TODO toggle auto gain
-    return false;
+    return camera_left->enableAutoGain(enable) &&
+           camera_right->enableAutoGain(enable);
 }
 
 bool StereoCameraVimba::setFPS(int fps){
     if (!isCapturing()){
-        AVT::VmbAPI::CameraPtr pCamera;
-        //apiController_.GetCamera(cameraID_l,pCamera);
-        //pCamera->GetFeatureByName("Exposure",)
+
+        camera_left->setFPS(fps);
+        camera_right->setFPS(fps);
+
+        //TODO this frame rate should be set by the camera's internal calculation
         frame_rate = fps;
-        return true;
     } else {
         qDebug() << "Cannot set FPS while capturing. Stop capturing and try again.";
         return false;
@@ -383,26 +221,11 @@ bool StereoCameraVimba::setFPS(int fps){
 }
 
 bool StereoCameraVimba::enableTrigger(bool enable){
-    //set hardware trigger
-    /*
-    AVT::VmbAPI::CameraPtr pCamera;
-    AVT::VmbAPI::FeaturePtr pFeature;
-    apiController.GetCamera(cameraID_l,pCamera);
-    VmbErrorType err = pCamera->GetFeatureByName( "TriggerMode", pFeature );
-    if (err == VmbErrorSuccess){
-        if (enable){
-            pFeature->SetValue( "On" );
-        } else {
-            pFeature->SetValue( "Off" );
-        }
-    }
-    */
-    return false;
+    return camera_left->enableTrigger(enable) &&
+           camera_right->enableTrigger(enable);
 }
 
 StereoCameraVimba::~StereoCameraVimba(void) {
-    if (connected){
-        closeCamera();
-    }
-    system.Shutdown();
+    camera_left->close();
+    camera_right->close();
 }
