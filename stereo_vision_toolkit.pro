@@ -36,6 +36,15 @@ TEMPLATE = app vcapp
 CONFIG += warn_on
 CONFIG += doc
 
+# Define if doing development build
+# !! ONLY USE WHEN ON DEVELOPMENT BRANCH !!
+# !! MAKE SURE TO REMOVE THIS BUILD OPTION WHEN DOING RELEASE !!
+DEV_BRANCH {
+    message("Development build")
+    message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING RELEASE !!")
+    DEFINES += DEV_BRANCH
+}
+
 # Setup FEVOR defines
 DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
