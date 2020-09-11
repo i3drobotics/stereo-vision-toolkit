@@ -8,7 +8,6 @@ var hierarchy =
     [ "GrabberListener", null, [
       [ "Listener", "class_listener.html", null ]
     ] ],
-    [ "I3DRSGM", "class_i3_d_r_s_g_m.html", null ],
     [ "ParamFile", "class_param_file.html", null ],
     [ "PylonSupport", "class_pylon_support.html", null ],
     [ "QDialog", null, [
@@ -39,6 +38,7 @@ var hierarchy =
       [ "CameraBasler", "class_camera_basler.html", null ],
       [ "CameraImagingSource", "class_camera_imaging_source.html", null ],
       [ "CameraOpenCV", "class_camera_open_c_v.html", null ],
+      [ "CameraVimba", "class_camera_vimba.html", null ],
       [ "Chessboard", "class_chessboard.html", null ],
       [ "CPylonImageEventHandler", "class_c_pylon_image_event_handler.html", null ],
       [ "Listener", "class_listener.html", null ],

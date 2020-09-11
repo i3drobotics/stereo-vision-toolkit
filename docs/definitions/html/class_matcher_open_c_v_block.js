@@ -31,7 +31,6 @@ var class_matcher_open_c_v_block =
     [ "setUniquenessRatio", "class_matcher_open_c_v_block.html#ae6d8ad706c2743abc1998a7e7deae899", null ],
     [ "setupDefaultMatcher", "class_matcher_open_c_v_block.html#ab417e1cbbc83d266a0653b324e67a627", null ],
     [ "matcher", "class_matcher_open_c_v_block.html#ae6369136aff57fd96ec79983b34d06bb", null ],
-    [ "wls_filter", "class_matcher_open_c_v_block.html#acc9e8518006e8d85880cd60ba69dfafa", null ],
     [ "wls_lambda", "class_matcher_open_c_v_block.html#a6645a323bdfd35f951b8d3397f5bc79b", null ],
     [ "wls_sigma", "class_matcher_open_c_v_block.html#a9aef4427fbd84d520d10ac9195227181", null ]
 ];

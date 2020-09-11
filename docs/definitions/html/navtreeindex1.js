@@ -1,6 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0":[10,0,3,3],
 "class_abstract_stereo_matcher.html#a4e4338b72a4f36ce0d0c3a2f5b2b6cb1":[10,0,3,23],
 "class_abstract_stereo_matcher.html#a51c30315cdc2c2eb0442abfccd99c2a3":[10,0,3,31],
 "class_abstract_stereo_matcher.html#a57d8d83507e36de82d29091c662cd7a1":[10,0,3,36],
@@ -27,14 +26,14 @@ var NAVTREEINDEX1 =
 "class_arduino_comms_camera_control.html":[10,0,4],
 "class_arduino_comms_camera_control.html#a40c72e504856894444bc9151e1c77878":[10,0,4,1],
 "class_arduino_comms_camera_control.html#a99cf651e92da56e4fd06f9f935ec4167":[10,0,4,0],
-"class_c_pylon_image_event_handler.html":[10,0,13],
-"class_c_pylon_image_event_handler.html#a4b23912e5c6e01a54dad44d387eb0ec6":[10,0,13,3],
-"class_c_pylon_image_event_handler.html#a52d7564e2712c1233355775f6bfaed71":[10,0,13,5],
-"class_c_pylon_image_event_handler.html#a6fea9f584cba39e7790751ec6dcfb55b":[10,0,13,2],
-"class_c_pylon_image_event_handler.html#a9ef8bc3b1b77130559d479a6ef63f82b":[10,0,13,1],
-"class_c_pylon_image_event_handler.html#ad2e9773865ec012ebf8e13199aeb6c1d":[10,0,13,0],
-"class_c_pylon_image_event_handler.html#af8422d94e69c081bbea1c268a1ab5e90":[10,0,13,4],
-"class_c_v_support.html":[10,0,14],
+"class_c_pylon_image_event_handler.html":[10,0,14],
+"class_c_pylon_image_event_handler.html#a4b23912e5c6e01a54dad44d387eb0ec6":[10,0,14,3],
+"class_c_pylon_image_event_handler.html#a52d7564e2712c1233355775f6bfaed71":[10,0,14,5],
+"class_c_pylon_image_event_handler.html#a6fea9f584cba39e7790751ec6dcfb55b":[10,0,14,2],
+"class_c_pylon_image_event_handler.html#a9ef8bc3b1b77130559d479a6ef63f82b":[10,0,14,1],
+"class_c_pylon_image_event_handler.html#ad2e9773865ec012ebf8e13199aeb6c1d":[10,0,14,0],
+"class_c_pylon_image_event_handler.html#af8422d94e69c081bbea1c268a1ab5e90":[10,0,14,4],
+"class_c_v_support.html":[10,0,15],
 "class_calibrate_confirm_dialog.html":[10,0,5],
 "class_calibrate_confirm_dialog.html#a0a039618491ce3e51e1e5b81e986b386":[10,0,5,0],
 "class_calibrate_confirm_dialog.html#a1e8fb6cf2afa573ba2157d4b7e2c750d":[10,0,5,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX1 =
 "class_camera_imaging_source.html#abe3b9f53fa1450474d51314b5dbcba5d":[10,0,10,5],
 "class_camera_imaging_source.html#ac03effc823e33de5cf6e4bfa5b51be7c":[10,0,10,12],
 "class_camera_imaging_source.html#ac36e0a0d57f7924f63050012692804db":[10,0,10,40],
-"class_camera_imaging_source.html#ac9cdbad70d343e6e9758c91ee26c441b":[10,0,10,19]
+"class_camera_imaging_source.html#ac9cdbad70d343e6e9758c91ee26c441b":[10,0,10,19],
+"class_camera_imaging_source.html#acb4778bfbb29bbd90675a6001bede094":[10,0,10,27]
 };

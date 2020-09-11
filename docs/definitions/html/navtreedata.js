@@ -34,8 +34,13 @@ var NAVTREE =
     [ "License", "index.html#autotoc_md8", null ],
     [ "Previous Releases", "index.html#autotoc_md9", null ],
     [ "Developer zone", "index.html#autotoc_md10", [
-      [ "3rd Party Content", "index.html#autotoc_md11", null ],
-      [ "Phobos control", "index.html#autotoc_md12", null ]
+      [ "3rd Party Content", "index.html#autotoc_md11", [
+        [ "Automaic install", "index.html#autotoc_md12", null ],
+        [ "Boost", "index.html#autotoc_md13", null ],
+        [ "QT", "index.html#autotoc_md14", null ],
+        [ "CUDA", "index.html#autotoc_md15", null ]
+      ] ],
+      [ "Phobos control", "index.html#autotoc_md16", null ]
     ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ]
@@ -46,7 +51,7 @@ var NAVTREE =
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", "functions_dup" ],
-        [ "Functions", "functions_func.html", "functions_func" ],
+        [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ],
         [ "Enumerations", "functions_enum.html", null ]
       ] ]
@@ -59,12 +64,12 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-".html",
-"class_abstract_stereo_matcher.html#a4e2bc164538e6dab3d31dcee275031b0",
-"class_camera_imaging_source.html#acb4778bfbb29bbd90675a6001bede094",
-"class_main_window.html#a6d8eda85e40c236f71c860ddd6ff2037",
-"class_matcher_widget_open_c_v_s_g_b_m.html#ac306ee75119e8812eb52e57daba44ba5",
-"class_stereo_camera_t_i_s.html#a0929d84017c5ae249ffecb2fb5482bf2"
+"_api_controller_8cpp_source.html",
+"class_abstract_stereo_matcher.html#a4e4338b72a4f36ce0d0c3a2f5b2b6cb1",
+"class_camera_imaging_source.html#acde0871eec58104112b975cf6f5817c7",
+"class_main_window.html#a7134e8888348e4d343f7469a9d17b31b",
+"class_matcher_widget_open_c_v_s_g_b_m.html#ae1ec0170a9823bf302c118fe736a9cc5",
+"class_stereo_camera_t_i_s.html#a1de325241a0aa899fa7971c928b99b78"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
