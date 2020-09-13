@@ -333,9 +333,9 @@ void MainWindow::detectionInit(){
     connect(ui->detectionSetupButton, SIGNAL(clicked(bool)), this, SLOT(configureDetection()));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(enableDetection(int)));
 
-    connect(ui->detectionThresholdSlider, SIGNAL(valueUpdated(int)), ui->detectionThresholdSpinbox, SLOT(setValue(int)));
-    connect(ui->detectionThresholdSpinbox, SIGNAL(valueUpdated(int)), ui->detectionThresholdSlider, SLOT(setValue(int)));
-
+    connect(ui->detectionThresholdSlider, SIGNAL(valueChanged(int)), ui->detectionThresholdSpinbox, SLOT(setValue(int)));
+    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), ui->detectionThresholdSlider, SLOT(setValue(int)));
+    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), object_detector, SLOT(setConfidenceThresholdPercent(int)));
 }
 
 void MainWindow::configureDetection(){

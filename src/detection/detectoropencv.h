@@ -47,15 +47,9 @@ public:
     std::vector<BoundingBox> inferDarknet(cv::Mat image);
     std::vector<BoundingBox> inferTensorflow(cv::Mat image);
 
-    void setFramework(model_framework framework){this->framework = framework;}
-    void setConfidenceThreshold(double thresh){confThreshold = std::max(0.0, thresh);}
-    void setNMSThreshold(double thresh){nmsThreshold = std::max(0.0, thresh);}
-    void setConvertGrayscale(bool convert){convert_grayscale = convert;}
-    void setConvertDepth(bool convert){convert_depth = convert;}
     double getConfidenceThreshold(void){ return confThreshold;}
     double getNMSThreshold(void){ return nmsThreshold;}
-    void setTarget(int target);
-    void setChannels(int channels);
+
     void assignThread(QThread* thread);
     int getChannels(void){return input_channels;}
     int getInputWidth(void){return input_width;}
@@ -68,6 +62,18 @@ public:
 
 public slots:
     std::vector<BoundingBox> infer(cv::Mat image);
+    void setFramework(model_framework framework){this->framework = framework;}
+
+    void setConfidenceThresholdPercent(int thresh_pc){confThreshold = std::max(0.0, thresh_pc / 100.);}
+    void setConfidenceThreshold(double thresh){confThreshold = std::max(0.0, thresh);}
+
+    void setNMSThresholdPercent(int thresh){nmsThreshold = std::max(0.0, thresh / 100.0);}
+    void setNMSThreshold(double thresh){nmsThreshold = std::max(0.0, thresh);}
+
+    void setConvertGrayscale(bool convert){convert_grayscale = convert;}
+    void setConvertDepth(bool convert){convert_depth = convert;}
+    void setTarget(int target);
+    void setChannels(int channels);
 
 private:
 
