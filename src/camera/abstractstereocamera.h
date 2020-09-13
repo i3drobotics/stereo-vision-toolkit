@@ -225,7 +225,7 @@ public:
    * @sa setSavelocation(), videoStreamStop()
    * @param[out] fps The frame rate of the video recording
   */
-    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = CV_FOURCC('H', '2', '6', '4'), bool is_color = false);
+    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = cv::VideoWriter::fourcc('H', '2', '6', '4'), bool is_color = false);
     bool addVideoStreamFrame(cv::Mat left, cv::Mat right);
 
     bool connected = false;
@@ -583,7 +583,7 @@ private:
     int cal_image_height;
 
     int video_fps = 0;
-    int video_codec = CV_FOURCC('H', '2', '6', '4');
+    int video_codec = cv::VideoWriter::fourcc('H', '2', '6', '4');
     bool video_is_color = false;
     std::string video_filename = "";
     cv::Mat video_frame;

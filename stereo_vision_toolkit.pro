@@ -94,7 +94,9 @@ SOURCES += \
     mainwindow.cpp \
     calibrationdialog.cpp \
     abstractarduinocoms.cpp \
-    src/camera/cameravimba.cpp \
+    camera/cameravimba.cpp \
+    detection/detectoropencv.cpp \
+    detection/detectorsetupdialog.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -142,7 +144,10 @@ HEADERS += \
     abstractarduinocoms.h \
     cvsupport.h \
     pylonsupport.h \
-    src/camera/cameravimba.h \
+    camera/cameravimba.h \
+    detection/boundingbox.h \
+    detection/detectoropencv.h \
+    detection/detectorsetupdialog.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -190,7 +195,8 @@ FORMS += \
     matcherwidgetopencvblock.ui \
     matcherwidgetopencvsgbm.ui \
     disparityviewer.ui \
-    cameradisplaywidget.ui
+    cameradisplaywidget.ui \
+    src/detection/detectorsetupdialog.ui
 # Optional I3DRSGM window form
 WITH_I3DRSGM {
     FORMS += matcherwidgeti3drsgm.ui
@@ -228,7 +234,7 @@ macx {
 }
 
 # Define include folders for libraries
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/VTK/include/vtk-7.0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/PCL/include/pcl-1.8"
@@ -248,7 +254,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/debug" -lhidapi
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/lib" -lopencv_world3410d
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440d
 }else {
     # Define release only libraries
     message("Release mode")
@@ -257,7 +263,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/release" -lhidapi
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/lib" -lopencv_world3410
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440
 }
 
 # Define libraries
@@ -314,7 +320,7 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rdparty/pylon/dep/x64/*.dll, true) \
         $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
         $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
-        $$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/bin/opencv_ffmpeg3410_64.dll
+        $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
 
     # Copy openssl dlls depending on version using
     WITH_OPENSSL_102j {
@@ -327,7 +333,7 @@ win32 {
     CONFIG( debug, debug|release ) {
         # Debug only dlls
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/bin/opencv_world3410d.dll \
+            $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440d.dll \
             $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/debug/*.dll, true) \
             $$_PRO_FILE_PWD_/3rdparty/png/libpng16d.dll \
             $$_PRO_FILE_PWD_/3rdparty/tbb/tbb_debug.dll \
@@ -337,7 +343,7 @@ win32 {
     } else {
         # Release only dlls
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rdparty/opencv-3.4.10/opencv/build/x64/vc15/bin/opencv_world3410.dll \
+            $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440.dll \
             $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/release/*.dll, true) \
             $$_PRO_FILE_PWD_/3rdparty/png/libpng16.dll \
             $$_PRO_FILE_PWD_/3rdparty/tis/bin/TIS_UDSHL11_x64.dll \
@@ -397,6 +403,7 @@ QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 CONFIG += file_copies
 COPIES += extraFiles
 win32 {
+#    message("Copying dependencies")
 #    extraFiles.files = $${EXTRA_FILES}
 }
 #extraFiles.path = $${DEPLOY_FOLDER}
