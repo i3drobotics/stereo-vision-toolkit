@@ -363,7 +363,7 @@
             </size>
            </property>
            <property name="currentIndex">
-            <number>0</number>
+            <number>2</number>
            </property>
            <widget class="QWidget" name="tabCameraList">
             <attribute name="title">
@@ -440,8 +440,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>310</width>
-                    <height>193</height>
+                    <width>308</width>
+                    <height>187</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1158,19 +1158,94 @@
                 </layout>
                </item>
                <item>
-                <spacer name="verticalSpacer_4">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
+                <widget class="QGroupBox" name="groupBox">
+                 <property name="title">
+                  <string>Object detection</string>
                  </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
+                 <layout class="QFormLayout" name="formLayout">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_6">
+                    <property name="text">
+                     <string>Image source:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="imageSourceComboBox">
+                    <item>
+                     <property name="text">
+                      <string>Left</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Right</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_16">
+                    <property name="text">
+                     <string>Threshold:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <layout class="QHBoxLayout" name="horizontalLayout_3">
+                    <item>
+                     <widget class="QSlider" name="detectionThresholdSlider">
+                      <property name="value">
+                       <number>75</number>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="detectionThresholdSpinbox">
+                      <property name="suffix">
+                       <string>%</string>
+                      </property>
+                      <property name="value">
+                       <number>75</number>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="2" column="0" colspan="2">
+                   <widget class="QPushButton" name="detectionSetupButton">
+                    <property name="text">
+                     <string>Setup</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <widget class="QCheckBox" name="detectionCheckBox">
+                    <property name="text">
+                     <string>Detect objects</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -1196,7 +1271,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="imageViewTab">
            <attribute name="title">
@@ -1492,6 +1567,105 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="detectionTab">
+           <attribute name="title">
+            <string>Detect Objects</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Objects detected:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="8" colspan="3">
+               <widget class="QLabel" name="activeWeightsLoadedLabel">
+                <property name="text">
+                 <string>No weights</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLabel" name="numberObjectsLabel">
+                <property name="text">
+                 <string>0</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="latencyLabel">
+                <property name="text">
+                 <string>0 ms</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Detection time:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="7">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Weights:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="5" colspan="2">
+               <widget class="QLabel" name="activeModelLabel">
+                <property name="text">
+                 <string>No model</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="12">
+               <widget class="QLabel" name="numberClassesLabel">
+                <property name="text">
+                 <string>0</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="11">
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string># Classes:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Model:</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
         <item>
@@ -1654,7 +1828,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

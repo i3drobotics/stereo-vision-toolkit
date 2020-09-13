@@ -162,6 +162,7 @@ MainWindow::MainWindow(QWidget* parent)
     controlsInit();
     pointCloudInit();
     setupMatchers();
+    detectionInit();
 
     hideCameraSettings(false);
 
@@ -291,7 +292,7 @@ void MainWindow::controlsInit(void) {
     connect(ui->reset3DViewButton, SIGNAL(clicked(bool)), this, SLOT(resetPointCloudView()));
 }
 
-void MainWindow::enable3DViz(int tab) {
+void MainWindow::enable3DViz(int tab = 0) {
     if (!stereo_cam) return;
 
     if (tab == 2) {
@@ -300,6 +301,159 @@ void MainWindow::enable3DViz(int tab) {
         stereo_cam->enableReproject(false);
     }
 }
+
+void MainWindow::enableDetection(int tab = 0){
+    if (!stereo_cam) return;
+
+    detection_enabled = false;
+
+    if (tab == 3) {
+        // Do ML stuff
+        qDebug() << "Running detection";
+        detection_enabled = true;
+    }
+}
+
+void MainWindow::detectionInit(){
+    QProgressDialog progressPCI("Initialising detection...", "", 0, 100, this);
+    progressPCI.setWindowTitle("SVT");
+    progressPCI.setWindowModality(Qt::WindowModal);
+    progressPCI.setCancelButton(nullptr);
+    progressPCI.setMinimumDuration(0);
+    progressPCI.setValue(10);
+    QCoreApplication::processEvents();
+
+    object_detector = new DetectorOpenCV();
+    QThread* detector_thread = new QThread;
+    object_detector->assignThread(detector_thread);
+
+    object_detection_display = new CameraDisplayWidget(this);
+    ui->detectionTab->layout()->addWidget(object_detection_display);
+
+    connect(ui->detectionSetupButton, SIGNAL(clicked(bool)), this, SLOT(configureDetection()));
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(enableDetection(int)));
+
+    connect(ui->detectionThresholdSlider, SIGNAL(valueUpdated(int)), ui->detectionThresholdSpinbox, SLOT(setValue(int)));
+    connect(ui->detectionThresholdSpinbox, SIGNAL(valueUpdated(int)), ui->detectionThresholdSlider, SLOT(setValue(int)));
+
+}
+
+void MainWindow::configureDetection(){
+    if(object_detector == nullptr) return;
+
+    DetectorSetupDialog detection_dialog;
+    detection_dialog.exec();
+
+    if(detection_dialog.result() != QDialog::Accepted ) return;
+
+    auto names_file = detection_dialog.getNames().toStdString();
+    auto cfg_file = detection_dialog.getCfg().toStdString();
+    auto weight_file = detection_dialog.getWeights().toStdString();
+
+    object_detector->setChannels(detection_dialog.getChannels());
+    object_detector->setTarget(detection_dialog.getTarget());
+    object_detector->setFramework(detection_dialog.getFramework());
+    object_detector->setConvertGrayscale(detection_dialog.getConvertGrayscale());
+    object_detector->setConvertDepth(detection_dialog.getConvertDepth());
+    object_detector->loadNetwork(names_file, cfg_file, weight_file);
+    object_detector->setImageSize(detection_dialog.getWidth(), detection_dialog.getHeight());
+
+    ui->detectionCheckBox->setEnabled(true);
+
+    // GUI feedback
+    ui->numberClassesLabel->setText(QString("%1").arg(object_detector->getNumClasses()));
+
+    QFile weight_name(detection_dialog.getWeights());
+    QFileInfo weights_fileinfo(weight_name.fileName());
+    ui->activeModelLabel->setText(weights_fileinfo.fileName());
+
+    QFile config_name(detection_dialog.getCfg());
+    QFileInfo config_fileinfo(config_name.fileName());
+    ui->activeModelLabel->setText(config_fileinfo.fileName());
+}
+
+void MainWindow::updateDetection(){
+
+    if(!object_detector) return;
+
+    // Protect callback against high frame rates (faster than detector)
+    if(object_detector->isRunning() || detecting){
+        return;
+    }
+
+    this->detecting = true;
+
+    // Select image source
+    if(ui->imageSourceComboBox->currentText() == "Left"){
+        stereo_cam->getLeftImage(image_detection);
+    }else{
+        stereo_cam->getRightImage(image_detection);
+    }
+
+    double scale_factor_x = 1.0;
+    double scale_factor_y = 1.0;
+
+    if(detection_enabled &&
+       ui->detectionCheckBox->isChecked()){
+
+        if(image_detection.empty()){
+            qDebug() << "Empty image passed to detector";
+            return;
+        }
+
+        // Check if we have a network loaded
+        if(!object_detector->isReady())
+            return;
+
+        // We'll later resize the bounding boxes to the input image size
+        scale_factor_x = static_cast<double>(object_detector->getInputWidth())/image_detection.cols;
+        scale_factor_y = static_cast<double>(object_detector->getInputHeight())/image_detection.rows;
+
+        // (Down)scale input for DNN first layer
+        cv::resize(image_detection,
+                   image_detection_rescale,
+                   cv::Size(),
+                   scale_factor_x,
+                   scale_factor_y);
+
+
+        // Inference
+        auto results = object_detector->infer(image_detection_rescale);
+
+        // Update UI
+        ui->latencyLabel->setText(QString("%1 ms").arg(object_detector->getProcessingTime()));
+        ui->numberObjectsLabel->setText(QString("%1").arg(results.size()));
+
+        // Draw bounding boxes
+        drawBoundingBoxes(image_detection, results, 1./scale_factor_x, 1./scale_factor_y);
+
+        object_detection_display->updateView(image_detection);
+    }
+
+    this->detecting = false;
+}
+
+void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x=1.0, double scale_y=1.0){
+    for(auto &bbox : bboxes){
+        cv::Point top_left(static_cast<int>(scale_x*bbox.rect.topLeft().x()),
+                           static_cast<int>(scale_y*bbox.rect.topLeft().y()));
+        cv::Point bottom_right(static_cast<int>(scale_x*bbox.rect.bottomRight().x()),
+                               static_cast<int>(scale_y*bbox.rect.bottomRight().y()));
+        int thickness = 2;
+        cv::Scalar font_colour(255, 255, 255);
+
+        cv::rectangle(image, top_left, bottom_right, font_colour, thickness);
+
+        //Get the label for the class name and its confidence
+        std::string label = cv::format("%.2f", bbox.confidence);
+
+        //Display the label at the top of the bounding box
+        int baseLine;
+        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+        cv::putText(image, label, top_left, cv::FONT_HERSHEY_SIMPLEX, 0.5, font_colour);
+    }
+}
+
 
 void MainWindow::pointCloudInit() {
     QProgressDialog progressPCI("Initialising display...", "", 0, 100, this);
@@ -674,6 +828,9 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(ui->dateInFilenameCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableDateInFilename(bool)));
     connect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
 
+    /* Detection */
+    connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDetection()));
+
     enableWindow();
     toggleCameraActiveSettings(true);
     toggleCameraPassiveSettings(true);
@@ -787,6 +944,9 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->savePointCloudButton, SIGNAL(clicked()), stereo_cam, SLOT(savePointCloud()));
         disconnect(ui->dateInFilenameCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableDateInFilename(bool)));
         disconnect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
+
+        /* Detection */
+        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDetection()));
 
         //wait 1 second to make sure connections are closed
         QTime dieTime= QTime::currentTime().addSecs(1);

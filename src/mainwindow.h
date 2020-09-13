@@ -52,6 +52,9 @@
 #include "stereocalibrate.h"
 #include "cameradisplaywidget.h"
 
+#include "detection/detectoropencv.h"
+#include "detection/detectorsetupdialog.h"
+
 #include "paramfile.h"
 #ifdef WITH_FERVOR
 #include "fvupdater.h"
@@ -129,6 +132,7 @@ private:
     CameraDisplayWidget *left_view;
     CameraDisplayWidget *left_matcher_view;
     CameraDisplayWidget *right_view;
+    CameraDisplayWidget *object_detection_display;
 
     std::vector<QPushButton> deviceListButtons;
 
@@ -161,6 +165,12 @@ private:
 
     DShowLib::Grabber* tisgrabber;
 
+    DetectorOpenCV* object_detector;
+    bool detection_enabled = false;
+    bool detecting = false;
+    cv::Mat image_detection;
+    cv::Mat image_detection_rescale;
+
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> current_camera_serial_info_list;
     std::vector<QSignalMapper*>* camera_button_signal_mapper_list;
 
@@ -169,6 +179,7 @@ private:
     void resetStatusBar();
     void controlsInit();
     void pointCloudInit();
+    void detectionInit();
 
     void stereoCameraInit(void);
     void stereoCameraInitConnections(void);
@@ -238,8 +249,12 @@ public slots:
     void updateCloud(void);
     void enable3DViz(int);
     void resetPointCloudView(void);
-
     void pointCloudSaveStatus(QString);
+
+    void updateDetection(void);
+    void enableDetection(int);
+    void configureDetection(void);
+    void drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x, double scale_y);
 
     void openHelp();
 
