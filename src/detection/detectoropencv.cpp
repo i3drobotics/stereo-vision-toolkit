@@ -120,7 +120,7 @@ void DetectorOpenCV::postProcessTensorflow(cv::Mat& frame, const std::vector<cv:
     {
         float confidence = detections.at<float>(i, 2);
 
-        if (confidence > confThreshold)
+        if (confidence > confThreshold )
         {
 
             // Extract the bounding box
