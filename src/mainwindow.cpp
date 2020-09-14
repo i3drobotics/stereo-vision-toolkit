@@ -366,12 +366,51 @@ void MainWindow::resetPointCloudView(){
         max_depth = 5.0;
     }
 
-    viewer->resetCamera();
+    /*
+    if (min_depth < 0){
+        min_depth = 0;
+    }
+    if (max_depth < 0){
+        max_depth = 0;
+    }
+    */
+
+    //viewer->resetCamera();
 
     ui->minZSpinBox->setValue(min_depth);
     ui->maxZSpinBox->setValue(max_depth);
 
     vtk_widget->update();
+}
+
+void MainWindow::updateCloud() {
+
+    cloud = stereo_cam->getPointCloud();
+
+    if(!cloud.get()){
+        first_cloud = true;
+    }
+
+    if (!cloud->empty()) {
+        // Initial point cloud load
+
+        if (!viewer->updatePointCloud(cloud, "cloud")) {
+            viewer->addPointCloud(cloud, "cloud");
+        }
+
+        vtk_widget->update();
+    } else {
+        qDebug() << "Empty point cloud";
+        first_cloud = true;
+    }
+
+    if (first_cloud){
+        first_cloud = false;
+        viewer->resetCamera();
+        resetPointCloudView();
+    }
+    resetPointCloudView();
+
 }
 
 void MainWindow::stereoCameraInitWindow(void){
@@ -1206,34 +1245,6 @@ void MainWindow::videoStreamLoad(void) {
             //ui->toggleVideoButton->setDisabled(true);
         }
     }
-}
-
-void MainWindow::updateCloud() {
-
-    cloud = stereo_cam->getPointCloud();
-
-    if(!cloud.get()){
-        first_cloud = true;
-    }
-
-    if (!cloud->empty()) {
-        // Initial point cloud load
-
-        if (!viewer->updatePointCloud(cloud, "cloud")) {
-            viewer->addPointCloud(cloud, "cloud");
-        }
-
-        vtk_widget->update();
-    } else {
-        qDebug() << "Empty point cloud";
-        first_cloud = true;
-    }
-
-    if (first_cloud){
-        first_cloud = false;
-        resetPointCloudView();
-    }
-
 }
 
 void MainWindow::enableVideoCapture(bool enable){

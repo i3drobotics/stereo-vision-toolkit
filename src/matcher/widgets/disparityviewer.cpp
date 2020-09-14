@@ -138,6 +138,11 @@ void DisparityViewer::updateDisparity() {
 
     double min_disp = 10000;
     double max_disp = 0;
+    int min_i = 0;
+    int max_i = 0;
+    int min_j = 0;
+    int max_j = 0;
+
     double min_depth = 10000;
     double max_depth = 0;
 
@@ -153,11 +158,13 @@ void DisparityViewer::updateDisparity() {
                 float d = disparity.at<float>(i, j);
                 if (d < min_disp){
                     min_disp = d;
-                    max_depth = (double)genZ(_Q,(double)j,(double)i,(double)d);
+                    min_i = i;
+                    min_j = j;
                 }
                 if (d > max_disp){
                     max_disp = d;
-                    min_depth = (double)genZ(_Q,(double)j,(double)i,(double)d);
+                    max_i = i;
+                    max_j = j;
                 }
             }
         }
@@ -173,6 +180,26 @@ void DisparityViewer::updateDisparity() {
             }
         }
     }
+
+    double min_depth_tmp = (double)genZ(_Q,(double)min_i,(double)min_j,(double)min_disp);
+    double max_depth_tmp = (double)genZ(_Q,(double)max_i,(double)max_j,(double)max_disp);
+
+    if (max_depth_tmp < min_depth_tmp){
+        max_depth = min_depth_tmp;
+        min_depth = max_depth_tmp;
+    } else {
+        max_depth = max_depth_tmp;
+        min_depth = min_depth_tmp;
+    }
+
+    /*if (max_depth < 0){
+        max_depth = 0;
+    }
+
+    if (min_depth < 0){
+        min_depth = 0;
+    }
+    */
 
     //use depth rather than disparity for more user readable results
     double range_disp = max_disp - min_disp;
