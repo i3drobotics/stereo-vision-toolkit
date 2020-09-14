@@ -1196,7 +1196,7 @@
            <enum>QTabWidget::North</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="imageViewTab">
            <attribute name="title">
@@ -1418,7 +1418,7 @@
                  <string> m</string>
                 </property>
                 <property name="minimum">
-                 <double>0.010000000000000</double>
+                 <double>-10.000000000000000</double>
                 </property>
                 <property name="maximum">
                  <double>10.000000000000000</double>
