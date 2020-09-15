@@ -151,6 +151,11 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->stereoMatcherLayout->insertWidget(0,left_matcher_view);
 
+    ui->checkBoxAutoZ->setChecked(true);
+    enableAutoZ(true);
+
+    connect(ui->checkBoxAutoZ, SIGNAL(toggled(bool)), this, SLOT(enableAutoZ(bool)));
+
     statusBarInit();
 
 #ifdef WITH_VIMBA
@@ -229,6 +234,12 @@ void MainWindow::enableWindow(){
     ui->actionCalibration_wizard->setEnabled(true);
 }
 
+void MainWindow::enableAutoZ(bool enable){
+    autoZ = enable;
+    ui->minZSpinBox->setEnabled(!enable);
+    ui->maxZSpinBox->setEnabled(!enable);
+}
+
 void MainWindow::pointCloudSaveStatus(QString msg){
     qDebug() << msg;
     QMessageBox::warning(this,"Stereo Vision Toolkit",msg);
@@ -301,6 +312,10 @@ void MainWindow::controlsInit(void) {
     connect(ui->reset3DViewButton, SIGNAL(clicked(bool)), this, SLOT(resetPointCloudView()));
 }
 
+void MainWindow::resetPointCloudView(){
+    cloud_viewer->resetCamera();
+}
+
 void MainWindow::enable3DViz(int tab) {
     if (!stereo_cam) return;
 
@@ -320,7 +335,7 @@ void MainWindow::pointCloudInit() {
     progressPCI.setValue(10);
     QCoreApplication::processEvents();
 
-    viewer.reset(new pcl::visualization::PCLVisualizer("viewer", false));
+    cloud_viewer.reset(new pcl::visualization::PCLVisualizer("viewer", false));
     vtk_widget = new QVTKWidget();
 
     ui->visualiserTab->layout()->addWidget(vtk_widget);
@@ -330,8 +345,8 @@ void MainWindow::pointCloudInit() {
     progressPCI.setValue(20);
     QCoreApplication::processEvents();
 
-    vtk_widget->SetRenderWindow(viewer->getRenderWindow());
-    viewer->setupInteractor(vtk_widget->GetInteractor(),
+    vtk_widget->SetRenderWindow(cloud_viewer->getRenderWindow());
+    cloud_viewer->setupInteractor(vtk_widget->GetInteractor(),
                             vtk_widget->GetRenderWindow());
 
     progressPCI.setValue(40);
@@ -355,32 +370,26 @@ void MainWindow::pointCloudInit() {
     QCoreApplication::processEvents();
 }
 
-void MainWindow::resetPointCloudView(){
-    double min_depth = disparity_view->getMinDepth();
-    double max_depth = disparity_view->getMaxDepth();
+void MainWindow::autoUpdatePointCloudBounds(){
+    double min_depth = 0;
+    double max_depth = 5;
+    if (autoZ){
+        min_depth = disparity_view->getMinDepth();
+        max_depth = disparity_view->getMaxDepth();
 
-    if (min_depth == -1){
-        min_depth = 0.0;
+        if (min_depth < 0){
+            min_depth = 0;
+        }
+        if (max_depth < 0){
+            max_depth = 0;
+        }
+        if (max_depth > 20){
+            max_depth = 20;
+        }
+
+        ui->minZSpinBox->setValue(min_depth);
+        ui->maxZSpinBox->setValue(max_depth);
     }
-    if (max_depth == -1){
-        max_depth = 5.0;
-    }
-
-    /*
-    if (min_depth < 0){
-        min_depth = 0;
-    }
-    if (max_depth < 0){
-        max_depth = 0;
-    }
-    */
-
-    //viewer->resetCamera();
-
-    ui->minZSpinBox->setValue(min_depth);
-    ui->maxZSpinBox->setValue(max_depth);
-
-    vtk_widget->update();
 }
 
 void MainWindow::updateCloud() {
@@ -394,8 +403,8 @@ void MainWindow::updateCloud() {
     if (!cloud->empty()) {
         // Initial point cloud load
 
-        if (!viewer->updatePointCloud(cloud, "cloud")) {
-            viewer->addPointCloud(cloud, "cloud");
+        if (!cloud_viewer->updatePointCloud(cloud, "cloud")) {
+            cloud_viewer->addPointCloud(cloud, "cloud");
         }
 
         vtk_widget->update();
@@ -406,11 +415,10 @@ void MainWindow::updateCloud() {
 
     if (first_cloud){
         first_cloud = false;
-        viewer->resetCamera();
         resetPointCloudView();
     }
-    resetPointCloudView();
-
+    autoUpdatePointCloudBounds();
+    vtk_widget->update();
 }
 
 void MainWindow::stereoCameraInitWindow(void){
