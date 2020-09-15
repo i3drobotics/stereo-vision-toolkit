@@ -146,12 +146,14 @@ private:
     bool calibration_dialog_used = false;
     bool calibration_from_images_dialog_used = false;
 
+    bool autoZ = false;
+
     AbstractStereoCamera* stereo_cam;
     StereoCalibrate* calibrator;
 
     QList<MatcherWidget*> matcher_list;
 
-    boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
+    boost::shared_ptr<pcl::visualization::PCLVisualizer> cloud_viewer;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
 
     AboutDialog* about_dialog;
@@ -191,6 +193,8 @@ public slots:
     void displaySaved(QString fname);
     void statusMessageTimeout(void);
     void setMatcher(int matcher);
+
+    void enableAutoZ(bool);
 
     void disableWindow();
     void enableWindow();
@@ -242,6 +246,7 @@ public slots:
     void updateCloud(void);
     void enable3DViz(int);
     void resetPointCloudView(void);
+    void autoUpdatePointCloudBounds(void);
 
     void pointCloudSaveStatus(QString);
 

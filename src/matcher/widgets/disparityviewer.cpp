@@ -146,6 +146,8 @@ void DisparityViewer::updateDisparity() {
     double min_depth = 10000;
     double max_depth = 0;
 
+    double d_error = 16 * matcher->getErrorDisparity();
+
     cv::Matx44d _Q;
     Q.convertTo(_Q, CV_64F);
 
@@ -154,12 +156,16 @@ void DisparityViewer::updateDisparity() {
         for (int j = 0; j < disparity.cols; j++)
         {
             float d = disparity.at<float>(i, j);
-            if (d < 10000 && d > 0){
+            if (d < 10000 && d > 0 && d != d_error){
                 float d = disparity.at<float>(i, j);
                 if (d < min_disp){
-                    min_disp = d;
-                    min_i = i;
-                    min_j = j;
+                    //TODO find out why issue with disp < ~3 causing negative w and so negative z
+                    cv::Vec4d homg_pt = _Q * cv::Vec4d((double)i, (double)j, (double)d, 1.0);
+                    if (homg_pt[3] > 0){
+                        min_disp = d;
+                        min_i = i;
+                        min_j = j;
+                    }
                 }
                 if (d > max_disp){
                     max_disp = d;
@@ -175,15 +181,16 @@ void DisparityViewer::updateDisparity() {
         for (int j = 0; j < disparity.cols; j++)
         {
             float d = disparity.at<float>(i, j);
-            if (d > max_disp || d < min_disp){
+            if (d > max_disp || d < min_disp || d == d_error){
                 disparity_thresh.at<float>(i, j) = 0;
             }
         }
     }
 
-    double min_depth_tmp = (double)genZ(_Q,(double)min_i,(double)min_j,(double)min_disp);
-    double max_depth_tmp = (double)genZ(_Q,(double)max_i,(double)max_j,(double)max_disp);
+    min_depth = (double)genZ(_Q,(double)max_i,(double)max_j,(double)max_disp);
+    max_depth = (double)genZ(_Q,(double)min_i,(double)min_j,(double)min_disp);
 
+    /*
     if (max_depth_tmp < min_depth_tmp){
         max_depth = min_depth_tmp;
         min_depth = max_depth_tmp;
@@ -191,6 +198,7 @@ void DisparityViewer::updateDisparity() {
         max_depth = max_depth_tmp;
         min_depth = min_depth_tmp;
     }
+    */
 
     /*if (max_depth < 0){
         max_depth = 0;

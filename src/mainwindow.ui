@@ -1455,6 +1455,16 @@
                </widget>
               </item>
               <item>
+               <widget class="QCheckBox" name="checkBoxAutoZ">
+                <property name="text">
+                 <string>Auto</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="reset3DViewButton">
                 <property name="text">
                  <string>Reset</string>
