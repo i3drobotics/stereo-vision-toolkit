@@ -34,19 +34,31 @@ int MatcherI3DRSGM::getErrorDisparity(void)
 }
 
 //compute disparity
-void MatcherI3DRSGM::forwardMatch()
+bool MatcherI3DRSGM::forwardMatch(cv::Mat left_img, cv::Mat right_img)
 {
-    cv::Mat oDisparity;
-    oDisparity = this->i3drsgm->forwardMatch(*left,*right);
-    oDisparity.convertTo(disparity_lr, CV_32F, -16);
+    if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
+        cv::Mat oDisparity;
+        oDisparity = this->i3drsgm->forwardMatch(left_img,right_img);
+        oDisparity.convertTo(disparity_lr, CV_32F, -16);
+        return true;
+    } else {
+        qDebug() << "Invalid image type for stereo matcher. MUST be CV_8UC1.";
+        return false;
+    }
 }
 
 //backward match disparity
-void MatcherI3DRSGM::backwardMatch()
+bool MatcherI3DRSGM::backwardMatch(cv::Mat left_img, cv::Mat right_img)
 {
-    cv::Mat oDisparity;
-    oDisparity = this->i3drsgm->backwardMatch(*left,*right);
-    oDisparity.convertTo(disparity_rl, CV_32F, -16);
+    if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
+        cv::Mat oDisparity;
+        oDisparity = this->i3drsgm->backwardMatch(left_img,right_img);
+        oDisparity.convertTo(disparity_rl, CV_32F, -16);
+        return true;
+    } else {
+        qDebug() << "Invalid image type for stereo matcher. MUST be CV_8UC1.";
+        return false;
+    }
 }
 
 void MatcherI3DRSGM::enableCPU(bool enable)

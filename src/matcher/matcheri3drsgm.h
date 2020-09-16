@@ -62,8 +62,8 @@ public:
     void setDisparityError(int val);
     void enableCPU(bool enable);
 
-    void forwardMatch();
-    void backwardMatch();
+    bool forwardMatch(cv::Mat left_img, cv::Mat right_img);
+    bool backwardMatch(cv::Mat left_img, cv::Mat right_img);
 
     int getStatus();
 

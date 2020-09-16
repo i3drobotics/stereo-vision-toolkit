@@ -68,8 +68,13 @@ bool StereoCameraDeimos::captureSingle(){
                 flip(image_buffer, image_buffer, 0);
                 split(image_buffer, channels);
 
-                left_raw = channels[1].clone();
-                right_raw = channels[2].clone();
+                cv::Mat left_raw_tmp = channels[1].clone();
+                cv::Mat right_raw_tmp = channels[2].clone();
+                //TODO remove this (only here for testing colour)
+                cv::cvtColor(left_raw_tmp, left_raw, CV_GRAY2BGR);
+                cv::cvtColor(right_raw_tmp, right_raw, CV_GRAY2BGR);
+                //left_raw = left_raw_tmp.clone();
+                //right_raw = right_raw_tmp.clone();
 
                 res = true;
 

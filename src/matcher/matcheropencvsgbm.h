@@ -37,8 +37,8 @@ public slots:
 
     void saveParams();
 
-    void forwardMatch(void);
-    void backwardMatch(void);
+    bool forwardMatch(cv::Mat left_img, cv::Mat right_img);
+    bool backwardMatch(cv::Mat left_img, cv::Mat right_img);
 
 
     int getMinDisparity(){return matcher->getMinDisparity();}
