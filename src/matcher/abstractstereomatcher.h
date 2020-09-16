@@ -45,18 +45,6 @@ class AbstractStereoMatcher : public QObject {
    void finished();
 
  public slots:
-   //!  Set images for matching
-   /*!
-   * \param left Left image
-   * \param right Right image
-   */
-  void setImages(cv::Mat* left, cv::Mat* right);
-
-  //! Perform a match with the left image as the reference. This is normally what you want.
-  virtual void forwardMatch() = 0;
-
-  //! Perform a match with the right image as the reference.
-  virtual void backwardMatch() = 0;
 
   //! Setup the matcher.
   virtual void init(void) = 0;
@@ -108,14 +96,14 @@ class AbstractStereoMatcher : public QObject {
   void checkLRConsistencyFull(double threshold);
 
   //!  Get a pointer to the left image
-  cv::Mat *getLeftImage(void){return left;}
+  cv::Mat getLeftImage(void){return left;}
 
   //!  Get a pointer to the right image
-  cv::Mat *getRighttImage(void){return right;}
+  cv::Mat getRightImage(void){return right;}
 
   void setDownsampleFactor(int factor){ downsample_factor=factor; };
 
-  virtual void match();
+  bool match(cv::Mat left_img, cv::Mat right_img);
 
   void normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity);
 
@@ -127,9 +115,24 @@ class AbstractStereoMatcher : public QObject {
 
   void calcPointCloud(cv::Mat inDepth, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outPoints);
 
+private:
+  //!  Set images for matching
+  /*!
+  * \param left Left image
+  * \param right Right image
+  */
+ void convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img);
+
  protected:
-  cv::Mat *left;
-  cv::Mat *right;
+
+    //! Perform a match with the left image as the reference. This is normally what you want.
+    virtual bool forwardMatch(cv::Mat left_img, cv::Mat right_img) = 0;
+
+    //! Perform a match with the right image as the reference.
+    virtual bool backwardMatch(cv::Mat left_img, cv::Mat right_img) = 0;
+
+  cv::Mat left;
+  cv::Mat right;
 
   cv::Mat disparity_buffer;
   cv::Mat disparity_rl;

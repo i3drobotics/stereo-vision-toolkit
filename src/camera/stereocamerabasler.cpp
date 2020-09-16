@@ -127,6 +127,7 @@ bool StereoCameraBasler::openCamera(){
         formatConverter = new Pylon::CImageFormatConverter();
 
         formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
+        //formatConverter->OutputPixelFormat = Pylon::PixelType_
         formatConverter->OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
     }
     catch (const Pylon::GenericException &e)

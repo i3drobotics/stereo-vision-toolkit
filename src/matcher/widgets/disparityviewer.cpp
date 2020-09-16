@@ -258,7 +258,7 @@ void DisparityViewer::updateDisparity() {
 
     cv::cvtColor(disparity_vis, disparity_vis, CV_BGR2RGB);
 
-    auto left_ptr = matcher->getLeftImage();
+    cv::Mat left_ptr = matcher->getLeftImage();
 
     for (int x = 0; x < disparity_scale.cols; x++) {
         for (int y = 0; y < disparity_scale.rows; y++) {
@@ -270,9 +270,9 @@ void DisparityViewer::updateDisparity() {
                 disparity_vis.at<cv::Vec3b>(y, x)[2] = 0;
             }
 
-            if(left_ptr->empty()) continue;
+            if(left_ptr.empty()) continue;
 
-            uchar image_val = (uchar) left_ptr->at<unsigned char>(y, x);
+            uchar image_val = (uchar) left_ptr.at<unsigned char>(y, x);
 
             if (image_val == 0 ||
                     image_val > ui->intensityThresholdSlider->value()) {

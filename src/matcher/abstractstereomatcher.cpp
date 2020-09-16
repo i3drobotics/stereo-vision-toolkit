@@ -17,19 +17,31 @@ void AbstractStereoMatcher::assignThread(QThread *thread) {
     thread->start();
 }
 
-void AbstractStereoMatcher::setImages(cv::Mat *left_img, cv::Mat *right_img) {
-    if (downsample_factor != 1){
-        cv::Mat right_tmp, left_tmp;
-        cv::resize(*right_img,right_tmp,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(*left_img,left_tmp,cv::Size(),downsample_factor,downsample_factor);
-        this->left = &left_tmp;
-        this->right = &right_tmp;
+void AbstractStereoMatcher::convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img) {
+    cv::Mat right_tmp, left_tmp;
+
+    if (left_img.type() == CV_8UC3){
+        cv::cvtColor(left_img,left_tmp,cv::COLOR_BGR2GRAY);
+        left_tmp.convertTo(left_tmp, CV_8UC1);
     } else {
-        this->left = left_img;
-        this->right = right_img;
+        left_img.copyTo(left_tmp);
+    }
+    if (right_img.type() == CV_8UC3){
+        cv::cvtColor(right_img,right_tmp,cv::COLOR_BGR2GRAY);
+        right_tmp.convertTo(right_tmp, CV_8UC1);
+    } else {
+        right_img.copyTo(right_tmp);
     }
 
-    this->image_size = left_img->size();
+    if (downsample_factor != 1){
+        cv::resize(right_tmp,right_tmp,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(left_tmp,left_tmp,cv::Size(),downsample_factor,downsample_factor);
+    }
+
+    left_conv_img = left_tmp.clone();
+    right_conv_img = right_tmp.clone();
+
+    this->image_size = left.size();
 }
 
 void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {
@@ -84,16 +96,24 @@ void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
     */
 }
 
-void AbstractStereoMatcher::match() {
+bool AbstractStereoMatcher::match(cv::Mat left_img, cv::Mat right_img) {
     QElapsedTimer timer;
     timer.restart();
-    forwardMatch();
-    // qDebug() << 1/(timer.elapsed() / 1e3);
 
-    //checkLRConsistencyFull(5);
+    convertImages(left_img,right_img,left,right);
+    bool valid = forwardMatch(left,right);
+    if (valid){
+        // qDebug() << 1/(timer.elapsed() / 1e3);
 
-    disparity_lr.convertTo(disparity_buffer, CV_32F);
-    disparity16 = disparity_lr / 16;
+        //checkLRConsistencyFull(5);
+
+        disparity_lr.convertTo(disparity_buffer, CV_32F);
+        disparity16 = disparity_lr / 16;
+        return true;
+    } else {
+        qDebug() << "Stereo match failed";
+        return false;
+    }
 }
 
 void AbstractStereoMatcher::normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity){

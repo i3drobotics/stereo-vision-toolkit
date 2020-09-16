@@ -171,7 +171,6 @@ void AbstractStereoCamera::reproject3D() {
 
     cv::Mat depth;
     matcher->calcDepth(disparity,depth);
-
     qDebug() << "disparity image size: " << disparity_downscale.size().width << "," << disparity_downscale.size().height;
 
     //cv::abs(disparity_downscale);
@@ -189,6 +188,11 @@ void AbstractStereoCamera::reproject3D() {
         qDebug() << "Q or disparity map is empty";
         return;
     }
+
+    //cv::Mat image = left_remapped.clone();
+    cv::Mat norm_disp;
+    matcher->disparity2colormap(disparity_downscale, norm_disp);
+    cv::Mat image = norm_disp;
 
     //cv::reprojectImageTo3D(disparity_downscale, stereo_reprojected, Q, true);
 
@@ -229,15 +233,30 @@ void AbstractStereoCamera::reproject3D() {
                 float y = (float)homg_pt[1] / (float)homg_pt[3];
                 float z = (float)homg_pt[2] / (float)homg_pt[3];
 
-                uchar intensity = left_remapped.at<uchar>(i,j);
+                uchar b,g,r;
+                if (image.type() == CV_8UC1){
+                    uchar intensity = image.at<uchar>(i,j);
+                    b = intensity;
+                    g = intensity;
+                    r = intensity;
+                } else if (image.type() == CV_8UC3){
+                    b = image.at<cv::Vec3b>(i,j)[0];
+                    g = image.at<cv::Vec3b>(i,j)[1];
+                    r = image.at<cv::Vec3b>(i,j)[2];
+                } else {
+                    b = 0;
+                    g = 0;
+                    r = 0;
+                    qDebug() << "Invalid image type. MUST be CV_8UC1 or CV_8UC3";
+                }
 
                 pcl::PointXYZRGB point;
                 point.x = x;
                 point.y = y;
                 point.z = z;
-                point.r = intensity;
-                point.g = intensity;
-                point.b = intensity;
+                point.r = r;
+                point.g = g;
+                point.b = b;
                 ptCloudTemp->points.push_back(point);
             }
         }
@@ -621,7 +640,6 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
         enableMatching(false);
     }
     this->matcher = matcher;
-    this->matcher->setImages(&left_remapped, &right_remapped);
     if (reenable_required){
         enableMatching(true);
     }
@@ -670,7 +688,7 @@ void AbstractStereoCamera::processStereo(void) {
     }
 
     if (matching) {
-        matcher->match();
+        matcher->match(left_remapped,right_remapped);
         if (reprojecting) {
             reproject3D();
         }

@@ -81,38 +81,47 @@ int MatcherOpenCVBlock::getErrorDisparity(void){
     return min_disparity - 1;
 }
 
-void MatcherOpenCVBlock::forwardMatch() {
+bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 
   matcher->setMinDisparity(min_disparity);
 
   try {
-    matcher->compute(*left, *right, disparity_lr);
-    //NOTE: Removed to try and not use ximageproc
-    /*
-    if(wls_filter){
-        backwardMatch();
-        cv::Mat disparity_filter;
-        auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
-        wls_filter->setLambda(wls_lambda);
-        wls_filter->setSigmaColor(wls_sigma);
-        wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
+      if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
+        matcher->compute(left_img, right_img, disparity_lr);
+        //NOTE: Removed to try and not use ximageproc
+        /*
+        if(wls_filter){
+            backwardMatch();
+            cv::Mat disparity_filter;
+            auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
+            wls_filter->setLambda(wls_lambda);
+            wls_filter->setSigmaColor(wls_sigma);
+            wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
 
-        disparity_filter.convertTo(disparity_lr, CV_32F);
-    }else{
-        disparity_lr.convertTo(disparity_lr, CV_32F);
-    }
-    */
-   disparity_lr.convertTo(disparity_lr, CV_32F);
+            disparity_filter.convertTo(disparity_lr, CV_32F);
+        }else{
+            disparity_lr.convertTo(disparity_lr, CV_32F);
+        }
+        */
+       disparity_lr.convertTo(disparity_lr, CV_32F);
+       return true;
+      } else {
+          qDebug() << "Invalid image type for stereo matcher. MUST be CV_8UC1.";
+          qDebug() << "Left image type index: " << left_img.type();
+          qDebug() << "Right image type index: " << right_img.type();
+          return false;
+      }
 
   } catch (...) {
     qDebug() << "Error in OpenCV block match parameters";
   }
 }
 
-void MatcherOpenCVBlock::backwardMatch() {
+bool MatcherOpenCVBlock::backwardMatch(cv::Mat left_img, cv::Mat right_img) {
     //NOTE: Removed to try and not use ximageproc
     //auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
     //right_matcher->compute(*right, *left, disparity_rl);
+    return false;
 }
 
 void MatcherOpenCVBlock::saveParams() {
