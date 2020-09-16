@@ -7,10 +7,10 @@
 
 AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, StereoCameraSettings camera_settings, QObject *parent) :
     QObject(parent),
-    stereoCameraSerialInfo_(serial_info),
-    stereoCameraSettings_(camera_settings),
     ptCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>)),
-    cv_video_writer(new cv::VideoWriter())
+    cv_video_writer(new cv::VideoWriter()),
+    stereoCameraSettings_(camera_settings),
+    stereoCameraSerialInfo_(serial_info)
 {
 
 #ifdef WITH_CUDA
@@ -19,7 +19,7 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
     }
 #endif
     //startThread();
-    connect(this, SIGNAL(captured_success()), this, SLOT(processStereo()));
+    connect(this, SIGNAL(captured_success()), this, SLOT(processNewCapture()));
     connect(this, SIGNAL(captured_success()), this, SLOT(resetFailFrameCount()));
 }
 
@@ -121,15 +121,22 @@ void AbstractStereoCamera::saveImage(QString fname) {
     if (rectifying) {
         filename_l = fname.toStdString() + "_l_rect.png";
         filename_r = fname.toStdString() + "_r_rect.png";
-        left_remapped.copyTo(left);
-        right_remapped.copyTo(right);
     } else {
         filename_l = fname.toStdString() + "_l.png";
         filename_r = fname.toStdString() + "_r.png";
-        left_raw.copyTo(left);
-        right_raw.copyTo(right);
     }
 
+    left = matcher->getLeftImage().clone();
+    right = matcher->getRightImage().clone();
+
+    qDebug() << "Saving left image...";
+    CVSupport::write_parallel(filename_l,left);
+    qDebug() << "Saving right image...";
+    CVSupport::write_parallel(filename_r,right);
+    qDebug() << "Image saving complete.";
+    imageSaved(true);
+
+    /*
     QFuture<bool> rect_l = QtConcurrent::run(
                 CVSupport::write_parallel, filename_l, left);
     QFuture<bool> rect_r = QtConcurrent::run(
@@ -141,6 +148,7 @@ void AbstractStereoCamera::saveImage(QString fname) {
 
     futureWatcher_l.setFuture(rect_l);
     futureWatcher_r.setFuture(rect_r);
+    */
 
     if(matching && savingDisparity){
         matcher->saveDisparity(fname + "_disp_raw.png");
@@ -189,10 +197,15 @@ void AbstractStereoCamera::reproject3D() {
         return;
     }
 
-    //cv::Mat image = left_remapped.clone();
-    cv::Mat norm_disp;
-    matcher->disparity2colormap(disparity_downscale, norm_disp);
-    cv::Mat image = norm_disp;
+    std::string texture_type = "image"; //TODO set this as option on window
+    cv::Mat image;
+    if (texture_type == "image"){
+        image = matcher->getLeftImage().clone();
+    } else if (texture_type == "depth"){
+        cv::Mat norm_disp;
+        matcher->disparity2colormap(disparity_downscale, norm_disp);
+        image = norm_disp.clone();
+    }
 
     //cv::reprojectImageTo3D(disparity_downscale, stereo_reprojected, Q, true);
 
@@ -646,6 +659,13 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
     qDebug() << "Changed matcher";
 }
 
+void AbstractStereoCamera::processNewCapture(void){
+    if (!processing_busy){
+        processing_busy = true;
+        stereo_future = QtConcurrent::run(this, &AbstractStereoCamera::processStereo);
+    }
+}
+
 void AbstractStereoCamera::processStereo(void) {
 
     frames++;
@@ -688,11 +708,10 @@ void AbstractStereoCamera::processStereo(void) {
     }
 
     if (matching) {
-        matcher->match(left_remapped,right_remapped);
-        if (reprojecting) {
-            reproject3D();
+        if (!match_busy){
+            match_busy = true;
+            match_future = QtConcurrent::run(this, &AbstractStereoCamera::parallelMatch);
         }
-        emit matched();
     }
 
     emit stereopair_processed();
@@ -703,6 +722,23 @@ void AbstractStereoCamera::processStereo(void) {
 
     emit frametime(frametimer.elapsed());
     frametimer.restart();
+
+    processing_busy = false;
+}
+
+void AbstractStereoCamera::parallelMatch(){
+    cv::Mat left_img, right_img;
+    left_img = left_output.clone();
+    right_img = right_output.clone();
+    matcher->match(left_img,right_img);
+    match_busy = false;
+    emit matched();
+    if (reprojecting) {
+        reproject3D();
+    }
+
+    emit matchtime(matchtimer.elapsed());
+    matchtimer.restart();
 }
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){

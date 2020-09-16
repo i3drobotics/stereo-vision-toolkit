@@ -246,7 +246,8 @@ void MainWindow::pointCloudSaveStatus(QString msg){
 }
 
 void MainWindow::resetStatusBar(void) {
-    fps_counter->setText("FPS: 0");
+    fps_counter->setText("Camera FPS: 0");
+    match_fps_counter->setText("Match FPS: 0");
     frame_counter->setText("Frame count: 0");
 }
 
@@ -255,6 +256,7 @@ void MainWindow::statusBarInit(void) {
     ui->statusBar->addPermanentWidget(status_widget);
 
     fps_counter = new QLabel(this);
+    match_fps_counter = new QLabel(this);
     temp_label = new QLabel(this);
     frame_counter = new QLabel(this);
     status_bar_spacer = new QSpacerItem(20, 1);
@@ -262,6 +264,7 @@ void MainWindow::statusBarInit(void) {
     QHBoxLayout* _hlayout = new QHBoxLayout();
     _hlayout->addWidget(frame_counter);
     _hlayout->addSpacerItem(status_bar_spacer);
+    _hlayout->addWidget(match_fps_counter);
     _hlayout->addWidget(fps_counter);
     _hlayout->addWidget(temp_label);
 
@@ -697,6 +700,7 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(stereo_cam, SIGNAL(error(int)), this, SLOT(error(int)));
 
     connect(stereo_cam, SIGNAL(frametime(qint64)), this, SLOT(updateFrameTime(qint64)));
+    connect(stereo_cam, SIGNAL(matchtime(qint64)), this, SLOT(updateMatchTime(qint64)));
     connect(stereo_cam, SIGNAL(framecount(qint64)), this, SLOT(updateFrameCount(qint64)));
     connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(saveImageTimestamped()));
     connect(stereo_cam, SIGNAL(first_image_ready(bool)), ui->saveButton, SLOT(setEnabled(bool)));
@@ -813,6 +817,7 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(stereo_cam, SIGNAL(matched()), disparity_view,
                    SLOT(updateDisparityAsync(void)));
         disconnect(stereo_cam, SIGNAL(frametime(qint64)), this, SLOT(updateFrameTime(qint64)));
+        disconnect(stereo_cam, SIGNAL(matchtime(qint64)), this, SLOT(updateMatchTime(qint64)));
         disconnect(stereo_cam, SIGNAL(framecount(qint64)), this, SLOT(updateFrameCount(qint64)));
         disconnect(ui->saveButton, SIGNAL(clicked()), stereo_cam,
                    SLOT(saveImageTimestamped()));
@@ -1425,7 +1430,7 @@ void MainWindow::setupMatchers(void) {
     MatcherWidgetI3DRSGM* i3dr_sgm =
             new MatcherWidgetI3DRSGM(this);
     matcher_list.append(i3dr_sgm);
-    ui->matcherSelectBox->insertItem(2, "I3DR SGBM");
+    ui->matcherSelectBox->insertItem(2, "I3DRSGM");
     ui->matcherSettingsLayout->addWidget(i3dr_sgm);
     if (!i3dr_sgm->getMatcher()->isLicenseValid()){
         QStandardItemModel *model =
@@ -1761,6 +1766,23 @@ void MainWindow::updateFrameCount(qint64 count) {
     frame_counter->setText(QString("Frame count: %1").arg(count));
 }
 
+void MainWindow::updateMatchTime(qint64 time) {
+    int fps = 1000.0 / time;
+    measured_match_fps = fps;
+
+    match_fps_measure_total+= measured_match_fps;
+    match_fps_measure_count++;
+
+    int average_fps = 0;
+    average_fps = ceil((float)match_fps_measure_total / (float)match_fps_measure_count);
+    match_fps_counter->setText(QString("Match FPS: %1").arg(average_fps)); //TODO create seperate timer for matching time
+
+    if (match_fps_measure_count > 10){
+        match_fps_measure_total = average_fps;
+        match_fps_measure_count = 1;
+    }
+}
+
 void MainWindow::updateFrameTime(qint64 time) {
     int fps = 1000.0 / time;
     measured_fps = fps;
@@ -1770,7 +1792,7 @@ void MainWindow::updateFrameTime(qint64 time) {
 
     int average_fps = 0;
     average_fps = ceil((float)fps_measure_total / (float)fps_measure_count);
-    fps_counter->setText(QString("FPS: %1").arg(average_fps));
+    fps_counter->setText(QString("Camera FPS: %1").arg(average_fps));
 
     if (fps_measure_count > 10){
         fps_measure_total = average_fps;

@@ -33,9 +33,11 @@ public:
     static bool write_parallel(std::string fname, cv::Mat src)
     {
         std::vector<int> params;
-        int compression_level = 9;
+        int compression_level = 0;
         params.push_back(cv::IMWRITE_PNG_COMPRESSION);
         params.push_back(compression_level);
+        //params.push_back(cv::IMWRITE_PNG_STRATEGY);
+        //params.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT)
 
         return cv::imwrite(fname, src, params);
     }

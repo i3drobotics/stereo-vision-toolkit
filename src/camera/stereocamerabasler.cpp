@@ -121,13 +121,14 @@ bool StereoCameraBasler::openCamera(){
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).MaxNumBuffer = 1;
-            cameras->operator[](i).OutputQueueSize = cameras->operator[](i).MaxNumBuffer.GetValue();
+            cameras->operator[](i).OutputQueueSize = 1;
+            cameras->operator[](i).ClearBufferModeEnable();
         }
 
         formatConverter = new Pylon::CImageFormatConverter();
 
-        formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
-        //formatConverter->OutputPixelFormat = Pylon::PixelType_
+        //formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
+        formatConverter->OutputPixelFormat = Pylon::PixelType_BGR8packed;
         formatConverter->OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
     }
     catch (const Pylon::GenericException &e)
@@ -497,6 +498,7 @@ bool StereoCameraBasler::enableAutoExposure(bool enable){
 }
 
 bool StereoCameraBasler::captureSingle(){
+    cv::Mat left_tmp, right_tmp;
     // set maximum timeout of capure to 2xfps
     int max_timeout = 10*(1000*(1.0f/(float)frame_rate));
     if (max_timeout > 1000){
@@ -513,8 +515,8 @@ bool StereoCameraBasler::captureSingle(){
                     cameras->operator[](0).RetrieveResult(max_timeout, ptrGrabResult_left, Pylon::TimeoutHandling_ThrowException);
                     cameras->operator[](1).RetrieveResult(max_timeout, ptrGrabResult_right, Pylon::TimeoutHandling_ThrowException);
 
-                    bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_raw);
-                    bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_raw);
+                    bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_tmp);
+                    bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_tmp);
 
                     ptrGrabResult_left.Release();
                     ptrGrabResult_right.Release();
@@ -538,8 +540,8 @@ bool StereoCameraBasler::captureSingle(){
                 cameras->operator[](0).GrabOne( max_timeout, ptrGrabResult_left);
                 cameras->operator[](1).GrabOne( max_timeout, ptrGrabResult_right);
 
-                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_raw);
-                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_raw);
+                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_tmp);
+                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_tmp);
 
                 ptrGrabResult_left.Release();
                 ptrGrabResult_right.Release();
@@ -568,6 +570,8 @@ bool StereoCameraBasler::captureSingle(){
         send_error(CAPTURE_ERROR);
         emit captured_fail();
     } else {
+        left_raw = left_tmp.clone();
+        right_raw = right_tmp.clone();
         emit captured_success();
     }
     emit captured();
@@ -583,7 +587,7 @@ bool StereoCameraBasler::enableCapture(bool enable){
         //Start capture thread
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
-            cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImages);
+            cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImageOnly);
         }
         //TODO replace this with pylon callback
         connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
