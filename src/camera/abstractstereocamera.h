@@ -272,6 +272,9 @@ signals:
     //! Emitted after a frame has been processed to indicate the process time (fps = 1000/frametime)
     void frametime(qint64 time);
 
+    //! Emitted after a match has been processed to indicate the process time (fps = 1000/matchtime)
+    void matchtime(qint64 time);
+
     //! Emitted after a frame has been processed to indicates the current frame count
     void framecount(qint64 count);
 
@@ -484,8 +487,15 @@ private slots:
         failed_frames = 0;
     }
 
+    void processNewCapture(void);
+
+    void parallelMatch(void);
+
 private:
     qint64 frames = 0;
+
+    bool match_busy = false;
+    bool processing_busy = false;
 
     bool includeDateInFilename = false;
     bool matching = false;
@@ -501,6 +511,9 @@ private:
     QString save_directory = ".";
 
     QString file_save_directory = "";
+
+    QFuture<void> match_future;
+    QFuture<void> stereo_future;
 
     cv::VideoWriter *cv_video_writer;
 
@@ -609,6 +622,7 @@ protected:
     StereoCameraSerialInfo stereoCameraSerialInfo_;
 
     QElapsedTimer frametimer;
+    QElapsedTimer matchtimer;
 
     bool rectification_valid = false;
     bool calibration_valid = false;

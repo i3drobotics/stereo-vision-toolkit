@@ -93,6 +93,8 @@ private:
 
     int fps_measure_count = 0;
     int fps_measure_total = 0;
+    int match_fps_measure_count = 0;
+    int match_fps_measure_total = 0;
 
     int CAMERA_CONNECTION_SUCCESS_EXIT_CODE = 0;
     int CAMERA_CONNECTION_FAILED_EXIT_CODE = -1;
@@ -122,6 +124,7 @@ private:
 
     QLabel* frame_counter;
     QLabel* fps_counter;
+    QLabel* match_fps_counter;
     QLabel* temp_label;
     QSpacerItem* status_bar_spacer;
     QWidget* status_widget;
@@ -136,6 +139,7 @@ private:
 
     bool cameras_connected = false;
     int measured_fps = 0;
+    int measured_match_fps = 0;
     int current_fps = 0;
     int current_binning = 0;
     bool using_gige = false;
@@ -186,6 +190,7 @@ public slots:
     void stereoCameraRelease(void);
     void updateDisplay(void);
     void updateFrameTime(qint64);
+    void updateMatchTime(qint64);
     void updateFrameCount(qint64);
     void enableCapture(bool);
     void singleShotClicked(void);
