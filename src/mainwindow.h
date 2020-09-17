@@ -21,6 +21,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QStandardItemModel>
+#include <QColorDialog>
 
 // Point Cloud Library
 #include <pcl/point_cloud.h>
@@ -170,6 +171,9 @@ private:
     bool detecting = false;
     cv::Mat image_detection;
     cv::Mat image_detection_rescale;
+    QMap<QString, QColor> class_colour_map;
+    QMap<QString, bool> class_visible_map;
+    QMap<QString, bool> class_filled_map;
 
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> current_camera_serial_info_list;
     std::vector<QSignalMapper*>* camera_button_signal_mapper_list;
@@ -255,6 +259,13 @@ public slots:
     void enableDetection(int);
     void configureDetection(void);
     void drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x, double scale_y);
+    void setClassColour(QString class_name, QColor class_colour);
+    void setClassVisible(QString class_name, bool visible);
+    void setClassFilled(QString class_name, bool fill);
+    void updateClassColour(void);
+    void updateClassFilled(bool checked);
+    void updateClassVisible(bool checked);
+    void onClassListClicked(void);
 
     void openHelp();
 
