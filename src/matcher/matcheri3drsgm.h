@@ -68,9 +68,26 @@ public:
     int getStatus();
 
 private:
+    bool CPU = false;
+    int disparityError = -10000;
+    int disparityShift = 0;
+    int disparityRange = 105;
+    bool subpixel = false;
+    float p1 = 100;
+    float p2 = 800;
+    int windowSize = 7;
+    int speckleDifference = 5;
+    int speckleSize = 1000;
+    bool interpolation = false;
+    bool occlusionDetection;
+    bool occlusionInterpolation;
+    bool textureDSI;
+    int maxPyramidLevel = 6;
+
     int min_disparity, disparity_range;
 
     void init();
+    void initMatcherParams();
 
     I3DRSGM * i3drsgm;
 };

@@ -79,8 +79,6 @@ private:
     double min_depth_ = -1;
     double max_depth_ = -1;
 
-    float genZ(cv::Matx44d Q_, int x_index, int y_index, float d);
-
 public slots:
     //void updateDisparityRange_slide(int val);
     //void updateDisparityRange_spin(int val);

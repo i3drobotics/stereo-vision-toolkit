@@ -95,10 +95,15 @@ class AbstractStereoMatcher : public QObject {
    */
   void checkLRConsistencyFull(double threshold);
 
-  //!  Get a pointer to the left image
+  //!  Get left image used in stereo match
   cv::Mat getLeftImage(void){return left;}
 
-  //!  Get a pointer to the right image
+  //! Get left image in colour
+  //! Actual matching is done is grayscale but can be useful for
+  //! future processing such as point clouds to store original colour image
+  cv::Mat getLeftBGRImage(void){return left_bgr;}
+
+  //!  Get right image used in stereo match
   cv::Mat getRightImage(void){return right;}
 
   void setDownsampleFactor(int factor){ downsample_factor=factor; };
@@ -121,7 +126,7 @@ private:
   * \param left Left image
   * \param right Right image
   */
- void convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img);
+ void convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_bgr_conv_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img);
 
  protected:
 
@@ -133,6 +138,7 @@ private:
 
   cv::Mat left;
   cv::Mat right;
+  cv::Mat left_bgr;
 
   cv::Mat disparity_buffer;
   cv::Mat disparity_rl;
@@ -140,6 +146,8 @@ private:
   cv::Mat disparity16;
 
   cv::Size image_size;
+
+  bool sizeChangedThisFrame = false;
 
   int min_disparity = 0;
   int disparity_range = 64;

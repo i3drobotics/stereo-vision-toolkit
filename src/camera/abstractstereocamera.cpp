@@ -20,6 +20,8 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
 #endif
     //startThread();
     connect(this, SIGNAL(captured_success()), this, SLOT(processNewCapture()));
+    //connect(this, SIGNAL(stereopair_processed()), this, SLOT(processNewStereo()));
+    //connect(this, SIGNAL(matched()), this, SLOT(processNewMatch()));
     connect(this, SIGNAL(captured_success()), this, SLOT(resetFailFrameCount()));
 }
 
@@ -170,15 +172,18 @@ void AbstractStereoCamera::setVisualZmax(double zmax){
 }
 
 void AbstractStereoCamera::reproject3D() {
-
+    cv::Mat image;
     cv::Mat disparity_downscale;
     cv::Mat disparity;
 
     matcher->getDisparity(disparity);
     disparity.copyTo(disparity_downscale);
+    if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_IMAGE){
+        image = matcher->getLeftBGRImage().clone();
+    }
 
-    cv::Mat depth;
-    matcher->calcDepth(disparity,depth);
+    //cv::Mat depth;
+    //matcher->calcDepth(disparity,depth);
     qDebug() << "disparity image size: " << disparity_downscale.size().width << "," << disparity_downscale.size().height;
 
     //cv::abs(disparity_downscale);
@@ -197,11 +202,7 @@ void AbstractStereoCamera::reproject3D() {
         return;
     }
 
-    std::string texture_type = "image"; //TODO set this as option on window
-    cv::Mat image;
-    if (texture_type == "image"){
-        image = matcher->getLeftImage().clone();
-    } else if (texture_type == "depth"){
+    if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH){
         cv::Mat norm_disp;
         matcher->disparity2colormap(disparity_downscale, norm_disp);
         image = norm_disp.clone();
@@ -234,43 +235,47 @@ void AbstractStereoCamera::reproject3D() {
         {
             float d = disparity_downscale.at<float>(i, j);
 
-            if (d < 10000 && d > 0){
+            if (d < 10000){
                 float x_index = j;
                 float y_index = i;
 
                 //qDebug() << d;
 
                 cv::Vec4d homg_pt = _Q * cv::Vec4d((double)x_index, (double)y_index, (double)d, 1.0);
+                if (homg_pt[3] > 0){ // negative W would give negative z which is not possible (behind camera)
 
-                float x = (float)homg_pt[0] / (float)homg_pt[3];
-                float y = (float)homg_pt[1] / (float)homg_pt[3];
-                float z = (float)homg_pt[2] / (float)homg_pt[3];
+                    float x = (float)homg_pt[0] / (float)homg_pt[3];
+                    float y = (float)homg_pt[1] / (float)homg_pt[3];
+                    float z = (float)homg_pt[2] / (float)homg_pt[3];
 
-                uchar b,g,r;
-                if (image.type() == CV_8UC1){
-                    uchar intensity = image.at<uchar>(i,j);
-                    b = intensity;
-                    g = intensity;
-                    r = intensity;
-                } else if (image.type() == CV_8UC3){
-                    b = image.at<cv::Vec3b>(i,j)[0];
-                    g = image.at<cv::Vec3b>(i,j)[1];
-                    r = image.at<cv::Vec3b>(i,j)[2];
-                } else {
-                    b = 0;
-                    g = 0;
-                    r = 0;
-                    qDebug() << "Invalid image type. MUST be CV_8UC1 or CV_8UC3";
+                    if (z > 0){ // negative z is not possible (behind camera)
+                        uchar b,g,r;
+                        if (image.type() == CV_8UC1){
+                            uchar intensity = image.at<uchar>(i,j);
+                            b = intensity;
+                            g = intensity;
+                            r = intensity;
+                        } else if (image.type() == CV_8UC3){
+                            b = image.at<cv::Vec3b>(i,j)[0];
+                            g = image.at<cv::Vec3b>(i,j)[1];
+                            r = image.at<cv::Vec3b>(i,j)[2];
+                        } else {
+                            b = 0;
+                            g = 0;
+                            r = 0;
+                            qDebug() << "Invalid image type. MUST be CV_8UC1 or CV_8UC3";
+                        }
+
+                        pcl::PointXYZRGB point;
+                        point.x = x;
+                        point.y = y;
+                        point.z = z;
+                        point.r = r;
+                        point.g = g;
+                        point.b = b;
+                        ptCloudTemp->points.push_back(point);
+                    }
                 }
-
-                pcl::PointXYZRGB point;
-                point.x = x;
-                point.y = y;
-                point.z = z;
-                point.r = r;
-                point.g = g;
-                point.b = b;
-                ptCloudTemp->points.push_back(point);
             }
         }
     }
@@ -286,26 +291,15 @@ void AbstractStereoCamera::reproject3D() {
     pass.setFilterLimits(visualisation_min_z, visualisation_max_z);
     pass.filter(*ptCloudTemp);
 
-    /*
-  pcl::RadiusOutlierRemoval<pcl::PointXYZRGB> outrem;
-  outrem.setInputCloud(ptCloudTemp);
-  outrem.setRadiusSearch(0.05);
-  outrem.setMinNeighborsInRadius (5);
-  outrem.filter (*ptCloudTemp);
-
-  pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
-  sor.setInputCloud (ptCloudTemp);
-  sor.setMeanK (5);
-  sor.setStddevMulThresh (4.0);
-  sor.filter(*ptCloudTemp);
-  */
-
     ptCloud = ptCloudTemp;
 
     qDebug() << "tmp point cloud size: " << ptCloudTemp->points.size();
     qDebug() << "point cloud size: " << ptCloud->points.size();
 
     emit reprojected();
+    //emit reprojecttime(reprojecttimer.elapsed());
+    //reprojecttimer.restart();
+    reproject_busy = false;
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr AbstractStereoCamera::getPointCloud(){
@@ -662,9 +656,28 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 void AbstractStereoCamera::processNewCapture(void){
     if (!processing_busy){
         processing_busy = true;
-        stereo_future = QtConcurrent::run(this, &AbstractStereoCamera::processStereo);
+        processStereo();
+        //stereo_future = QtConcurrent::run(this, &AbstractStereoCamera::processStereo);
     }
 }
+
+/*
+void AbstractStereoCamera::processNewStereo(void){
+    if (!match_busy && matching){
+        match_busy = true;
+        match_future = QtConcurrent::run(this, &AbstractStereoCamera::processMatch);
+    }
+}
+*/
+
+/*
+void AbstractStereoCamera::processNewMatch(void){
+    if (!reproject_busy && reprojecting){
+        reproject_busy = true;
+        reproject_future = QtConcurrent::run(this, &AbstractStereoCamera::reproject3D);
+    }
+}
+*/
 
 void AbstractStereoCamera::processStereo(void) {
 
@@ -707,11 +720,8 @@ void AbstractStereoCamera::processStereo(void) {
         }
     }
 
-    if (matching) {
-        if (!match_busy){
-            match_busy = true;
-            match_future = QtConcurrent::run(this, &AbstractStereoCamera::parallelMatch);
-        }
+    if (matching){
+        processMatch();
     }
 
     emit stereopair_processed();
@@ -726,19 +736,40 @@ void AbstractStereoCamera::processStereo(void) {
     processing_busy = false;
 }
 
-void AbstractStereoCamera::parallelMatch(){
-    cv::Mat left_img, right_img;
+void AbstractStereoCamera::processMatch(){
+    cv::Mat left_img, right_img, disp, left_bgr;
     left_img = left_output.clone();
     right_img = right_output.clone();
     matcher->match(left_img,right_img);
-    match_busy = false;
-    emit matched();
-    if (reprojecting) {
-        reproject3D();
+    matcher->getDisparity(disp);
+    left_bgr = matcher->getLeftBGRImage();
+
+    if (reprojecting){
+        cv::Mat texture_image;
+        if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_IMAGE){
+            texture_image = left_bgr.clone();
+        } else if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH){
+            CVSupport::disparity2colormap(disp,texture_image);
+        }
+
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp = PCLSupport::disparity2PointCloud(disp,texture_image,Q);
+
+        pcl::PassThrough<pcl::PointXYZRGB> pass;
+        pass.setInputCloud (ptCloudTemp);
+        pass.setFilterFieldName ("z");
+        pass.setFilterLimits(visualisation_min_z, visualisation_max_z);
+        pass.filter(*ptCloudTemp);
+
+        ptCloud = ptCloudTemp;
+
+        emit reprojected();
+        //reproject3D();
     }
 
-    emit matchtime(matchtimer.elapsed());
-    matchtimer.restart();
+    //match_busy = false;
+    emit matched();
+    //emit matchtime(matchtimer.elapsed());
+    //matchtimer.restart();
 }
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){

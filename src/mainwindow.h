@@ -198,6 +198,7 @@ public slots:
     void displaySaved(QString fname);
     void statusMessageTimeout(void);
     void setMatcher(int matcher);
+    void updatePointTexture(int index); // 0 = image, 1 = depth
 
     void enableAutoZ(bool);
 
@@ -264,6 +265,8 @@ protected:
 private slots:
     void on_btnShowCameraSettings_clicked();
     void on_btnHideCameraSettings_clicked();
+
+    void enableMatching(bool enable);
 
 signals:
     void cameraListUpdated(void);
