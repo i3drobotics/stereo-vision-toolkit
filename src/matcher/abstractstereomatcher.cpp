@@ -17,13 +17,15 @@ void AbstractStereoMatcher::assignThread(QThread *thread) {
     thread->start();
 }
 
-void AbstractStereoMatcher::convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img) {
-    cv::Mat right_tmp, left_tmp;
+void AbstractStereoMatcher::convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_bgr_conv_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img) {
+    cv::Mat right_tmp, left_tmp, left_bgr_tmp;
 
     if (left_img.type() == CV_8UC3){
-        cv::cvtColor(left_img,left_tmp,cv::COLOR_BGR2GRAY);
+        left_img.copyTo(left_bgr_tmp);
+        cv::cvtColor(left_bgr_tmp,left_tmp,cv::COLOR_BGR2GRAY);
         left_tmp.convertTo(left_tmp, CV_8UC1);
     } else {
+        left_img.copyTo(left_bgr_tmp);
         left_img.copyTo(left_tmp);
     }
     if (right_img.type() == CV_8UC3){
@@ -35,13 +37,13 @@ void AbstractStereoMatcher::convertImages(cv::Mat left_img, cv::Mat right_img, c
 
     if (downsample_factor != 1){
         cv::resize(right_tmp,right_tmp,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(left_bgr_tmp,left_bgr_tmp,cv::Size(),downsample_factor,downsample_factor);
         cv::resize(left_tmp,left_tmp,cv::Size(),downsample_factor,downsample_factor);
     }
 
     left_conv_img = left_tmp.clone();
+    left_bgr_conv_img = left_bgr_tmp.clone();
     right_conv_img = right_tmp.clone();
-
-    this->image_size = left.size();
 }
 
 void AbstractStereoMatcher::getDisparity(cv::Mat &dst) {
@@ -100,7 +102,15 @@ bool AbstractStereoMatcher::match(cv::Mat left_img, cv::Mat right_img) {
     QElapsedTimer timer;
     timer.restart();
 
-    convertImages(left_img,right_img,left,right);
+    convertImages(left_img,right_img,left_bgr,left,right);
+    //required to check if size has changed
+    //I3DRSGM needs to regenerate its matcher if so
+    if (this->image_size != left.size()){
+        this->image_size = left.size();
+        sizeChangedThisFrame = true;
+    } else {
+        sizeChangedThisFrame = false;
+    }
     bool valid = forwardMatch(left,right);
     if (valid){
         // qDebug() << 1/(timer.elapsed() / 1e3);
@@ -135,17 +145,6 @@ void AbstractStereoMatcher::normaliseDisparity(cv::Mat inDisparity, cv::Mat &out
         }
     }
 
-    for (int i = 0; i < disparity_thresh.rows; i++)
-    {
-        for (int j = 0; j < disparity_thresh.cols; j++)
-        {
-            float d = disparity_thresh.at<float>(i, j);
-            if (d > max_disp || d < min_disp){
-                disparity_thresh.at<float>(i, j) = 0;
-            }
-        }
-    }
-
     disparity_thresh.convertTo(disparity_thresh, CV_8U);
 
     cv::normalize(disparity_thresh, disparity_thresh, 0, 255, cv::NORM_MINMAX);
@@ -162,7 +161,7 @@ void AbstractStereoMatcher::getMinMaxDisparity(cv::Mat inDisparity, double &min_
         for (int j = 0; j < inDisparity.cols; j++)
         {
             float d = inDisparity.at<float>(i, j);
-            if (d < 10000 && d > 0){
+            if (d < 10000){
                 float d = inDisparity.at<float>(i, j);
                 if (d < min_disp){
                     min_disp = d;

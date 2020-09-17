@@ -30,64 +30,10 @@ void DisparityViewer::assignThread(QThread *thread) {
     thread->start();
 }
 
-/*
-void DisparityViewer::updateDisparityRange_spin(int range){
-    ui->disparityRangeSpinbox->setValue(range);
-    updatePixmapRange();
-}
-
-void DisparityViewer::updateDisparityRange_slide(int range){
-    ui->disparityRangeSpinbox->setValue(range * 16);
-    updatePixmapRange();
-}
-
-void DisparityViewer::updatePixmapRange(void) {
-  min_disparity = ui->minDisparitySlider->value();
-  disparity_range = ui->disparityRangeSlider->value() * 16;
-
-  ui->minDisparityLabel->setText(
-      QString("%1 px").arg(QString::number(min_disparity)));
-  ui->maxDisparityLabel->setText(
-      QString("%1 px").arg(QString::number(min_disparity+disparity_range)));
-
-  setColourmap(colourmap);
-
-  return;
-
-  if(Q.empty()){
-      ui->minDisparityLabel->setText(
-          QString("%1 px").arg(QString::number(min_disparity)));
-      ui->maxDisparityLabel->setText(
-          QString("%1 px").arg(QString::number(min_disparity+disparity_range)));
-
-      return;
-  }
-
-  cv::Point3f p_min;
-  p_min.x = 0;
-  p_min.y = 0;
-  p_min.z = min_disparity;
-
-  cv::Point3f p_max;
-  p_min.x = 0;
-  p_min.y = 0;
-  p_min.z = min_disparity+disparity_range;
-
-  std::vector<cv::Point3f> points = {p_min, p_max};
-  std::vector<cv::Point3f> output_points = {p_min, p_max};
-
-  cv::perspectiveTransform(points, output_points, Q);
-
-  qDebug() << output_points[0].z << output_points[1].z;
-
-}
-*/
-
 void DisparityViewer::setViewer(QLabel *viewer) { this->viewer = viewer; }
 
 void DisparityViewer::setMatcher(AbstractStereoMatcher *matcher) {
     this->matcher = matcher;
-    //updatePixmapRange();
     setColourmap(2);
 }
 
@@ -120,15 +66,6 @@ void DisparityViewer::updateDisparityAsync() {
     QtConcurrent::run(this, &DisparityViewer::updateDisparity);
 }
 
-float DisparityViewer::genZ(cv::Matx44d Q_, int x_index, int y_index, float d){
-    cv::Vec4d homg_pt = Q_ * cv::Vec4d((double)x_index, (double)y_index, (double)d, 1.0);
-
-    //float x = (float)homg_pt[0] / (float)homg_pt[3];
-    //float y = (float)homg_pt[1] / (float)homg_pt[3];
-    float z = (float)homg_pt[2] / (float)homg_pt[3];
-    return z;
-}
-
 void DisparityViewer::updateDisparity() {
     cv::Mat disparity;
     matcher->getDisparity16(disparity);
@@ -156,12 +93,11 @@ void DisparityViewer::updateDisparity() {
         for (int j = 0; j < disparity.cols; j++)
         {
             float d = disparity.at<float>(i, j);
-            if (d < 10000 && d > 0 && d != d_error){
+            if (d < 10000 && d != d_error){
                 float d = disparity.at<float>(i, j);
                 if (d < min_disp){
                     //TODO find out why issue with disp < ~3 causing negative w and so negative z
-                    cv::Vec4d homg_pt = _Q * cv::Vec4d((double)i, (double)j, (double)d, 1.0);
-                    if (homg_pt[3] > 0){
+                    if (CVSupport::genZ(_Q,i,j,d) > 0){
                         min_disp = d;
                         min_i = i;
                         min_j = j;
@@ -187,8 +123,8 @@ void DisparityViewer::updateDisparity() {
         }
     }
 
-    min_depth = (double)genZ(_Q,(double)max_i,(double)max_j,(double)max_disp);
-    max_depth = (double)genZ(_Q,(double)min_i,(double)min_j,(double)min_disp);
+    min_depth = (double)CVSupport::genZ(_Q,(double)max_i,(double)max_j,(double)max_disp);
+    max_depth = (double)CVSupport::genZ(_Q,(double)min_i,(double)min_j,(double)min_disp);
 
     /*
     if (max_depth_tmp < min_depth_tmp){
@@ -258,29 +194,18 @@ void DisparityViewer::updateDisparity() {
 
     cv::cvtColor(disparity_vis, disparity_vis, CV_BGR2RGB);
 
-    cv::Mat left_ptr = matcher->getLeftImage();
-
     for (int x = 0; x < disparity_scale.cols; x++) {
         for (int y = 0; y < disparity_scale.rows; y++) {
-            if (disparity_scale.at<uchar>(y, x) == 255 ||
+            if (
+                    disparity_scale.at<uchar>(y, x) == 255 ||
                     disparity_scale.at<uchar>(y, x) == 0 ||
-                    disparity.at<float>(y, x) == 16 * matcher->getErrorDisparity()) {
+                    disparity_thresh.at<float>(y,x) == 0 ||
+                    disparity.at<float>(y, x) == 16 * matcher->getErrorDisparity())
+            {
                 disparity_vis.at<cv::Vec3b>(y, x)[0] = 0;
                 disparity_vis.at<cv::Vec3b>(y, x)[1] = 0;
                 disparity_vis.at<cv::Vec3b>(y, x)[2] = 0;
             }
-
-            if(left_ptr.empty()) continue;
-
-            uchar image_val = (uchar) left_ptr.at<unsigned char>(y, x);
-
-            if (image_val == 0 ||
-                    image_val > ui->intensityThresholdSlider->value()) {
-                disparity_vis.at<cv::Vec3b>(y, x)[0] = 0;
-                disparity_vis.at<cv::Vec3b>(y, x)[1] = 0;
-                disparity_vis.at<cv::Vec3b>(y, x)[2] = 0;
-            }
-
         }
     }
 

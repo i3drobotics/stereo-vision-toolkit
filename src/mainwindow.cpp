@@ -709,6 +709,8 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(displaySaved(QString)));
     connect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
             SLOT(enableMatching(bool)));
+    //connect(ui->enableStereo, SIGNAL(clicked(bool)), this,
+    //        SLOT(enableMatching(bool)));
     connect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
             SLOT(enableRectify(bool)));
     connect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
@@ -734,6 +736,7 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(ui->savePointCloudButton, SIGNAL(clicked()), stereo_cam, SLOT(savePointCloud()));
     connect(ui->dateInFilenameCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableDateInFilename(bool)));
     connect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
+    connect(ui->comboBoxPointTexture, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePointTexture(int)));
 
     enableWindow();
     toggleCameraActiveSettings(true);
@@ -826,6 +829,8 @@ void MainWindow::stereoCameraRelease(void) {
                    SLOT(displaySaved(QString)));
         disconnect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
                    SLOT(enableMatching(bool)));
+        //disconnect(ui->enableStereo, SIGNAL(clicked(bool)), this,
+        //        SLOT(enableMatching(bool)));
         disconnect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
                    SLOT(enableRectify(bool)));
         disconnect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
@@ -849,6 +854,7 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->savePointCloudButton, SIGNAL(clicked()), stereo_cam, SLOT(savePointCloud()));
         disconnect(ui->dateInFilenameCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableDateInFilename(bool)));
         disconnect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
+        disconnect(ui->comboBoxPointTexture, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePointTexture(int)));
 
         //wait 1 second to make sure connections are closed
         QTime dieTime= QTime::currentTime().addSecs(1);
@@ -1834,6 +1840,12 @@ void MainWindow::on_btnHideCameraSettings_clicked()
     on_btnShowCameraSettings_clicked();
 }
 
+void MainWindow::enableMatching(bool enable){
+    if (!enable){
+        match_fps_counter->setText(QString("Match FPS: 0"));
+    }
+}
+
 void MainWindow::error(int error){
     QMessageBox msgBox;
     msgBox.setWindowTitle("Stereo Vision Toolkit");
@@ -1859,6 +1871,16 @@ void MainWindow::error(int error){
         msgBoxMsg = "Lost too many camera frames, camera was closed.";
         msgBox.setText(msgBoxMsg.c_str());
         msgBox.exec();
+    }
+}
+
+void MainWindow::updatePointTexture(int index){
+    if(index == 0){
+        stereo_cam->setPointCloudTexture(AbstractStereoCamera::POINT_CLOUD_TEXTURE_IMAGE);
+    } else if (index == 1){
+        stereo_cam->setPointCloudTexture(AbstractStereoCamera::POINT_CLOUD_TEXTURE_DEPTH);
+    } else {
+        qDebug() << "Invalid point texture index. MUST be 0: image or 1: depth";
     }
 }
 

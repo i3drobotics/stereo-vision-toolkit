@@ -19,6 +19,7 @@
 #endif
 
 #include "cvsupport.h"
+#include "pclsupport.h"
 
 // Point Cloud Library
 #include <pcl/point_cloud.h>
@@ -75,6 +76,8 @@ public:
                             CAMERA_TYPE_BASLER_USB, CAMERA_TYPE_TIS, CAMERA_TYPE_VIMBA, CAMERA_TYPE_INVALID };
 
     enum StereoCalibrationType { CALIBRATION_TYPE_YAML, CALIBRATION_TYPE_XML };
+
+    enum PointCloudTexture { POINT_CLOUD_TEXTURE_IMAGE, POINT_CLOUD_TEXTURE_DEPTH };
 
     //! Structure to hold camera settings
     struct StereoCameraSettings {
@@ -217,6 +220,14 @@ public:
   */
     cv::Size getSize(void){ return cv::Size(getWidth(),getHeight()); }
 
+    void setPointCloudTexture(PointCloudTexture pct){
+        this->pct = pct;
+    }
+
+    PointCloudTexture getPointCloudTexture(void){
+        return this->pct;
+    }
+
     //! Initalise video stream for writing a video stream to a file
     /*!
    * If no filename is supplied, a timestamped video will be stored in the current selected save folder.
@@ -274,6 +285,9 @@ signals:
 
     //! Emitted after a match has been processed to indicate the process time (fps = 1000/matchtime)
     void matchtime(qint64 time);
+
+    //! Emitted after a reproject has been processed to indicate the process time (fps = 1000/reprojecttime)
+    void reprojecttime(qint64 time);
 
     //! Emitted after a frame has been processed to indicates the current frame count
     void framecount(qint64 count);
@@ -489,13 +503,20 @@ private slots:
 
     void processNewCapture(void);
 
-    void parallelMatch(void);
+    //void processNewStereo(void);
+
+    //void processNewMatch(void);
+
+    void processMatch(void);
 
 private:
     qint64 frames = 0;
 
+    PointCloudTexture pct = POINT_CLOUD_TEXTURE_IMAGE;
+
     bool match_busy = false;
     bool processing_busy = false;
+    bool reproject_busy = false;
 
     bool includeDateInFilename = false;
     bool matching = false;
@@ -514,6 +535,9 @@ private:
 
     QFuture<void> match_future;
     QFuture<void> stereo_future;
+    QFuture<void> reproject_future;
+
+    QFutureWatcher<void> match_futureWatcher;
 
     cv::VideoWriter *cv_video_writer;
 
@@ -622,7 +646,8 @@ protected:
     StereoCameraSerialInfo stereoCameraSerialInfo_;
 
     QElapsedTimer frametimer;
-    QElapsedTimer matchtimer;
+    //QElapsedTimer matchtimer;
+    //QElapsedTimer reprojecttimer;
 
     bool rectification_valid = false;
     bool calibration_valid = false;

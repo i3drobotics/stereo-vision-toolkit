@@ -1456,8 +1456,11 @@
               </item>
               <item>
                <widget class="QCheckBox" name="checkBoxAutoZ">
+                <property name="layoutDirection">
+                 <enum>Qt::RightToLeft</enum>
+                </property>
                 <property name="text">
-                 <string>Auto</string>
+                 <string>Auto Z:</string>
                 </property>
                 <property name="checked">
                  <bool>false</bool>
@@ -1469,6 +1472,27 @@
                 <property name="text">
                  <string>Reset</string>
                 </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Texture:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBoxPointTexture">
+                <item>
+                 <property name="text">
+                  <string>Image</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Depth</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item>
