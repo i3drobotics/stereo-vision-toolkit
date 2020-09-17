@@ -337,8 +337,6 @@ std::vector<BoundingBox> DetectorOpenCV::inferTensorflow(cv::Mat image){
         double freq = cv::getTickFrequency() / 1000;
         processing_time = net.getPerfProfile(layersTimes) / freq;
 
-        //qDebug() << "Processed in: " << processing_time;
-
         return results;
 }
 
@@ -375,8 +373,6 @@ std::vector<BoundingBox> DetectorOpenCV::inferDarknet(cv::Mat image){
         std::vector<double> layersTimes;
         double freq = cv::getTickFrequency() / 1000;
         processing_time = net.getPerfProfile(layersTimes) / freq;
-
-        std::cout << "Processed in: " << processing_time << std::endl;
 
         // Remove the bounding boxes with low confidence
         postProcess(image, outputs, results);

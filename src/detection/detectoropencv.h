@@ -57,6 +57,7 @@ public:
     bool isReady(void){return ready;}
     double getProcessingTime(void){return processing_time;}
     int getNumClasses(void){return static_cast<int>(class_names.size());}
+    std::vector<std::string> getClassNames(void){return class_names;}
     bool isRunning(void){return running;}
     ~DetectorOpenCV();
 
