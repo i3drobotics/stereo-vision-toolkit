@@ -503,11 +503,11 @@ private slots:
 
     void processNewCapture(void);
 
-    //void processNewStereo(void);
+    void processNewStereo(void);
 
     //void processNewMatch(void);
 
-    void processMatch(void);
+    void processMatch();
 
 private:
     qint64 frames = 0;
@@ -576,7 +576,7 @@ private:
     /*!
   * Note this will update the image matrices: #left_remapped and #right_remapped
   */
-    bool rectifyImages(void);
+    bool rectifyImages(cv::Mat left, cv::Mat right, cv::Mat& left_rect, cv::Mat& right_rect);
 
     //! Wrapper around OpenCV rectify function for paralell calls.
     /*!
@@ -601,7 +601,6 @@ private:
   *
   * @sa setVisualZmin(), setVisualZmax(), getPointCloud()
   */
-    void reproject3D();
 
     cv::Mat rectmapx_l;
     cv::Mat rectmapy_l;
@@ -627,6 +626,9 @@ private:
 
     cv::Mat left_output;
     cv::Mat right_output;
+
+    cv::Mat left_match_input;
+    cv::Mat right_match_input;
 
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 5;

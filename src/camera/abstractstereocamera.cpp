@@ -20,7 +20,7 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
 #endif
     //startThread();
     connect(this, SIGNAL(captured_success()), this, SLOT(processNewCapture()));
-    //connect(this, SIGNAL(stereopair_processed()), this, SLOT(processNewStereo()));
+    connect(this, SIGNAL(stereopair_processed()), this, SLOT(processNewStereo()));
     //connect(this, SIGNAL(matched()), this, SLOT(processNewMatch()));
     connect(this, SIGNAL(captured_success()), this, SLOT(resetFailFrameCount()));
 }
@@ -169,137 +169,6 @@ void AbstractStereoCamera::setVisualZmax(double zmax){
     assert(zmax > 0);
     visualisation_max_z = zmax;
     qDebug() << "Set vmax: " << zmax;
-}
-
-void AbstractStereoCamera::reproject3D() {
-    cv::Mat image;
-    cv::Mat disparity_downscale;
-    cv::Mat disparity;
-
-    matcher->getDisparity(disparity);
-    disparity.copyTo(disparity_downscale);
-    if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_IMAGE){
-        image = matcher->getLeftBGRImage().clone();
-    }
-
-    //cv::Mat depth;
-    //matcher->calcDepth(disparity,depth);
-    qDebug() << "disparity image size: " << disparity_downscale.size().width << "," << disparity_downscale.size().height;
-
-    //cv::abs(disparity_downscale);
-
-    // By default the disparity maps are scaled by a factor of 16.0
-    disparity_downscale /= 16.0;
-
-    int row = (disparity_downscale.rows-1)/2;
-    int column = (disparity_downscale.cols-1)/2;
-    float disp_val_f =  disparity_downscale.at<float>(row, column);
-    qDebug() << "IMAGE CENTER: " << column+1 << "," << row+1;
-    qDebug() << "DISPARITY AT CENTER: " << disp_val_f;
-
-    if (Q.empty() || disparity_downscale.empty()) {
-        qDebug() << "Q or disparity map is empty";
-        return;
-    }
-
-    if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH){
-        cv::Mat norm_disp;
-        matcher->disparity2colormap(disparity_downscale, norm_disp);
-        image = norm_disp.clone();
-    }
-
-    //cv::reprojectImageTo3D(disparity_downscale, stereo_reprojected, Q, true);
-
-    //qDebug() << "reprojected image size: " << stereo_reprojected.size().width << "," << stereo_reprojected.size().height;
-
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp(
-                new pcl::PointCloud<pcl::PointXYZRGB>);
-
-    pcl::PointXYZRGB point;
-    uint32_t rgb = 0;
-
-    point.x = 0;
-    point.y = 0;
-    point.z = 0;
-
-    rgb = ((int)255) << 16 | ((int)255) << 8 | ((int)255);
-    point.rgb = *reinterpret_cast<float *>(&rgb);
-    ptCloudTemp->points.push_back(point);
-
-    cv::Matx44d _Q;
-    Q.convertTo(_Q, CV_64F);
-
-    for (int i = 0; i < disparity_downscale.rows; i++)
-    {
-        for (int j = 0; j < disparity_downscale.cols; j++)
-        {
-            float d = disparity_downscale.at<float>(i, j);
-
-            if (d < 10000){
-                float x_index = j;
-                float y_index = i;
-
-                //qDebug() << d;
-
-                cv::Vec4d homg_pt = _Q * cv::Vec4d((double)x_index, (double)y_index, (double)d, 1.0);
-                if (homg_pt[3] > 0){ // negative W would give negative z which is not possible (behind camera)
-
-                    float x = (float)homg_pt[0] / (float)homg_pt[3];
-                    float y = (float)homg_pt[1] / (float)homg_pt[3];
-                    float z = (float)homg_pt[2] / (float)homg_pt[3];
-
-                    if (z > 0){ // negative z is not possible (behind camera)
-                        uchar b,g,r;
-                        if (image.type() == CV_8UC1){
-                            uchar intensity = image.at<uchar>(i,j);
-                            b = intensity;
-                            g = intensity;
-                            r = intensity;
-                        } else if (image.type() == CV_8UC3){
-                            b = image.at<cv::Vec3b>(i,j)[0];
-                            g = image.at<cv::Vec3b>(i,j)[1];
-                            r = image.at<cv::Vec3b>(i,j)[2];
-                        } else {
-                            b = 0;
-                            g = 0;
-                            r = 0;
-                            qDebug() << "Invalid image type. MUST be CV_8UC1 or CV_8UC3";
-                        }
-
-                        pcl::PointXYZRGB point;
-                        point.x = x;
-                        point.y = y;
-                        point.z = z;
-                        point.r = r;
-                        point.g = g;
-                        point.b = b;
-                        ptCloudTemp->points.push_back(point);
-                    }
-                }
-            }
-        }
-    }
-
-    if(ptCloudTemp->points.empty()){
-        qDebug() << "Failed to create Point cloud. Point cloud is empty";
-        return;
-    }
-
-    pcl::PassThrough<pcl::PointXYZRGB> pass;
-    pass.setInputCloud (ptCloudTemp);
-    pass.setFilterFieldName ("z");
-    pass.setFilterLimits(visualisation_min_z, visualisation_max_z);
-    pass.filter(*ptCloudTemp);
-
-    ptCloud = ptCloudTemp;
-
-    qDebug() << "tmp point cloud size: " << ptCloudTemp->points.size();
-    qDebug() << "point cloud size: " << ptCloud->points.size();
-
-    emit reprojected();
-    //emit reprojecttime(reprojecttimer.elapsed());
-    //reprojecttimer.restart();
-    reproject_busy = false;
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr AbstractStereoCamera::getPointCloud(){
@@ -590,17 +459,20 @@ bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString ri
 }
 
 
-bool AbstractStereoCamera::rectifyImages(void) {
+bool AbstractStereoCamera::rectifyImages(cv::Mat left, cv::Mat right, cv::Mat& left_rect, cv::Mat& right_rect) {
     if (cal_image_width != image_width || cal_image_height != image_height){
         qDebug() << "Image size does not match calibrated image size";
+        left.copyTo(left_rect);
+        right.copyTo(right_rect);
         return false;
     }
-#ifdef WITH_CUDA
     if (cuda_device_found){
+#ifdef WITH_CUDA
+
         cv::cuda::GpuMat d_left, d_right, d_left_remap, d_right_remap;
 
-        d_left.upload(left_raw);
-        d_right.upload(right_raw);
+        d_left.upload(left);
+        d_right.upload(right);
 
         cv::cuda::GpuMat d_rectmapx_l, d_rectmapy_l, d_rectmapx_r, d_rectmapy_r;
 
@@ -614,23 +486,17 @@ bool AbstractStereoCamera::rectifyImages(void) {
         cv::cuda::remap(d_right, d_right_remap, d_rectmapx_r, d_rectmapy_r,
                         cv::INTER_CUBIC, cv::BORDER_CONSTANT);
 
-        d_left_remap.download(left_remapped);
-        d_right_remap.download(right_remapped);
+        d_left_remap.download(left_rect);
+        d_right_remap.download(right_rect);
+        return true;
+#else
+        return false;
+#endif
     } else {
-#endif
-        QFuture<void> res_l =
-                QtConcurrent::run(this, &AbstractStereoCamera::remap_parallel, left_raw,
-                                  std::ref(left_remapped), rectmapx_l, rectmapy_l);
-        QFuture<void> res_r = QtConcurrent::run(
-                    this, &AbstractStereoCamera::remap_parallel, right_raw,
-                    std::ref(right_remapped), rectmapx_r, rectmapy_r);
-
-        res_l.waitForFinished();
-        res_r.waitForFinished();
-#ifdef WITH_CUDA
+        remap_parallel(left,left_rect, rectmapx_l, rectmapy_l);
+        remap_parallel(right,right_rect, rectmapx_r, rectmapy_r);
+        return true;
     }
-#endif
-    return true;
 }
 
 void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
@@ -645,6 +511,7 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
     if (this->isMatching()){
         reenable_required = true;
         enableMatching(false);
+        while(match_busy){};
     }
     this->matcher = matcher;
     if (reenable_required){
@@ -654,21 +521,20 @@ void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 }
 
 void AbstractStereoCamera::processNewCapture(void){
-    if (!processing_busy){
+    if (!stereo_future.isRunning()){
         processing_busy = true;
-        processStereo();
-        //stereo_future = QtConcurrent::run(this, &AbstractStereoCamera::processStereo);
+        //processStereo();
+        stereo_future = QtConcurrent::run(this, &AbstractStereoCamera::processStereo);
     }
 }
 
-/*
 void AbstractStereoCamera::processNewStereo(void){
-    if (!match_busy && matching){
+    if (!match_future.isRunning() && matching){
         match_busy = true;
-        match_future = QtConcurrent::run(this, &AbstractStereoCamera::processMatch);
+        //processMatch();
+        //match_future = QtConcurrent::run(this, &AbstractStereoCamera::processMatch);
     }
 }
-*/
 
 /*
 void AbstractStereoCamera::processNewMatch(void){
@@ -684,44 +550,39 @@ void AbstractStereoCamera::processStereo(void) {
     frames++;
     emit framecount(frames);
 
-    if (isSwappingLeftRight()){
-        cv::Mat right_tmp;
-        right_raw.copyTo(right_tmp);
+    cv::Mat left_in, right_in;
 
-        left_raw.copyTo(right_raw);
-        right_tmp.copyTo(left_raw);
+    if (isSwappingLeftRight()){
+        left_in = right_raw.clone();
+        right_in = left_raw.clone();
+    } else {
+        left_in = left_raw.clone();
+        right_in = right_raw.clone();
     }
 
     if (downsample_factor != 1){
-        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(left_in,left_in,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(right_in,right_in,cv::Size(),downsample_factor,downsample_factor);
     }
 
     if (rectifying) {
-        bool res = rectifyImages();
+        bool res = rectifyImages(left_in,right_in,left_remapped,right_remapped);
         if (!res){
             send_error(RECTIFY_ERROR);
-            left_raw.copyTo(left_remapped);
-            right_raw.copyTo(right_remapped);
         }
+        left_output = left_remapped.clone();
+        right_output = right_remapped.clone();
     } else {
-        left_raw.copyTo(left_remapped);
-        right_raw.copyTo(right_remapped);
+        left_output = left_in.clone();
+        right_output = right_in.clone();
     }
-
-    left_remapped.copyTo(left_output);
-    right_remapped.copyTo(right_output);
 
     if (capturing_video){
         if (capturing_rectified_video){
             addVideoStreamFrame(left_remapped,right_remapped);
         } else {
-            addVideoStreamFrame(left_raw,right_raw);
+            addVideoStreamFrame(left_in,right_in);
         }
-    }
-
-    if (matching){
-        processMatch();
     }
 
     emit stereopair_processed();
@@ -743,11 +604,12 @@ void AbstractStereoCamera::processMatch(){
     matcher->match(left_img,right_img);
     matcher->getDisparity(disp);
     left_bgr = matcher->getLeftBGRImage();
+    emit matched();
 
     if (reprojecting){
         cv::Mat texture_image;
         if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_IMAGE){
-            texture_image = left_bgr.clone();
+            left_bgr.copyTo(texture_image);
         } else if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH){
             CVSupport::disparity2colormap(disp,texture_image);
         }
@@ -763,11 +625,10 @@ void AbstractStereoCamera::processMatch(){
         ptCloud = ptCloudTemp;
 
         emit reprojected();
-        //reproject3D();
     }
 
-    //match_busy = false;
-    emit matched();
+    match_busy = false;
+
     //emit matchtime(matchtimer.elapsed());
     //matchtimer.restart();
 }
