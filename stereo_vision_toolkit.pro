@@ -57,6 +57,13 @@ WITH_I3DRSGM {
     DEFINES += WITH_I3DRSGM
 }
 
+# To use CUDA
+# add 'CONFIG+=WITH_CUDA' to build arguments
+WITH_CUDA {
+    message("CUDA enabled")
+    DEFINES += WITH_CUDA
+}
+
 # To use Vimbda camera API (currently optional while being implimented)
 # add 'CONFIG+=WITH_VIMBA' to build arguments
 WITH_VIMBA {
@@ -153,6 +160,7 @@ HEADERS += \
     asmopencv.h \
     abstractarduinocoms.h \
     cvsupport.h \
+    pclsupport.h \
     pylonsupport.h \
     src/camera/cameravimba.h \
     stereocalibrate.h \
