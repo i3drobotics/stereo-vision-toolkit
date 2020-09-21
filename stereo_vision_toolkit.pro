@@ -52,8 +52,10 @@ WITH_I3DRSGM {
 
 # To use Vimbda camera API (currently optional while being implimented)
 # add 'CONFIG+=WITH_VIMBA' to build arguments
-message("VIMBA enabled")
-DEFINES += WITH_VIMBA
+WITH_VIMBA {
+    message("VIMBA enabled")
+    DEFINES += WITH_VIMBA
+}
 
 # Define resources
 RC_FILE = icon.rc
@@ -94,7 +96,6 @@ SOURCES += \
     mainwindow.cpp \
     calibrationdialog.cpp \
     abstractarduinocoms.cpp \
-    camera/cameravimba.cpp \
     detection/detectoropencv.cpp \
     detection/detectorsetupdialog.cpp \
     stereocalibrate.cpp \
@@ -126,6 +127,7 @@ win32 {
 # Optional vimba source files (as currently in development)
 WITH_VIMBA {
     SOURCES += \
+        camera/cameravimba.cpp \
         stereocameravimba.cpp
 }
 # Optional I3RSGM matcher source files
@@ -144,7 +146,6 @@ HEADERS += \
     abstractarduinocoms.h \
     cvsupport.h \
     pylonsupport.h \
-    camera/cameravimba.h \
     detection/boundingbox.h \
     detection/detectoropencv.h \
     detection/detectorsetupdialog.h \
@@ -178,6 +179,7 @@ win32 {
 # Optional vimba header files (as currently in development)
 WITH_VIMBA {
     HEADERS += \
+        camera/cameravimba.h \
         stereocameravimba.h
 }
 # Optional I3DRSGM matcher header files
@@ -366,7 +368,6 @@ win32 {
     # Vimba dlls
     WITH_VIMBA {
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll \
             $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaC/Bin/Win64/VimbaC.dll \
             $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/clallserial.dll \
             $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/VimbaCLConfigTL.cti \
@@ -376,10 +377,14 @@ win32 {
 
         CONFIG( debug, debug|release ) {
             # Debug only dlls
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
+            # TODO find out why CPP is needed with CPPd (causing debug issues)
+            EXTRA_FILES += \
+                $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll \
+                $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
+        } else {
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
         }
     }
-
 }
 
 # Define additional files to copy to build folder
@@ -403,10 +408,10 @@ QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 CONFIG += file_copies
 COPIES += extraFiles
 win32 {
-#    message("Copying dependencies")
-#    extraFiles.files = $${EXTRA_FILES}
+    message("Copying dependencies")
+    extraFiles.files = $${EXTRA_FILES}
 }
-#extraFiles.path = $${DEPLOY_FOLDER}
+extraFiles.path = $${DEPLOY_FOLDER}
 
 # Install drivers
 win32 {
