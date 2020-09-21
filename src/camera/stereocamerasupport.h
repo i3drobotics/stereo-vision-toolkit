@@ -24,13 +24,15 @@ class StereoCameraSupport
 {
 
 public:
-    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> getStereoDeviceList(DShowLib::Grabber* handle){
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> getStereoDeviceList(DShowLib::Grabber* handle, Pylon::CTlFactory* tlFactory){
 
         std::vector<AbstractStereoCamera::StereoCameraSerialInfo> all_camera_serial_info;
 
-        std::vector<AbstractStereoCamera::StereoCameraSerialInfo> basler_camera_serial_info = StereoCameraBasler::listSystems();
+        std::vector<AbstractStereoCamera::StereoCameraSerialInfo> basler_camera_serial_info = StereoCameraBasler::listSystemsQuick(tlFactory);
 
+#ifdef WITH_VIMBA
         std::vector<AbstractStereoCamera::StereoCameraSerialInfo> vimba_camera_serial_info = StereoCameraVimba::listSystems();
+#endif
 
         std::vector<AbstractStereoCamera::StereoCameraSerialInfo> tis_camera_serial_info = StereoCameraTIS::listSystemsQuick(handle);
 
@@ -40,7 +42,9 @@ public:
 
         all_camera_serial_info.insert( all_camera_serial_info.end(), basler_camera_serial_info.begin(), basler_camera_serial_info.end() );
 
+#ifdef WITH_VIMBA
         all_camera_serial_info.insert( all_camera_serial_info.end(), vimba_camera_serial_info.begin(), vimba_camera_serial_info.end() );
+#endif
         all_camera_serial_info.insert( all_camera_serial_info.end(), tis_camera_serial_info.begin(), tis_camera_serial_info.end() );
         all_camera_serial_info.insert( all_camera_serial_info.end(), deimos_camera_serial_info.begin(), deimos_camera_serial_info.end() );
         all_camera_serial_info.insert( all_camera_serial_info.end(), usb_camera_serial_info.begin(), usb_camera_serial_info.end() );
