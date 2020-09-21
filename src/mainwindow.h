@@ -166,6 +166,8 @@ private:
 
     DShowLib::Grabber* tisgrabber;
 
+    Pylon::CTlFactory* pylonTlFactory;
+
     DetectorOpenCV* object_detector;
     bool detection_enabled = false;
     bool detecting = false;

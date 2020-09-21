@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget* parent)
     Pylon::PylonInitialize();
     DShowLib::InitLibrary();
     tisgrabber = new DShowLib::Grabber();
+    pylonTlFactory = &Pylon::CTlFactory::GetInstance();
 
     ui->imageViewTab->raise();
     ui->tabWidget->lower();
@@ -584,6 +585,8 @@ void MainWindow::updateDetection(){
         }
         drawBoundingBoxes(image_detection, results, 1./scale_factor_x, 1./scale_factor_y);
 
+        cv::cvtColor(image_detection, image_detection, cv::COLOR_RGBA2BGRA);
+
         object_detection_display->updateView(image_detection);
     }
 
@@ -1006,6 +1009,7 @@ void MainWindow::stereoCameraInitConnections(void) {
     enableWindow();
     toggleCameraActiveSettings(true);
     toggleCameraPassiveSettings(true);
+    stopDeviceListTimer();
 }
 
 void MainWindow::stereoCameraRelease(void) {
@@ -1043,6 +1047,9 @@ void MainWindow::stereoCameraRelease(void) {
 
     if (cameras_connected) {
         cameras_connected = false;
+
+        ui->gridLayoutCameraList->setEnabled(false);
+        QCoreApplication::processEvents();
 
         QProgressDialog progressClose("Ending camera capture...", "", 0, 100, this);
         progressClose.setWindowTitle("SVT");
@@ -1274,14 +1281,18 @@ void MainWindow::refreshCameraListThreaded(){
 }
 
 void MainWindow::refreshCameraList(){
-    ui->gridLayoutCameraList->setEnabled(false);
-    QCoreApplication::processEvents();
-    QElapsedTimer task_timer;
-    task_timer.start();
-    current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList(tisgrabber);
-    qDebug() << "Time to get device list: " << task_timer.elapsed();
-    emit cameraListUpdated();
-    //refreshCameraListGUI();
+    if (!cameras_connected){
+        ui->gridLayoutCameraList->setEnabled(false);
+        QCoreApplication::processEvents();
+        QElapsedTimer task_timer;
+        task_timer.start();
+        current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList(tisgrabber,pylonTlFactory);
+        qDebug() << "Time to get device list: " << task_timer.elapsed();
+        if (!cameras_connected){
+            emit cameraListUpdated();
+            //refreshCameraListGUI();
+        }
+    }
 }
 
 void MainWindow::refreshCameraListGUI(){
@@ -1463,11 +1474,13 @@ void MainWindow::stereoCameraInit() {
 void MainWindow::startDeviceListTimer() {
     // refresh device list every 5 seconds
     //TODO replace this with event driven system
-    device_list_timer->stop();
-    device_list_timer = new QTimer(this);
-    refreshCameraListThreaded();
-    device_list_timer->start(5000);
-    QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
+    if (!device_list_timer->isActive()){
+        device_list_timer->stop();
+        device_list_timer = new QTimer(this);
+        //refreshCameraListThreaded();
+        device_list_timer->start(5000);
+        QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
+    }
     ui->btnRefreshCameras->setEnabled(true);
 }
 
