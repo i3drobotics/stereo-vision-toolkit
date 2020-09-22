@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.3.0
+VERSION = 1.3.1a.3
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
