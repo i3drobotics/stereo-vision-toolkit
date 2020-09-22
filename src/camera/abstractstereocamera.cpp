@@ -198,7 +198,7 @@ void AbstractStereoCamera::savePointCloud(){
     ptCloud->sensor_origin_ = Eigen::Vector4f::Zero();
 
     //TODO Figure out how to disable outputting camera information in the PLY file
-    int exit_code = pcl::io::savePLYFile(fname.toStdString(), *ptCloud);
+    int exit_code = pcl::io::savePLYFileBinary(fname.toStdString(), *ptCloud);
 
     QString msgBoxMessage;
     if (exit_code == 0){ //Point cloud saved successfully
