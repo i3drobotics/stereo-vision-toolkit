@@ -1773,34 +1773,38 @@ void MainWindow::updateFrameCount(qint64 count) {
 }
 
 void MainWindow::updateMatchTime(qint64 time) {
-    int fps = 1000.0 / time;
+    float fps = 1000.0 / time;
     measured_match_fps = fps;
 
     match_fps_measure_total+= measured_match_fps;
     match_fps_measure_count++;
 
-    int average_fps = 0;
-    average_fps = ceil((float)match_fps_measure_total / (float)match_fps_measure_count);
-    match_fps_counter->setText(QString("Match FPS: %1").arg(average_fps)); //TODO create seperate timer for matching time
+    float average_fps = 0;
+    average_fps = (float)match_fps_measure_total / (float)match_fps_measure_count;
 
-    if (match_fps_measure_count > 10){
+    QString fps_number = QString::number(average_fps, 'G', 2);
+    match_fps_counter->setText(QString("Match FPS: ") + fps_number);
+
+    if (match_fps_measure_count > 3){
         match_fps_measure_total = average_fps;
         match_fps_measure_count = 1;
     }
 }
 
 void MainWindow::updateFrameTime(qint64 time) {
-    int fps = 1000.0 / time;
+    float fps = 1000.0 / time;
     measured_fps = fps;
 
     fps_measure_total+= measured_fps;
     fps_measure_count++;
 
-    int average_fps = 0;
-    average_fps = ceil((float)fps_measure_total / (float)fps_measure_count);
-    fps_counter->setText(QString("Camera FPS: %1").arg(average_fps));
+    float average_fps = 0;
+    average_fps = (float)fps_measure_total / (float)fps_measure_count;
 
-    if (fps_measure_count > 10){
+    QString fps_number = QString::number(average_fps, 'G', 2);
+    fps_counter->setText(QString("Camera FPS: ") + fps_number);
+
+    if (fps_measure_count > 3){
         fps_measure_total = average_fps;
         fps_measure_count = 1;
     }

@@ -19,6 +19,7 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
     }
 #endif
     //startThread();
+    //connect(this, SIGNAL(captured_success()), this, SLOT(processStereo()));
     connect(this, SIGNAL(captured_success()), this, SLOT(processNewCapture()));
     connect(this, SIGNAL(stereopair_processed()), this, SLOT(processNewStereo()));
     //connect(this, SIGNAL(matched()), this, SLOT(processNewMatch()));
@@ -163,7 +164,6 @@ void AbstractStereoCamera::setVisualZmin(double zmin){
     visualisation_min_z = zmin;
     qDebug() << "Set vmin: " << zmin;
 }
-
 
 void AbstractStereoCamera::setVisualZmax(double zmax){
     assert(zmax > 0);
@@ -507,21 +507,24 @@ void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
 
 void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 
+    new_matcher = matcher;
+    changed_matcher = true;
+    /*
     bool reenable_required = false;
     if (this->isMatching()){
         reenable_required = true;
         enableMatching(false);
-        while(match_busy){};
     }
     this->matcher = matcher;
     if (reenable_required){
         enableMatching(true);
     }
     qDebug() << "Changed matcher";
+    */
 }
 
 void AbstractStereoCamera::processNewCapture(void){
-    if (!stereo_future.isRunning()){
+    if (!processing_busy){
         processing_busy = true;
         //processStereo();
         stereo_future = QtConcurrent::run(this, &AbstractStereoCamera::processStereo);
@@ -529,10 +532,10 @@ void AbstractStereoCamera::processNewCapture(void){
 }
 
 void AbstractStereoCamera::processNewStereo(void){
-    if (!match_future.isRunning() && matching){
+    if (!match_busy && matching){
         match_busy = true;
         //processMatch();
-        //match_future = QtConcurrent::run(this, &AbstractStereoCamera::processMatch);
+        match_future = QtConcurrent::run(this, &AbstractStereoCamera::processMatch);
     }
 }
 
@@ -550,40 +553,56 @@ void AbstractStereoCamera::processStereo(void) {
     frames++;
     emit framecount(frames);
 
-    cv::Mat left_in, right_in;
+    if (right_raw.empty() || left_raw.empty()){
+        return;
+    }
 
     if (isSwappingLeftRight()){
-        left_in = right_raw.clone();
-        right_in = left_raw.clone();
-    } else {
-        left_in = left_raw.clone();
-        right_in = right_raw.clone();
+        cv::Mat right_tmp;
+        right_raw.copyTo(right_tmp);
+
+        left_raw.copyTo(right_raw);
+        right_tmp.copyTo(left_raw);
     }
 
     if (downsample_factor != 1){
-        cv::resize(left_in,left_in,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(right_in,right_in,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
     }
 
     if (rectifying) {
-        bool res = rectifyImages(left_in,right_in,left_remapped,right_remapped);
+        bool res = rectifyImages(left_raw,right_raw,left_remapped,right_remapped);
         if (!res){
             send_error(RECTIFY_ERROR);
+            left_raw.copyTo(left_remapped);
+            right_raw.copyTo(right_remapped);
         }
-        left_output = left_remapped.clone();
-        right_output = right_remapped.clone();
     } else {
-        left_output = left_in.clone();
-        right_output = right_in.clone();
+        left_raw.copyTo(left_remapped);
+        right_raw.copyTo(right_remapped);
     }
+
+    left_remapped.copyTo(left_output);
+    right_remapped.copyTo(right_output);
 
     if (capturing_video){
         if (capturing_rectified_video){
             addVideoStreamFrame(left_remapped,right_remapped);
         } else {
-            addVideoStreamFrame(left_in,right_in);
+            addVideoStreamFrame(left_raw,right_raw);
         }
     }
+
+    /*
+    if (matching) {
+        if (changed_matcher){
+            changed_matcher = false;
+            this->matcher = new_matcher;
+        }
+        match_busy = true;
+        processMatch();
+    }
+    */
 
     emit stereopair_processed();
     if (!first_image_received){
@@ -598,9 +617,18 @@ void AbstractStereoCamera::processStereo(void) {
 }
 
 void AbstractStereoCamera::processMatch(){
+    if (left_output.empty() || right_output.empty()){
+        return;
+    }
     cv::Mat left_img, right_img, disp, left_bgr;
     left_img = left_output.clone();
     right_img = right_output.clone();
+
+    if (changed_matcher){
+        changed_matcher = false;
+        this->matcher = new_matcher;
+    }
+
     matcher->match(left_img,right_img);
     matcher->getDisparity(disp);
     left_bgr = matcher->getLeftBGRImage();
@@ -612,6 +640,10 @@ void AbstractStereoCamera::processMatch(){
             left_bgr.copyTo(texture_image);
         } else if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH){
             CVSupport::disparity2colormap(disp,texture_image);
+        }
+
+        if (disp.empty() || texture_image.empty()){
+            return;
         }
 
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp = PCLSupport::disparity2PointCloud(disp,texture_image,Q);
@@ -629,8 +661,8 @@ void AbstractStereoCamera::processMatch(){
 
     match_busy = false;
 
-    //emit matchtime(matchtimer.elapsed());
-    //matchtimer.restart();
+    emit matchtime(matchtimer.elapsed());
+    matchtimer.restart();
 }
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){

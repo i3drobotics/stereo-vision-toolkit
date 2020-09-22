@@ -92,9 +92,9 @@ private:
     QThread* cam_thread;
 
     int fps_measure_count = 0;
-    int fps_measure_total = 0;
+    float fps_measure_total = 0;
     int match_fps_measure_count = 0;
-    int match_fps_measure_total = 0;
+    float match_fps_measure_total = 0;
 
     int CAMERA_CONNECTION_SUCCESS_EXIT_CODE = 0;
     int CAMERA_CONNECTION_FAILED_EXIT_CODE = -1;
@@ -138,9 +138,9 @@ private:
     std::vector<QPushButton> deviceListButtons;
 
     bool cameras_connected = false;
-    int measured_fps = 0;
-    int measured_match_fps = 0;
-    int current_fps = 0;
+    float measured_fps = 0;
+    float measured_match_fps = 0;
+    float current_fps = 0;
     int current_binning = 0;
     bool using_gige = false;
     bool first_cloud = true;
