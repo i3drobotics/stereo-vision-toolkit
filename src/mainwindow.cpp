@@ -128,6 +128,10 @@ MainWindow::MainWindow(QWidget* parent)
             SLOT(startCalibrationFromImages()));
     connect(ui->actionDocumentation, SIGNAL(triggered(bool)), this,
             SLOT(openHelp()));
+#ifdef WITH_FERVOR
+    connect(ui->actionCheckUpdates, SIGNAL(triggered(bool)), this,
+            SLOT(checkUpdates()));
+#endif
     connect(ui->actionAbout, SIGNAL(triggered(bool)), this,
             SLOT(openAbout()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), QApplication::instance(),

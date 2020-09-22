@@ -22,6 +22,8 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
+#include "cvsupport.h"
+
 //!  Stereo matcher base class
 /*!
   An abstract class to match stereo images. This class should not be used directly,
@@ -109,12 +111,6 @@ class AbstractStereoMatcher : public QObject {
   void setDownsampleFactor(int factor){ downsample_factor=factor; };
 
   bool match(cv::Mat left_img, cv::Mat right_img);
-
-  void normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity);
-
-  void getMinMaxDisparity(cv::Mat inDisparity, double &min_disp, double &max_disp);
-
-  void disparity2colormap(cv::Mat inDisparity, cv::Mat &outColormap);
 
   void calcDepth(cv::Mat inDisparity, cv::Mat &outDepth);
 

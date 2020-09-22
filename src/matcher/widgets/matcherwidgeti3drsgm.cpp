@@ -35,6 +35,7 @@ MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent)
     updateMinDisparity(ui->minDisparitySlider->value());
     updateDisparityRange(ui->disparityRangeSlider->value());
     enableInterpolatation(ui->interpolateCheck->isChecked());
+    enableExtendDisparity(ui->checkBoxExtendDisparity->isChecked());
     negative_disparity = ui->minDisparitySlider->value() <= 0;
     ui->checkBoxNegativeDisparity->setChecked(negative_disparity);
 
