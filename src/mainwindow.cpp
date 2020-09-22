@@ -177,6 +177,22 @@ MainWindow::MainWindow(QWidget* parent)
     hideCameraSettings(false);
 
 #ifdef WITH_FERVOR
+    checkUpdates();
+    QObject::connect(FvUpdater::sharedUpdater(), SIGNAL(downloadFinished(void)), this, SLOT(downloadUpdateComplete(void)));
+#endif
+
+    //refreshCameraListThreaded();
+    startDeviceListTimer();
+}
+
+#ifdef WITH_FERVOR
+void MainWindow::downloadUpdateComplete(){
+    FvUpdater::sharedUpdater()->RunUpdator();
+    QApplication::quit();
+}
+
+void MainWindow::checkUpdates(){
+
     // Set the Fervor appcast url
 #ifdef DEV_BRANCH
     FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/AppcastDev.xml");
@@ -190,11 +206,8 @@ MainWindow::MainWindow(QWidget* parent)
     // Check for updates silently -- this will not block the initialization of
     // your application, just start a HTTP request and return immediately.
     FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
-
-#endif
-    //refreshCameraListThreaded();
-    startDeviceListTimer();
 }
+#endif
 
 void MainWindow::disableWindow(){
     ui->toggleSwapLeftRight->setDisabled(true);

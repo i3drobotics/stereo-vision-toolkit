@@ -200,6 +200,11 @@ public slots:
     void setMatcher(int matcher);
     void updatePointTexture(int index); // 0 = image, 1 = depth
 
+#ifdef WITH_FERVOR
+    void downloadUpdateComplete();
+    void checkUpdates();
+#endif
+
     void enableAutoZ(bool);
 
     void disableWindow();
