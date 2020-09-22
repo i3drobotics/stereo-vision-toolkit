@@ -110,6 +110,7 @@ public:
     ~AbstractStereoCamera(void);
 
     AbstractStereoMatcher *matcher = nullptr;
+    AbstractStereoMatcher *new_matcher = nullptr;
 
     //! Convert between stereo camera type enum and string
     static std::string StereoCameraType2String(StereoCameraType camera_type);
@@ -517,6 +518,7 @@ private:
     bool match_busy = false;
     bool processing_busy = false;
     bool reproject_busy = false;
+    bool changed_matcher = false;
 
     bool includeDateInFilename = false;
     bool matching = false;
@@ -648,7 +650,7 @@ protected:
     StereoCameraSerialInfo stereoCameraSerialInfo_;
 
     QElapsedTimer frametimer;
-    //QElapsedTimer matchtimer;
+    QElapsedTimer matchtimer;
     //QElapsedTimer reprojecttimer;
 
     bool rectification_valid = false;

@@ -47,9 +47,9 @@ public:
 
         inDisparity.copyTo(disparity_norm);
 
-        disparity_norm.convertTo(disparity_norm, CV_8U);
-
         cv::normalize(disparity_norm, disparity_norm, 0, 255, cv::NORM_MINMAX);
+
+        disparity_norm.convertTo(disparity_norm, CV_8U);
 
         outNormalisedDisparity = disparity_norm;
     }
@@ -61,6 +61,36 @@ public:
         //float y = (float)homg_pt[1] / (float)homg_pt[3];
         float z = (float)homg_pt[2] / (float)homg_pt[3];
         return z;
+    }
+
+    static void getMinMaxDepth(cv::Mat inDisparity, cv::Mat Q, double &min_depth, double &max_depth){
+        float min_disp = 10000;
+        float max_disp = 0;
+
+        min_depth = -1;
+        max_depth = -1;
+
+        for (int i = 0; i < inDisparity.rows; i++)
+        {
+            for (int j = 0; j < inDisparity.cols; j++)
+            {
+                float d = inDisparity.at<float>(i, j);
+                if (d < 10000){
+                    float d = inDisparity.at<float>(i, j);
+                    if (d < min_disp){
+                        float depth = CVSupport::genZ(Q,i,j,d);
+                        if (depth > 0){ //depth must be in front of camera so positive
+                            min_disp = d;
+                            max_depth = depth;
+                        }
+                    }
+                    if (d > max_disp){
+                        max_disp = d;
+                        min_depth = CVSupport::genZ(Q,i,j,d);
+                    }
+                }
+            }
+        }
     }
 
     static void getMinMaxDisparity(cv::Mat inDisparity, double &min_disp, double &max_disp){
@@ -111,6 +141,9 @@ public:
         // threshold value disparity
         cv::Mat validDisp;
         removeInvalidDisparity(inDisparity, validDisp);
+
+        cv::Mat floatDisp;
+        validDisp.convertTo(floatDisp, CV_32F);
 
         // normalise disparity
         cv::Mat normDisp;
