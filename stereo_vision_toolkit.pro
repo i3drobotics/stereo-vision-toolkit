@@ -296,11 +296,11 @@ WITH_VIMBA {
 
 WITH_I3DRSGM {
     # I3DRSGM library and include files
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/lib/" -lI3DRSGM
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/include"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.3/i3drsgm/i3drsgm-1.0.3/lib/" -lI3DRSGM
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.3/i3drsgm/i3drsgm-1.0.3/include"
     # PhobosIntegration library and include files (required for I3DRSGM)
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/phobosIntegration-1.0.54/include"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.3/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.3/i3drsgm/phobosIntegration-1.0.54/include"
 }
 
 # Basler library files
@@ -375,9 +375,9 @@ win32 {
     # I3DRSGM dlls
     WITH_I3DRSGM {
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/bin/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/i3drsgm-1.0.2/bin/*.param, true) \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.2/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.3/i3drsgm/i3drsgm-1.0.3/bin/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.3/i3drsgm/i3drsgm-1.0.3/bin/*.param, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.3/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
     }
 
     # Vimba dlls
