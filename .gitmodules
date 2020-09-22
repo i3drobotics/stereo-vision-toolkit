@@ -3,4 +3,4 @@
 	url = https://github.com/i3drobotics/i3drsgm.git
 [submodule "fervor"]
 	path = fervor
-	url = https://github.com/pypt/fervor.git
+	url = https://github.com/i3drobotics/fervor.git

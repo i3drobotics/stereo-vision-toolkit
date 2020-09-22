@@ -64,7 +64,7 @@ void MatcherWidgetI3DRSGM::updatePyramidLevel(int level) {
 
 void MatcherWidgetI3DRSGM::enableExtendDisparity(bool enable) {
     if (enable){
-        ui->disparityRangeSlider->setMaximum(128);
+        ui->disparityRangeSlider->setMaximum(300);
         ui->minDisparitySlider->setMaximum(2048);
     } else {
         ui->disparityRangeSlider->setMaximum(32);
