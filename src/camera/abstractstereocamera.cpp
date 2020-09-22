@@ -129,8 +129,8 @@ void AbstractStereoCamera::saveImage(QString fname) {
         filename_r = fname.toStdString() + "_r.png";
     }
 
-    left = matcher->getLeftImage().clone();
-    right = matcher->getRightImage().clone();
+    left = left_output.clone();
+    right = right_output.clone();
 
     qDebug() << "Saving left image...";
     CVSupport::write_parallel(filename_l,left);
@@ -154,7 +154,7 @@ void AbstractStereoCamera::saveImage(QString fname) {
     */
 
     if(matching && savingDisparity){
-        matcher->saveDisparity(fname + "_disp_raw.png");
+        matcher->saveDisparity(fname + "_disp_raw.tif");
         matcher->saveDisparityColormap(fname + "_disp_colormap.png");
     }
 }

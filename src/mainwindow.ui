@@ -1703,6 +1703,7 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionDocumentation"/>
+    <addaction name="actionCheckUpdates"/>
    </widget>
    <widget class="QMenu" name="menuCalibration">
     <property name="title">
@@ -1752,6 +1753,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionCheckUpdates">
+   <property name="text">
+    <string>Check for Updates</string>
    </property>
   </action>
  </widget>
