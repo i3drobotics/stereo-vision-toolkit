@@ -3,7 +3,7 @@
 ; MUST be installed on x64 bit machine
 
 #define AppName "Stereo Vision Toolkit"
-#define AppVersion "1.3.1a.4"
+#define AppVersion "1.3.1a.5"
 #define InstallerName "StereoVisionToolkit"
 #define ExeName "StereoVisionToolkit.exe"
 #define IconName "i3dr_logo.ico"
