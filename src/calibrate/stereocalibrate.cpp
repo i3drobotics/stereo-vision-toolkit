@@ -396,7 +396,12 @@ bool StereoCalibrate::findCorners(cv::Mat image,
 
     //if image is high resolution, find checkerboard on downscaled image
     bool found = false;
-    int max_size = 1100;
+    int max_size = 2448;
+    /*
+     * Note: Subpixel corners deprecated in OpenCV 4
+     * Should now be rolled into findChessboardCorners
+    }*/
+
     if (image.size().width > max_size || image.size().height > max_size){
         qDebug() << "Finding chessboard corners in downscaled image...";
         float scale_amount = (float)max_size/(float)image.size().width;
@@ -422,23 +427,7 @@ bool StereoCalibrate::findCorners(cv::Mat image,
             qDebug() << "Found corners in image.";
         }
     }
-
-    /*
-     * Subpixel corners deprecated in OpenCV 4?
-     * Should now be rolled into findChessboardCorners
-    if (found) {
-        qDebug() << "Chessboard corners found";
-        qDebug() << "Finding subpix corners...";
-        cv::find4QuadCornerSubpix(
-                    image, corners, cv::Size(11, 11), cv::Size(-1, -1),
-                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.001));
-        qDebug() << "Subpix corners complete.";
-        return true;
-    } else {
-        qDebug() << "Failed to find chessboard corners.";
-    }*/
-
-    return false;
+    return found;
 }
 
 void StereoCalibrate::overlayImage(cv::Mat& image, Chessboard* board,

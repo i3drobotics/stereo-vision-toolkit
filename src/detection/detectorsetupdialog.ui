@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>216</height>
+    <height>307</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -77,7 +77,11 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="weightPathLineEdit"/>
+      <widget class="QLineEdit" name="weightPathLineEdit">
+       <property name="text">
+        <string>./ml/coco/yolov4-tiny.weights</string>
+       </property>
+      </widget>
      </item>
      <item row="9" column="1">
       <widget class="QLabel" name="imageHeightLabel">
@@ -153,7 +157,11 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="cfgPathLineEdit"/>
+      <widget class="QLineEdit" name="cfgPathLineEdit">
+       <property name="text">
+        <string>./ml/coco/yolov4-tiny.cfg</string>
+       </property>
+      </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_10">
@@ -163,7 +171,11 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="namesPathLineEdit"/>
+      <widget class="QLineEdit" name="namesPathLineEdit">
+       <property name="text">
+        <string>./ml/coco/coco.names</string>
+       </property>
+      </widget>
      </item>
      <item row="8" column="0">
       <widget class="QLabel" name="label_4">
