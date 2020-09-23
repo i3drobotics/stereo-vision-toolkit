@@ -333,6 +333,9 @@ bool AbstractStereoCamera::loadCalibrationXML(QString directory) {
                 cal_image_height != image_height || rectmapy_r.rows != image_height) {
             rectification_valid = false;
             qDebug() << "Image size doesn't match rectification maps";
+            qDebug() << "Cal image size: " << cal_image_width << "," << cal_image_height;
+            qDebug() << "Rectmap size: " << rectmapx_r.cols << "," << rectmapy_r.rows;
+            qDebug() << "Camera image size: " << image_width << "," << image_height;
 
             return false;
         }
@@ -557,6 +560,12 @@ void AbstractStereoCamera::processStereo(void) {
 
     if (right_raw.empty() || left_raw.empty()){
         return;
+    } else {
+        //temporary fix while vimba camera do not read image size correctly
+        image_height = left_raw.size().height;
+        image_width = left_raw.size().width;
+        image_bitdepth = 1;
+        emit update_size(image_width, image_height, image_bitdepth);
     }
 
     if (isSwappingLeftRight()){
