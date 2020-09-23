@@ -312,6 +312,15 @@ bool AbstractStereoCamera::loadCalibrationXML(QString directory) {
     directory = QDir::cleanPath(directory);
 
     bool load_rectification = true;
+
+    if (!loadCalibrationXMLFiles(directory + "/left_calibration.xml",
+                         directory + "/right_calibration.xml",
+                         directory + "/stereo_calibration.xml")) {
+        qDebug() << "Couldn't load camera calibration";
+        calibration_valid = false;
+        return false;
+    }
+
     if (load_rectification){
         if (!loadXMLRectificationMaps(directory + "/left_rectification.xml", directory + "/right_rectification.xml")){
             rectification_valid = false;
@@ -327,13 +336,6 @@ bool AbstractStereoCamera::loadCalibrationXML(QString directory) {
 
             return false;
         }
-    }
-    if (!loadCalibrationXMLFiles(directory + "/left_calibration.xml",
-                         directory + "/right_calibration.xml",
-                         directory + "/stereo_calibration.xml")) {
-        qDebug() << "Couldn't load camera calibration";
-        calibration_valid = false;
-        return false;
     }
 
     rectification_valid = true;

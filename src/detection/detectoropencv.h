@@ -103,6 +103,7 @@ private:
 
 signals:
     void finished();
+    void objectsDetected();
 };
 
 #endif // DETECTOROPENCV_H

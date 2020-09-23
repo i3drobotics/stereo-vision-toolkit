@@ -447,6 +447,11 @@ COPIES += helpDocs
 helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/app/*.pdf, true)
 helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 
+# Copy example ml to build folder
+COPIES += mlExamples
+mlExamples.files = $$files($$_PRO_FILE_PWD_/resources/ml/coco/*, true)
+mlExamples.path = $${DEPLOY_FOLDER}/ml/coco
+
 # Fervor autoupdater
 !include("fervor/Fervor.pri") {
         error("Unable to include Fervor autoupdater.")

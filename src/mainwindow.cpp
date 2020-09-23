@@ -381,6 +381,9 @@ void MainWindow::detectionInit(){
     object_detection_display = new CameraDisplayWidget(this);
     ui->detectionTab->layout()->addWidget(object_detection_display);
 
+    object_detector->setConfidenceThresholdPercent(ui->detectionThresholdSpinbox->value());
+    object_detector->setNMSThresholdPercent(ui->nmsThresholdSpinbox->value());
+
     connect(ui->detectionSetupButton, SIGNAL(clicked(bool)), this, SLOT(configureDetection()));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(enableDetection(int)));
 
@@ -661,7 +664,7 @@ void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxe
         box_colour.getRgb(&r, &g, &b, &a);
 
         cv::Scalar font_colour(r, g, b, a);
-        //qDebug() << "Drawing with: " << classname << "(" << r << "," << g << "," << b << ")";
+        qDebug() << "Drawing with: " << bbox.classname.toStdString().c_str() << "(" << r << "," << g << "," << b << ")";
 
         if(class_filled_map[bbox.classname]){
              cv::Scalar font_colour(r, g, b, 100);
@@ -671,12 +674,16 @@ void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxe
         cv::rectangle(image, top_left, bottom_right, font_colour, thickness);
 
         //Get the label for the class name and its confidence
-        std::string label = cv::format("%.2f", bbox.confidence);
+        std::string label = cv::format("%s %.2f", bbox.classname.toStdString().c_str(), bbox.confidence);
 
         //Display the label at the top of the bounding box
         int baseLine;
-        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-        cv::putText(image, label, top_left, cv::FONT_HERSHEY_SIMPLEX, 0.5, font_colour);
+        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.4, 1, &baseLine);
+
+        cv::Point text_pos = top_left;
+        text_pos.y = text_pos.y - (labelSize.height / 2);
+
+        cv::putText(image, label, text_pos, cv::FONT_HERSHEY_SIMPLEX, 0.4, font_colour);
     }
 }
 
