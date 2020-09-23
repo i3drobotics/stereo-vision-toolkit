@@ -5,7 +5,7 @@ SETLOCAL EnableDelayedExpansion
 SET initcwd=%cd%
 SET scriptpath=%~dp0
 cd %scriptpath:~0,-1%
-set opencv_version=3.4.10
+set opencv_version=4.4.0
 SET "opencv_version_=%opencv_version:.=_%"
 
 :: set default option values

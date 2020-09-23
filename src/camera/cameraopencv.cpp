@@ -32,14 +32,14 @@ bool CameraOpenCV::initCamera(int index) {
 
 void CameraOpenCV::getImageSize(int &image_width, int &image_height,
                                 cv::Size &image_size) {
-  image_width = camera.get(CV_CAP_PROP_FRAME_WIDTH);
-  image_height = camera.get(CV_CAP_PROP_FRAME_HEIGHT);
+  image_width = camera.get(cv::CAP_PROP_FRAME_WIDTH);
+  image_height = camera.get(cv::CAP_PROP_FRAME_HEIGHT);
   image_size = cv::Size(image_width, image_height);
 }
 
 bool CameraOpenCV::setMaximumResolution(void) {
-  bool res = camera.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
-  res &= camera.set(CV_CAP_PROP_FRAME_HEIGHT, 960);
+  bool res = camera.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+  res &= camera.set(cv::CAP_PROP_FRAME_HEIGHT, 960);
 
   return res;
 }
@@ -49,8 +49,8 @@ bool CameraOpenCV::setFrame16(void) {
 
   // Note this will not work in versions of OpenCV prior to 4.0 due
   // to a bug in the DShow driver.
-  res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
-  camera.set(CV_CAP_PROP_CONVERT_RGB, false);
+  res = camera.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
+  camera.set(cv::CAP_PROP_CONVERT_RGB, false);
 
   image_format = Y16;
 
@@ -62,8 +62,8 @@ bool CameraOpenCV::setFrame8(void) {
 
   // Note this will not work in versions of OpenCV prior to 4.0 due
   // to a bug in the DShow driver.
-  res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '8', '0', '0'));
-  camera.set(CV_CAP_PROP_CONVERT_RGB, false);
+  res = camera.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '8', '0', '0'));
+  camera.set(cv::CAP_PROP_CONVERT_RGB, false);
 
   image_format = Y800;
 
@@ -71,15 +71,15 @@ bool CameraOpenCV::setFrame8(void) {
 }
 
 bool CameraOpenCV::setExposure(double exposure) {
-  return camera.set(CV_CAP_PROP_EXPOSURE, -log2(exposure));
+  return camera.set(cv::CAP_PROP_EXPOSURE, -log2(exposure));
 }
 
 bool CameraOpenCV::setGain(double gain) {
-  return camera.set(CV_CAP_PROP_GAIN, gain);
+  return camera.set(cv::CAP_PROP_GAIN, gain);
 }
 
 bool CameraOpenCV::setFPS(double fps){
-    return camera.set(CV_CAP_PROP_FPS, fps);
+    return camera.set(cv::CAP_PROP_FPS, fps);
 }
 
 bool CameraOpenCV::capture(void) {

@@ -14,7 +14,7 @@
 		<atom:link href="https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/master/Appcast.xml" rel="self" type="application/rss+xml" />
 
 		<item>
-			<title>Version 1.3.1</title>
+			<title>Version 1.3.0</title>
 			<pubDate>Wed, 01 July 2020 13:00:00 +0000</pubDate>
 			<guid isPermaLink="true">https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/master/ReleaseNotes.html</guid>
 
@@ -28,8 +28,8 @@
 
 			<!-- Windows version. -->
 			<enclosure
-				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1/StereoVisionToolkit-1.3.1-Win64.exe"
-				fervor:version="1.3.1"
+				url="https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.0/StereoVisionToolkit-1.3.0-Win64.exe"
+				fervor:version="1.3.0"
 				fervor:platform="Q_OS_WIN32"
 				length="121651640"
 				type="application/octet-stream" />

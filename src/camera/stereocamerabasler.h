@@ -31,6 +31,7 @@ public:
     }
 
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystemsQuick(Pylon::CTlFactory* tlFactory);
 
     ~StereoCameraBasler(void);
 

@@ -17,11 +17,13 @@ MainWindow::MainWindow(QWidget* parent)
     Pylon::PylonInitialize();
     DShowLib::InitLibrary();
     tisgrabber = new DShowLib::Grabber();
+    pylonTlFactory = &Pylon::CTlFactory::GetInstance();
 
     ui->imageViewTab->raise();
     ui->tabWidget->lower();
 
     ui->tabWidget->setCurrentIndex(0);
+    ui->tabLayoutSettings->setCurrentIndex(0);
 
     cameras_connected = false;
     calibration_dialog_used = false;
@@ -59,7 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     default_vimba_init_settings.exposure = 5;
     default_vimba_init_settings.gain = 0;
-    default_vimba_init_settings.fps = 5;
+    default_vimba_init_settings.fps = 30;
     default_vimba_init_settings.binning = 1;
     default_vimba_init_settings.trigger = false;
     default_vimba_init_settings.hdr = -1;
@@ -177,12 +179,12 @@ MainWindow::MainWindow(QWidget* parent)
     controlsInit();
     pointCloudInit();
     setupMatchers();
+    detectionInit();
 
     hideCameraSettings(false);
 
 #ifdef WITH_FERVOR
     checkUpdates();
-    QObject::connect(FvUpdater::sharedUpdater(), SIGNAL(downloadFinished(void)), this, SLOT(downloadUpdateComplete(void)));
 #endif
 
     //refreshCameraListThreaded();
@@ -209,7 +211,10 @@ void MainWindow::checkUpdates(){
 
     // Check for updates silently -- this will not block the initialization of
     // your application, just start a HTTP request and return immediately.
+    qDebug() << "Silently checking for updates...";
     FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
+    qDebug() << "Update check running in non blocking thread.";
+    QObject::connect(FvUpdater::sharedUpdater(), SIGNAL(downloadFinished(void)), this, SLOT(downloadUpdateComplete(void)));
 }
 #endif
 
@@ -263,8 +268,9 @@ void MainWindow::pointCloudSaveStatus(QString msg){
 }
 
 void MainWindow::resetStatusBar(void) {
-    fps_counter->setText("Camera FPS: 0");
-    match_fps_counter->setText("Match FPS: 0");
+    QString fps_number = QString::number(0, 'G', 3);
+    match_fps_counter->setText(QString("Match FPS: ") + fps_number);
+    fps_counter->setText(QString("Camera FPS: ") + fps_number);
     frame_counter->setText("Frame count: 0");
 }
 
@@ -336,7 +342,7 @@ void MainWindow::resetPointCloudView(){
     cloud_viewer->resetCamera();
 }
 
-void MainWindow::enable3DViz(int tab) {
+void MainWindow::enable3DViz(int tab = 0) {
     if (!stereo_cam) return;
 
     if (tab == 2) {
@@ -345,6 +351,335 @@ void MainWindow::enable3DViz(int tab) {
         stereo_cam->enableReproject(false);
     }
 }
+
+void MainWindow::enableDetection(int tab = 0){
+    if (!stereo_cam) return;
+
+    detection_enabled = false;
+
+    if (tab == 3) {
+        // Do ML stuff
+        qDebug() << "Running detection";
+        detection_enabled = true;
+    }
+}
+
+void MainWindow::detectionInit(){
+    qDebug() << "Initialising detector...";
+    QProgressDialog progressPCI("Initialising detection...", "", 0, 100, this);
+    progressPCI.setWindowTitle("SVT");
+    progressPCI.setWindowModality(Qt::WindowModal);
+    progressPCI.setCancelButton(nullptr);
+    progressPCI.setMinimumDuration(0);
+    progressPCI.setValue(10);
+    QCoreApplication::processEvents();
+
+    object_detector = new DetectorOpenCV();
+    QThread* detector_thread = new QThread;
+    object_detector->assignThread(detector_thread);
+
+    object_detection_display = new CameraDisplayWidget(this);
+    ui->detectionTab->layout()->addWidget(object_detection_display);
+
+    connect(ui->detectionSetupButton, SIGNAL(clicked(bool)), this, SLOT(configureDetection()));
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(enableDetection(int)));
+
+    connect(ui->detectionThresholdSlider, SIGNAL(valueChanged(int)), ui->detectionThresholdSpinbox, SLOT(setValue(int)));
+    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), ui->detectionThresholdSlider, SLOT(setValue(int)));
+    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), object_detector, SLOT(setConfidenceThresholdPercent(int)));
+
+    connect(ui->nmsThresholdSlider, SIGNAL(valueChanged(int)), ui->nmsThresholdSpinbox, SLOT(setValue(int)));
+    connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), ui->nmsThresholdSlider, SLOT(setValue(int)));
+    connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), object_detector, SLOT(setNMSThresholdPercent(int)));
+
+    qDebug() << "Detector initalisation complete.";
+}
+
+void MainWindow::configureDetection(){
+    if(object_detector == nullptr) return;
+
+    DetectorSetupDialog detection_dialog;
+    detection_dialog.exec();
+
+    if(detection_dialog.result() != QDialog::Accepted ) return;
+
+    auto names_file = detection_dialog.getNames().toStdString();
+    auto cfg_file = detection_dialog.getCfg().toStdString();
+    auto weight_file = detection_dialog.getWeights().toStdString();
+
+    object_detector->setChannels(detection_dialog.getChannels());
+    object_detector->setTarget(detection_dialog.getTarget());
+    object_detector->setFramework(detection_dialog.getFramework());
+    object_detector->setConvertGrayscale(detection_dialog.getConvertGrayscale());
+    object_detector->setConvertDepth(detection_dialog.getConvertDepth());
+    object_detector->loadNetwork(names_file, cfg_file, weight_file);
+    object_detector->setImageSize(detection_dialog.getWidth(), detection_dialog.getHeight());
+
+    ui->detectionCheckBox->setEnabled(true);
+
+    // GUI feedback
+    ui->numberClassesLabel->setText(QString("%1").arg(object_detector->getNumClasses()));
+
+    if(object_detector->getNumClasses() > 0){
+
+        ui->classListWidget->clear();
+
+        for(auto &class_name : object_detector->getClassNames()){
+            ui->classListWidget->addItem(class_name.c_str());
+
+            auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
+            auto tag_name = QString("class/%1/colour").arg(class_name.c_str());
+
+            int r=255, g=0, b=0, a=255;
+
+            if(settings->contains(tag_name)){
+                auto colour = settings->value(tag_name).toString().split(",");
+
+                if(colour.size() >= 3){
+                    r = colour[0].toInt();
+                    g = colour[1].toInt();
+                    b = colour[2].toInt();
+                }
+
+                if(colour.size() >= 4){
+                    a = colour[3].toInt();
+                }
+            }
+
+            setClassColour(class_name.c_str(), QColor(r, g, b, a));
+
+
+            tag_name = QString("class/%1/visible").arg(class_name.c_str());
+            bool visible = true;
+            if(settings->contains(tag_name)){
+                visible = settings->value(tag_name).toBool();
+            }
+            setClassVisible(class_name.c_str(), visible);
+
+
+            tag_name = QString("class/%1/fill").arg(class_name.c_str());
+            bool fill = false;
+            if(settings->contains(tag_name)){
+                fill = settings->value(tag_name).toBool();
+            }
+            setClassFilled(class_name.c_str(), fill);
+        }
+
+        connect(ui->setClassColourButton, SIGNAL(clicked(bool)), this, SLOT(updateClassColour(void)));
+        connect(ui->setClassFilledButton, SIGNAL(clicked(bool)), this, SLOT(updateClassFilled(bool)));
+        connect(ui->setClassVisibleButton, SIGNAL(clicked(bool)), this, SLOT(updateClassVisible(bool)));
+
+        connect(ui->classListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onClassListClicked()));
+    }
+
+    QFile weight_name(detection_dialog.getWeights());
+    QFileInfo weights_fileinfo(weight_name.fileName());
+    ui->activeWeightsLoadedLabel->setText(weights_fileinfo.fileName());
+
+    QFile config_name(detection_dialog.getCfg());
+    QFileInfo config_fileinfo(config_name.fileName());
+    ui->activeModelLabel->setText(config_fileinfo.fileName());
+}
+
+void MainWindow::onClassListClicked(void){
+
+    int number_selected = ui->classListWidget->selectedItems().size();
+    if(number_selected == 0){
+        ui->setClassFilledButton->setDisabled(true);
+        ui->setClassVisibleButton->setDisabled(true);
+        ui->setClassColourButton->setDisabled(true);
+        ui->classColourLabel->setVisible(false);
+    }else{
+        ui->setClassFilledButton->setEnabled(true);
+        ui->setClassVisibleButton->setEnabled(true);
+        ui->setClassColourButton->setEnabled(true);
+        ui->classColourLabel->setVisible(true);
+
+        QString class_name = ui->classListWidget->currentItem()->text();
+        bool filled = class_filled_map[class_name];
+        ui->setClassFilledButton->setChecked(filled);
+        bool visible = class_visible_map[class_name];
+        ui->setClassVisibleButton->setChecked(visible);
+
+        int r, g, b;
+        class_colour_map[class_name].getRgb(&r, &g, &b);
+
+        ui->classColourLabel->setStyleSheet(QString("background-color: %1, %2, %3;")
+                                            .arg(QString::number(r))
+                                            .arg(QString::number(g))
+                                            .arg(QString::number(b)));
+    }
+}
+
+void MainWindow::updateClassColour(void){
+
+    QColorDialog dialog;
+    QString class_name = ui->classListWidget->currentItem()->text();
+    auto result = dialog.getColor(class_colour_map[class_name]);
+
+    if(result.isValid()){
+        setClassColour(ui->classListWidget->currentItem()->text(), result);
+    }
+}
+
+void MainWindow::updateClassFilled(bool checked){
+    setClassFilled(ui->classListWidget->currentItem()->text(), checked);
+}
+
+void MainWindow::updateClassVisible(bool checked){
+    setClassVisible(ui->classListWidget->currentItem()->text(), checked);
+}
+
+
+void MainWindow::setClassColour(QString class_name, QColor class_colour){
+
+    // Set class colour
+    auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
+    auto tag_name = QString("class/%1/colour").arg(class_name);
+
+    int r=255, g=0, b=0, a=255; // default to red
+    class_colour.getRgb(&r, &g, &b, &a);
+
+    settings->setValue(tag_name, QString("%1,%2,%3,%4")
+                                        .arg(QString::number(r))
+                                        .arg(QString::number(g))
+                                        .arg(QString::number(b))
+                                        .arg(QString::number(a)));
+
+    class_colour_map.insert(class_name, class_colour);
+
+    qDebug() << "Updated colour for " << class_name << "(" << r << "," << g << "," << b << ")";
+}
+
+void MainWindow::setClassVisible(QString class_name, bool visible){
+
+    auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
+    auto tag_name = QString("class/%1/visible").arg(class_name);
+
+    settings->setValue(tag_name, visible);
+
+    class_visible_map.insert(class_name, visible);
+
+    if(!visible)
+        qDebug() << "Hiding " << class_name;
+}
+
+void MainWindow::setClassFilled(QString class_name, bool fill){
+    auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
+    auto tag_name = QString("class/%1/fill").arg(class_name);
+
+    settings->setValue(tag_name, fill);
+
+    class_filled_map.insert(class_name, fill);
+
+    if(fill)
+        qDebug() << "Setting " << class_name << " class to be filled";
+}
+
+void MainWindow::updateDetection(){
+
+    if(!object_detector) return;
+
+    // Protect callback against high frame rates (faster than detector)
+    if(object_detector->isRunning() || detecting){
+        return;
+    }
+
+    this->detecting = true;
+
+    // Select image source
+    if(ui->imageSourceComboBox->currentText() == "Left"){
+        stereo_cam->getLeftImage(image_detection);
+    }else{
+        stereo_cam->getRightImage(image_detection);
+    }
+
+    double scale_factor_x = 1.0;
+    double scale_factor_y = 1.0;
+
+    if(detection_enabled &&
+       ui->detectionCheckBox->isChecked()){
+
+        if(image_detection.empty()){
+            qDebug() << "Empty image passed to detector";
+            return;
+        }
+
+        // Check if we have a network loaded
+        if(!object_detector->isReady())
+            return;
+
+        // We'll later resize the bounding boxes to the input image size
+        scale_factor_x = static_cast<double>(object_detector->getInputWidth())/image_detection.cols;
+        scale_factor_y = static_cast<double>(object_detector->getInputHeight())/image_detection.rows;
+
+        // (Down)scale input for DNN first layer
+        cv::resize(image_detection,
+                   image_detection_rescale,
+                   cv::Size(),
+                   scale_factor_x,
+                   scale_factor_y);
+
+
+        // Inference
+        auto results = object_detector->infer(image_detection_rescale);
+
+        // Update UI
+        ui->latencyLabel->setText(QString("%1 ms").arg(object_detector->getProcessingTime()));
+        ui->numberObjectsLabel->setText(QString("%1").arg(results.size()));
+
+        // Draw bounding boxes, but we need a 4-channel image with alpha
+        if(image_detection.channels() == 1){
+            cv::cvtColor(image_detection, image_detection, cv::COLOR_GRAY2RGBA);
+        }else if(image_detection.channels() == 3){
+            cv::cvtColor(image_detection, image_detection, cv::COLOR_RGB2RGBA);
+        }
+        drawBoundingBoxes(image_detection, results, 1./scale_factor_x, 1./scale_factor_y);
+
+        cv::cvtColor(image_detection, image_detection, cv::COLOR_RGBA2BGRA);
+
+        object_detection_display->updateView(image_detection);
+    }
+
+    this->detecting = false;
+}
+
+void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x=1.0, double scale_y=1.0){
+    for(auto &bbox : bboxes){
+
+        if(!class_visible_map[bbox.classname])
+            continue;
+
+        cv::Point top_left(static_cast<int>(scale_x*bbox.rect.topLeft().x()),
+                           static_cast<int>(scale_y*bbox.rect.topLeft().y()));
+        cv::Point bottom_right(static_cast<int>(scale_x*bbox.rect.bottomRight().x()),
+                               static_cast<int>(scale_y*bbox.rect.bottomRight().y()));
+        int thickness = 2;
+
+        QColor box_colour = class_colour_map[bbox.classname];
+        int r=255, g=0, b=0, a=255; // default to red
+        box_colour.getRgb(&r, &g, &b, &a);
+
+        cv::Scalar font_colour(r, g, b, a);
+        //qDebug() << "Drawing with: " << classname << "(" << r << "," << g << "," << b << ")";
+
+        if(class_filled_map[bbox.classname]){
+             cv::Scalar font_colour(r, g, b, 100);
+            thickness = -1;
+        }
+
+        cv::rectangle(image, top_left, bottom_right, font_colour, thickness);
+
+        //Get the label for the class name and its confidence
+        std::string label = cv::format("%.2f", bbox.confidence);
+
+        //Display the label at the top of the bounding box
+        int baseLine;
+        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+        cv::putText(image, label, top_left, cv::FONT_HERSHEY_SIMPLEX, 0.5, font_colour);
+    }
+}
+
 
 void MainWindow::pointCloudInit() {
     QProgressDialog progressPCI("Initialising display...", "", 0, 100, this);
@@ -460,7 +795,7 @@ void MainWindow::stereoCameraInitWindow(void){
         using_gige = false;
     }
 
-    if (default_exposure == -1 && default_iAutoExpose == -1){
+    if (static_cast<int>(default_exposure) == -1 && static_cast<int>(default_iAutoExpose) == -1){
         ui->lblExposure->setVisible(false);
     } else {
         ui->lblExposure->setVisible(true);
@@ -496,7 +831,7 @@ void MainWindow::stereoCameraInitWindow(void){
         ui->lblPacketSize->setVisible(true);
     }
 
-    if (default_exposure != -1){
+    if (static_cast<int>(default_exposure) != -1){
         ui->exposureSpinBox->setEnabled(true);
         ui->exposureSpinBox->setVisible(true);
     } else {
@@ -755,9 +1090,13 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
     connect(ui->comboBoxPointTexture, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePointTexture(int)));
 
+    /* Detection */
+    connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDetection()));
+
     enableWindow();
     toggleCameraActiveSettings(true);
     toggleCameraPassiveSettings(true);
+    stopDeviceListTimer();
 }
 
 void MainWindow::stereoCameraRelease(void) {
@@ -795,6 +1134,9 @@ void MainWindow::stereoCameraRelease(void) {
 
     if (cameras_connected) {
         cameras_connected = false;
+
+        ui->gridLayoutCameraList->setEnabled(false);
+        QCoreApplication::processEvents();
 
         QProgressDialog progressClose("Ending camera capture...", "", 0, 100, this);
         progressClose.setWindowTitle("SVT");
@@ -872,6 +1214,9 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->dateInFilenameCheckbox, SIGNAL(clicked(bool)), stereo_cam, SLOT(enableDateInFilename(bool)));
         disconnect(stereo_cam, SIGNAL(pointCloudSaveStatus(QString)),this,SLOT(pointCloudSaveStatus(QString)));
         disconnect(ui->comboBoxPointTexture, SIGNAL(currentIndexChanged(int)), this, SLOT(updatePointTexture(int)));
+
+        /* Detection */
+        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDetection()));
 
         //wait 1 second to make sure connections are closed
         QTime dieTime= QTime::currentTime().addSecs(1);
@@ -1027,14 +1372,18 @@ void MainWindow::refreshCameraListThreaded(){
 }
 
 void MainWindow::refreshCameraList(){
-    ui->gridLayoutCameraList->setEnabled(false);
-    QCoreApplication::processEvents();
-    QElapsedTimer task_timer;
-    task_timer.start();
-    current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList(tisgrabber);
-    qDebug() << "Time to get device list: " << task_timer.elapsed();
-    emit cameraListUpdated();
-    //refreshCameraListGUI();
+    if (!cameras_connected){
+        ui->gridLayoutCameraList->setEnabled(false);
+        QCoreApplication::processEvents();
+        QElapsedTimer task_timer;
+        task_timer.start();
+        current_camera_serial_info_list = StereoCameraSupport::getStereoDeviceList(tisgrabber,pylonTlFactory);
+        qDebug() << "Time to get device list: " << task_timer.elapsed();
+        if (!cameras_connected){
+            emit cameraListUpdated();
+            //refreshCameraListGUI();
+        }
+    }
 }
 
 void MainWindow::refreshCameraListGUI(){
@@ -1050,10 +1399,10 @@ void MainWindow::refreshCameraListGUI(){
     //Clear layout list
     deviceListButtons.clear();
     QLayoutItem *item;
-    while ((item = ui->gridLayoutCameraList->takeAt(0)) != 0) {
+    while ((item = ui->gridLayoutCameraList->takeAt(0)) != nullptr) {
         if (item->layout()){
             QLayoutItem *item2;
-            while ((item2 = item->layout()->takeAt(0)) != 0) {
+            while ((item2 = item->layout()->takeAt(0)) != nullptr) {
                 if (item2->widget()){
                     delete item2->widget();
                 }
@@ -1133,11 +1482,11 @@ void MainWindow::refreshCameraListGUI(){
 
 void MainWindow::cameraDeviceSelected(int index){
     stopDeviceListTimer();
-    unsigned long long button_index = index;
-    if (button_index < current_camera_serial_info_list.size()){
+    int button_index = index;
+    if (static_cast<size_t>(button_index) < current_camera_serial_info_list.size()){
         // disconnect of camera if already connected
-        AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info = current_camera_serial_info_list.at(button_index);
-        unsigned long long i = 0;
+        AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info = current_camera_serial_info_list.at(static_cast<unsigned long long>(button_index));
+        int i = 0;
         if (openCamera(camera_serial_info) == CAMERA_CONNECTION_SUCCESS_EXIT_CODE){
             // disable all other buttons if camera open is successful
             for (std::vector<AbstractStereoCamera::StereoCameraSerialInfo>::iterator it = current_camera_serial_info_list.begin() ; it != current_camera_serial_info_list.end(); ++it){
@@ -1146,7 +1495,7 @@ void MainWindow::cameraDeviceSelected(int index){
                 QWidget *wSelectCamera = ui->gridLayoutCameraList->itemAtPosition(i+1,2)->widget();
                 QPushButton *btnSelectCamera = qobject_cast<QPushButton*>(wSelectCamera);
                 // Disconnect signal mapper
-                QSignalMapper * mapper = camera_button_signal_mapper_list->at(i);
+                QSignalMapper * mapper = camera_button_signal_mapper_list->at(static_cast<unsigned long long>(i));
                 QObject::disconnect(mapper,SIGNAL(mapped(int)),this,SLOT(cameraDeviceSelected(int)));
                 QObject::disconnect(btnSelectCamera, SIGNAL(clicked()),mapper,SLOT(map()));
                 if (i != button_index){
@@ -1157,7 +1506,7 @@ void MainWindow::cameraDeviceSelected(int index){
                     } else if (ui->gridLayoutCameraList->itemAtPosition(i+1,0)->layout()){
                         QLayout *l1 = ui->gridLayoutCameraList->itemAtPosition(i+1,0)->layout();
                         QLayoutItem *item2;
-                        while ((item2 = l1->takeAt(0)) != 0) {
+                        while ((item2 = l1->takeAt(0)) != nullptr) {
                             if (item2->widget()){
                                 delete item2->widget();
                             }
@@ -1216,11 +1565,17 @@ void MainWindow::stereoCameraInit() {
 void MainWindow::startDeviceListTimer() {
     // refresh device list every 5 seconds
     //TODO replace this with event driven system
-    device_list_timer->stop();
-    device_list_timer = new QTimer(this);
-    refreshCameraListThreaded();
-    device_list_timer->start(5000);
-    QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
+    qDebug() << "Starting device list timer";
+    if (!device_list_timer->isActive()){
+        device_list_timer->stop();
+        device_list_timer = new QTimer(this);
+        refreshCameraListThreaded();
+        device_list_timer->start(5000);
+        QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
+        qDebug() << "Device list timer started";
+    } else {
+        qDebug() << "Device list timer already active";
+    }
     ui->btnRefreshCameras->setEnabled(true);
 }
 
@@ -1796,16 +2151,15 @@ void MainWindow::updateMatchTime(qint64 time) {
     match_fps_measure_total+= measured_match_fps;
     match_fps_measure_count++;
 
-    float average_fps = 0;
-    average_fps = (float)match_fps_measure_total / (float)match_fps_measure_count;
-
-    QString fps_number = QString::number(average_fps, 'G', 2);
-    match_fps_counter->setText(QString("Match FPS: ") + fps_number);
+    float average_fps = (float)match_fps_measure_total / (float)match_fps_measure_count;
 
     if (match_fps_measure_count > 3){
         match_fps_measure_total = average_fps;
         match_fps_measure_count = 1;
     }
+
+    QString fps_number = QString::number(average_fps, 'G', 3);
+    match_fps_counter->setText(QString("Match FPS: ") + fps_number);
 }
 
 void MainWindow::updateFrameTime(qint64 time) {
@@ -1815,16 +2169,15 @@ void MainWindow::updateFrameTime(qint64 time) {
     fps_measure_total+= measured_fps;
     fps_measure_count++;
 
-    float average_fps = 0;
-    average_fps = (float)fps_measure_total / (float)fps_measure_count;
-
-    QString fps_number = QString::number(average_fps, 'G', 2);
-    fps_counter->setText(QString("Camera FPS: ") + fps_number);
+    float average_fps = (float)fps_measure_total / (float)fps_measure_count;
 
     if (fps_measure_count > 3){
         fps_measure_total = average_fps;
         fps_measure_count = 1;
     }
+
+    QString fps_number = QString::number(average_fps, 'G', 3);
+    fps_counter->setText(QString("Camera FPS: ") + fps_number);
 }
 
 void MainWindow::openHelp(){
@@ -1863,7 +2216,8 @@ void MainWindow::on_btnHideCameraSettings_clicked()
 
 void MainWindow::enableMatching(bool enable){
     if (!enable){
-        match_fps_counter->setText(QString("Match FPS: 0"));
+        QString fps_number = QString::number(0, 'G', 3);
+        match_fps_counter->setText(QString("Match FPS: ") + fps_number);
     }
 }
 
@@ -1906,11 +2260,20 @@ void MainWindow::updatePointTexture(int index){
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {
-    qDebug() << "Closing application";
+    qDebug() << "Releasing cameras...";
     stereoCameraRelease();
-    qDebug() << "Waiting for device list timer to finish...";
+
+    qDebug() << "Closing application...";
     stopDeviceListTimer();
     while(device_list_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+
+#ifdef WITH_VIMBA
+    // Close the Vimba API here.
+    VimbaSystem &system = VimbaSystem::GetInstance();
+    system.Shutdown();
+    qDebug() << "Shutting down VIMBA";
+#endif
+
     // Close external windows
     about_dialog->close();
     if (calibration_dialog_used){
@@ -1923,11 +2286,7 @@ void MainWindow::closeEvent(QCloseEvent *) {
 }
 
 MainWindow::~MainWindow() {
+    qDebug() << "Shutting down Pylon";
     Pylon::PylonTerminate();
-#ifdef WITH_VIMBA
-    // Close the Vimba API here.
-    VimbaSystem &system = VimbaSystem::GetInstance();
-    system.Shutdown();
-#endif
     delete ui;
 }
