@@ -54,13 +54,20 @@ public:
         outNormalisedDisparity = disparity_norm;
     }
 
-    static float genZ(cv::Matx44d Q_, int x_index, int y_index, float d){
+    static cv::Vec3d genXYZ(cv::Matx44d Q_, int x_index, int y_index, float d){
         cv::Vec4d homg_pt = Q_ * cv::Vec4d((double)x_index, (double)y_index, (double)d, 1.0);
 
-        //float x = (float)homg_pt[0] / (float)homg_pt[3];
-        //float y = (float)homg_pt[1] / (float)homg_pt[3];
+        float x = (float)homg_pt[0] / (float)homg_pt[3];
+        float y = (float)homg_pt[1] / (float)homg_pt[3];
         float z = (float)homg_pt[2] / (float)homg_pt[3];
-        return z;
+
+        cv::Vec3d xyz(x,y,z);
+        return xyz;
+    }
+
+    static double genZ(cv::Matx44d Q_, int x_index, int y_index, float d){
+        //TODO simplify this to only calculate what is nessacary for getting Z
+        return genXYZ(Q_,x_index,y_index,d)[2];
     }
 
     static void getMinMaxDepth(cv::Mat inDisparity, cv::Mat Q, double &min_depth, double &max_depth){

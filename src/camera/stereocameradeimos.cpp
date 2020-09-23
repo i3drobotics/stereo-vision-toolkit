@@ -71,8 +71,8 @@ bool StereoCameraDeimos::captureSingle(){
                 cv::Mat left_raw_tmp = channels[1].clone();
                 cv::Mat right_raw_tmp = channels[2].clone();
                 //TODO remove this (only here for testing colour)
-                cv::cvtColor(left_raw_tmp, left_raw, CV_GRAY2BGR);
-                cv::cvtColor(right_raw_tmp, right_raw, CV_GRAY2BGR);
+                cv::cvtColor(left_raw_tmp, left_raw, cv::COLOR_GRAY2BGR);
+                cv::cvtColor(right_raw_tmp, right_raw, cv::COLOR_GRAY2BGR);
                 //left_raw = left_raw_tmp.clone();
                 //right_raw = right_raw_tmp.clone();
 
@@ -507,7 +507,7 @@ bool StereoCameraDeimos::setFPS(int fps){
             frame_rate = 60;
             fps_d = 0;
         }
-        camera.set(CV_CAP_PROP_FPS, fps_d);
+        camera.set(cv::CAP_PROP_FPS, fps_d);
         frame_rate = fps;
         return true;
     } else {
@@ -573,8 +573,8 @@ bool StereoCameraDeimos::send_hid(std::vector<unsigned char> &buffer,
 bool StereoCameraDeimos::setFrameSize(int width, int height) {
     bool res = false;
 
-    res = camera.set(CV_CAP_PROP_FRAME_WIDTH, width);
-    res &= camera.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    res = camera.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    res &= camera.set(cv::CAP_PROP_FRAME_HEIGHT, height);
     image_width = width;
     image_height = height;
     image_bitdepth = 1; //TODO get bit depth
@@ -585,13 +585,13 @@ bool StereoCameraDeimos::setFrameSize(int width, int height) {
 
 bool StereoCameraDeimos::setFrame16(void) {
     bool res = false;
-    res = camera.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
+    res = camera.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
 
     return res;
 }
 
 void StereoCameraDeimos::getFrameRate() {
-    int frame_rate_index = (int)camera.get(CV_CAP_PROP_FPS);
+    int frame_rate_index = (int)camera.get(cv::CAP_PROP_FPS);
     if (frame_rate_index == 0){
         frame_rate = 60;
     } else if (frame_rate_index == 1){

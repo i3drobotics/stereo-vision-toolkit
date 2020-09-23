@@ -18,11 +18,8 @@ void CameraVimba::close() {
 
     qDebug() << "Closing camera";
 
-    if (connected){
-        camera->EndCapture();
-        camera->StopContinuousImageAcquisition();
-        camera->Close();
-    }
+    stopCapture();
+    camera->Close();
 
     connected = false;
 }
@@ -74,8 +71,8 @@ bool CameraVimba::initCamera(std::string camera_serial,int binning, bool trigger
         if(!success)
             qDebug() << "Failed to set FPS";
 
+        frame_observer = shared_ptr<FrameObserver>(new FrameObserver(camera));
         connected = true;
-
 
     } else {
         qDebug() << "Failed to open camera";
@@ -85,7 +82,105 @@ bool CameraVimba::initCamera(std::string camera_serial,int binning, bool trigger
     return connected;
 }
 
-VmbError_t CameraVimba::getStringFeature(std::string name, std::string res){
+void CameraVimba::startCapture(void){
+
+    if(capturing) return;
+
+    auto res = camera->StartContinuousImageAcquisition(15, frame_observer);
+
+    if(res != VmbErrorSuccess){
+        qDebug() << "Couldn't start capture!" << res;
+    }else{
+        connect(frame_observer.get(), SIGNAL( frameReady(int) ), this, SLOT( onFrame(int) ) );
+        capturing = true;
+    }
+}
+
+void CameraVimba::stopCapture(void){
+    if(!capturing) return;
+
+    camera->StopContinuousImageAcquisition();
+    disconnect(frame_observer.get(), SIGNAL( frameReady(int) ), this, SLOT( onFrame(int) ) );
+    capturing = false;
+}
+
+void CameraVimba::onFrame(int status){
+    if(!connected){
+        return;
+     }
+
+    // Pick up frame
+    FramePtr pFrame = frame_observer->getFrame();
+    if( pFrame == nullptr){
+        qDebug() << "frame pointer is NULL, late frame ready message";
+        return;
+    }
+
+    // See if it is not corrupt
+    if( status == VmbFrameStatusComplete ){
+        VmbUchar_t *pBuffer;
+        VmbErrorType err = pFrame.get()->GetImage(pBuffer);
+        if( VmbErrorSuccess != err )
+        {
+            qDebug() << "Failed to get image pointer";
+            return;
+        }
+
+        VmbPixelFormatType ePixelFormat = VmbPixelFormatMono8;
+        err = pFrame->GetPixelFormat( ePixelFormat );
+        if ( err != VmbErrorSuccess)
+        {
+            qDebug() << "Failed to get pixel format";
+            return;
+        }
+
+        if (( ePixelFormat != VmbPixelFormatMono8 ))
+        {
+            qDebug() << "Invalid pixel format";
+            return;
+        }
+
+        VmbUint32_t nImageSize = 0;
+        err = pFrame->GetImageSize( nImageSize );
+        if ( err != VmbErrorSuccess )
+        {
+            qDebug() << "Failed to get image size";
+            return;
+        }
+
+        VmbUint32_t nWidth = 0;
+        err = pFrame->GetWidth( nWidth );
+        if ( err != VmbErrorSuccess ){
+            qDebug() << "Failed to get image width";
+            return;
+        }
+
+        VmbUint32_t nHeight = 0;
+        err = pFrame->GetHeight( nHeight );
+        if ( err != VmbErrorSuccess )
+        {
+            qDebug() << "Failed to get image height";
+            return;
+        }
+
+        VmbUchar_t *pImage = nullptr;
+        err = pFrame->GetImage( pImage );
+        if ( err == VmbErrorSuccess)
+        {
+            frame_mutex.lock();
+            cv::Mat image_temp = cv::Mat(static_cast<int>(nHeight), static_cast<int>(nWidth), CV_8UC1, pImage );
+            image_temp.copyTo(image);
+            frame_mutex.unlock();
+
+        }
+
+        camera->QueueFrame(pFrame);
+    }
+
+    emit captured();
+}
+
+VmbError_t CameraVimba::getStringFeature(std::string name, std::string &res){
 
     FeaturePtr feature;
     auto error = camera->GetFeatureByName(name.c_str(), feature);
@@ -96,7 +191,20 @@ VmbError_t CameraVimba::getStringFeature(std::string name, std::string res){
     return error;
 }
 
-VmbError_t CameraVimba::getIntFeature(std::string name, VmbInt64_t res){
+VmbError_t CameraVimba::getIntFeature(std::string name, long long &res){
+
+    FeaturePtr feature;
+    auto error = camera->GetFeatureByName(name.c_str(), feature);
+    if(error == VmbErrorSuccess){
+         VmbInt64_t out;
+         feature->GetValue(out);
+         res = static_cast<int>(out);
+    }
+
+    return error;
+}
+
+VmbError_t CameraVimba::getBoolFeature(std::string name, bool &res){
 
     FeaturePtr feature;
     auto error = camera->GetFeatureByName(name.c_str(), feature);
@@ -107,18 +215,7 @@ VmbError_t CameraVimba::getIntFeature(std::string name, VmbInt64_t res){
     return error;
 }
 
-VmbError_t CameraVimba::getBoolFeature(std::string name, bool res){
-
-    FeaturePtr feature;
-    auto error = camera->GetFeatureByName(name.c_str(), feature);
-    if(error == VmbErrorSuccess){
-         feature->GetValue(res);
-    }
-
-    return error;
-}
-
-VmbError_t CameraVimba::getDoubleFeature(std::string name, double res){
+VmbError_t CameraVimba::getDoubleFeature(std::string name, double &res){
 
     FeaturePtr feature;
     auto error = camera->GetFeatureByName(name.c_str(), feature);
@@ -132,7 +229,7 @@ VmbError_t CameraVimba::getDoubleFeature(std::string name, double res){
 void CameraVimba::getImageSize(int &width, int &height, int &bitdepth)
 {
     //get image size
-    int h = 0, w = 0;
+    long long h = 0, w = 0;
     auto err_h = getIntFeature("Height", h);
     auto err_w = getIntFeature("Width", w);
 
@@ -140,8 +237,8 @@ void CameraVimba::getImageSize(int &width, int &height, int &bitdepth)
     auto err_fmt = getStringFeature("PixelSize", format);
 
     if (err_h == VmbErrorSuccess && err_w == VmbErrorSuccess && err_fmt == VmbErrorSuccess){
-        height = h;
-        width = w;
+        height = static_cast<int>(h);
+        width = static_cast<int>(w);
         if(format == "Bpp8")
             bitdepth = 8;
         else if(format == "Bpp16")
@@ -153,14 +250,28 @@ void CameraVimba::getImageSize(int &width, int &height, int &bitdepth)
 
 bool CameraVimba::changeFPS(int fps){
     bool res = true;
+    bool capture_state = capturing;
+
+    if(capture_state){
+        stopCapture();
+    }
     // unlimited frame rate if set to 0
-    if (fps>0){
-        res &= setFPS(fps);
+    if (fps > 0){
+        // Order is important!
         res &= enableFPS(true);
+        if(!res)
+            qDebug() << "Failed to enable FPS";
+        res &= setFPS(fps);
+        if(!res)
+            qDebug() << "Failed to set FPS";
+
         this->fps = fps;
     } else {
         res &= enableFPS(false);
         this->fps = fps;
+    }
+    if(capture_state){
+        startCapture();
     }
     return res;
 }
@@ -176,25 +287,44 @@ bool CameraVimba::enableFPS(bool enable){
     FeaturePtr feature;
     camera->GetFeatureByName("AcquisitionFrameRateEnable", feature);
     auto error = feature->SetValue(enable);
-    return error == VmbErrorSuccess;
+
+    bool state;
+    feature->GetValue(state);
+
+    return (error == VmbErrorSuccess) && (state == enable);
 }
 
 bool CameraVimba::enableTrigger(bool enable){
     FeaturePtr feature;
     camera->GetFeatureByName("TriggerMode", feature);
     VmbError_t error;
+    std::string state;
+    std::string requested_mode;
 
     if(enable)
-        error = feature->SetValue("On");
+        requested_mode = "On";
     else
-        error = feature->SetValue("Off");
+        requested_mode = "Off";
 
-    return error == VmbErrorSuccess;
+    error = feature->SetValue(requested_mode.c_str());
+    feature->GetValue(state);
+
+    return (error == VmbErrorSuccess) && (state == requested_mode);
 }
 
 bool CameraVimba::changeBinning(int binning){
     close();
     return (initCamera(this->camera_serial,binning,this->trigger,this->fps));
+}
+
+double CameraVimba::getFPS(void){
+    FeaturePtr feature;
+    double fps;
+    auto success = getDoubleFeature("AcquisitionFrameRate", fps);
+    if(success != VmbErrorSuccess){
+        fps = -1;
+    }
+    return fps;
 }
 
 
@@ -216,8 +346,18 @@ bool CameraVimba::setBinning(int binning)
 bool CameraVimba::setExposure(double exposure)
 {
     FeaturePtr feature;
+    int fps = static_cast<int>(getFPS());
     camera.get()->GetFeatureByName("ExposureTime", feature);
+    qDebug() << "Setting exposure to: " << 1000.0*exposure;
     auto error = feature->SetValue(1000.0*exposure); // microseconds
+
+    if(error != VmbErrorSuccess){
+        qDebug() << "Failed to set exposure";
+    }else{
+        if(fps < 30 && 1.0/(1000.0*exposure) < 1.0/30){
+            changeFPS(30);
+        }
+    }
 
     return error == VmbErrorSuccess;
 }
@@ -250,9 +390,16 @@ bool CameraVimba::enableAutoGain(bool enable)
 
 bool CameraVimba::setGain(int gain)
 {
+
+    enableAutoGain(false);
+
     FeaturePtr feature;
     camera.get()->GetFeatureByName("Gain", feature);
-    auto error = feature->SetValue(gain);
+
+    double min_gain, max_gain;
+    feature->GetRange(min_gain, max_gain);
+
+    auto error = feature->SetValue(max_gain*static_cast<double>(gain)/100.0);
 
     return error == VmbErrorSuccess;
 }
@@ -260,13 +407,19 @@ bool CameraVimba::setGain(int gain)
 bool CameraVimba::capture(void)
 {
     bool res = false;
+    QElapsedTimer timer;
+    timer.start();
+
     if (connected){
         // get image from cameras
         AVT::VmbAPI::FramePtr pFrame;
         VmbErrorType capture_err;
         VmbFrameStatusType status = VmbFrameStatusIncomplete;
 
+        //qDebug() << "Init: " << timer.nsecsElapsed() / 1e9;
+
         capture_err = camera->AcquireSingleImage( pFrame, 5000 );
+        //timer.start();
 
         if ( capture_err == VmbErrorSuccess)
         {
@@ -332,18 +485,26 @@ bool CameraVimba::capture(void)
         res = false;
     }
 
+     qDebug() << "Capture time: " << timer.nsecsElapsed() / 1e9;
+
     return res;
 }
 
-cv::Mat *CameraVimba::getImage(void) {
+bool CameraVimba::getImage(cv::Mat &out) {
+    cv::Mat temp;
+    frame_mutex.lock();
     if (image.cols == 0 || image.rows == 0){
         qDebug() << "Global image result buffer size is incorrect";
         qDebug() << "cols: " << image.cols << " rows: " << image.rows;
+        return false;
     }
-    return &image;
+    image.copyTo(out);
+    frame_mutex.unlock();
+    return true;
 }
 
 CameraVimba::~CameraVimba(void)
 {
     close();
+    emit finished();
 }

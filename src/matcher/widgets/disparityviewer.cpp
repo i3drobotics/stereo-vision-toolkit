@@ -48,7 +48,7 @@ void DisparityViewer::setColourmap(int idx) {
     }
 
     cv::applyColorMap(colourbar, colourbar_vis, colourmap);
-    cv::cvtColor(colourbar_vis, colourbar_vis, CV_BGR2RGB);
+    cv::cvtColor(colourbar_vis, colourbar_vis, cv::COLOR_BGR2RGB);
     QImage colourbar_image(colourbar_vis.data, colourbar_vis.cols,
                            colourbar_vis.rows, QImage::Format_RGB888);
     QPixmap colourbar_pmap = QPixmap::fromImage(colourbar_image);
@@ -192,7 +192,7 @@ void DisparityViewer::updateDisparity() {
 
     //colour_disparity = disparity_vis;
 
-    cv::cvtColor(disparity_vis, disparity_vis, CV_BGR2RGB);
+    cv::cvtColor(disparity_vis, disparity_vis, cv::COLOR_BGR2RGB);
 
     for (int x = 0; x < disparity_scale.cols; x++) {
         for (int y = 0; y < disparity_scale.rows; y++) {

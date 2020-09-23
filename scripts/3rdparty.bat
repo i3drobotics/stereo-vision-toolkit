@@ -43,7 +43,7 @@ if "%option_with_i3drsgm%"=="true" (
 call ..\3rdparty\boost-1.66.0\setup_boost.bat %script_params% --mirror vorboss
 
 :: install opencv
-call ..\3rdparty\opencv-3.4.10\setup_opencv.bat %script_params%
+call ..\3rdparty\opencv-4.4.0\setup_opencv.bat %script_params%
 
 :: reset working directory
 cd %initcwd%

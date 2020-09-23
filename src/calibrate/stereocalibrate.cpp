@@ -423,17 +423,20 @@ bool StereoCalibrate::findCorners(cv::Mat image,
         }
     }
 
+    /*
+     * Subpixel corners deprecated in OpenCV 4?
+     * Should now be rolled into findChessboardCorners
     if (found) {
         qDebug() << "Chessboard corners found";
         qDebug() << "Finding subpix corners...";
-        cv::cornerSubPix(
+        cv::find4QuadCornerSubpix(
                     image, corners, cv::Size(11, 11), cv::Size(-1, -1),
                     cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.001));
         qDebug() << "Subpix corners complete.";
         return true;
     } else {
         qDebug() << "Failed to find chessboard corners.";
-    }
+    }*/
 
     return false;
 }
@@ -493,10 +496,10 @@ void StereoCalibrate::overlayImage(cv::Mat& image, Chessboard* board,
 
 void StereoCalibrate::overlayArrow(cv::Mat& image,
                                    std::vector<cv::Point2f>& points,
-                                   cv::Point2f offset, CvScalar colour,
+                                   cv::Point2f offset, cv::Scalar colour,
                                    int thickness) {
     cv::Mat mean_;
-    cv::reduce(points, mean_, 1, CV_REDUCE_AVG);
+    cv::reduce(points, mean_, 1, cv::REDUCE_AVG);
     cv::Point2f centrepoint(mean_.at<float>(0, 0), mean_.at<float>(0, 1));
 
     auto end = centrepoint + offset;
