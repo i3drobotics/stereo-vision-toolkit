@@ -7,7 +7,7 @@ SET scriptpath=%~dp0
 cd %scriptpath:~0,-1%
 
 :: set i3drsgm version
-set version=1.0.3
+set version=1.0.4
 
 :: search for token in first argument
 set token_found=false
@@ -32,18 +32,14 @@ if "%~1"=="" (
 fetch --repo="https://github.com/i3drobotics/i3drsgm" --tag="v%version%" --release-asset="i3drsgm-%version%.exe" --progress --github-oauth-token=%token% ./
 :: extract self-exracting archive
 i3drsgm-%version%.exe -o"./" -y
-
-:: install opencv
-call i3drsgm\opencv-3.4.1\install_opencv.bat
+:: delete downloaded file
+del i3drsgm-%version%.exe
 
 :: install phobosIntegration
 call i3drsgm\phobosIntegration-1.0.54\install_phobosIntegration.bat %token%
 
 :: complete message
 echo I3DRSGM install complete
-
-:: delete downloaded file
-del i3drsgm-%version%.exe
 
 :: reset working directory
 cd %initcwd%
