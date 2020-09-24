@@ -3,8 +3,18 @@
 * Author: Ben Knight (bknight@i3drobotics.com)
 */
 
-#define CAMERA_TRIGGER_1 3 //Phobos USB uses pin 12 / Phobos GigE uses pin 3 
-#define CAMERA_TRIGGER_2 2 //Phobos USB uses pin 12 / Phobos GigE uses pin 2
+#define PHOBOS_USB_TRIGGER_1 12
+#define PHOBOS_USB_TRIGGER_2 12
+
+#define PHOBOS_GIGE_TRIGGER_1 3
+#define PHOBOS_GIGE_TRIGGER_2 2
+
+#define TITANIA_USB_TRIGGER_1 4
+#define TITANIA_USB_TRIGGER_2 6
+
+//Choose trigger pins based on the camera being used
+#define CAMERA_TRIGGER_1 TITANIA_USB_TRIGGER_1 
+#define CAMERA_TRIGGER_2 TITANIA_USB_TRIGGER_2
 
 double frame_delay;      // amount of time between triggered (1/fps)
 int trigger_time = 10;   // time for trigger to be registered by camera

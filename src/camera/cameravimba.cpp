@@ -61,15 +61,15 @@ bool CameraVimba::initCamera(std::string camera_serial,int binning, bool trigger
 
     if (error == VmbErrorSuccess){
 
-        // Currently binning is not supported
-        //bool error = setBinning(binning);
-        bool success = enableTrigger(trigger);
-        if(!success)
-            qDebug() << "Failed to set trigger mode";
-
-        success = changeFPS(fps);
+        bool success = changeFPS(fps);
         if(!success)
             qDebug() << "Failed to set FPS";
+
+        // Currently binning is not supported
+        //bool error = setBinning(binning);
+        success = enableTrigger(trigger);
+        if(!success)
+            qDebug() << "Failed to set trigger mode";
 
         frame_observer = shared_ptr<FrameObserver>(new FrameObserver(camera));
         connected = true;
@@ -278,12 +278,19 @@ bool CameraVimba::changeFPS(int fps){
 
 bool CameraVimba::setFPS(int fps){
     FeaturePtr feature;
+    qDebug() << "Setting fps: " << fps;
     camera->GetFeatureByName("AcquisitionFrameRate", feature);
     auto error = feature->SetValue(static_cast<double>(fps));
     return error == VmbErrorSuccess;
 }
 
 bool CameraVimba::enableFPS(bool enable){
+    if (enable){
+        qDebug() << "Enabling fps";
+    } else {
+        qDebug() << "Disabling fps";
+    }
+
     FeaturePtr feature;
     camera->GetFeatureByName("AcquisitionFrameRateEnable", feature);
     auto error = feature->SetValue(enable);
@@ -296,20 +303,87 @@ bool CameraVimba::enableFPS(bool enable){
 
 bool CameraVimba::enableTrigger(bool enable){
     FeaturePtr feature;
-    camera->GetFeatureByName("TriggerMode", feature);
     VmbError_t error;
     std::string state;
-    std::string requested_mode;
+    std::string requested_trigger_mode;
+    std::string requested_line_selector;
+    std::string requested_line_mode;
+    std::string requested_trigger_source;
+    std::string requested_trigger_selector;
+    bool success = true;
 
-    if(enable)
-        requested_mode = "On";
-    else
-        requested_mode = "Off";
+    if(enable){
+        qDebug() << "Enabling trigger";
+        requested_trigger_mode = "On";
+        requested_trigger_source = "Line0";
+        requested_trigger_selector = "FrameStart";
+        requested_line_selector = "Line0";
+        requested_line_mode = "Input";
+    } else {
+        qDebug() << "Disabling trigger";
+        requested_trigger_mode = "Off";
+        requested_trigger_source = "Software";
+        requested_trigger_selector = "FrameStart";
+        requested_line_selector = "Line0";
+        requested_line_mode = "Input";
+    }
 
-    error = feature->SetValue(requested_mode.c_str());
+    if (enable){
+        /*
+        camera->GetFeatureByName("LineSelector", feature);
+        error = feature->SetValue(requested_line_selector.c_str());
+        feature->GetValue(state);
+        success &= (error == VmbErrorSuccess) && (state == requested_line_selector);
+
+        if (!success){
+            qDebug() << "Failed to set line selector";
+            return success;
+        }
+
+        camera->GetFeatureByName("LineMode", feature);
+        error = feature->SetValue(requested_line_mode.c_str());
+        feature->GetValue(state);
+        success &= (error == VmbErrorSuccess) && (state == requested_line_mode);
+
+        if (!success){
+            qDebug() << "Failed to set line mode";
+            return success;
+        }
+        */
+    }
+
+    camera->GetFeatureByName("TriggerSelector", feature);
+    error = feature->SetValue(requested_trigger_selector.c_str());
     feature->GetValue(state);
+    success &= (error == VmbErrorSuccess) && (state == requested_trigger_selector);
 
-    return (error == VmbErrorSuccess) && (state == requested_mode);
+    if (!success){
+        qDebug() << "Failed to set trigger selector";
+        return success;
+    }
+
+    camera->GetFeatureByName("TriggerSource", feature);
+    error = feature->SetValue(requested_trigger_source.c_str());
+    feature->GetValue(state);
+    success &= (error == VmbErrorSuccess) && (state == requested_trigger_source);
+
+    if (!success){
+        qDebug() << "Failed to set trigger source";
+        return success;
+    }
+
+    camera->GetFeatureByName("TriggerMode", feature);
+    error = feature->SetValue(requested_trigger_mode.c_str());
+    feature->GetValue(state);
+    success &= (error == VmbErrorSuccess) && (state == requested_trigger_mode);
+
+    if (!success){
+        qDebug() << "Failed to set trigger mode";
+        qDebug() << state.c_str();
+        return success;
+    }
+
+    return success;
 }
 
 bool CameraVimba::changeBinning(int binning){
@@ -348,15 +422,19 @@ bool CameraVimba::setExposure(double exposure)
     FeaturePtr feature;
     int fps = static_cast<int>(getFPS());
     camera.get()->GetFeatureByName("ExposureTime", feature);
-    qDebug() << "Setting exposure to: " << 1000.0*exposure;
-    auto error = feature->SetValue(1000.0*exposure); // microseconds
+    double exposure_scaled = exposure * 1000;
+    qDebug() << "Setting exposure to: " << exposure_scaled;
+    qDebug() << "Vimba exposure to: " << exposure_scaled;
+    auto error = feature->SetValue(exposure_scaled); // microseconds
 
     if(error != VmbErrorSuccess){
         qDebug() << "Failed to set exposure";
     }else{
+        /*
         if(fps < 30 && 1.0/(1000.0*exposure) < 1.0/30){
             changeFPS(30);
         }
+        */
     }
 
     return error == VmbErrorSuccess;
@@ -369,6 +447,12 @@ bool CameraVimba::enableAutoExposure(bool enable)
 
     FeaturePtr feature;
 
+    if (enable){
+        qDebug() << "Enabling auto exposure";
+    } else {
+        qDebug() << "Disabling auto exposure";
+    }
+
     camera->GetFeatureByName("ExposureAuto", feature);
     auto error = feature->SetValue(exposure_mode.c_str());
 
@@ -377,6 +461,12 @@ bool CameraVimba::enableAutoExposure(bool enable)
 
 bool CameraVimba::enableAutoGain(bool enable)
 {
+
+    if (enable){
+        qDebug() << "Enabling auto gain";
+    } else {
+        qDebug() << "Disabling auto gain";
+    }
 
     std::string gain_mode = "Off";
     if(enable) gain_mode = "Continuous";
@@ -396,8 +486,12 @@ bool CameraVimba::setGain(int gain)
     FeaturePtr feature;
     camera.get()->GetFeatureByName("Gain", feature);
 
+    qDebug() << "Setting gain to: " << gain;
+
     double min_gain, max_gain;
     feature->GetRange(min_gain, max_gain);
+
+    qDebug() << "Vimba gain to: " << max_gain*static_cast<double>(gain)/100.0;
 
     auto error = feature->SetValue(max_gain*static_cast<double>(gain)/100.0);
 

@@ -25,7 +25,9 @@ void CameraDisplayWidget::updateView(cv::Mat new_image){
         // for increased performance update time cannot exeed > 30fps
         if (time_since_update > min_update_time){
 
-            pixmap = ASM::cvMatToQPixmap(new_image);
+            cv::Mat display_image = new_image.clone();
+
+            pixmap = ASM::cvMatToQPixmap(display_image);
 
             if(pixmap.isNull()) return;
 

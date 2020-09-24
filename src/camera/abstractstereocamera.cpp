@@ -562,10 +562,10 @@ void AbstractStereoCamera::processStereo(void) {
         return;
     } else {
         //temporary fix while vimba camera do not read image size correctly
-        image_height = left_raw.size().height;
-        image_width = left_raw.size().width;
-        image_bitdepth = 1;
-        emit update_size(image_width, image_height, image_bitdepth);
+        //image_height = left_raw.size().height;
+        //image_width = left_raw.size().width;
+        //image_bitdepth = 1;
+        //emit update_size(image_width, image_height, image_bitdepth);
     }
 
     if (isSwappingLeftRight()){
