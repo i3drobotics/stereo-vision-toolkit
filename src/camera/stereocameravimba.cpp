@@ -67,9 +67,8 @@ bool StereoCameraVimba::setupCameras(AbstractStereoCamera::StereoCameraSerialInf
     success &= camera_right->initCamera(camera_right_serial, iBinning, trigger, iFps);
 
     if(success){
-        int height, width, bitdepth;
-        camera_left->getImageSize(height, width, bitdepth);
-        emit update_size(width, height, bitdepth);
+        camera_left->getImageSize(image_width, image_height, image_bitdepth);
+        emit update_size(image_height, image_width, image_bitdepth);
     }
 
     connect(this, SIGNAL(start_capture()), camera_left, SLOT(startCapture()));

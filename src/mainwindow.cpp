@@ -63,11 +63,13 @@ MainWindow::MainWindow(QWidget* parent)
     default_vimba_init_settings.gain = 0;
     default_vimba_init_settings.fps = 30;
     default_vimba_init_settings.binning = 1;
-    default_vimba_init_settings.trigger = false;
+    default_vimba_init_settings.trigger = true;
     default_vimba_init_settings.hdr = -1;
-    default_vimba_init_settings.autoExpose = true;
-    default_vimba_init_settings.autoGain = true;
+    default_vimba_init_settings.autoExpose = false;
+    default_vimba_init_settings.autoGain = false;
     default_vimba_init_settings.isGige = false;
+    default_vimba_init_settings.packetDelay = -1;
+    default_vimba_init_settings.packetSize = -1;
 
     default_tis_init_settings.exposure = 5;
     default_tis_init_settings.gain = 0;
@@ -883,7 +885,7 @@ void MainWindow::stereoCameraInitWindow(void){
         ui->enabledTriggeredCheckbox->setChecked(default_trigger);
         ui->enabledTriggeredCheckbox->setVisible(true);
         AbstractStereoCamera::StereoCameraSerialInfo cam_info = stereo_cam->getCameraSerialInfo();
-        if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
+        if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
             ui->fpsSpinBox->setEnabled(true);
         } else {
             if (default_trigger){
@@ -946,7 +948,7 @@ void MainWindow::stereoCameraInitWindow(void){
     // set window to default values
     // set fps spin box limits
     int max_fps = 60;
-    int min_fps = 0;
+    int min_fps = 1;
     int step_fps = 1;
 
     int max_gain = 360;
@@ -982,7 +984,8 @@ void MainWindow::stereoCameraInitWindow(void){
         min_gain = 0;
         step_gain = 1;
     } else  if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
-        //VIMBA only settings
+        min_fps = 1;
+        max_fps = 100;
     }
 
     current_fps = default_fps;
