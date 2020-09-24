@@ -7,6 +7,9 @@ installer/Output/*
 /3rdparty/i3drsgm-1.0.3/token.txt
 /3rdparty/i3drsgm-1.0.3/i3drsgm
 /3rdparty/i3drsgm-1.0.3/i3drsgm-1.0.3.exe
+/3rdparty/i3drsgm-1.0.4/token.txt
+/3rdparty/i3drsgm-1.0.4/i3drsgm
+/3rdparty/i3drsgm-1.0.4/i3drsgm-1.0.4.exe
 /3rdparty/opencv-3.4.10/opencv
 /3rdparty/opencv-3.4.10/opencv-3.4.10-vc14_vc15.exe
 /3rdparty/opencv-4.4.0/opencv
