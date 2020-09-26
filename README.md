@@ -67,7 +67,7 @@ This repository is used for internal development and so we include both debug an
 
 The project uses OpenCV for image processing, PCL and VTK for point cloud visualisation and hidapi for camera control. PCL requires Boost and Eigen which are included here. These dependencies are provided in accordance with their respective licenses which may be found in the license folder. We also use FontAwesome for icons via QtAwesome, along with QDarkStyle.
 
-#### Automaic install
+#### Automatic install
 Some libraries have been moved to be externally downloaded to reduce the repostiory size. To download these libraries use the '3rdparty.bat' script provided in 'scripts'. This will download the libraries of the correct versions to the correct folders.  
 *Note: This process builds boost with the required boost libraries so will take some time to complete.*
 ```
@@ -83,7 +83,29 @@ Tested with QT 5.14.2 with Visual Studio 2017.
 Requires QT Webengine module for use in Fevor. 
 
 #### CUDA
-There is limited usage of CUDA for certain image processing steps (e.g. rectification).
+There is limited usage of CUDA for certain image processing steps (e.g. rectification) and neural network support. If you want to build with CUDA support, you need to build OpenCV manually as the pre-packaged releases don't include it.
+
+* First make sure you have an up to date version of CUDA and CUDNN installed. You can merge CUDNN into your CUDA install folder if you like.
+* You need to build OpenCV with the contrib modules to enable CUDA support
+* Then, configure OpenCV using cmake:
+  * Check that you're building for the correct CPU architecture - you must set x64 explicitly in cmake-gui because CUDA provides very limited 32-bit libraries.
+  * Make sure `WITH_CUDA` is on and run configure
+  * CUDA should be discovered automatically, but you will need to set:
+    * `CUDNN_INCLUDE_DIR`
+    * `CUDNN_LIBRARY`
+    * Manually define these entries and set their correct paths
+  * Run configure again and double check:
+    * `CUDA_64_BIT_DEVICE_CODE` is set to true
+    * `CUDA_ARCH_BIN` is appropriate for your device (e.g. 6.0, 6.1 for a GTX 1080). Remove the ones you don't need otherwise building will take forever.
+    * `CUDA_FAST_MATH` can be enabled if you like, it's not mandatory
+    * your GPU architecture as well, if you know it e.g. Pascal
+    * that `CUDA_USE_STATIC_CUDA_RUNTIME` is set, which will integrate it into opencv_world
+    * that `CUDNN_VERSION` is discovered correctly
+  * Make sure that you enable `OPENCV_DNN_CUDA` otherwise inference will fall back to CPU
+* Build and install OpenCV as normal, but it will take a lot longer
+* Point Qt to your standalone OpenCV build, not the bundled 3rdparty one (modify the .pro file)
+* Add `DEFINES+=WITH_CUDA` to your build settings
+* Build!
 
 ### Phobos control
 Arduino code for controlling Phobos cameras is provided in src/camera/camera_control.
