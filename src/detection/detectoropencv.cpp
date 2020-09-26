@@ -64,6 +64,17 @@ void DetectorOpenCV::setTarget(int target){
             cv::ocl::Device(context.device(1));
         }
     }
+#ifdef WITH_CUDA
+    else if(preferable_target == cv::dnn::DNN_TARGET_CUDA || preferable_target == cv::dnn::DNN_TARGET_CUDA_FP16){
+        // Check for GPU
+        if (cv::cuda::getCudaEnabledDeviceCount() <= 0) {
+            qDebug() << "OpenCL is not available. Falling back to CPU";
+            preferable_target = cv::dnn::DNN_TARGET_CPU;
+        }else{
+            qDebug() << "NVIDIA GPU detected.";
+        }
+    }
+#endif
 }
 
 void DetectorOpenCV::loadNetwork(std::string names_file, std::string cfg_file, std::string model_file){
@@ -73,7 +84,15 @@ void DetectorOpenCV::loadNetwork(std::string names_file, std::string cfg_file, s
     // Infer network type automatically
     net = cv::dnn::readNet(model_file, cfg_file);
 
-    net.setPreferableBackend(cv::dnn::DNN_BACKEND_DEFAULT);
+    // Should default to DNN_BACKEND_OPENCV (otherwise Intel inference engine)
+    if(preferable_target == cv::dnn::DNN_TARGET_CUDA || preferable_target == cv::dnn::DNN_TARGET_CUDA_FP16){
+        net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
+        qDebug() << "Set backend and target to CUDA";
+    }else{
+        net.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);
+    }
+
+    // Network target, e.g. CUDA, CPU, etc
     net.setPreferableTarget(preferable_target);
 
     getOutputClassNames();
