@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget* parent)
     QCoreApplication::setApplicationName("Stereo Vision Toolkit");
     setWindowTitle(QCoreApplication::applicationName());
 
+    settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
+
     // Required outside of the camera class definitions as 'list_systems' is slow otherwise
     // due to it having to re-initalise api's
     Pylon::PylonInitialize();
@@ -391,11 +393,18 @@ void MainWindow::detectionInit(){
 
     connect(ui->detectionThresholdSlider, SIGNAL(valueChanged(int)), ui->detectionThresholdSpinbox, SLOT(setValue(int)));
     connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), ui->detectionThresholdSlider, SLOT(setValue(int)));
-    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), object_detector, SLOT(setConfidenceThresholdPercent(int)));
+    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), this, SLOT(setConfidenceThresholdPercent(int)));
+    ui->detectionThresholdSpinbox->setValue(settings->value("detection_threshold", 75).toInt());
 
     connect(ui->nmsThresholdSlider, SIGNAL(valueChanged(int)), ui->nmsThresholdSpinbox, SLOT(setValue(int)));
     connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), ui->nmsThresholdSlider, SLOT(setValue(int)));
-    connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), object_detector, SLOT(setNMSThresholdPercent(int)));
+    connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), this, SLOT(setNMSThresholdPercent(int)));
+    ui->nmsThresholdSpinbox->setValue(settings->value("nms_threshold", 75).toInt());
+
+    connect(ui->bboxAlphaSlider, SIGNAL(valueChanged(int)), ui->bboxAlphaSpinbox, SLOT(setValue(int)));
+    connect(ui->bboxAlphaSpinbox, SIGNAL(valueChanged(int)), ui->bboxAlphaSlider, SLOT(setValue(int)));
+    connect(ui->bboxAlphaSpinbox, SIGNAL(valueChanged(int)), this, SLOT(updateBoundingBoxAlpha(int)));
+    ui->bboxAlphaSpinbox->setValue(settings->value("bbox_alpha", 75).toInt());
 
     qDebug() << "Detector initalisation complete.";
 }
@@ -432,7 +441,6 @@ void MainWindow::configureDetection(){
         for(auto &class_name : object_detector->getClassNames()){
             ui->classListWidget->addItem(class_name.c_str());
 
-            auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
             auto tag_name = QString("class/%1/colour").arg(class_name.c_str());
 
             int r=255, g=0, b=0, a=255;
@@ -476,6 +484,8 @@ void MainWindow::configureDetection(){
 
         connect(ui->classListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onClassListClicked()));
     }
+
+    ui->classListWidget->sortItems();
 
     QFile weight_name(detection_dialog.getWeights());
     QFileInfo weights_fileinfo(weight_name.fileName());
@@ -535,11 +545,27 @@ void MainWindow::updateClassVisible(bool checked){
     setClassVisible(ui->classListWidget->currentItem()->text(), checked);
 }
 
+void MainWindow::updateBoundingBoxAlpha(int value){
+    bounding_box_alpha = value;
+    settings->setValue("bbox_alpha", value);
+    qDebug() << "Updated bounding box fill transparency to: " << value;
+}
+
+void MainWindow::updateNMSThreshold(int value){
+    object_detector->setNMSThresholdPercent(value);
+    settings->setValue("nms_threshold", value);
+    qDebug() << "Updated NMS threshold % to: " << value;
+}
+
+void MainWindow::updateDetectionThreshold(int value){
+    object_detector->setConfidenceThresholdPercent(value);
+    settings->setValue("Updated detection threshold % to: ", value);
+}
+
 
 void MainWindow::setClassColour(QString class_name, QColor class_colour){
 
     // Set class colour
-    auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
     auto tag_name = QString("class/%1/colour").arg(class_name);
 
     int r=255, g=0, b=0, a=255; // default to red
@@ -558,7 +584,6 @@ void MainWindow::setClassColour(QString class_name, QColor class_colour){
 
 void MainWindow::setClassVisible(QString class_name, bool visible){
 
-    auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
     auto tag_name = QString("class/%1/visible").arg(class_name);
 
     settings->setValue(tag_name, visible);
@@ -570,7 +595,6 @@ void MainWindow::setClassVisible(QString class_name, bool visible){
 }
 
 void MainWindow::setClassFilled(QString class_name, bool fill){
-    auto settings = new QSettings("I3Dr", "Stereo Vision Toolkit");
     auto tag_name = QString("class/%1/fill").arg(class_name);
 
     settings->setValue(tag_name, fill);
@@ -644,12 +668,14 @@ void MainWindow::updateDetection(){
         cv::cvtColor(image_detection, image_detection, cv::COLOR_RGBA2BGRA);
 
         object_detection_display->updateView(image_detection);
+        QCoreApplication::processEvents();
     }
 
     this->detecting = false;
 }
 
 void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x=1.0, double scale_y=1.0){
+
     for(auto &bbox : bboxes){
 
         if(!class_visible_map[bbox.classname])
@@ -666,26 +692,36 @@ void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxe
         box_colour.getRgb(&r, &g, &b, &a);
 
         cv::Scalar font_colour(r, g, b, a);
-        qDebug() << "Drawing with: " << bbox.classname.toStdString().c_str() << "(" << r << "," << g << "," << b << ")";
-
-        if(class_filled_map[bbox.classname]){
-             cv::Scalar font_colour(r, g, b, 100);
-            thickness = -1;
-        }
-
-        cv::rectangle(image, top_left, bottom_right, font_colour, thickness);
 
         //Get the label for the class name and its confidence
         std::string label = cv::format("%s %.2f", bbox.classname.toStdString().c_str(), bbox.confidence);
 
         //Display the label at the top of the bounding box
         int baseLine;
-        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.4, 1, &baseLine);
+        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_TRIPLEX, 0.4, 1, &baseLine);
 
         cv::Point text_pos = top_left;
         text_pos.y = text_pos.y - (labelSize.height / 2);
+        cv::putText(image, label, text_pos, cv::FONT_HERSHEY_TRIPLEX, 0.4, font_colour);
 
-        cv::putText(image, label, text_pos, cv::FONT_HERSHEY_SIMPLEX, 0.4, font_colour);
+        if(class_filled_map[bbox.classname]){
+            cv::Scalar font_colour(r, g, b);
+            thickness = -1;
+
+            cv::Rect bbox_roi(top_left, bottom_right);
+            cv::Mat subimage = image(bbox_roi);
+            cv::Mat subimage_overlay = subimage.clone();
+            subimage_overlay = cv::Scalar(r, g, b);
+
+            // Overlay box
+            double gamma = 0.0;
+            double alpha = static_cast<double>(bounding_box_alpha) / 255.0;
+            cv::addWeighted(subimage_overlay, alpha, subimage, 1-alpha, gamma, subimage);
+
+            //image(roi) = subimage;
+        }else{
+            cv::rectangle(image, top_left, bottom_right, font_colour, thickness);
+        }
     }
 }
 

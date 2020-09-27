@@ -186,6 +186,9 @@ private:
     QMap<QString, QColor> class_colour_map;
     QMap<QString, bool> class_visible_map;
     QMap<QString, bool> class_filled_map;
+    int bounding_box_alpha = 50;
+
+    QSettings *settings = nullptr;
 
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> current_camera_serial_info_list;
     std::vector<QSignalMapper*>* camera_button_signal_mapper_list;
@@ -289,6 +292,9 @@ public slots:
     void updateClassFilled(bool checked);
     void updateClassVisible(bool checked);
     void onClassListClicked(void);
+    void updateBoundingBoxAlpha(int fill_alpha);
+    void updateDetectionThreshold(int value);
+    void updateNMSThreshold(int value);
 
     void openHelp();
 
