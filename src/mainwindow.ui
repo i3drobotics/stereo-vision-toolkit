@@ -441,7 +441,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>314</width>
-                    <height>225</height>
+                    <height>220</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1248,28 +1248,35 @@
                   </item>
                  </layout>
                 </item>
-                <item row="3" column="0">
+                <item row="4" column="0">
                  <widget class="QPushButton" name="detectionSetupButton">
                   <property name="text">
                    <string>Setup</string>
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
+                <item row="5" column="0">
                  <widget class="QCheckBox" name="detectionCheckBox">
                   <property name="text">
                    <string>Enable Detection</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="0" colspan="2">
+                <item row="6" column="0" colspan="2">
                  <widget class="QGroupBox" name="groupBox_2">
                   <property name="title">
                    <string>Classes</string>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_12">
                    <item>
-                    <widget class="QListWidget" name="classListWidget"/>
+                    <widget class="QListWidget" name="classListWidget">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                    </widget>
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -1329,6 +1336,34 @@
                    </item>
                   </layout>
                  </widget>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QLabel" name="label_11">
+                  <property name="text">
+                   <string>Fill alpha</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="1">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <item>
+                   <widget class="QSlider" name="bboxAlphaSlider">
+                    <property name="maximum">
+                     <number>255</number>
+                    </property>
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="bboxAlphaSpinbox">
+                    <property name="maximum">
+                     <number>255</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </item>
                </layout>
               </widget>
@@ -1961,7 +1996,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
