@@ -231,6 +231,7 @@ void MainWindow::disableWindow(){
     ui->tabApplicationSettings->setDisabled(true);
     ui->matcherSelectBox->setDisabled(true);
     ui->enableStereo->setDisabled(true);
+    ui->enableDetection->setDisabled(true);
 
     ui->captureButton->setDisabled(true);
     ui->singleShotButton->setDisabled(true);
@@ -253,6 +254,7 @@ void MainWindow::enableWindow(){
     ui->tabApplicationSettings->setEnabled(true);
     ui->matcherSelectBox->setEnabled(true);
 
+    //ui->enableDetection->setEnabled(true);
     ui->captureButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
     //ui->saveButton->setEnabled(false);
@@ -325,6 +327,7 @@ void MainWindow::controlsInit(void) {
     ui->saveButton->setIcon(awesome->icon(fa::save, icon_options));
     ui->singleShotButton->setIcon(awesome->icon(fa::camera, icon_options));
     ui->enableStereo->setIcon(awesome->icon(fa::cubes, icon_options));
+    ui->enableDetection->setIcon(awesome->icon(fa::eye, icon_options));
     ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
 
     connect(ui->btnLoadVideo, SIGNAL(clicked(bool)), this,
@@ -356,16 +359,12 @@ void MainWindow::enable3DViz(int tab = 0) {
     }
 }
 
-void MainWindow::enableDetection(int tab = 0){
-    if (!stereo_cam) return;
-
-    detection_enabled = false;
-
-    if (tab == 3) {
-        // Do ML stuff
-        qDebug() << "Running detection";
-        detection_enabled = true;
+void MainWindow::enableDetection(bool enable){
+    if (!stereo_cam){
+        detection_enabled = false;
+        return;
     }
+    detection_enabled = enable;
 }
 
 void MainWindow::detectionInit(){
@@ -383,7 +382,7 @@ void MainWindow::detectionInit(){
     object_detector->assignThread(detector_thread);
 
     object_detection_display = new CameraDisplayWidget(this);
-    ui->detectionTab->layout()->addWidget(object_detection_display);
+    ui->gridLayoutDetection->addWidget(object_detection_display);
 
     object_detector->setConfidenceThresholdPercent(ui->detectionThresholdSpinbox->value());
     object_detector->setNMSThresholdPercent(ui->nmsThresholdSpinbox->value());
@@ -429,7 +428,9 @@ void MainWindow::configureDetection(){
     object_detector->loadNetwork(names_file, cfg_file, weight_file);
     object_detector->setImageSize(detection_dialog.getWidth(), detection_dialog.getHeight());
 
-    ui->detectionCheckBox->setEnabled(true);
+    ui->enableDetection->setEnabled(true);
+    ui->enableDetection->setChecked(true);
+    this->enableDetection(true);
 
     // GUI feedback
     ui->numberClassesLabel->setText(QString("%1").arg(object_detector->getNumClasses()));
@@ -626,8 +627,7 @@ void MainWindow::updateDetection(){
     double scale_factor_x = 1.0;
     double scale_factor_y = 1.0;
 
-    if(detection_enabled &&
-       ui->detectionCheckBox->isChecked()){
+    if(detection_enabled){
 
         if(image_detection.empty()){
             qDebug() << "Empty image passed to detector";
@@ -696,13 +696,16 @@ void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxe
         //Get the label for the class name and its confidence
         std::string label = cv::format("%s %.2f", bbox.classname.toStdString().c_str(), bbox.confidence);
 
+        float fontScale = (float)image.size().height / 1200;
+        float fontThickness = fontScale*2;
+
         //Display the label at the top of the bounding box
         int baseLine;
-        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_TRIPLEX, 0.4, 1, &baseLine);
+        cv::Size labelSize = getTextSize(label, cv::FONT_HERSHEY_COMPLEX, fontScale, 1, &baseLine);
 
         cv::Point text_pos = top_left;
         text_pos.y = text_pos.y - (labelSize.height / 2);
-        cv::putText(image, label, text_pos, cv::FONT_HERSHEY_TRIPLEX, 0.4, font_colour);
+        cv::putText(image, label, text_pos, cv::FONT_HERSHEY_COMPLEX, fontScale, font_colour, fontThickness);
 
         if(class_filled_map[bbox.classname]){
             cv::Scalar font_colour(r, g, b);
@@ -1107,8 +1110,8 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(displaySaved(QString)));
     connect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
             SLOT(enableMatching(bool)));
-    //connect(ui->enableStereo, SIGNAL(clicked(bool)), this,
-    //        SLOT(enableMatching(bool)));
+    connect(ui->enableDetection, SIGNAL(clicked(bool)), this,
+            SLOT(enableDetection(bool)));
     connect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
             SLOT(enableRectify(bool)));
     connect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
@@ -1139,6 +1142,8 @@ void MainWindow::stereoCameraInitConnections(void) {
     /* Detection */
     connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDetection()));
 
+    updatePointTexture(ui->comboBoxPointTexture->currentIndex());
+
     enableWindow();
     toggleCameraActiveSettings(true);
     toggleCameraPassiveSettings(true);
@@ -1164,6 +1169,7 @@ void MainWindow::stereoCameraRelease(void) {
     ui->enabledTriggeredCheckbox->setDisabled(true);
 
     ui->enableStereo->setChecked(false);
+    ui->enableDetection->setChecked(false);
     ui->captureButton->setChecked(false);
     ui->singleShotButton->setChecked(false);
     ui->toggleVideoButton->setChecked(false);
@@ -1177,6 +1183,7 @@ void MainWindow::stereoCameraRelease(void) {
 
     ui->tabWidget->setCurrentIndex(0);
     ui->tabLayoutSettings->setCurrentIndex(0);
+    //ui->comboBoxPointTexture->setCurrentIndex(0);
 
     if (cameras_connected) {
         cameras_connected = false;
@@ -1195,6 +1202,7 @@ void MainWindow::stereoCameraRelease(void) {
         enableCapture(false);
         enableRectify(false);
         stereo_cam->enableMatching(false);
+        this->enableDetection(false);
 
         progressClose.setLabelText("Closing camera connections...");
         progressClose.setValue(30);
@@ -1234,8 +1242,8 @@ void MainWindow::stereoCameraRelease(void) {
                    SLOT(displaySaved(QString)));
         disconnect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
                    SLOT(enableMatching(bool)));
-        //disconnect(ui->enableStereo, SIGNAL(clicked(bool)), this,
-        //        SLOT(enableMatching(bool)));
+        disconnect(ui->enableDetection, SIGNAL(clicked(bool)), this,
+                   SLOT(enableDetection(bool)));
         disconnect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
                    SLOT(enableRectify(bool)));
         disconnect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
@@ -2296,12 +2304,14 @@ void MainWindow::error(int error){
 }
 
 void MainWindow::updatePointTexture(int index){
-    if(index == 0){
-        stereo_cam->setPointCloudTexture(AbstractStereoCamera::POINT_CLOUD_TEXTURE_IMAGE);
-    } else if (index == 1){
-        stereo_cam->setPointCloudTexture(AbstractStereoCamera::POINT_CLOUD_TEXTURE_DEPTH);
-    } else {
-        qDebug() << "Invalid point texture index. MUST be 0: image or 1: depth";
+    if (cameras_connected){
+        if(index == 0){
+            stereo_cam->setPointCloudTexture(AbstractStereoCamera::POINT_CLOUD_TEXTURE_IMAGE);
+        } else if (index == 1){
+            stereo_cam->setPointCloudTexture(AbstractStereoCamera::POINT_CLOUD_TEXTURE_DEPTH);
+        } else {
+            qDebug() << "Invalid point texture index. MUST be 0: image or 1: depth";
+        }
     }
 }
 

@@ -158,11 +158,13 @@ void DetectorOpenCV::postProcessTensorflow(cv::Mat& frame, const std::vector<cv:
             bbox.classid = classId;
             bbox.classname = QString::fromStdString(class_names.at(static_cast<size_t>(bbox.classid)));
 
+            /*
             std::cout << "Found (" << bbox.classid << ") " << bbox.classname.toStdString()
                       << " at" << " (" << bbox.rect.center().x() << ", " << bbox.rect.center().y()
                       << "), conf: " << bbox.confidence
                       << ", size (" << bbox.rect.width() << "x" << bbox.rect.height() << ")"
                       << std::endl;
+            */
 
             filtered_boxes.push_back(bbox);
         }else{
@@ -254,11 +256,13 @@ void DetectorOpenCV::postProcess(cv::Mat& frame, const std::vector<cv::Mat>& out
         box.rect.setBottomRight(bottom_right);
         box.rect.setTopLeft(top_left);
 
+        /*
         std::cout << "Found " << box.classname.toStdString()
                   << " at" << " (" << box.rect.center().x() << ", " << box.rect.center().y()
                   << "), conf: " << box.confidence
                   << ", size (" << box.rect.width() << "x" << box.rect.height() << ")"
                   << std::endl;
+        */
 
         filtered_boxes.push_back(box);
 
