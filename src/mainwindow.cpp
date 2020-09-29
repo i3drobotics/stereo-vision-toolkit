@@ -184,6 +184,7 @@ MainWindow::MainWindow(QWidget* parent)
     pointCloudInit();
     setupMatchers();
     detectionInit();
+    streamerInit();
 
     hideCameraSettings(false);
 
@@ -232,6 +233,7 @@ void MainWindow::disableWindow(){
     ui->matcherSelectBox->setDisabled(true);
     ui->enableStereo->setDisabled(true);
     ui->enableDetection->setDisabled(true);
+    ui->enableStreamer->setDisabled(true);
 
     ui->captureButton->setDisabled(true);
     ui->singleShotButton->setDisabled(true);
@@ -255,6 +257,7 @@ void MainWindow::enableWindow(){
     ui->matcherSelectBox->setEnabled(true);
 
     //ui->enableDetection->setEnabled(true);
+    ui->enableStreamer->setEnabled(true);
     ui->captureButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
     //ui->saveButton->setEnabled(false);
@@ -328,6 +331,7 @@ void MainWindow::controlsInit(void) {
     ui->singleShotButton->setIcon(awesome->icon(fa::camera, icon_options));
     ui->enableStereo->setIcon(awesome->icon(fa::cubes, icon_options));
     ui->enableDetection->setIcon(awesome->icon(fa::eye, icon_options));
+    ui->enableStreamer->setIcon(awesome->icon(fa::wifi, icon_options));
     ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
 
     connect(ui->btnLoadVideo, SIGNAL(clicked(bool)), this,
@@ -367,6 +371,19 @@ void MainWindow::enableDetection(bool enable){
     detection_enabled = enable;
 }
 
+void MainWindow::enableStreamer(bool enable){
+    if (!stereo_cam){
+        streamer_enabled = false;
+        return;
+    }
+    streamer_enabled = enable;
+    if (enable){
+        streamer->startServer();
+    } else {
+        streamer->stopServer();
+    }
+}
+
 void MainWindow::detectionInit(){
     qDebug() << "Initialising detector...";
     QProgressDialog progressPCI("Initialising detection...", "", 0, 100, this);
@@ -388,16 +405,16 @@ void MainWindow::detectionInit(){
     object_detector->setNMSThresholdPercent(ui->nmsThresholdSpinbox->value());
 
     connect(ui->detectionSetupButton, SIGNAL(clicked(bool)), this, SLOT(configureDetection()));
-    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(enableDetection(int)));
+    //connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(enableDetection(int)));
 
     connect(ui->detectionThresholdSlider, SIGNAL(valueChanged(int)), ui->detectionThresholdSpinbox, SLOT(setValue(int)));
     connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), ui->detectionThresholdSlider, SLOT(setValue(int)));
-    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), this, SLOT(setConfidenceThresholdPercent(int)));
+    connect(ui->detectionThresholdSpinbox, SIGNAL(valueChanged(int)), this, SLOT(updateDetectionThreshold(int)));
     ui->detectionThresholdSpinbox->setValue(settings->value("detection_threshold", 75).toInt());
 
     connect(ui->nmsThresholdSlider, SIGNAL(valueChanged(int)), ui->nmsThresholdSpinbox, SLOT(setValue(int)));
     connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), ui->nmsThresholdSlider, SLOT(setValue(int)));
-    connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), this, SLOT(setNMSThresholdPercent(int)));
+    connect(ui->nmsThresholdSpinbox, SIGNAL(valueChanged(int)), this, SLOT(updateNMSThreshold(int)));
     ui->nmsThresholdSpinbox->setValue(settings->value("nms_threshold", 75).toInt());
 
     connect(ui->bboxAlphaSlider, SIGNAL(valueChanged(int)), ui->bboxAlphaSpinbox, SLOT(setValue(int)));
@@ -406,6 +423,14 @@ void MainWindow::detectionInit(){
     ui->bboxAlphaSpinbox->setValue(settings->value("bbox_alpha", 75).toInt());
 
     qDebug() << "Detector initalisation complete.";
+}
+
+void MainWindow::streamerInit(){
+    std::string ip = ui->txtStreamerHostIP->text().toStdString();
+    std::string port = QString::number(ui->spinBoxStreamPort->value()).toStdString();
+    streamer = new Streamer(ip,port);
+    QThread* streamerThread = new QThread;
+    streamer->assignThread(streamerThread);
 }
 
 void MainWindow::configureDetection(){
@@ -504,11 +529,15 @@ void MainWindow::onClassListClicked(void){
         ui->setClassFilledButton->setDisabled(true);
         ui->setClassVisibleButton->setDisabled(true);
         ui->setClassColourButton->setDisabled(true);
+        ui->bboxAlphaSlider->setDisabled(true);
+        ui->bboxAlphaSpinbox->setDisabled(true);
         ui->classColourLabel->setVisible(false);
     }else{
         ui->setClassFilledButton->setEnabled(true);
         ui->setClassVisibleButton->setEnabled(true);
         ui->setClassColourButton->setEnabled(true);
+        ui->bboxAlphaSlider->setEnabled(true);
+        ui->bboxAlphaSpinbox->setEnabled(true);
         ui->classColourLabel->setVisible(true);
 
         QString class_name = ui->classListWidget->currentItem()->text();
@@ -604,6 +633,26 @@ void MainWindow::setClassFilled(QString class_name, bool fill){
 
     if(fill)
         qDebug() << "Setting " << class_name << " class to be filled";
+}
+
+void MainWindow::updateStreamer(){
+    if (this->streaming)
+        return;
+
+    this->streaming = true;
+
+    // Select image source
+    stereo_cam->getLeftImage(image_stream);
+
+    if (streamer_enabled){
+        if(image_stream.empty()){
+            qDebug() << "Empty image passed to streamer";
+            return;
+        }
+
+        //TODO do streaming
+    }
+    this->streaming = false;
 }
 
 void MainWindow::updateDetection(){
@@ -1112,6 +1161,8 @@ void MainWindow::stereoCameraInitConnections(void) {
             SLOT(enableMatching(bool)));
     connect(ui->enableDetection, SIGNAL(clicked(bool)), this,
             SLOT(enableDetection(bool)));
+    connect(ui->enableStreamer, SIGNAL(clicked(bool)), this,
+            SLOT(enableStreamer(bool)));
     connect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
             SLOT(enableRectify(bool)));
     connect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
@@ -1141,6 +1192,7 @@ void MainWindow::stereoCameraInitConnections(void) {
 
     /* Detection */
     connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDetection()));
+    connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
 
     updatePointTexture(ui->comboBoxPointTexture->currentIndex());
 
@@ -1170,6 +1222,7 @@ void MainWindow::stereoCameraRelease(void) {
 
     ui->enableStereo->setChecked(false);
     ui->enableDetection->setChecked(false);
+    ui->enableStreamer->setChecked(false);
     ui->captureButton->setChecked(false);
     ui->singleShotButton->setChecked(false);
     ui->toggleVideoButton->setChecked(false);
@@ -1203,6 +1256,7 @@ void MainWindow::stereoCameraRelease(void) {
         enableRectify(false);
         stereo_cam->enableMatching(false);
         this->enableDetection(false);
+        this->enableStreamer(false);
 
         progressClose.setLabelText("Closing camera connections...");
         progressClose.setValue(30);
@@ -1244,6 +1298,8 @@ void MainWindow::stereoCameraRelease(void) {
                    SLOT(enableMatching(bool)));
         disconnect(ui->enableDetection, SIGNAL(clicked(bool)), this,
                    SLOT(enableDetection(bool)));
+        disconnect(ui->enableStreamer, SIGNAL(clicked(bool)), this,
+                   SLOT(enableStreamer(bool)));
         disconnect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
                    SLOT(enableRectify(bool)));
         disconnect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,

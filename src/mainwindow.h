@@ -55,8 +55,9 @@
 #include "stereocalibrate.h"
 #include "cameradisplaywidget.h"
 
-#include "detection/detectoropencv.h"
-#include "detection/detectorsetupdialog.h"
+#include "detectoropencv.h"
+#include "detectorsetupdialog.h"
+#include "streamer.h"
 
 #include "paramfile.h"
 #ifdef WITH_FERVOR
@@ -179,9 +180,13 @@ private:
     Pylon::CTlFactory* pylonTlFactory;
 
     DetectorOpenCV* object_detector;
+    Streamer* streamer;
     bool detection_enabled = false;
+    bool streamer_enabled = false;
     bool detecting = false;
+    bool streaming = false;
     cv::Mat image_detection;
+    cv::Mat image_stream;
     cv::Mat image_detection_rescale;
     QMap<QString, QColor> class_colour_map;
     QMap<QString, bool> class_visible_map;
@@ -282,8 +287,11 @@ public slots:
     void pointCloudSaveStatus(QString);
 
     void updateDetection(void);
+    void updateStreamer(void);
     void enableDetection(bool);
+    void enableStreamer(bool);
     void configureDetection(void);
+    void streamerInit(void);
     void drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x, double scale_y);
     void setClassColour(QString class_name, QColor class_colour);
     void setClassVisible(QString class_name, bool visible);
