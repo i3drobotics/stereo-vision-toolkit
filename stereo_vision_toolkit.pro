@@ -52,6 +52,8 @@ DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
+DEFINES += _WINSOCKAPI_
+
 # To use I3DRSGM
 # add 'CONFIG+=WITH_I3DRSGM' to build arguments
 WITH_I3DRSGM {
@@ -93,6 +95,8 @@ VPATH += $$_PRO_FILE_PWD_/src/camera/widgets
 VPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 VPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 VPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
+VPATH += $$_PRO_FILE_PWD_/src/detection
+VPATH += $$_PRO_FILE_PWD_/src/streamer
 INCLUDEPATH += $$_PRO_FILE_PWD_/src
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher
@@ -101,6 +105,8 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/streamer
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/detection
 
 WITH_VIMBA {
     VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
@@ -115,8 +121,9 @@ SOURCES += \
     aboutdialog.cpp \
     calibrationdialog.cpp \
     abstractarduinocoms.cpp \
-    detection/detectoropencv.cpp \
-    detection/detectorsetupdialog.cpp \
+    detectoropencv.cpp \
+    detectorsetupdialog.cpp \
+    streamer.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -138,7 +145,10 @@ SOURCES += \
     paramfile.cpp \
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp \
-    virtualcam.cpp
+    virtualcam.cpp \
+    base64.cpp \
+    image2string.cpp \
+    sha1.cpp
 # Deimos source file is windows only for directshow
 win32 {
     SOURCES += stereocameradeimos.cpp
@@ -167,9 +177,10 @@ HEADERS += \
     cvsupport.h \
     pclsupport.h \
     pylonsupport.h \
-    detection/boundingbox.h \
-    detection/detectoropencv.h \
-    detection/detectorsetupdialog.h \
+    boundingbox.h \
+    detectoropencv.h \
+    detectorsetupdialog.h \
+    streamer.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -192,7 +203,10 @@ HEADERS += \
     paramfile.h \
     cameradisplaywidget.h \
     cameraimagingsource.h \
-    virtualcam.h
+    virtualcam.h \
+    base64.h \
+    image2string.h \
+    sha1.h
 # Deimos header file is windows only for directshow
 win32 {
     HEADERS += stereocameradeimos.h
@@ -220,8 +234,8 @@ FORMS += \
     matcherwidgetopencvsgbm.ui \
     disparityviewer.ui \
     cameradisplaywidget.ui \
-    src/aboutdialog.ui \
-    src/detection/detectorsetupdialog.ui
+    aboutdialog.ui \
+    detectorsetupdialog.ui
 # Optional I3DRSGM window form
 WITH_I3DRSGM {
     FORMS += matcherwidgeti3drsgm.ui
