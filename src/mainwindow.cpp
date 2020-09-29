@@ -2382,11 +2382,12 @@ void MainWindow::closeEvent(QCloseEvent *) {
 #ifdef WITH_VIMBA
     // Close the Vimba API here.
     VimbaSystem &system = VimbaSystem::GetInstance();
+    qDebug() << "Shutting down VIMBA...";
     system.Shutdown();
-    qDebug() << "Shutting down VIMBA";
 #endif
 
     // Close external windows
+    qDebug() << "Closing external windows...";
     about_dialog->close();
     if (calibration_dialog_used){
         calibration_dialog->close();
@@ -2394,11 +2395,22 @@ void MainWindow::closeEvent(QCloseEvent *) {
     if (calibration_from_images_dialog_used){
         calibration_images_dialog->close();
     }
-    qDebug() << "Closing processes...";
+
+    qDebug() << "Shutting down Pylon...";
+    Pylon::PylonTerminate();
+
+    qDebug() << "Removing TIS grabber...";
+    delete(tisgrabber);
+
+    qDebug() << "Close event complete.";
 }
 
 MainWindow::~MainWindow() {
-    qDebug() << "Shutting down Pylon";
-    Pylon::PylonTerminate();
+    qDebug() << "Cleaning up threads...";
+    delete(streamer);
+    delete(object_detector);
+    delete(cam_thread);
+    qDebug() << "Closing ui...";
     delete ui;
+    QApplication::quit();
 }
