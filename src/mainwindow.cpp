@@ -661,7 +661,7 @@ void MainWindow::updateDetection(){
         if(image_detection.channels() == 1){
             cv::cvtColor(image_detection, image_detection, cv::COLOR_GRAY2RGBA);
         }else if(image_detection.channels() == 3){
-            cv::cvtColor(image_detection, image_detection, cv::COLOR_RGB2RGBA);
+            cv::cvtColor(image_detection, image_detection, cv::COLOR_BGR2RGBA); //Assumes image from camera is BGR
         }
         drawBoundingBoxes(image_detection, results, 1./scale_factor_x, 1./scale_factor_y);
 
