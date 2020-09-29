@@ -282,7 +282,7 @@ public slots:
     void pointCloudSaveStatus(QString);
 
     void updateDetection(void);
-    void enableDetection(int);
+    void enableDetection(bool);
     void configureDetection(void);
     void drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x, double scale_y);
     void setClassColour(QString class_name, QColor class_colour);
