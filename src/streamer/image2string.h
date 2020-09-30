@@ -5,9 +5,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-using namespace cv;
-
 #ifndef IMAGE2STRING_H_
 #define IMAGE2STRING_H_
 
@@ -26,21 +23,21 @@ public:
 	 * @param imageBase64, imagem em base64
 	 * @return imagem em cv::Mat
 	 */
-	cv::Mat str2mat(const string& imageBase64);
+    static cv::Mat str2mat(const std::string& imageBase64);
 	
 	/**
 	 * Método que converte uma cv::Mat numa imagem em base64
 	 * @param img, imagem em cv::Mat
 	 * @return imagem em base64
 	 */
-	string mat2str(const Mat& img);
+    static std::string mat2str(const cv::Mat& img, int quality);
 
     virtual ~Image2String();
 
 private:
-	std::string base64_encode(uchar const* bytesToEncode, unsigned int inLen);
+    static std::string base64_encode(uchar const* bytesToEncode, unsigned int inLen);
 
-	std::string base64_decode(std::string const& encodedString);
+    static std::string base64_decode(std::string const& encodedString);
 
 };
 

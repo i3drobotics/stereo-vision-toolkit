@@ -123,29 +123,31 @@ std::string Image2String::base64_decode(std::string const& encoded_string)
 	return ret;
 }
 
-string Image2String::mat2str(const Mat& m)
+std::string Image2String::mat2str(const cv::Mat& m, int quality=100)
 {
 	int params[3] = {0};
-    params[0] = IMWRITE_JPEG_QUALITY;
-	params[1] = 100;
+    params[0] = cv::IMWRITE_JPEG_QUALITY;
+    params[1] = quality;
+    //params[0] = cv::IMWRITE_PNG_COMPRESSION;
+    //params[1] = quality;
 
-	vector<uchar> buf;
-	bool code = cv::imencode(".jpg", m, buf, std::vector<int>(params, params+2));
+    std::vector<uchar> buf;
+    bool code = cv::imencode(".jpg", m, buf, std::vector<int>(params, params+2));
+    //bool code = cv::imencode(".png", m, buf, std::vector<int>(params, params+2));
 	uchar* result = reinterpret_cast<uchar*> (&buf[0]);
 
 	return base64_encode(result, buf.size());
-
 }
 
 
 
-Mat Image2String::str2mat(const string& s)
+cv::Mat Image2String::str2mat(const std::string& s)
 {
 	// Decode data
-	string decoded_string = base64_decode(s);
-	vector<uchar> data(decoded_string.begin(), decoded_string.end());
+    std::string decoded_string = base64_decode(s);
+    std::vector<uchar> data(decoded_string.begin(), decoded_string.end());
 
-	cv::Mat img = imdecode(data, IMREAD_UNCHANGED);
+    cv::Mat img = imdecode(data, cv::IMREAD_UNCHANGED);
 	return img;
 }
 
