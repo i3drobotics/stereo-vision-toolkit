@@ -379,7 +379,9 @@ void MainWindow::enableStreamer(bool enable){
     streamer_enabled = enable;
     if (enable){
         streamer->startServer();
+        mClient = streamer->startClient();
     } else {
+        streamer->stopClient(mClient);
         streamer->stopServer();
     }
 }
@@ -636,6 +638,8 @@ void MainWindow::setClassFilled(QString class_name, bool fill){
 }
 
 void MainWindow::updateStreamer(){
+    if(!streamer) return;
+
     if (this->streaming)
         return;
 
@@ -649,8 +653,13 @@ void MainWindow::updateStreamer(){
             qDebug() << "Empty image passed to streamer";
             return;
         }
-
-        //TODO do streaming
+        if (mClient.id == -1 || mClient.socket == INVALID_SOCKET){
+            mClient = streamer->startClient();
+        } else {
+            //TODO do streaming
+            //streamer->clientSendMessage(mClient,"test");
+            streamer->clientSendImageThreaded(mClient,image_stream);
+        }
     }
     this->streaming = false;
 }
@@ -2407,9 +2416,12 @@ void MainWindow::closeEvent(QCloseEvent *) {
 
 MainWindow::~MainWindow() {
     qDebug() << "Cleaning up threads...";
-    delete(streamer);
-    delete(object_detector);
-    delete(cam_thread);
+    if (streamer)
+        delete(streamer);
+    if (object_detector)
+        delete(object_detector);
+    if (cam_thread)
+        delete(cam_thread);
     qDebug() << "Closing ui...";
     delete ui;
     QApplication::quit();

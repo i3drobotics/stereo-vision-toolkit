@@ -181,6 +181,7 @@ private:
 
     DetectorOpenCV* object_detector;
     Streamer* streamer;
+    Streamer::client_type mClient;
     bool detection_enabled = false;
     bool streamer_enabled = false;
     bool detecting = false;
