@@ -30,7 +30,9 @@ public:
 	 * @param img, imagem em cv::Mat
 	 * @return imagem em base64
 	 */
-    static std::string mat2str(const cv::Mat& img, int quality);
+    static std::string ucharMat2str(const cv::Mat& img, int quality);
+
+    static std::string floatMat2str(const cv::Mat& img, int quality);
 
     virtual ~Image2String();
 

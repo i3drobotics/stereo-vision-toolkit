@@ -123,7 +123,7 @@ std::string Image2String::base64_decode(std::string const& encoded_string)
 	return ret;
 }
 
-std::string Image2String::mat2str(const cv::Mat& m, int quality=100)
+std::string Image2String::ucharMat2str(const cv::Mat& m, int quality=100)
 {
 	int params[3] = {0};
     params[0] = cv::IMWRITE_JPEG_QUALITY;
@@ -139,7 +139,21 @@ std::string Image2String::mat2str(const cv::Mat& m, int quality=100)
 	return base64_encode(result, buf.size());
 }
 
+std::string Image2String::floatMat2str(const cv::Mat& m, int quality=100)
+{
+    int params[3] = {0};
+    //params[0] = cv::IMWRITE_JPEG_QUALITY;
+    //params[1] = quality;
+    //params[0] = cv::IMWRITE_PNG_COMPRESSION;
+    //params[1] = quality;
 
+    std::vector<uchar> buf;
+    bool code = cv::imencode(".tiff", m, buf);
+    //bool code = cv::imencode(".png", m, buf, std::vector<int>(params, params+2));
+    uchar* result = reinterpret_cast<uchar*> (&buf[0]);
+
+    return base64_encode(result, buf.size());
+}
 
 cv::Mat Image2String::str2mat(const std::string& s)
 {

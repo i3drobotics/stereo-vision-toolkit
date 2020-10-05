@@ -181,13 +181,15 @@ private:
 
     DetectorOpenCV* object_detector;
     Streamer* streamer;
-    Streamer::client_type mClient;
+    Streamer::client_type mImageClient;
+    Streamer::client_type mDispClient;
     bool detection_enabled = false;
     bool streamer_enabled = false;
     bool detecting = false;
     bool streaming = false;
     cv::Mat image_detection;
     cv::Mat image_stream;
+    cv::Mat disparity_stream;
     cv::Mat image_detection_rescale;
     QMap<QString, QColor> class_colour_map;
     QMap<QString, bool> class_visible_map;
