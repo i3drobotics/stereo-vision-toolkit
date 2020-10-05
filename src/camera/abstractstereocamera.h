@@ -313,7 +313,7 @@ signals:
     void savedImage();
 
     //! Emitted when an image has been saved, including the filename
-    void savedImage(QString filename);
+    void savedImage(bool success);
 
     //! Emmitted when point cloud is saved
     void pointCloudSaveStatus(QString);
@@ -396,6 +396,9 @@ public slots:
     /*! @return Return sucess or failer of changing the setting
      * This is a virtual function which should be implmented by a particular camera driver */
     virtual bool setPacketSize(int) = 0;
+
+    void setFileSaveDirectory(QString path){file_save_directory = path;};
+    QString getFileSaveDirectory(){return file_save_directory;};
 
     bool startCapture(){return enableCapture(true);};
     bool stopCapture(){return enableCapture(false);};
@@ -635,7 +638,8 @@ private:
 
     int video_fps = 0;
     int video_codec = cv::VideoWriter::fourcc('H', '2', '6', '4');
-    bool video_is_color = false;
+    //int video_codec = cv::VideoWriter::fourcc('H', 'E', 'V', 'C');
+    bool video_is_color = true;
     std::string video_filename = "";
     cv::Mat video_frame;
 

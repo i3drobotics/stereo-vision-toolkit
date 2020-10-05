@@ -146,7 +146,7 @@ bool Streamer::clientSendMessagePacket(client_type client, std::string message){
         qDebug() << "Unable to send message as it will overflow the stream buffer";
         return false;
     } else {
-        int iResult = send(client.socket, message.c_str(), strlen(message.c_str()), 0);
+        int iResult = send(client.socket, message.c_str(), (int)strlen(message.c_str()), 0);
         if (iResult <= 0)
         {
             qDebug() << "send() failed: " << WSAGetLastError();
@@ -160,22 +160,22 @@ bool Streamer::clientSendMessagePacket(client_type client, std::string message){
 bool Streamer::clientSendMessage(client_type client, std::string message){
     // add end of message token to end of string
     std::string msg = message + eom_token_;
-    int total_size = msg.size();
+    size_t total_size = msg.size();
     if (total_size < max_buffer_length_){
         return clientSendMessagePacket(client, msg);
     } else {
         bool success = true;
         //split message into packets
         float num_of_packets_f = (float)total_size / (float)max_buffer_length_;
-        int num_of_packets_i = ceil(num_of_packets_f);
-        for (int i = 0; i < num_of_packets_i; i++){
-            int start_index = i*max_buffer_length_;
-            int packet_length = max_buffer_length_;
+        size_t num_of_packets_i = ceil(num_of_packets_f);
+        for (size_t i = 0; i < num_of_packets_i; i++){
+            size_t start_index = i*max_buffer_length_;
+            size_t packet_length = max_buffer_length_;
             if ((start_index + max_buffer_length_) > msg.size()){
                 packet_length = msg.size() - start_index;
             }
             std::string msg_packet = msg.substr(start_index, packet_length);
-            success += clientSendMessagePacket(client, msg_packet);
+            success &= clientSendMessagePacket(client, msg_packet);
         }
         return success;
     }
@@ -294,9 +294,13 @@ int Streamer::process_client(client_type &new_client, std::vector<client_type> &
                 //Broadcast that message to the other clients
                 for (int i = 0; i < max_clients_; i++)
                 {
-                    if (client_array[i].socket != INVALID_SOCKET)
-                        if (new_client.id != i)
-                            iResult = send(client_array[i].socket, msg.c_str(), strlen(msg.c_str()), 0);
+                    if (client_array[i].socket != INVALID_SOCKET){
+                        if (new_client.id != i){
+                            send(client_array[i].socket, msg.c_str(), (int)strlen(msg.c_str()), 0);
+                            //TODO check result of send to make sure it was successful
+                            //iResult = send(client_array[i].socket, msg.c_str(), (int)strlen(msg.c_str()), 0);
+                        }
+                    }
                 }
             }
             else
@@ -313,8 +317,11 @@ int Streamer::process_client(client_type &new_client, std::vector<client_type> &
                 //Broadcast the disconnection message to the other clients
                 for (int i = 0; i < max_clients_; i++)
                 {
-                    if (client_array[i].socket != INVALID_SOCKET)
-                        iResult = send(client_array[i].socket, msg.c_str(), strlen(msg.c_str()), 0);
+                    if (client_array[i].socket != INVALID_SOCKET){
+                        send(client_array[i].socket, msg.c_str(), (int)strlen(msg.c_str()), 0);
+                        //TODO check result of send to make sure it was successful
+                        //iResult = send(client_array[i].socket, msg.c_str(), (int)strlen(msg.c_str()), 0);
+                    }
                 }
 
                 break;
@@ -337,7 +344,7 @@ void Streamer::serverCycle(){
         num_clients_ = -1;
 
         //Create a temporary id for the next client
-        temp_id_ = -1;
+        int temp_id_ = -1;
         for (int i = 0; i < max_clients_; i++)
         {
             if (client_[i].socket == INVALID_SOCKET && temp_id_ == -1)
@@ -359,7 +366,7 @@ void Streamer::serverCycle(){
             qDebug() << "Client #" << client_[temp_id_].id << " Accepted";
             //std::cout << "Client #" << client_[temp_id_].id << " Accepted" << std::endl;
             msg = std::to_string(client_[temp_id_].id);
-            send(client_[temp_id_].socket, msg.c_str(), strlen(msg.c_str()), 0);
+            send(client_[temp_id_].socket, msg.c_str(), (int)strlen(msg.c_str()), 0);
 
             //Create a thread process for that client
             clientThread_[temp_id_] = std::thread(&Streamer::process_client, std::ref(client_[temp_id_]), std::ref(client_), std::ref(clientThread_[temp_id_]));
@@ -367,7 +374,7 @@ void Streamer::serverCycle(){
         else
         {
             msg = "Server is full";
-            send(incoming, msg.c_str(), strlen(msg.c_str()), 0);
+            send(incoming, msg.c_str(), (int)strlen(msg.c_str()), 0);
             qDebug() << msg.c_str();
             //std::cout << msg << std::endl;
         }

@@ -92,8 +92,8 @@ void CameraImagingSource::showProperties() { handle.showVCDPropertyPage(0, ""); 
 void CameraImagingSource::setVideoFormat(int width, int height) {
 
   QString format_string = QString("Y800 (%1x%2)o")
-                              .arg(QString::number(width))
-                              .arg(QString::number(height));
+                              .arg(QString::number(width),
+                                   QString::number(height));
   if (!handle.setVideoFormat(format_string.toStdString())) {
     debugMessage("Failed to set 8-bit video format");
   }
@@ -108,8 +108,8 @@ void CameraImagingSource::setFrameRateIndex(int index) {
 
 void CameraImagingSource::setVideoFormat16(int width, int height) {
   QString format_string = QString("Y16 (%1x%2)")
-                              .arg(QString::number(width))
-                              .arg(QString::number(height));
+                              .arg(QString::number(width),
+                                   QString::number(height));
 
   if (!handle.setVideoFormat(format_string.toStdString())) {
     debugMessage("Failed to set 16-bit video format");

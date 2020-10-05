@@ -36,7 +36,7 @@ bool CameraVimba::initCamera(std::string camera_serial,int binning, bool trigger
     system.GetCameras(cameras);
 
     bool cameraFind = false;
-    for (CameraPtr trial_camera : cameras){
+    for (const CameraPtr &trial_camera : cameras){
         std::string serial;
         trial_camera->GetSerialNumber(serial);
 
@@ -420,7 +420,7 @@ bool CameraVimba::setBinning(int binning)
 bool CameraVimba::setExposure(double exposure)
 {
     FeaturePtr feature;
-    int fps = static_cast<int>(getFPS());
+    //int fps = static_cast<int>(getFPS());
     camera.get()->GetFeatureByName("ExposureTime", feature);
     double exposure_scaled = exposure * 1000;
     qDebug() << "Setting exposure to: " << exposure_scaled;
@@ -527,7 +527,7 @@ bool CameraVimba::capture(void)
                 {
                     if (    ( ePixelFormat != VmbPixelFormatMono8 ))
                     {
-                        capture_err = VmbErrorInvalidValue;
+                        //capture_err = VmbErrorInvalidValue;
                         qDebug() << "Invalid pixel format";
                         res = false;
                     }

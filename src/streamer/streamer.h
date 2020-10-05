@@ -7,7 +7,7 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 #include "image2string.h"
 
@@ -18,8 +18,6 @@
 #include <QtConcurrent>
 
 #pragma comment (lib, "Ws2_32.lib")
-
-#define STREAMER_MAX_CLIENTS 5
 
 class Streamer  : public QObject {
     Q_OBJECT
@@ -41,14 +39,14 @@ public slots:
     void startServer();
     void stopServer();
 
-    client_type startClient();
-    bool stopClient(client_type id);
+    Streamer::client_type startClient();
+    bool stopClient(Streamer::client_type id);
 
-    static bool clientSendMessage(client_type id, std::string msg);
-    static bool clientSendUCharImage(client_type client, cv::Mat image);
-    static bool clientSendFloatImage(client_type client, cv::Mat image);
-    bool clientSendUCharImageThreaded(client_type id, cv::Mat image);
-    bool clientSendFloatImageThreaded(client_type id, cv::Mat image);
+    static bool clientSendMessage(Streamer::client_type id, std::string msg);
+    static bool clientSendUCharImage(Streamer::client_type client, cv::Mat image);
+    static bool clientSendFloatImage(Streamer::client_type client, cv::Mat image);
+    bool clientSendUCharImageThreaded(Streamer::client_type id, cv::Mat image);
+    bool clientSendFloatImageThreaded(Streamer::client_type id, cv::Mat image);
 
 private slots:
     void serverCycleThreaded();
@@ -60,25 +58,24 @@ private:
 
     bool sendingMessage = false;
 
-    static const int max_clients_ = STREAMER_MAX_CLIENTS;
-    static const int max_buffer_length_ = 65535;
+    static const int max_clients_ = 5;
+    static const size_t max_buffer_length_ = 65535;
 
     static const char eom_token_ = '\n';
 
     char option_value_ = 1;
     int num_clients_ = 0;
-    int temp_id_ = -1;
 
     QFuture<void> *qfuture_serverCycle = nullptr;
     std::vector<QFuture<bool>*> qfuture_clientSendThreaded;
 
     SOCKET server_socket_;
-    std::vector<client_type> client_;
-    std::thread clientThread_[STREAMER_MAX_CLIENTS];
+    std::vector<Streamer::client_type> client_;
+    std::thread clientThread_[max_clients_];
     QThread* thread_;
 
-    static int process_client(client_type &new_client, std::vector<client_type> &client_array, std::thread &thread);
-    static bool clientSendMessagePacket(client_type id, std::string msg);
+    static int process_client(Streamer::client_type &new_client, std::vector<Streamer::client_type> &client_array, std::thread &thread);
+    static bool clientSendMessagePacket(Streamer::client_type id, std::string msg);
 
 signals:
     void finished();

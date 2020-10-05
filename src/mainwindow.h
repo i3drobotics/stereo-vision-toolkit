@@ -6,7 +6,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-//#define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+
+#include "cmath"
+#include "streamer.h" //defined first to avoid '_WINSOCKAPI_ macro redefinition' errors
 
 #include <QtAwesome.h>
 #include <QDebug>
@@ -57,14 +60,11 @@
 
 #include "detectoropencv.h"
 #include "detectorsetupdialog.h"
-#include "streamer.h"
 
 #include "paramfile.h"
 #ifdef WITH_FERVOR
 #include "fvupdater.h"
 #endif
-
-#include "math.h"
 
 using namespace std;
 using namespace cv;
@@ -223,7 +223,7 @@ public slots:
     void enableCapture(bool);
     void singleShotClicked(void);
     void saveSingle(void);
-    void displaySaved(QString fname);
+    void displaySaved(bool success);
     void statusMessageTimeout(void);
     void setMatcher(int matcher);
     void updatePointTexture(int index); // 0 = image, 1 = depth

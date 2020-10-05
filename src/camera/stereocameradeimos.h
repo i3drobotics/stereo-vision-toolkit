@@ -11,7 +11,8 @@
 // Correct for math.h warnings
 #define NOMINMAX
 //#define _USE_MATH_DEFINES
-#define _MATH_DEFINES_DEFINED
+//#define _MATH_DEFINES_DEFINED
+#define _WINSOCKAPI_
 #include <windows.h>
 #include <dshow.h>
 #include <hidapi/hidapi.h>

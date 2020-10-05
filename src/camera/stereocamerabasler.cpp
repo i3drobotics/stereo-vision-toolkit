@@ -404,6 +404,7 @@ bool StereoCameraBasler::setFPS(int val){
             return false;
         }
     }
+    return false;
 }
 
 bool StereoCameraBasler::enableFPS(bool enable){
