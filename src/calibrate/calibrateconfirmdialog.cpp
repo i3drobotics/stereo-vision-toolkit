@@ -22,8 +22,8 @@ void CalibrateConfirmDialog::updateLeft(const cv::Mat &camera_matrix, const cv::
    double cx = camera_matrix.at<double>(0, 2);
    double cy = camera_matrix.at<double>(1, 2);
 
-   ui->left_focal->setText(QString("%1 %2 px").arg(QString::number(focal_x, 'f', 2)).arg(QString::number(focal_y, 'f', 2)));
-   ui->left_principle->setText(QString("%1 %2 px").arg(QString::number(cx, 'f', 2)).arg(QString::number(cy, 'f', 2)));
+   ui->left_focal->setText(QString("%1 %2 px").arg(QString::number(focal_x, 'f', 2),QString::number(focal_y, 'f', 2)));
+   ui->left_principle->setText(QString("%1 %2 px").arg(QString::number(cx, 'f', 2),QString::number(cy, 'f', 2)));
 
    QString distortion_label;
 
@@ -45,8 +45,8 @@ void CalibrateConfirmDialog::updateRight(const cv::Mat &camera_matrix, const cv:
     double cx = camera_matrix.at<double>(0, 2);
     double cy = camera_matrix.at<double>(1, 2);
 
-   ui->right_focal->setText(QString("%1 %2 px").arg(QString::number(focal_x, 'f', 2)).arg(QString::number(focal_y, 'f', 2)));
-   ui->right_principle->setText(QString("%1 %2 px").arg(QString::number(cx, 'f', 2)).arg(QString::number(cy, 'f', 2)));
+   ui->right_focal->setText(QString("%1 %2 px").arg(QString::number(focal_x, 'f', 2),QString::number(focal_y, 'f', 2)));
+   ui->right_principle->setText(QString("%1 %2 px").arg(QString::number(cx, 'f', 2),QString::number(cy, 'f', 2)));
 
    QString distortion_label;
 
@@ -68,7 +68,7 @@ void CalibrateConfirmDialog::updateStereo(const cv::Mat Q, const double &rms) {
    double baseline = -1.0/-Q.at<double>(3,2);
 
    ui->stereo_focal->setText(QString::number(Q.at<double>(2,3), 'f', 2));
-   ui->stereo_principle->setText(QString("%1 %2 px").arg(cx).arg(cy));
+   ui->stereo_principle->setText(QString("%1 %2 px").arg(cx,cy));
    ui->stereo_baseline->setText(QString("%1 mm").arg(QString::number(1000*baseline, 'f', 2)));
    ui->stereo_rms->setText(QString("%1 px").arg(QString::number(rms, 'f', 3)));
 

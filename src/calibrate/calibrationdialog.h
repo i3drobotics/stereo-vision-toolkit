@@ -6,7 +6,7 @@
 #ifndef CALIBRATIONDIALOG_H
 #define CALIBRATIONDIALOG_H
 
-#include <math.h>
+#include <cmath>
 #include <QDialog>
 #include <QFileDialog>
 #include <QSettings>

@@ -483,7 +483,7 @@ bool StereoCameraOpenCV::send_hid(hid_device* cam_device, std::vector<unsigned c
     if (cam_device == NULL) return false;
 
     std::vector<unsigned char> commands;
-    for (int i = 0; i < command_len; i++) {
+    for (size_t i = 0; i < command_len; i++) {
         commands.push_back(buffer[i + 1]);
     }
 
@@ -500,7 +500,7 @@ bool StereoCameraOpenCV::send_hid(hid_device* cam_device, std::vector<unsigned c
         qDebug() << "Failed to read HID data";
         return false;
     } else {
-        for (int i = 0; i < command_len; i++) {
+        for (size_t i = 0; i < command_len; i++) {
             if (commands[i] != buffer[i]) return false;
         }
     }

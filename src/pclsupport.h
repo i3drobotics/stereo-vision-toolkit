@@ -32,9 +32,9 @@ public:
         // By default the disparity maps are scaled by a factor of 16.0
         disparity_downscale /= 16.0;
 
-        int row = (disparity_downscale.rows-1)/2;
-        int column = (disparity_downscale.cols-1)/2;
-        float disp_val_f =  disparity_downscale.at<float>(row, column);
+        //int row = (disparity_downscale.rows-1)/2;
+        //int column = (disparity_downscale.cols-1)/2;
+        //float disp_val_f =  disparity_downscale.at<float>(row, column);
 
         if (Q.empty() || disparity_downscale.empty()) {
             //qDebug() << "Q or disparity map is empty";

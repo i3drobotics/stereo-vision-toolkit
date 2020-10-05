@@ -1203,8 +1203,8 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(ui->saveButton, SIGNAL(clicked()), stereo_cam, SLOT(saveImageTimestamped()));
     connect(stereo_cam, SIGNAL(first_image_ready(bool)), ui->saveButton, SLOT(setEnabled(bool)));
     connect(disparity_view, SIGNAL(disparitySaveCheckChanged(bool)), stereo_cam, SLOT(enableSaveDisparity(bool)));
-    connect(stereo_cam, SIGNAL(savedImage(QString)), this,
-            SLOT(displaySaved(QString)));
+    connect(stereo_cam, SIGNAL(savedImage(bool)), this,
+            SLOT(displaySaved(bool)));
     connect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
             SLOT(enableMatching(bool)));
     connect(ui->enableDetection, SIGNAL(clicked(bool)), this,
@@ -1339,8 +1339,8 @@ void MainWindow::stereoCameraRelease(void) {
         disconnect(ui->saveButton, SIGNAL(clicked()), stereo_cam,
                    SLOT(saveImageTimestamped()));
         disconnect(disparity_view, SIGNAL(disparitySaveCheckChanged(bool)), stereo_cam, SLOT(enableSaveDisparity(bool)));
-        disconnect(stereo_cam, SIGNAL(savedImage(QString)), this,
-                   SLOT(displaySaved(QString)));
+        disconnect(stereo_cam, SIGNAL(savedImage(bool)), this,
+                   SLOT(displaySaved(bool)));
         disconnect(ui->enableStereo, SIGNAL(clicked(bool)), stereo_cam,
                    SLOT(enableMatching(bool)));
         disconnect(ui->enableDetection, SIGNAL(clicked(bool)), this,
@@ -2088,8 +2088,14 @@ void MainWindow::enableCapture(bool enable) {
    }
 }
 
-void MainWindow::displaySaved(QString fname) {
-    ui->statusBar->showMessage(QString("Saved to: %1").arg(fname));
+void MainWindow::displaySaved(bool success) {
+    QString msg;
+    if (success){
+        msg = QString("Saved to: %1").arg(stereo_cam->getFileSaveDirectory());
+    } else {
+        msg = QString("Failed to save: %1").arg(stereo_cam->getFileSaveDirectory());
+    }
+    ui->statusBar->showMessage(msg);
     status_bar_timer->setSingleShot(true);
     status_bar_timer->start(1500);
 }

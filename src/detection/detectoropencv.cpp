@@ -332,12 +332,14 @@ std::vector<BoundingBox> DetectorOpenCV::inferTensorflow(cv::Mat image){
             mean = cv::Scalar(0);
         }
 
+        /*
         // Check for 16-bit
         double scale_factor = 1/255.0;
 
         if(image.elemSize() == 2){
             scale_factor = 1/65535.0;
         }
+        */
 
         auto input_size = cv::Size(image.cols, image.rows);
 

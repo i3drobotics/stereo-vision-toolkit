@@ -49,7 +49,7 @@ DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
-DEFINES += _WINSOCKAPI_
+#DEFINES += _WINSOCKAPI_
 
 # To use I3DRSGM
 # add 'CONFIG+=WITH_I3DRSGM' to build arguments
@@ -143,9 +143,7 @@ SOURCES += \
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp \
     virtualcam.cpp \
-    base64.cpp \
-    image2string.cpp \
-    sha1.cpp
+    image2string.cpp
 # Deimos source file is windows only for directshow
 win32 {
     SOURCES += stereocameradeimos.cpp
@@ -201,9 +199,7 @@ HEADERS += \
     cameradisplaywidget.h \
     cameraimagingsource.h \
     virtualcam.h \
-    base64.h \
-    image2string.h \
-    sha1.h
+    image2string.h
 # Deimos header file is windows only for directshow
 win32 {
     HEADERS += stereocameradeimos.h
@@ -356,6 +352,7 @@ win32 {
         $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
         $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
         $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll \
+        $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/openh264-1.8.0-win64.dll \
         $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
 
     CONFIG( debug, debug|release ) {

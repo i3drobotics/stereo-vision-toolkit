@@ -205,8 +205,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>310</width>
-                    <height>193</height>
+                    <width>314</width>
+                    <height>225</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -2146,6 +2146,12 @@
           <height>40</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::TabFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Streamer</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -2216,7 +2222,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -41,6 +41,10 @@ private:
 
     static std::string base64_decode(std::string const& encodedString);
 
+    static inline bool is_base64(unsigned char c);
+
+    static const std::string base64_chars;
+
 };
 
 #endif /* CONVERTIMAGE_H_ */

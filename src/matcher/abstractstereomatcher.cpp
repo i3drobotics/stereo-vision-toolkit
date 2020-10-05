@@ -86,6 +86,7 @@ void AbstractStereoMatcher::saveDisparityColormap(QString filename) {
 }
 
 void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
+    //TODO access if this is needed
     //NOTE: Removed to try and not use ximageproc
     /*
     backwardMatch();
