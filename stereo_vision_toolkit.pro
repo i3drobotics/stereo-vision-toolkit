@@ -13,19 +13,11 @@ FV_APP_VERSION = $$VERSION
 
 QT += core gui concurrent widgets xml network quick serialport
 
-#QT version > 5.6 required for using openssl 1.0.2j
-#QT version > 5.12.4 uses newer openssl 1.1.1g
-!versionAtLeast(QT_VERSION, 5.6.0):
-versionAtLeast(QT_VERSION, 5.6.0){
-    versionAtLeast(QT_VERSION, 5.12.4){
-        CONFIG += WITH_OPENSSL_111g
-        message("Building with OpenSSL 1.1.1g")
-    } else {
-        CONFIG += WITH_OPENSSL_102j
-        message("Building with OpenSSL 1.0.2j")
-    }
+#QT version > 5.12.4 uses openssl 1.1.1g
+versionAtLeast(QT_VERSION, 5.12.4){
+    message("Building with OpenSSL 1.1.1g")
 } else {
-    error("Use at least Qt version 5.6.0")
+    error("Use at least Qt version 5.12.4")
 }
 
 # Application name
@@ -45,6 +37,11 @@ DEV_BRANCH {
     message("Development build")
     message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING MASTER RELEASE !!")
     DEFINES += DEV_BRANCH
+
+    CONFIG(debug, debug|release) { # debug
+    }else { # release
+        CONFIG += console
+    }
 }
 
 # Setup FEVOR defines
@@ -242,7 +239,7 @@ WITH_I3DRSGM {
 }
 
 # For building in a release and debug in seperate folders
-CONFIG(debug, debug|release) {
+CONFIG(debug, debug|release) { #debug
     DESTDIR = debug
     OBJECTS_DIR = .obj_debug
     MOC_DIR     = .moc_debug
@@ -309,7 +306,6 @@ CONFIG(debug, debug|release) {
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
 LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0/stage/lib"
 
-
 WITH_VIMBA {
     # Vimba library and include files
     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/vimba/"
@@ -359,15 +355,8 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rdparty/pylon/dep/x64/*.dll, true) \
         $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
         $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
-        $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
-
-    # Copy openssl dlls depending on version using
-    WITH_OPENSSL_102j {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.0.2j/Win64/bin/*.dll, true)
-    }
-    WITH_OPENSSL_111g {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
-    }
+        $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll \
+        $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
 
     CONFIG( debug, debug|release ) {
         # Debug only dlls

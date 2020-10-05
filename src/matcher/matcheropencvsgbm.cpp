@@ -98,6 +98,7 @@ bool MatcherOpenCVSGBM::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 
   } catch (...) {
     qDebug() << "Error in SGBM match parameters";
+    return false;
   }
 }
 
