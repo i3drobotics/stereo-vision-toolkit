@@ -7,6 +7,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <math.h>
 
 #include "image2string.h"
 
@@ -19,10 +20,6 @@
 #pragma comment (lib, "Ws2_32.lib")
 
 #define STREAMER_MAX_CLIENTS 5
-#define STREAMER_MAX_BUFFER_LENGTH 999000 //TODO test this on other machine to make sure it's stable
-
-#define TEST_IMG_WIDTH 2448
-#define TEST_IMG_HEIGHT 2048
 
 class Streamer  : public QObject {
     Q_OBJECT
@@ -48,8 +45,10 @@ public slots:
     bool stopClient(client_type id);
 
     static bool clientSendMessage(client_type id, std::string msg);
-    static bool clientSendImage(client_type client, cv::Mat image);
-    void clientSendImageThreaded(client_type id, cv::Mat image);
+    static bool clientSendUCharImage(client_type client, cv::Mat image);
+    static bool clientSendFloatImage(client_type client, cv::Mat image);
+    bool clientSendUCharImageThreaded(client_type id, cv::Mat image);
+    bool clientSendFloatImageThreaded(client_type id, cv::Mat image);
 
 private slots:
     void serverCycleThreaded();
@@ -61,12 +60,17 @@ private:
 
     bool sendingMessage = false;
 
+    static const int max_clients_ = STREAMER_MAX_CLIENTS;
+    static const int max_buffer_length_ = 65535;
+
+    static const char eom_token_ = '\n';
+
     char option_value_ = 1;
     int num_clients_ = 0;
     int temp_id_ = -1;
 
     QFuture<void> *qfuture_serverCycle = nullptr;
-    QFuture<bool> *qfuture_clientSendThreaded = nullptr;
+    std::vector<QFuture<bool>*> qfuture_clientSendThreaded;
 
     SOCKET server_socket_;
     std::vector<client_type> client_;
@@ -74,6 +78,7 @@ private:
     QThread* thread_;
 
     static int process_client(client_type &new_client, std::vector<client_type> &client_array, std::thread &thread);
+    static bool clientSendMessagePacket(client_type id, std::string msg);
 
 signals:
     void finished();

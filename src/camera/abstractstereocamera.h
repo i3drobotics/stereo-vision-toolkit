@@ -191,6 +191,19 @@ public:
   */
     cv::Mat getRightImage();
 
+    //! Get the disparity image
+    /*!
+  * @return OpenCV matrix containing disparity image
+  */
+    cv::Mat getDisparity();
+
+    //! Get the disparity image
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getDisparity(cv::Mat &dst);
+
+
     //! Get a pointer to the current point cloud
     /*!
   * @return Pointer to the current point cloud
@@ -631,6 +644,8 @@ private:
 
     cv::Mat left_match_input;
     cv::Mat right_match_input;
+
+    cv::Mat disparity;
 
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 5;

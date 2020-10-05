@@ -265,6 +265,10 @@ cv::Mat AbstractStereoCamera::getLeftImage(void) { return left_raw.clone(); }
 
 cv::Mat AbstractStereoCamera::getRightImage(void) { return right_raw.clone(); }
 
+void AbstractStereoCamera::getDisparity(cv::Mat &dst) { disparity.copyTo(dst); }
+
+cv::Mat AbstractStereoCamera::getDisparity(){ return disparity.clone();}
+
 void AbstractStereoCamera::generateRectificationMaps(cv::Size image_size){
     cv::initUndistortRectifyMap(l_camera_matrix,l_dist_coeffs,l_rect_mat,l_proj_mat,image_size,CV_32FC1,rectmapx_l,rectmapy_l);
     cv::initUndistortRectifyMap(r_camera_matrix,r_dist_coeffs,r_rect_mat,r_proj_mat,image_size,CV_32FC1,rectmapx_r,rectmapy_r);
@@ -642,6 +646,7 @@ void AbstractStereoCamera::processMatch(){
 
     matcher->match(left_img,right_img);
     matcher->getDisparity(disp);
+    disparity = disp.clone();
     left_bgr = matcher->getLeftBGRImage();
     emit matched();
 
