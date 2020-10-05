@@ -114,6 +114,7 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 
   } catch (...) {
     qDebug() << "Error in OpenCV block match parameters";
+    return false;
   }
 }
 

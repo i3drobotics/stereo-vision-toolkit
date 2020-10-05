@@ -2,10 +2,15 @@
 
 Streamer::Streamer(std::string ip, std::string port, QObject *parent) : QObject(parent), ip_(ip), port_(port)
 {
-    client_ = std::vector<client_type>(STREAMER_MAX_CLIENTS);
-    for (int i = 0; i < STREAMER_MAX_CLIENTS; i++)
+    client_ = std::vector<client_type>(max_clients_);
+    for (int i = 0; i < max_clients_; i++)
     {
         clientThread_[i] = std::thread();
+    }
+    qfuture_clientSendThreaded = std::vector<QFuture<bool>*>(max_clients_);
+    for (int i = 0; i < max_clients_; i++)
+    {
+        qfuture_clientSendThreaded.at(i) = nullptr;
     }
 }
 
@@ -89,8 +94,8 @@ Streamer::client_type Streamer::startClient(){
     //std::cout << "Successfully Connected" << std::endl;
 
     //Obtain id from server for this client;
-    char received_message[STREAMER_MAX_BUFFER_LENGTH];
-    recv(client.socket, received_message, STREAMER_MAX_BUFFER_LENGTH, 0);
+    char received_message[max_buffer_length_];
+    recv(client.socket, received_message, max_buffer_length_, 0);
     message = received_message;
 
     if (message != "Server is full")
@@ -102,45 +107,97 @@ Streamer::client_type Streamer::startClient(){
     }
 }
 
-void Streamer::clientSendImageThreaded(client_type id, cv::Mat image){
-    if (qfuture_clientSendThreaded != nullptr){
-        if (qfuture_clientSendThreaded->isFinished()){
-            cv::Mat send_image = image;
-            qfuture_clientSendThreaded = new QFuture<bool>(QtConcurrent::run(Streamer::clientSendImage, id, send_image));
+bool Streamer::clientSendUCharImageThreaded(client_type id, cv::Mat image){
+    if (qfuture_clientSendThreaded.at(id.id) != nullptr){
+        if (qfuture_clientSendThreaded.at(id.id)->isFinished()){
+            cv::Mat send_image = image.clone();
+            qfuture_clientSendThreaded.at(id.id) = new QFuture<bool>(QtConcurrent::run(Streamer::clientSendUCharImage, id, send_image));
+            return true;
+        } else {
+            qDebug() << "client thread is busy";
+            return false;
         }
     } else {
-        cv::Mat send_image = image;
-        qfuture_clientSendThreaded = new QFuture<bool>(QtConcurrent::run(Streamer::clientSendImage, id, send_image));
-    }
-}
-
-bool Streamer::clientSendMessage(client_type client, std::string message){
-    int iResult = send(client.socket, message.c_str(), strlen(message.c_str()), 0);
-    if (iResult <= 0)
-    {
-        qDebug() << "send() failed: " << WSAGetLastError();
-        //std::cout << "send() failed: " << WSAGetLastError() << endl;
-        return false;
-    } else {
+        cv::Mat send_image = image.clone();
+        qfuture_clientSendThreaded.at(id.id) = new QFuture<bool>(QtConcurrent::run(Streamer::clientSendUCharImage, id, send_image));
         return true;
     }
 }
 
-bool Streamer::clientSendImage(client_type client, cv::Mat image){
-    cv::resize(image, image, cv::Size(TEST_IMG_WIDTH, TEST_IMG_HEIGHT));
-    image.convertTo(image,CV_8UC1);
-    std::string message = Image2String::mat2str(image,96);
+bool Streamer::clientSendFloatImageThreaded(client_type id, cv::Mat image){
+    if (qfuture_clientSendThreaded.at(id.id) != nullptr){
+        if (qfuture_clientSendThreaded.at(id.id)->isFinished()){
+            cv::Mat send_image = image.clone();
+            qfuture_clientSendThreaded.at(id.id) = new QFuture<bool>(QtConcurrent::run(Streamer::clientSendFloatImage, id, send_image));
+            return true;
+        } else {
+            qDebug() << "client thread is busy";
+            return false;
+        }
+    } else {
+        cv::Mat send_image = image.clone();
+        qfuture_clientSendThreaded.at(id.id) = new QFuture<bool>(QtConcurrent::run(Streamer::clientSendFloatImage, id, send_image));
+        return true;
+    }
+}
+
+bool Streamer::clientSendMessagePacket(client_type client, std::string message){
+    if (message.size() > max_buffer_length_){
+        qDebug() << "Unable to send message as it will overflow the stream buffer";
+        return false;
+    } else {
+        int iResult = send(client.socket, message.c_str(), strlen(message.c_str()), 0);
+        if (iResult <= 0)
+        {
+            qDebug() << "send() failed: " << WSAGetLastError();
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+bool Streamer::clientSendMessage(client_type client, std::string message){
+    // add end of message token to end of string
+    std::string msg = message + eom_token_;
+    int total_size = msg.size();
+    if (total_size < max_buffer_length_){
+        return clientSendMessagePacket(client, msg);
+    } else {
+        bool success = true;
+        //split message into packets
+        float num_of_packets_f = (float)total_size / (float)max_buffer_length_;
+        int num_of_packets_i = ceil(num_of_packets_f);
+        for (int i = 0; i < num_of_packets_i; i++){
+            int start_index = i*max_buffer_length_;
+            int packet_length = max_buffer_length_;
+            if ((start_index + max_buffer_length_) > msg.size()){
+                packet_length = msg.size() - start_index;
+            }
+            std::string msg_packet = msg.substr(start_index, packet_length);
+            success += clientSendMessagePacket(client, msg_packet);
+        }
+        return success;
+    }
+}
+
+bool Streamer::clientSendUCharImage(client_type client, cv::Mat image){
+    std::string message = Image2String::ucharMat2str(image,100);
+    qDebug() << "Sending image message of size: " << message.size();
+    return clientSendMessage(client,message);
+}
+
+bool Streamer::clientSendFloatImage(client_type client, cv::Mat image){
+    std::string message = Image2String::floatMat2str(image,100);
     qDebug() << "Sending image message of size: " << message.size();
     return clientSendMessage(client,message);
 }
 
 bool Streamer::stopClient(client_type client){
     qDebug() << "Shutting down socket...";
-    //std::cout << "Shutting down socket..." << endl;
     int iResult = shutdown(client.socket, SD_SEND);
     if (iResult == SOCKET_ERROR) {
         qDebug() << "shutdown() failed with error: " << WSAGetLastError();
-        //std::cout << "shutdown() failed with error: " << WSAGetLastError() << endl;
         closesocket(client.socket);
     }
     closesocket(client.socket);
@@ -179,6 +236,9 @@ void Streamer::startServer(){
     setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &option_value_, sizeof(int)); //Make it possible to re-bind to a port that was used within the last 2 minutes
     setsockopt(server_socket_, IPPROTO_TCP, TCP_NODELAY, &option_value_, sizeof(int)); //Used for interactive programs
 
+    //int ReceiveTimeout = 3000;
+    //int e = setsockopt(server_socket_, SOL_SOCKET, SO_RCVTIMEO, (char*)&ReceiveTimeout, sizeof(int));
+
     //Assign an address to the server socket.
     qDebug() << "Binding socket...";
     //std::cout << "Binding socket..." << std::endl;
@@ -190,7 +250,7 @@ void Streamer::startServer(){
     listen(server_socket_, SOMAXCONN);
 
     //Initialize the client list
-    for (int i = 0; i < STREAMER_MAX_CLIENTS; i++)
+    for (int i = 0; i < max_clients_; i++)
     {
         client_[i] = { -1, INVALID_SOCKET };
     }
@@ -207,31 +267,32 @@ void Streamer::serverCycleThreaded(){
 int Streamer::process_client(client_type &new_client, std::vector<client_type> &client_array, std::thread &thread)
 {
     std::string msg = "";
-    char tempmsg[STREAMER_MAX_BUFFER_LENGTH] = "";
+    char tempmsg[max_buffer_length_] = "";
 
     //Session
     while (1)
     {
-        memset(tempmsg, 0, STREAMER_MAX_BUFFER_LENGTH);
+        memset(tempmsg, 0, max_buffer_length_);
 
         if (new_client.socket != 0)
         {
-            int iResult = recv(new_client.socket, tempmsg, STREAMER_MAX_BUFFER_LENGTH, 0);
+            int iResult = recv(new_client.socket, tempmsg, max_buffer_length_, 0);
 
-            std::string endlch = "\n";
+            //std::string endlch = "\n";
 
             if (iResult != SOCKET_ERROR)
             {
-                if (strcmp("", tempmsg))
+                //if (strcmp("", tempmsg))
                     //msg = "Client #" + std::to_string(new_client.id) + ": " + tempmsg;
-                    msg = tempmsg + endlch;
+                    //msg = tempmsg + endlch;
                     //msg = tempmsg;
+                msg = tempmsg;
 
                 //qDebug() << msg.c_str();
                 //std::cout << msg.c_str() << std::endl;
 
                 //Broadcast that message to the other clients
-                for (int i = 0; i < STREAMER_MAX_CLIENTS; i++)
+                for (int i = 0; i < max_clients_; i++)
                 {
                     if (client_array[i].socket != INVALID_SOCKET)
                         if (new_client.id != i)
@@ -250,7 +311,7 @@ int Streamer::process_client(client_type &new_client, std::vector<client_type> &
                 client_array[new_client.id].socket = INVALID_SOCKET;
 
                 //Broadcast the disconnection message to the other clients
-                for (int i = 0; i < STREAMER_MAX_CLIENTS; i++)
+                for (int i = 0; i < max_clients_; i++)
                 {
                     if (client_array[i].socket != INVALID_SOCKET)
                         iResult = send(client_array[i].socket, msg.c_str(), strlen(msg.c_str()), 0);
@@ -277,7 +338,7 @@ void Streamer::serverCycle(){
 
         //Create a temporary id for the next client
         temp_id_ = -1;
-        for (int i = 0; i < STREAMER_MAX_CLIENTS; i++)
+        for (int i = 0; i < max_clients_; i++)
         {
             if (client_[i].socket == INVALID_SOCKET && temp_id_ == -1)
             {
@@ -323,7 +384,7 @@ void Streamer::stopServer(){
     closesocket(server_socket_);
 
     //Close client socket
-    for (int i = 0; i < STREAMER_MAX_CLIENTS; i++)
+    for (int i = 0; i < max_clients_; i++)
     {
         /*
         if (clientThread_[i].joinable())

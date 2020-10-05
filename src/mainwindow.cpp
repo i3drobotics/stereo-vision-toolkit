@@ -373,17 +373,30 @@ void MainWindow::enableDetection(bool enable){
 
 void MainWindow::enableStreamer(bool enable){
     if (!stereo_cam){
-        streamer_enabled = false;
-        return;
+        enable = false;
     }
     streamer_enabled = enable;
     if (enable){
+        if (ui->comboBoxStreamerSource->currentIndex() == 4){ //disparity
+            connect(stereo_cam, SIGNAL(matched()), this, SLOT(updateStreamer()));
+        } else {
+            connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
+        }
         streamer->startServer();
-        mClient = streamer->startClient();
+        mImageClient.id = -1;
+        mImageClient.socket = INVALID_SOCKET;
+        //mImageClient = streamer->startClient();
+        //mDispClient = streamer->startClient();
     } else {
-        streamer->stopClient(mClient);
+        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
+        disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updateStreamer()));
+        streamer->stopClient(mImageClient);
+        //streamer->stopClient(mDispClient);
         streamer->stopServer();
     }
+    ui->txtStreamerHostIP->setEnabled(!enable);
+    ui->spinBoxStreamPort->setEnabled(!enable);
+    ui->comboBoxStreamerSource->setEnabled(!enable);
 }
 
 void MainWindow::detectionInit(){
@@ -645,20 +658,46 @@ void MainWindow::updateStreamer(){
 
     this->streaming = true;
 
-    // Select image source
-    stereo_cam->getLeftImage(image_stream);
-
     if (streamer_enabled){
+        bool isFloatImage = false;
+        // Select image source
+        switch(ui->comboBoxStreamerSource->currentIndex()) {
+        case 0: // left
+            stereo_cam->getLeftImage(image_stream);
+            break;
+        case 1: // right
+            stereo_cam->getRightImage(image_stream);
+            break;
+        case 2: // left rectified
+            stereo_cam->getLeftImage(image_stream);
+            break;
+        case 3: // right rectified
+            stereo_cam->getRightImage(image_stream);
+            break;
+        case 4: // disparity
+            if (stereo_cam->isMatching()){
+                isFloatImage = true;
+                stereo_cam->getDisparity(image_stream);
+            } else {
+                image_stream = cv::Mat();
+            }
+            break;
+        }
+
         if(image_stream.empty()){
             qDebug() << "Empty image passed to streamer";
             return;
         }
-        if (mClient.id == -1 || mClient.socket == INVALID_SOCKET){
-            mClient = streamer->startClient();
+        if (mImageClient.id == -1 || mImageClient.socket == INVALID_SOCKET){
+            mImageClient = streamer->startClient();
         } else {
-            //TODO do streaming
-            //streamer->clientSendMessage(mClient,"test");
-            streamer->clientSendImageThreaded(mClient,image_stream);
+            if (isFloatImage){
+                streamer->clientSendFloatImageThreaded(mImageClient,image_stream);
+            } else {
+                image_stream.convertTo(image_stream,CV_8UC1);
+                streamer->clientSendUCharImageThreaded(mImageClient,image_stream);
+            }
+
         }
     }
     this->streaming = false;
@@ -1201,7 +1240,6 @@ void MainWindow::stereoCameraInitConnections(void) {
 
     /* Detection */
     connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDetection()));
-    connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
 
     updatePointTexture(ui->comboBoxPointTexture->currentIndex());
 
@@ -2420,8 +2458,8 @@ MainWindow::~MainWindow() {
         delete(streamer);
     if (object_detector)
         delete(object_detector);
-    if (cam_thread)
-        delete(cam_thread);
+    //if (cam_thread)
+        //delete(cam_thread);
     qDebug() << "Closing ui...";
     delete ui;
     QApplication::quit();
