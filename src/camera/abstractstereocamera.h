@@ -79,6 +79,8 @@ public:
 
     enum PointCloudTexture { POINT_CLOUD_TEXTURE_IMAGE, POINT_CLOUD_TEXTURE_DEPTH };
 
+    enum VideoSource { VIDEO_SRC_STEREO, VIDEO_SRC_LEFT, VIDEO_SRC_RIGHT, VIDEO_SRC_DISPARITY };
+
     //! Structure to hold camera settings
     struct StereoCameraSettings {
         double exposure;
@@ -274,8 +276,8 @@ public:
    * @sa setSavelocation(), videoStreamStop()
    * @param[out] fps The frame rate of the video recording
   */
-    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = cv::VideoWriter::fourcc('H', '2', '6', '4'), bool is_color = false);
-    bool addVideoStreamFrame(cv::Mat left, cv::Mat right);
+    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = cv::VideoWriter::fourcc('H', '2', '6', '4'), bool is_color = false, VideoSource vid_src = VIDEO_SRC_STEREO);
+    bool addVideoStreamFrame(cv::Mat frame);
 
     bool connected = false;
     float downsample_factor = 1;
@@ -432,6 +434,7 @@ public slots:
     bool stopCapture(){return enableCapture(false);};
 
     bool enableVideoStream(bool enable);
+    bool setVideoSource(int source_index); // 0: stereo, 1: left, 2:right, 3:disparity
     bool startVideoStream(){return enableVideoStream(false);}
     bool stopVideoStream(){return enableVideoStream(false);}
 
@@ -569,6 +572,7 @@ private:
     bool rectifying = false;
     bool capturing_video = false;
     bool capturing_rectified_video = true;
+    VideoSource video_src = VIDEO_SRC_STEREO;
     bool swappingLeftRight = false;
     bool reprojecting = false;
     bool cuda_device_found = false;

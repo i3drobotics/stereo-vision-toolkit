@@ -378,7 +378,7 @@ void MainWindow::enableStreamer(bool enable){
     }
     streamer_enabled = enable;
     if (enable){
-        if (ui->comboBoxStreamerSource->currentIndex() == 4){ //disparity
+        if (ui->comboBoxStreamerSource->currentIndex() == 3){ //disparity
             connect(stereo_cam, SIGNAL(matched()), this, SLOT(updateStreamer()));
         } else {
             connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
@@ -661,21 +661,31 @@ void MainWindow::updateStreamer(){
 
     if (streamer_enabled){
         bool isFloatImage = false;
+        bool useRectified = ui->checkBoxStreamerUseRectified->isChecked();
         // Select image source
         switch(ui->comboBoxStreamerSource->currentIndex()) {
-        case 0: // left
-            stereo_cam->getLeftImage(image_stream);
+        case 0: // stereo
+            if (useRectified){
+                cv::hconcat(stereo_cam->getLeftImage(), stereo_cam->getRightImage(), image_stream);
+            } else {
+                cv::hconcat(stereo_cam->getLeftRawImage(), stereo_cam->getRightRawImage(), image_stream);
+            }
             break;
-        case 1: // right
-            stereo_cam->getRightImage(image_stream);
+        case 1: // left
+            if (useRectified){
+                stereo_cam->getLeftImage(image_stream);
+            } else {
+                stereo_cam->getLeftRawImage(image_stream);
+            }
             break;
-        case 2: // left rectified
-            stereo_cam->getLeftImage(image_stream);
+        case 2: // right
+            if (useRectified){
+                stereo_cam->getRightImage(image_stream);
+            } else {
+                stereo_cam->getRightRawImage(image_stream);
+            }
             break;
-        case 3: // right rectified
-            stereo_cam->getRightImage(image_stream);
-            break;
-        case 4: // disparity
+        case 3: // disparity
             if (stereo_cam->isMatching()){
                 isFloatImage = true;
                 stereo_cam->getDisparity(image_stream);
@@ -695,10 +705,8 @@ void MainWindow::updateStreamer(){
             if (isFloatImage){
                 streamer->clientSendFloatImageThreaded(mImageClient,image_stream);
             } else {
-                image_stream.convertTo(image_stream,CV_8UC1);
                 streamer->clientSendUCharImageThreaded(mImageClient,image_stream);
             }
-
         }
     }
     this->streaming = false;
@@ -1203,6 +1211,9 @@ void MainWindow::stereoCameraInitConnections(void) {
     connect(ui->packetDelaySpinBox, SIGNAL(valueChanged(int)), stereo_cam,
             SLOT(setPacketDelay(int)));
 
+    connect(ui->checkBoxVideoUseRectified, SIGNAL(toggled(bool)), stereo_cam, SLOT(enableCaptureRectifedVideo(bool)));
+    connect(ui->comboBoxVideoSource, SIGNAL(indexChanged(int)), stereo_cam, SLOT(setVideoSource(int)));
+
     connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_view, SLOT(setSize(int, int, int)));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_matcher_view, SLOT(setSize(int, int, int)));
@@ -1341,6 +1352,9 @@ void MainWindow::stereoCameraRelease(void) {
                    SLOT(setFPS(int)));
         disconnect(ui->packetSizeSpinBox, SIGNAL(valueChanged(int)), this,
                 SLOT(setPacketSize(int)));
+
+        disconnect(ui->checkBoxVideoUseRectified, SIGNAL(toggled(bool)), stereo_cam, SLOT(enableCaptureRectifedVideo(bool)));
+        disconnect(ui->comboBoxVideoSource, SIGNAL(indexChanged(int)), stereo_cam, SLOT(setVideoSource(int)));
 
         disconnect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
                    SLOT(enableTrigger(bool)));
@@ -1826,25 +1840,37 @@ void MainWindow::enableVideoCapture(bool enable){
             vid_fps = measured_fps;
         }
         //TODO replace this with lossless compression codec as currently creates very large files (raw uncompressed)
-        stereo_cam->setVideoStreamParams("",vid_fps,cv::VideoWriter::fourcc('R', 'G', 'B', 'A'),true);
+        AbstractStereoCamera::VideoSource vid_src = (AbstractStereoCamera::VideoSource)ui->comboBoxVideoSource->currentIndex();
+        stereo_cam->setVideoStreamParams("",vid_fps,cv::VideoWriter::fourcc('R', 'G', 'B', 'A'),true,vid_src);
 
-        // Ask user if to record rectified frames
-        QMessageBox msgBox;
-        msgBox.setText(tr("Record recitifed frames if avaiable?"));
-        QAbstractButton* pButtonRect = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
-        QAbstractButton* pButtonNonRect = msgBox.addButton(tr("No"), QMessageBox::NoRole);
+        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO ||
+                vid_src == AbstractStereoCamera::VIDEO_SRC_LEFT ||
+                vid_src == AbstractStereoCamera::VIDEO_SRC_RIGHT){
 
-        msgBox.exec();
+            // Ask user if to record rectified frames
+            QMessageBox msgBox;
+            msgBox.setText(tr("Record recitifed frames if avaiable?"));
+            QAbstractButton* pButtonRect = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
+            QAbstractButton* pButtonNonRect = msgBox.addButton(tr("No"), QMessageBox::NoRole);
 
-        if (msgBox.clickedButton()==pButtonRect) {
-            stereo_cam->enableCaptureRectifedVideo(true);
-        } else if (msgBox.clickedButton()==pButtonNonRect) {
-            stereo_cam->enableCaptureRectifedVideo(false);
+            msgBox.exec();
+
+            if (msgBox.clickedButton()==pButtonRect) {
+                ui->checkBoxVideoUseRectified->setChecked(true);
+                stereo_cam->enableCaptureRectifedVideo(true);
+            } else if (msgBox.clickedButton()==pButtonNonRect) {
+                ui->checkBoxVideoUseRectified->setChecked(false);
+                stereo_cam->enableCaptureRectifedVideo(false);
+            }
         }
 
         ui->toggleVideoButton->setIcon(awesome->icon(fa::stop, icon_options));
+        ui->checkBoxVideoUseRectified->setEnabled(false);
+        ui->comboBoxVideoSource->setEnabled(false);
     } else {
         ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
+        ui->checkBoxVideoUseRectified->setEnabled(true);
+        ui->comboBoxVideoSource->setEnabled(true);
     }
 
     stereo_cam->enableVideoStream(enable);
