@@ -225,6 +225,29 @@ void AbstractStereoCamera::enableCaptureRectifedVideo(bool rectify) {
     capturing_rectified_video = rectify;
 }
 
+bool AbstractStereoCamera::setVideoSource(int source_index){
+    // 0: stereo, 1: left, 2:right, 3:disparity
+    switch(source_index) {
+    case 0: // stereo
+        video_src = VIDEO_SRC_STEREO;
+        break;
+    case 1: // left
+        video_src = VIDEO_SRC_LEFT;
+        break;
+    case 2: // right
+        video_src = VIDEO_SRC_RIGHT;
+        break;
+    case 3: // disparity
+        video_src = VIDEO_SRC_DISPARITY;
+        break;
+    default:
+        qDebug() << "Invalid video source index. MUST be 0: stereo, 1: left, 2:right, 3:disparity";
+        return false;
+        break;
+    }
+    return true;
+}
+
 void AbstractStereoCamera::enableSwapLeftRight(bool swap){
     swappingLeftRight = swap;
 }
@@ -608,10 +631,27 @@ void AbstractStereoCamera::processStereo(void) {
     right_remapped.copyTo(right_output);
 
     if (capturing_video){
-        if (capturing_rectified_video){
-            addVideoStreamFrame(left_remapped,right_remapped);
-        } else {
-            addVideoStreamFrame(left_tmp,right_tmp);
+        if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT){
+            if (video_src == VIDEO_SRC_STEREO){
+                if (capturing_rectified_video){
+                    cv::hconcat(left_output, right_output, video_frame);
+                } else {
+                    cv::hconcat(left_unrectified, left_unrectified, video_frame);
+                }
+            } else if (video_src == VIDEO_SRC_LEFT){
+                if (capturing_rectified_video){
+                    left_output.copyTo(video_frame);
+                } else {
+                    left_unrectified.copyTo(video_frame);
+                }
+            } else if (video_src == VIDEO_SRC_RIGHT){
+                if (capturing_rectified_video){
+                    right_output.copyTo(video_frame);
+                } else {
+                    right_unrectified.copyTo(video_frame);
+                }
+            }
+            addVideoStreamFrame(video_frame);
         }
     }
 
@@ -646,12 +686,21 @@ void AbstractStereoCamera::processMatch(){
     left_bgr = matcher->getLeftBGRImage();
     emit matched();
 
+    cv::Mat disp_colormap;
+    if (video_src == VIDEO_SRC_DISPARITY || (reprojecting && getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH)){
+        CVSupport::disparity2colormap(disp,disp_colormap);
+
+        if (video_src == VIDEO_SRC_DISPARITY){
+            addVideoStreamFrame(disp_colormap);
+        }
+    }
+
     if (reprojecting){
         cv::Mat texture_image;
         if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_IMAGE){
             left_bgr.copyTo(texture_image);
         } else if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH){
-            CVSupport::disparity2colormap(disp,texture_image);
+            disp_colormap.copyTo(texture_image);
         }
 
         if (disp.empty() || texture_image.empty()){
@@ -677,17 +726,8 @@ void AbstractStereoCamera::processMatch(){
     matchtimer.restart();
 }
 
-bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){
-    cv::Mat left_new, right_new;
-    if (video_is_color){
-        left.convertTo(left_new,CV_8UC3);
-        right.convertTo(right_new,CV_8UC3);
-    } else {
-        left_new = left.clone();
-        right_new = right.clone();
-    }
-    cv::hconcat(left_new, right_new, video_frame);
-    cv_video_writer->write(video_frame);
+bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat frame){
+    cv_video_writer->write(frame);
     return true;
 }
 
@@ -696,10 +736,14 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
     if (enable){
         //start video capture
         cv_video_writer = new cv::VideoWriter();
+        int video_width = image_width;
+        if (video_src == VIDEO_SRC_STEREO){
+            video_width = 2 * image_width;
+        }
         if (video_is_color){
-            video_frame = cv::Mat (image_height, 2 * image_width, CV_8UC3);
+            video_frame = cv::Mat (image_height, video_width, CV_8UC3);
         } else {
-            video_frame = cv::Mat (image_height, 2 * image_width, CV_8UC1);
+            video_frame = cv::Mat (image_height, video_width, CV_8UC1);
         }
         res = cv_video_writer->open(video_filename, video_codec, video_fps, video_frame.size(), video_is_color);
         if (res){
@@ -716,7 +760,7 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
     return res;
 }
 
-bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int codec, bool is_color){
+bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int codec, bool is_color, VideoSource vid_src){
     if (filename == "") {
         QDateTime dateTime = dateTime.currentDateTime();
         QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
@@ -728,6 +772,7 @@ bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int c
 
     video_codec = codec;
     video_is_color = is_color;
+    video_src = vid_src;
     return true;
 }
 
