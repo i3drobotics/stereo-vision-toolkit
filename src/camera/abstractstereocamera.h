@@ -637,8 +637,10 @@ private:
     int cal_image_height;
 
     int video_fps = 0;
-    int video_codec = cv::VideoWriter::fourcc('H', '2', '6', '4');
+    //int video_codec = cv::VideoWriter::fourcc('H', '2', '6', '4');
     //int video_codec = cv::VideoWriter::fourcc('H', 'E', 'V', 'C');
+    int video_codec = cv::VideoWriter::fourcc('M','J','P','G');
+    //int video_codec = cv::VideoWriter::fourcc('a','v','c','1');
     bool video_is_color = true;
     std::string video_filename = "";
     cv::Mat video_frame;

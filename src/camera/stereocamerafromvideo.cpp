@@ -61,8 +61,8 @@ bool StereoCameraFromVideo::captureSingle(){
             QThread::msleep(delay_needed);
         }
         emit videoPosition(100*((float) stream.get(cv::CAP_PROP_POS_FRAMES))/number_frames);
-        if(image_buffer.channels() == 3)
-            cv::cvtColor(image_buffer, image_buffer, cv::COLOR_RGB2GRAY);
+        //if(image_buffer.channels() == 3)
+        //    cv::cvtColor(image_buffer, image_buffer, cv::COLOR_RGB2GRAY);
 
         cv::Mat(image_buffer,
                 cv::Rect(0, 0, image_buffer.cols / 2, image_buffer.rows))
