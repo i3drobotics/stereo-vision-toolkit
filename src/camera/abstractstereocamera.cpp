@@ -683,8 +683,13 @@ void AbstractStereoCamera::processMatch(){
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){
     cv::Mat left_new, right_new;
-    left.convertTo(left_new,CV_8UC3);
-    right.convertTo(right_new,CV_8UC3);
+    if (video_is_color){
+        left.convertTo(left_new,CV_8UC3);
+        right.convertTo(right_new,CV_8UC3);
+    } else {
+        left_new = left.clone();
+        right_new = right.clone();
+    }
     cv::hconcat(left_new, right_new, video_frame);
     cv_video_writer->write(video_frame);
     return true;
@@ -695,7 +700,11 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
     if (enable){
         //start video capture
         cv_video_writer = new cv::VideoWriter();
-        video_frame = cv::Mat (image_height, 2 * image_width, CV_8UC3);
+        if (video_is_color){
+            video_frame = cv::Mat (image_height, 2 * image_width, CV_8UC3);
+        } else {
+            video_frame = cv::Mat (image_height, 2 * image_width, CV_8UC1);
+        }
         res = cv_video_writer->open(video_filename, video_codec, video_fps, video_frame.size(), video_is_color);
         if (res){
             capturing_video = true;
@@ -705,7 +714,6 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
         capturing_video = false;
         if (cv_video_writer->isOpened()){
             cv_video_writer->release();
-            cv_video_writer = new cv::VideoWriter();
         }
         res = true;
     }
@@ -716,7 +724,7 @@ bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int c
     if (filename == "") {
         QDateTime dateTime = dateTime.currentDateTime();
         QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-        video_filename = QString("%1/stereo_video_%2.mkv").arg(save_directory, date_string).toStdString();
+        video_filename = QString("%1/stereo_video_%2.avi").arg(save_directory, date_string).toStdString();
     }
 
     if (fps == 0) fps = 30;

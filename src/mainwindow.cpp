@@ -1277,6 +1277,8 @@ void MainWindow::stereoCameraRelease(void) {
     ui->toggleRectifyCheckBox->setChecked(false);
     ui->toggleSwapLeftRight->setChecked(false);
 
+    ui->btnLoadVideo->setText("Load Video");
+
     //TODO enable this when implimented
     ui->toggleCalibrationDownsample->setVisible(false);
     ui->toggleCalibrationDownsample->setChecked(false);
@@ -1743,55 +1745,61 @@ void MainWindow::stopDeviceListTimer() {
 }
 
 void MainWindow::videoStreamLoad(void) {
-    QMessageBox msg;
+    if (ui->btnLoadVideo->text() == "Load Video"){
+        QMessageBox msg;
 
-    QString fname = QFileDialog::getOpenFileName(
-                this, tr("Open Stereo Video"), "/home", tr("Videos (*.avi *.mp4)"));
-    if (fname != "") {
-        stereoCameraRelease();
-        //stopDeviceListTimer();
+        QString fname = QFileDialog::getOpenFileName(
+                    this, tr("Open Stereo Video"), "/home", tr("Videos (*.avi *.mp4)"));
+        if (fname != "") {
+            stereoCameraRelease();
+            //stopDeviceListTimer();
+            ui->btnLoadVideo->setText("Disconnect Video");
 
-        AbstractStereoCamera::StereoCameraSerialInfo scis;
-        scis.filename = fname.toStdString();
+            AbstractStereoCamera::StereoCameraSerialInfo scis;
+            scis.filename = fname.toStdString();
 
-        current_camera_settings = default_video_init_settings;
+            current_camera_settings = default_video_init_settings;
 
-        cam_thread = new QThread;
-        StereoCameraFromVideo* stereo_cam_video = new StereoCameraFromVideo(scis,current_camera_settings);
-        cameras_connected = stereo_cam_video->openCamera();
-        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_video);
-        if (cameras_connected){
-            stereo_cam->assignThread(cam_thread);
-            ui->frameCountSlider->setEnabled(true);
-            connect(stereo_cam, SIGNAL(videoPosition(int)),ui->frameCountSlider, SLOT(setValue(int)));
-            connect(ui->frameCountSlider, SIGNAL(sliderMoved(int)),stereo_cam, SLOT(setPosition(int)));
-            connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(setFPS(int)));
-            stereoCameraInit();
-            stereoCameraInitWindow();
-            //ui->toggleVideoButton->setDisabled(true);
+            cam_thread = new QThread;
+            StereoCameraFromVideo* stereo_cam_video = new StereoCameraFromVideo(scis,current_camera_settings);
+            cameras_connected = stereo_cam_video->openCamera();
+            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_video);
+            if (cameras_connected){
+                stereo_cam->assignThread(cam_thread);
+                ui->frameCountSlider->setEnabled(true);
+                connect(stereo_cam, SIGNAL(videoPosition(int)),ui->frameCountSlider, SLOT(setValue(int)));
+                connect(ui->frameCountSlider, SIGNAL(sliderMoved(int)),stereo_cam, SLOT(setPosition(int)));
+                connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(setFPS(int)));
+                stereoCameraInit();
+                stereoCameraInitWindow();
+                //ui->toggleVideoButton->setDisabled(true);
 
-            // Ask user if to load rectified frames
-            QMessageBox msgBox;
-            msgBox.setText(tr("Was video recorded with rectified images? (This is asked to avoid double rectification)"));
-            QAbstractButton* pButtonRect = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
-            QAbstractButton* pButtonNonRect = msgBox.addButton(tr("No"), QMessageBox::NoRole);
+                // Ask user if to load rectified frames
+                QMessageBox msgBox;
+                msgBox.setText(tr("Was video recorded with rectified images? (This is asked to avoid double rectification)"));
+                QAbstractButton* pButtonRect = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
+                QAbstractButton* pButtonNonRect = msgBox.addButton(tr("No"), QMessageBox::NoRole);
 
-            msgBox.exec();
+                msgBox.exec();
 
-            if (msgBox.clickedButton()==pButtonRect) {
-                enableRectify(false);
-            } else if (msgBox.clickedButton()==pButtonNonRect) {
-                enableRectify(true);
+                if (msgBox.clickedButton()==pButtonRect) {
+                    enableRectify(false);
+                } else if (msgBox.clickedButton()==pButtonNonRect) {
+                    enableRectify(true);
+                }
+
+                // Start frame capture
+                enableCapture(true);
+            } else {
+                msg.setText("Failed to open video stream.");
+                msg.exec();
+                ui->statusBar->showMessage("Disconnected.");
+                //ui->toggleVideoButton->setDisabled(true);
+                ui->btnLoadVideo->setText("Load Video");
             }
-
-            // Start frame capture
-            enableCapture(true);
-        } else {
-            msg.setText("Failed to open video stream.");
-            msg.exec();
-            ui->statusBar->showMessage("Disconnected.");
-            //ui->toggleVideoButton->setDisabled(true);
         }
+    } else {
+        stereoCameraRelease();
     }
 }
 
@@ -1801,7 +1809,8 @@ void MainWindow::enableVideoCapture(bool enable){
         if (current_fps == 0){
             vid_fps = measured_fps;
         }
-        stereo_cam->setVideoStreamParams("",vid_fps);
+        //TODO replace this with lossless compression codec as currently creates very large files (raw uncompressed)
+        stereo_cam->setVideoStreamParams("",vid_fps,cv::VideoWriter::fourcc('R', 'G', 'B', 'A'),true);
 
         // Ask user if to record rectified frames
         QMessageBox msgBox;
