@@ -14,7 +14,7 @@ bool StereoCameraBasler::openCamera(){
         qDebug() << "Failed to find serial device for hardware control.";
         //return false;
     } else {
-        camControl->open(serial_device_list.at(0),115200);
+        has_trigger_fps_control = camControl->open(serial_device_list.at(0),115200);
     }
 
     int binning = stereoCameraSettings_.binning;

@@ -321,7 +321,8 @@ void MainWindow::controlsInit(void) {
     connect(ui->btnLoadCalibration, SIGNAL(clicked(bool)),this, SLOT(setCalibrationFolder()));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSpinBox, SLOT(setDisabled(bool)));
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), ui->gainSpinBox, SLOT(setDisabled(bool)));
-    connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), ui->fpsSpinBox, SLOT(setDisabled(bool)));
+
+    //connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), ui->fpsSpinBox, SLOT(setDisabled(bool)));
 
     connect(ui->btnRefreshCameras, SIGNAL(clicked(bool)), this, SLOT(refreshCameraListThreaded()));
 
@@ -1020,6 +1021,16 @@ void MainWindow::stereoCameraInitWindow(void){
         ui->enabledTriggeredCheckbox->setEnabled(true);
         ui->enabledTriggeredCheckbox->setChecked(default_trigger);
         ui->enabledTriggeredCheckbox->setVisible(true);
+        if (stereo_cam->hasTriggerFPSControl()){
+            ui->fpsSpinBox->setEnabled(true);
+        } else {
+            if (default_trigger){
+                ui->fpsSpinBox->setEnabled(false);
+            } else {
+                ui->fpsSpinBox->setEnabled(true);
+            }
+        }
+        /*
         AbstractStereoCamera::StereoCameraSerialInfo cam_info = stereo_cam->getCameraSerialInfo();
         if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
             ui->fpsSpinBox->setEnabled(true);
@@ -1030,6 +1041,7 @@ void MainWindow::stereoCameraInitWindow(void){
                 ui->fpsSpinBox->setEnabled(true);
             }
         }
+        */
     } else {
         default_trigger = false;
         ui->enabledTriggeredCheckbox->setVisible(false);
@@ -1168,6 +1180,10 @@ void MainWindow::stereoCameraInitWindow(void){
     ui->packetSizeSpinBox->setSingleStep(step_packetSize);
     ui->packetSizeSpinBox->setValue(default_packetSize);
     ui->packetSizeSpinBox->blockSignals(false);
+
+    if (!stereo_cam->hasTriggerFPSControl()){
+        connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), ui->fpsSpinBox, SLOT(setDisabled(bool)));
+    }
 }
 
 void MainWindow::stereoCameraInitConnections(void) {
@@ -1277,7 +1293,7 @@ void MainWindow::stereoCameraRelease(void) {
     ui->toggleRectifyCheckBox->setChecked(false);
     ui->toggleSwapLeftRight->setChecked(false);
 
-    ui->btnLoadVideo->setText("Load Video");
+    ui->btnLoadVideo->setText("Load Stereo Video");
 
     //TODO enable this when implimented
     ui->toggleCalibrationDownsample->setVisible(false);
@@ -1745,7 +1761,7 @@ void MainWindow::stopDeviceListTimer() {
 }
 
 void MainWindow::videoStreamLoad(void) {
-    if (ui->btnLoadVideo->text() == "Load Video"){
+    if (ui->btnLoadVideo->text() == "Load Stereo Video"){
         QMessageBox msg;
 
         QString fname = QFileDialog::getOpenFileName(
@@ -1753,7 +1769,7 @@ void MainWindow::videoStreamLoad(void) {
         if (fname != "") {
             stereoCameraRelease();
             //stopDeviceListTimer();
-            ui->btnLoadVideo->setText("Disconnect Video");
+            ui->btnLoadVideo->setText("Disconnect Stereo Video");
 
             AbstractStereoCamera::StereoCameraSerialInfo scis;
             scis.filename = fname.toStdString();
@@ -1795,7 +1811,7 @@ void MainWindow::videoStreamLoad(void) {
                 msg.exec();
                 ui->statusBar->showMessage("Disconnected.");
                 //ui->toggleVideoButton->setDisabled(true);
-                ui->btnLoadVideo->setText("Load Video");
+                ui->btnLoadVideo->setText("Load Stereo Video");
             }
         }
     } else {
