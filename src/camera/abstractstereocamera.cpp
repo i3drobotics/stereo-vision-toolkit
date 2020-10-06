@@ -691,7 +691,8 @@ void AbstractStereoCamera::processMatch(){
         CVSupport::disparity2colormap(disp,disp_colormap);
 
         if (video_src == VIDEO_SRC_DISPARITY){
-            addVideoStreamFrame(disp_colormap);
+            if (capturing_video)
+                addVideoStreamFrame(disp_colormap);
         }
     }
 
@@ -727,7 +728,11 @@ void AbstractStereoCamera::processMatch(){
 }
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat frame){
-    cv_video_writer->write(frame);
+    if (capturing_video){
+        if (cv_video_writer != nullptr && capturing_video)
+            if (cv_video_writer->isOpened() && cv_video_writer != nullptr && capturing_video) //TODO replace this with mutex
+                cv_video_writer->write(frame);
+    }
     return true;
 }
 
@@ -754,6 +759,7 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
         capturing_video = false;
         if (cv_video_writer->isOpened()){
             cv_video_writer->release();
+            cv_video_writer = new cv::VideoWriter();
         }
         res = true;
     }

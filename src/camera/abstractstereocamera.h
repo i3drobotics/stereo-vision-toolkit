@@ -589,7 +589,7 @@ private:
 
     QFutureWatcher<void> match_futureWatcher;
 
-    cv::VideoWriter *cv_video_writer;
+    cv::VideoWriter *cv_video_writer = nullptr;
 
     //! Block until a steroe processing has finished
     void stereo_process_finished(void);

@@ -1839,9 +1839,13 @@ void MainWindow::enableVideoCapture(bool enable){
         if (current_fps == 0){
             vid_fps = measured_fps;
         }
-        //TODO replace this with lossless compression codec as currently creates very large files (raw uncompressed)
         AbstractStereoCamera::VideoSource vid_src = (AbstractStereoCamera::VideoSource)ui->comboBoxVideoSource->currentIndex();
-        stereo_cam->setVideoStreamParams("",vid_fps,cv::VideoWriter::fourcc('R', 'G', 'B', 'A'),true,vid_src);
+        int vid_codec = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO){ // requires lossless for re-loading of stereo videos without loss
+            //TODO replace this with lossless compression codec as currently creates very large files (raw uncompressed)
+            vid_codec = cv::VideoWriter::fourcc('R', 'G', 'B', 'A');
+        }
+        stereo_cam->setVideoStreamParams("",vid_fps,vid_codec,true,vid_src);
 
         if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO ||
                 vid_src == AbstractStereoCamera::VIDEO_SRC_LEFT ||
