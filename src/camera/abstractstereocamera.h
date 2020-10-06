@@ -167,6 +167,30 @@ public:
     //! Returns wheather the camera is connected
     bool isConnected();
 
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getLeftRawImage(cv::Mat &dst);
+
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getRightRawImage(cv::Mat &dst);
+
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @return OpenCV matrix containing left image
+  */
+    cv::Mat getLeftRawImage();
+
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @return OpenCV matrix containing left image
+  */
+    cv::Mat getRightRawImage();
+
     //! Get the left stereo image
     /*!
   * @param[out] dst OpenCV matrix to store image into
@@ -258,6 +282,8 @@ public:
 
     cv::Mat left_remapped;
     cv::Mat right_remapped;
+    cv::Mat left_unrectified;
+    cv::Mat right_unrectified;
     cv::Mat left_raw;
     cv::Mat right_raw;
     cv::Mat Q;
@@ -399,6 +425,8 @@ public slots:
 
     void setFileSaveDirectory(QString path){file_save_directory = path;};
     QString getFileSaveDirectory(){return file_save_directory;};
+
+    bool hasTriggerFPSControl(){return has_trigger_fps_control;};
 
     bool startCapture(){return enableCapture(true);};
     bool stopCapture(){return enableCapture(false);};
@@ -679,6 +707,7 @@ protected:
     bool captured_stereo = false;
     bool first_image_received = false;
     bool capturing = false;
+    bool has_trigger_fps_control = false;
 
     QThread *thread_;
 

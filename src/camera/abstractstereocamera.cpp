@@ -261,9 +261,17 @@ void AbstractStereoCamera::getLeftImage(cv::Mat &dst) { left_output.copyTo(dst);
 
 void AbstractStereoCamera::getRightImage(cv::Mat &dst) { right_output.copyTo(dst); }
 
-cv::Mat AbstractStereoCamera::getLeftImage(void) { return left_raw.clone(); }
+cv::Mat AbstractStereoCamera::getLeftImage(void) { return left_output.clone(); }
 
-cv::Mat AbstractStereoCamera::getRightImage(void) { return right_raw.clone(); }
+cv::Mat AbstractStereoCamera::getRightImage(void) { return right_output.clone(); }
+
+void AbstractStereoCamera::getLeftRawImage(cv::Mat &dst) { left_unrectified.copyTo(dst); }
+
+void AbstractStereoCamera::getRightRawImage(cv::Mat &dst) { right_unrectified.copyTo(dst); }
+
+cv::Mat AbstractStereoCamera::getLeftRawImage(void) { return left_unrectified.clone(); }
+
+cv::Mat AbstractStereoCamera::getRightRawImage(void) { return right_unrectified.clone(); }
 
 void AbstractStereoCamera::getDisparity(cv::Mat &dst) { disparity.copyTo(dst); }
 
@@ -564,37 +572,36 @@ void AbstractStereoCamera::processStereo(void) {
 
     if (right_raw.empty() || left_raw.empty()){
         return;
-    } else {
-        //temporary fix while vimba camera do not read image size correctly
-        //image_height = left_raw.size().height;
-        //image_width = left_raw.size().width;
-        //image_bitdepth = 1;
-        //emit update_size(image_width, image_height, image_bitdepth);
     }
 
-    if (isSwappingLeftRight()){
-        cv::Mat right_tmp;
-        right_raw.copyTo(right_tmp);
+    cv::Mat left_tmp, right_tmp;
 
-        left_raw.copyTo(right_raw);
-        right_tmp.copyTo(left_raw);
+    if (isSwappingLeftRight()){
+        right_raw.copyTo(left_tmp);
+        left_raw.copyTo(right_tmp);
+    } else {
+        left_raw.copyTo(left_tmp);
+        right_raw.copyTo(right_tmp);
     }
 
     if (downsample_factor != 1){
-        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(left_tmp,left_tmp,cv::Size(),downsample_factor,downsample_factor);
+        cv::resize(right_tmp,right_tmp,cv::Size(),downsample_factor,downsample_factor);
     }
 
+    left_tmp.copyTo(left_unrectified);
+    right_tmp.copyTo(right_unrectified);
+
     if (rectifying) {
-        bool res = rectifyImages(left_raw,right_raw,left_remapped,right_remapped);
+        bool res = rectifyImages(left_unrectified,right_unrectified,left_remapped,right_remapped);
         if (!res){
             send_error(RECTIFY_ERROR);
-            left_raw.copyTo(left_remapped);
-            right_raw.copyTo(right_remapped);
+            left_unrectified.copyTo(left_remapped);
+            right_unrectified.copyTo(right_remapped);
         }
     } else {
-        left_raw.copyTo(left_remapped);
-        right_raw.copyTo(right_remapped);
+        left_unrectified.copyTo(left_remapped);
+        right_unrectified.copyTo(right_remapped);
     }
 
     left_remapped.copyTo(left_output);
@@ -604,20 +611,9 @@ void AbstractStereoCamera::processStereo(void) {
         if (capturing_rectified_video){
             addVideoStreamFrame(left_remapped,right_remapped);
         } else {
-            addVideoStreamFrame(left_raw,right_raw);
+            addVideoStreamFrame(left_tmp,right_tmp);
         }
     }
-
-    /*
-    if (matching) {
-        if (changed_matcher){
-            changed_matcher = false;
-            this->matcher = new_matcher;
-        }
-        match_busy = true;
-        processMatch();
-    }
-    */
 
     emit stereopair_processed();
     if (!first_image_received){
