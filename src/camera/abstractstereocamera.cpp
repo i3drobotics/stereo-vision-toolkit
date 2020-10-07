@@ -728,15 +728,18 @@ void AbstractStereoCamera::processMatch(){
 }
 
 bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat frame){
+    video_mutex.lock();
     if (capturing_video){
-        if (cv_video_writer != nullptr && capturing_video)
-            if (cv_video_writer->isOpened() && cv_video_writer != nullptr && capturing_video) //TODO replace this with mutex
+        if (cv_video_writer != nullptr)
+            if (cv_video_writer->isOpened())
                 cv_video_writer->write(frame);
     }
+    video_mutex.unlock();
     return true;
 }
 
 bool AbstractStereoCamera::enableVideoStream(bool enable){
+    video_mutex.lock();
     bool res;
     if (enable){
         //start video capture
@@ -763,6 +766,7 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
         }
         res = true;
     }
+    video_mutex.unlock();
     return res;
 }
 

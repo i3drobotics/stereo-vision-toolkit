@@ -37,6 +37,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QProgressDialog>
+#include <QMutex>
 
 //!  Stereo camera base class
 /*!
@@ -573,6 +574,7 @@ private:
     bool capturing_video = false;
     bool capturing_rectified_video = true;
     VideoSource video_src = VIDEO_SRC_STEREO;
+    QMutex video_mutex;
     bool swappingLeftRight = false;
     bool reprojecting = false;
     bool cuda_device_found = false;
