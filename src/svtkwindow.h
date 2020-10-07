@@ -3,8 +3,8 @@
 * Author: Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef SVTK_WINDOW_H
+#define SVTK_WINDOW_H
 
 #define _USE_MATH_DEFINES
 
@@ -70,13 +70,13 @@ using namespace std;
 using namespace cv;
 
 namespace Ui {
-class MainWindow;
+class SVTKWindow;
 }
 
 /**
  * @brief QT Main Window of application
  */
-class MainWindow : public QMainWindow {
+class SVTKWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -85,15 +85,15 @@ public:
     * 
     * @param parent 
     */
-    explicit MainWindow(QWidget* parent = nullptr);
+    explicit SVTKWindow(QWidget* parent = nullptr);
     /**
      * @brief Destroy the Main Window object
      * 
      */
-    ~MainWindow();
+    ~SVTKWindow();
 
 private:
-    Ui::MainWindow* ui;
+    Ui::SVTKWindow* ui;
     QThread* cam_thread;
 
     int fps_measure_count = 0;
@@ -323,4 +323,4 @@ signals:
     void cameraListUpdated(void);
 };
 
-#endif  // MAINWINDOW_H
+#endif  // SVTK_WINDOW_H

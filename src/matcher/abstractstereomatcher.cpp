@@ -128,12 +128,4 @@ bool AbstractStereoMatcher::match(cv::Mat left_img, cv::Mat right_img) {
     }
 }
 
-void AbstractStereoMatcher::calcDepth(cv::Mat inDisparity, cv::Mat &outDepth){
-    //TODO impliment this
-}
-
-void AbstractStereoMatcher::calcPointCloud(cv::Mat inDepth, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outPoints){
-    //TODO impliment this
-}
-
 AbstractStereoMatcher::~AbstractStereoMatcher() { emit finished(); }

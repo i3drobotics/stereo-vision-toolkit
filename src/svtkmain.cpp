@@ -13,7 +13,7 @@
 #include <QFile>
 #include <QFontDatabase>
 
-#include "mainwindow.h"
+#include "svtkwindow.h"
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
-  MainWindow w;
+  SVTKWindow w;
   w.showMaximized();
 
   int ret = a.exec();

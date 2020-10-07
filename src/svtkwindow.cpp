@@ -3,11 +3,11 @@
 * Author: Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
 */
 
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "svtkwindow.h"
+#include "ui_svtkwindow.h"
 
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
+SVTKWindow::SVTKWindow(QWidget* parent)
+    : QMainWindow(parent), ui(new Ui::SVTKWindow) {
     ui->setupUi(this);
     QCoreApplication::setApplicationName("Stereo Vision Toolkit");
     setWindowTitle(QCoreApplication::applicationName());
@@ -197,12 +197,12 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 #ifdef WITH_FERVOR
-void MainWindow::downloadUpdateComplete(){
+void SVTKWindow::downloadUpdateComplete(){
     FvUpdater::sharedUpdater()->RunUpdator();
     QApplication::quit();
 }
 
-void MainWindow::checkUpdates(){
+void SVTKWindow::checkUpdates(){
 
     // Set the Fervor appcast url
 #ifdef DEV_BRANCH
@@ -223,7 +223,7 @@ void MainWindow::checkUpdates(){
 }
 #endif
 
-void MainWindow::disableWindow(){
+void SVTKWindow::disableWindow(){
     ui->toggleSwapLeftRight->setDisabled(true);
     ui->toggleCalibrationDownsample->setDisabled(true);
     ui->spinBoxDownsample->setDisabled(true);
@@ -246,7 +246,7 @@ void MainWindow::disableWindow(){
     toggleCameraPassiveSettings(false);
 }
 
-void MainWindow::enableWindow(){
+void SVTKWindow::enableWindow(){
 
     ui->toggleSwapLeftRight->setEnabled(true);
     ui->toggleCalibrationDownsample->setEnabled(true);
@@ -265,25 +265,25 @@ void MainWindow::enableWindow(){
     ui->actionCalibration_wizard->setEnabled(true);
 }
 
-void MainWindow::enableAutoZ(bool enable){
+void SVTKWindow::enableAutoZ(bool enable){
     autoZ = enable;
     ui->minZSpinBox->setEnabled(!enable);
     ui->maxZSpinBox->setEnabled(!enable);
 }
 
-void MainWindow::pointCloudSaveStatus(QString msg){
+void SVTKWindow::pointCloudSaveStatus(QString msg){
     qDebug() << msg;
     QMessageBox::warning(this,"Stereo Vision Toolkit",msg);
 }
 
-void MainWindow::resetStatusBar(void) {
+void SVTKWindow::resetStatusBar(void) {
     QString fps_number = QString::number(0, 'G', 3);
     match_fps_counter->setText(QString("Match FPS: ") + fps_number);
     fps_counter->setText(QString("Camera FPS: ") + fps_number);
     frame_counter->setText("Frame count: 0");
 }
 
-void MainWindow::statusBarInit(void) {
+void SVTKWindow::statusBarInit(void) {
     status_widget = new QWidget;
     ui->statusBar->addPermanentWidget(status_widget);
 
@@ -310,7 +310,7 @@ void MainWindow::statusBarInit(void) {
     ui->saveDirLabel->setText(save_directory);
 }
 
-void MainWindow::controlsInit(void) {
+void SVTKWindow::controlsInit(void) {
 
     ui->widgetSideSettings->setVisible(true);
 
@@ -350,11 +350,11 @@ void MainWindow::controlsInit(void) {
     connect(ui->reset3DViewButton, SIGNAL(clicked(bool)), this, SLOT(resetPointCloudView()));
 }
 
-void MainWindow::resetPointCloudView(){
+void SVTKWindow::resetPointCloudView(){
     cloud_viewer->resetCamera();
 }
 
-void MainWindow::enable3DViz(int tab = 0) {
+void SVTKWindow::enable3DViz(int tab = 0) {
     if (!stereo_cam) return;
 
     if (tab == 2) {
@@ -364,7 +364,7 @@ void MainWindow::enable3DViz(int tab = 0) {
     }
 }
 
-void MainWindow::enableDetection(bool enable){
+void SVTKWindow::enableDetection(bool enable){
     if (!stereo_cam){
         detection_enabled = false;
         return;
@@ -372,7 +372,7 @@ void MainWindow::enableDetection(bool enable){
     detection_enabled = enable;
 }
 
-void MainWindow::enableStreamer(bool enable){
+void SVTKWindow::enableStreamer(bool enable){
     if (!stereo_cam){
         enable = false;
     }
@@ -400,7 +400,7 @@ void MainWindow::enableStreamer(bool enable){
     ui->comboBoxStreamerSource->setEnabled(!enable);
 }
 
-void MainWindow::detectionInit(){
+void SVTKWindow::detectionInit(){
     qDebug() << "Initialising detector...";
     QProgressDialog progressPCI("Initialising detection...", "", 0, 100, this);
     progressPCI.setWindowTitle("SVT");
@@ -441,7 +441,7 @@ void MainWindow::detectionInit(){
     qDebug() << "Detector initalisation complete.";
 }
 
-void MainWindow::streamerInit(){
+void SVTKWindow::streamerInit(){
     std::string ip = ui->txtStreamerHostIP->text().toStdString();
     std::string port = QString::number(ui->spinBoxStreamPort->value()).toStdString();
     streamer = new Streamer(ip,port);
@@ -449,7 +449,7 @@ void MainWindow::streamerInit(){
     streamer->assignThread(streamerThread);
 }
 
-void MainWindow::configureDetection(){
+void SVTKWindow::configureDetection(){
     if(object_detector == nullptr) return;
 
     DetectorSetupDialog detection_dialog;
@@ -538,7 +538,7 @@ void MainWindow::configureDetection(){
     ui->activeModelLabel->setText(config_fileinfo.fileName());
 }
 
-void MainWindow::onClassListClicked(void){
+void SVTKWindow::onClassListClicked(void){
 
     int number_selected = ui->classListWidget->selectedItems().size();
     if(number_selected == 0){
@@ -572,7 +572,7 @@ void MainWindow::onClassListClicked(void){
     }
 }
 
-void MainWindow::updateClassColour(void){
+void SVTKWindow::updateClassColour(void){
 
     QColorDialog dialog;
     QString class_name = ui->classListWidget->currentItem()->text();
@@ -583,33 +583,33 @@ void MainWindow::updateClassColour(void){
     }
 }
 
-void MainWindow::updateClassFilled(bool checked){
+void SVTKWindow::updateClassFilled(bool checked){
     setClassFilled(ui->classListWidget->currentItem()->text(), checked);
 }
 
-void MainWindow::updateClassVisible(bool checked){
+void SVTKWindow::updateClassVisible(bool checked){
     setClassVisible(ui->classListWidget->currentItem()->text(), checked);
 }
 
-void MainWindow::updateBoundingBoxAlpha(int value){
+void SVTKWindow::updateBoundingBoxAlpha(int value){
     bounding_box_alpha = value;
     settings->setValue("bbox_alpha", value);
     qDebug() << "Updated bounding box fill transparency to: " << value;
 }
 
-void MainWindow::updateNMSThreshold(int value){
+void SVTKWindow::updateNMSThreshold(int value){
     object_detector->setNMSThresholdPercent(value);
     settings->setValue("nms_threshold", value);
     qDebug() << "Updated NMS threshold % to: " << value;
 }
 
-void MainWindow::updateDetectionThreshold(int value){
+void SVTKWindow::updateDetectionThreshold(int value){
     object_detector->setConfidenceThresholdPercent(value);
     settings->setValue("Updated detection threshold % to: ", value);
 }
 
 
-void MainWindow::setClassColour(QString class_name, QColor class_colour){
+void SVTKWindow::setClassColour(QString class_name, QColor class_colour){
 
     // Set class colour
     auto tag_name = QString("class/%1/colour").arg(class_name);
@@ -628,7 +628,7 @@ void MainWindow::setClassColour(QString class_name, QColor class_colour){
     qDebug() << "Updated colour for " << class_name << "(" << r << "," << g << "," << b << ")";
 }
 
-void MainWindow::setClassVisible(QString class_name, bool visible){
+void SVTKWindow::setClassVisible(QString class_name, bool visible){
 
     auto tag_name = QString("class/%1/visible").arg(class_name);
 
@@ -640,7 +640,7 @@ void MainWindow::setClassVisible(QString class_name, bool visible){
         qDebug() << "Hiding " << class_name;
 }
 
-void MainWindow::setClassFilled(QString class_name, bool fill){
+void SVTKWindow::setClassFilled(QString class_name, bool fill){
     auto tag_name = QString("class/%1/fill").arg(class_name);
 
     settings->setValue(tag_name, fill);
@@ -651,7 +651,7 @@ void MainWindow::setClassFilled(QString class_name, bool fill){
         qDebug() << "Setting " << class_name << " class to be filled";
 }
 
-void MainWindow::updateStreamer(){
+void SVTKWindow::updateStreamer(){
     if(!streamer) return;
 
     if (this->streaming)
@@ -712,7 +712,7 @@ void MainWindow::updateStreamer(){
     this->streaming = false;
 }
 
-void MainWindow::updateDetection(){
+void SVTKWindow::updateDetection(){
 
     if(!object_detector) return;
 
@@ -780,7 +780,7 @@ void MainWindow::updateDetection(){
     this->detecting = false;
 }
 
-void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x=1.0, double scale_y=1.0){
+void SVTKWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x=1.0, double scale_y=1.0){
 
     for(auto &bbox : bboxes){
 
@@ -835,7 +835,7 @@ void MainWindow::drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxe
 }
 
 
-void MainWindow::pointCloudInit() {
+void SVTKWindow::pointCloudInit() {
     QProgressDialog progressPCI("Initialising display...", "", 0, 100, this);
     progressPCI.setWindowTitle("SVT");
     progressPCI.setWindowModality(Qt::WindowModal);
@@ -879,7 +879,7 @@ void MainWindow::pointCloudInit() {
     QCoreApplication::processEvents();
 }
 
-void MainWindow::autoUpdatePointCloudBounds(){
+void SVTKWindow::autoUpdatePointCloudBounds(){
     double min_depth = 0;
     double max_depth = 5;
     if (autoZ){
@@ -901,7 +901,7 @@ void MainWindow::autoUpdatePointCloudBounds(){
     }
 }
 
-void MainWindow::updateCloud() {
+void SVTKWindow::updateCloud() {
 
     cloud = stereo_cam->getPointCloud();
 
@@ -930,7 +930,7 @@ void MainWindow::updateCloud() {
     vtk_widget->update();
 }
 
-void MainWindow::stereoCameraInitWindow(void){
+void SVTKWindow::stereoCameraInitWindow(void){
     double default_exposure = current_camera_settings.exposure;
     int default_gain = current_camera_settings.gain;
     int default_fps = current_camera_settings.fps;
@@ -1194,7 +1194,7 @@ void MainWindow::stereoCameraInitWindow(void){
     }
 }
 
-void MainWindow::stereoCameraInitConnections(void) {
+void SVTKWindow::stereoCameraInitConnections(void) {
 
     stereoCameraInitWindow();
 
@@ -1276,7 +1276,7 @@ void MainWindow::stereoCameraInitConnections(void) {
     stopDeviceListTimer();
 }
 
-void MainWindow::stereoCameraRelease(void) {
+void SVTKWindow::stereoCameraRelease(void) {
     disableWindow();
 
     ui->exposureSpinBox->setDisabled(true);
@@ -1444,7 +1444,7 @@ void MainWindow::stereoCameraRelease(void) {
     resetStatusBar();
 }
 
-int MainWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info){
+int SVTKWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_serial_info){
     stereoCameraRelease();
     QProgressDialog progressConnect("Connecting to camera...", "", 0, 100, this);
     progressConnect.setWindowTitle("SVT");
@@ -1556,11 +1556,11 @@ int MainWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_s
     return exit_code;
 }
 
-void MainWindow::refreshCameraListThreaded(){
-    qfuture_refreshcameralist = QtConcurrent::run(this, &MainWindow::refreshCameraList);
+void SVTKWindow::refreshCameraListThreaded(){
+    qfuture_refreshcameralist = QtConcurrent::run(this, &SVTKWindow::refreshCameraList);
 }
 
-void MainWindow::refreshCameraList(){
+void SVTKWindow::refreshCameraList(){
     if (!cameras_connected){
         ui->gridLayoutCameraList->setEnabled(false);
         QCoreApplication::processEvents();
@@ -1575,7 +1575,7 @@ void MainWindow::refreshCameraList(){
     }
 }
 
-void MainWindow::refreshCameraListGUI(){
+void SVTKWindow::refreshCameraListGUI(){
     //triggered by 'cameraListUpdated()' signal
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> camera_serial_info_list = current_camera_serial_info_list;
     camera_button_signal_mapper_list = new vector<QSignalMapper*>();
@@ -1669,7 +1669,7 @@ void MainWindow::refreshCameraListGUI(){
     QCoreApplication::processEvents();
 }
 
-void MainWindow::cameraDeviceSelected(int index){
+void SVTKWindow::cameraDeviceSelected(int index){
     stopDeviceListTimer();
     int button_index = index;
     if (static_cast<size_t>(button_index) < current_camera_serial_info_list.size()){
@@ -1723,7 +1723,7 @@ void MainWindow::cameraDeviceSelected(int index){
     }
 }
 
-void MainWindow::stereoCameraInit() {
+void SVTKWindow::stereoCameraInit() {
     if (cameras_connected) {
         save_directory = parameters->get_string("saveDir");
         calibration_directory = parameters->get_string("calDir");
@@ -1751,7 +1751,7 @@ void MainWindow::stereoCameraInit() {
     }
 }
 
-void MainWindow::startDeviceListTimer() {
+void SVTKWindow::startDeviceListTimer() {
     // refresh device list every 5 seconds
     //TODO replace this with event driven system
     qDebug() << "Starting device list timer";
@@ -1768,13 +1768,13 @@ void MainWindow::startDeviceListTimer() {
     ui->btnRefreshCameras->setEnabled(true);
 }
 
-void MainWindow::stopDeviceListTimer() {
+void SVTKWindow::stopDeviceListTimer() {
     QObject::disconnect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
     device_list_timer->stop();
     ui->btnRefreshCameras->setEnabled(false);
 }
 
-void MainWindow::videoStreamLoad(void) {
+void SVTKWindow::videoStreamLoad(void) {
     if (ui->btnLoadVideo->text() == "Load Stereo Video"){
         QMessageBox msg;
 
@@ -1833,7 +1833,7 @@ void MainWindow::videoStreamLoad(void) {
     }
 }
 
-void MainWindow::enableVideoCapture(bool enable){
+void SVTKWindow::enableVideoCapture(bool enable){
     if (enable){
         int vid_fps = current_fps;
         if (current_fps == 0){
@@ -1880,7 +1880,7 @@ void MainWindow::enableVideoCapture(bool enable){
     stereo_cam->enableVideoStream(enable);
 }
 
-void MainWindow::startCalibrationFromImages(void) {
+void SVTKWindow::startCalibrationFromImages(void) {
     calibration_images_dialog = new CalibrateFromImagesDialog(this);
     connect(calibration_images_dialog, SIGNAL(run_calibration()), this, SLOT(runCalibrationFromImages()));
     calibration_images_dialog->move(100, 100);
@@ -1889,7 +1889,7 @@ void MainWindow::startCalibrationFromImages(void) {
     calibration_from_images_dialog_used = true;
 }
 
-void MainWindow::runCalibrationFromImages(void){
+void SVTKWindow::runCalibrationFromImages(void){
 
     qDebug() << "Beginning calibration from images";
 
@@ -1915,7 +1915,7 @@ void MainWindow::runCalibrationFromImages(void){
     calibrator->jointCalibration();
 }
 
-void MainWindow::startAutoCalibration(void) {
+void SVTKWindow::startAutoCalibration(void) {
     enableRectify(false);
     ui->enableStereo->setChecked(false);
     stereo_cam->enableMatching(false);
@@ -1928,7 +1928,7 @@ void MainWindow::startAutoCalibration(void) {
     calibration_dialog_used = true;
 }
 
-void MainWindow::runAutoCalibration(void){
+void SVTKWindow::runAutoCalibration(void){
     qDebug() << "Beginning calibration";
 
     if(calibration_dialog == nullptr) return;
@@ -1957,7 +1957,7 @@ void MainWindow::runAutoCalibration(void){
     calibrator->jointCalibration();
 }
 
-void MainWindow::doneCalibration(bool) {
+void SVTKWindow::doneCalibration(bool) {
     //connect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay())); TODO check this
 
     disconnect(calibration_dialog, SIGNAL(stopCalibration()), calibrator,
@@ -1967,7 +1967,7 @@ void MainWindow::doneCalibration(bool) {
     //stereo_cam->enableCapture(true);
 }
 
-void MainWindow::setMatcher(int index) {
+void SVTKWindow::setMatcher(int index) {
     if (index < 0 || index > matcher_list.size()) return;
 
     auto matcher_widget = matcher_list.at(index);
@@ -1987,7 +1987,7 @@ void MainWindow::setMatcher(int index) {
     }
 }
 
-void MainWindow::setupMatchers(void) {
+void SVTKWindow::setupMatchers(void) {
     disconnect(ui->matcherSelectBox, SIGNAL(currentIndexChanged(int)), this,
                SLOT(setMatcher(int)));
 
@@ -2051,7 +2051,7 @@ void MainWindow::setupMatchers(void) {
             SLOT(setMatcher(int)));
 }
 
-void MainWindow::setCalibrationFolder(QString dir) {
+void SVTKWindow::setCalibrationFolder(QString dir) {
     if(dir == ""){
         dir = QFileDialog::getExistingDirectory(
                     this, tr("Open Calibration Folder"), "/home",
@@ -2103,7 +2103,7 @@ void MainWindow::setCalibrationFolder(QString dir) {
     }
 }
 
-void MainWindow::statusMessageTimeout(void) {
+void SVTKWindow::statusMessageTimeout(void) {
     if (stereo_cam->isCapturing()) {
         ui->statusBar->showMessage("Capturing.");
     } else {
@@ -2111,21 +2111,21 @@ void MainWindow::statusMessageTimeout(void) {
     }
 }
 
-void MainWindow::singleShotClicked(void) {
+void SVTKWindow::singleShotClicked(void) {
     enableCapture(false);
     stereo_cam->captureSingle();
 }
 
-void MainWindow::saveSingle(void) {
+void SVTKWindow::saveSingle(void) {
     stereo_cam->saveImageTimestamped();
 }
 
-void MainWindow::enableRectify(bool enable) {   
+void SVTKWindow::enableRectify(bool enable) {   
     ui->toggleRectifyCheckBox->setChecked(enable);
     stereo_cam->enableRectify(enable);
 }
 
-void MainWindow::enableCapture(bool enable) {
+void SVTKWindow::enableCapture(bool enable) {
     if (enable){
         // start capture
         stereo_cam->startCapture();
@@ -2143,7 +2143,7 @@ void MainWindow::enableCapture(bool enable) {
    }
 }
 
-void MainWindow::displaySaved(bool success) {
+void SVTKWindow::displaySaved(bool success) {
     QString msg;
     if (success){
         msg = QString("Saved to: %1").arg(stereo_cam->getFileSaveDirectory());
@@ -2155,7 +2155,7 @@ void MainWindow::displaySaved(bool success) {
     status_bar_timer->start(1500);
 }
 
-void MainWindow::updateDisplay(void) {
+void SVTKWindow::updateDisplay(void) {
     cv::Mat left, right;
 
     if (cameras_connected){
@@ -2185,7 +2185,7 @@ void MainWindow::updateDisplay(void) {
     }
 }
 
-void MainWindow::setSaveDirectory(QString dir) {
+void SVTKWindow::setSaveDirectory(QString dir) {
 
     if(dir == ""){
         dir = QFileDialog::getExistingDirectory(
@@ -2203,7 +2203,7 @@ void MainWindow::setSaveDirectory(QString dir) {
     }
 }
 
-void MainWindow::enableAutoGain(bool enable){
+void SVTKWindow::enableAutoGain(bool enable){
     stereo_cam->enableAutoGain(enable);
     if (!enable){
         int gain_val = ui->gainSpinBox->value();
@@ -2211,7 +2211,7 @@ void MainWindow::enableAutoGain(bool enable){
     }
 }
 
-void MainWindow::enableAutoExpose(bool enable){
+void SVTKWindow::enableAutoExpose(bool enable){
     stereo_cam->enableAutoExposure(enable);
     if (!enable){
         double exposure_val = ui->exposureSpinBox->value();
@@ -2219,18 +2219,18 @@ void MainWindow::enableAutoExpose(bool enable){
     }
 }
 
-void MainWindow::enableTrigger(bool enable){
+void SVTKWindow::enableTrigger(bool enable){
     ui->enabledTriggeredCheckbox->setChecked(enable);
     stereo_cam->enableTrigger(enable);
     setFPS(ui->fpsSpinBox->value());
 }
 
-void MainWindow::setFPS(int fps){
+void SVTKWindow::setFPS(int fps){
     stereo_cam->setFPS(fps);
     current_fps = fps;
 }
 
-void MainWindow::setPacketSize(int packetSize){
+void SVTKWindow::setPacketSize(int packetSize){
     QProgressDialog progressPacketSize("Updating packet size...", "", 0, 100, this);
     progressPacketSize.setWindowTitle("SVT");
     progressPacketSize.setWindowModality(Qt::WindowModal);
@@ -2245,7 +2245,7 @@ void MainWindow::setPacketSize(int packetSize){
     progressPacketSize.close();
 }
 
-void MainWindow::setBinning(int binning){
+void SVTKWindow::setBinning(int binning){
     if (gigeWarning(binning)){
         QProgressDialog progressBinning("Updating binning...", "", 0, 100, this);
         progressBinning.setWindowTitle("SVT");
@@ -2274,7 +2274,7 @@ void MainWindow::setBinning(int binning){
     }
 }
 
-void MainWindow::enableBinning(bool enable){
+void SVTKWindow::enableBinning(bool enable){
     int binning_val = 1;
     if (enable){
         binning_val = current_binning;
@@ -2300,7 +2300,7 @@ void MainWindow::enableBinning(bool enable){
     }
 }
 
-void MainWindow::toggleCameraActiveSettings(bool enable){
+void SVTKWindow::toggleCameraActiveSettings(bool enable){
     ui->exposureSpinBox->setEnabled(enable);
     ui->autoExposeCheck->setEnabled(enable);
     ui->gainSpinBox->setEnabled(enable);
@@ -2309,7 +2309,7 @@ void MainWindow::toggleCameraActiveSettings(bool enable){
     ui->btnLoadCalibration->setEnabled(enable);
 }
 
-void MainWindow::toggleCameraPassiveSettings(bool enable){
+void SVTKWindow::toggleCameraPassiveSettings(bool enable){
     ui->fpsSpinBox->setEnabled(enable);
     ui->enabledTriggeredCheckbox->setEnabled(enable);
     ui->binningSpinBox->setEnabled(enable);
@@ -2317,7 +2317,7 @@ void MainWindow::toggleCameraPassiveSettings(bool enable){
     ui->packetSizeSpinBox->setEnabled(enable);
 }
 
-bool MainWindow::gigeWarning(int binning,int new_fps){
+bool SVTKWindow::gigeWarning(int binning,int new_fps){
     if (using_gige){
         int fps;
         if (new_fps >= 0){
@@ -2358,11 +2358,11 @@ bool MainWindow::gigeWarning(int binning,int new_fps){
     }
 }
 
-void MainWindow::updateFrameCount(qint64 count) {
+void SVTKWindow::updateFrameCount(qint64 count) {
     frame_counter->setText(QString("Frame count: %1").arg(count));
 }
 
-void MainWindow::updateMatchTime(qint64 time) {
+void SVTKWindow::updateMatchTime(qint64 time) {
     float fps = 1000.0 / time;
     measured_match_fps = fps;
 
@@ -2380,7 +2380,7 @@ void MainWindow::updateMatchTime(qint64 time) {
     match_fps_counter->setText(QString("Match FPS: ") + fps_number);
 }
 
-void MainWindow::updateFrameTime(qint64 time) {
+void SVTKWindow::updateFrameTime(qint64 time) {
     float fps = 1000.0 / time;
     measured_fps = fps;
 
@@ -2398,17 +2398,17 @@ void MainWindow::updateFrameTime(qint64 time) {
     fps_counter->setText(QString("Camera FPS: ") + fps_number);
 }
 
-void MainWindow::openHelp(){
+void SVTKWindow::openHelp(){
     QString link = "https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf";
     QDesktopServices::openUrl(QUrl(link));
 }
 
-void MainWindow::openAbout(){
+void SVTKWindow::openAbout(){
     about_dialog->show();
     about_dialog_used = true;
 }
 
-void MainWindow::hideCameraSettings(bool hide){
+void SVTKWindow::hideCameraSettings(bool hide){
     if (hide){
         ui->widgetSideSettings->setVisible(false);
         ui->btnShowCameraSettings->setVisible(true);
@@ -2422,24 +2422,24 @@ void MainWindow::hideCameraSettings(bool hide){
     }
 }
 
-void MainWindow::on_btnShowCameraSettings_clicked()
+void SVTKWindow::on_btnShowCameraSettings_clicked()
 {
     hideCameraSettings(ui->widgetSideSettings->isVisible());
 }
 
-void MainWindow::on_btnHideCameraSettings_clicked()
+void SVTKWindow::on_btnHideCameraSettings_clicked()
 {
     on_btnShowCameraSettings_clicked();
 }
 
-void MainWindow::enableMatching(bool enable){
+void SVTKWindow::enableMatching(bool enable){
     if (!enable){
         QString fps_number = QString::number(0, 'G', 3);
         match_fps_counter->setText(QString("Match FPS: ") + fps_number);
     }
 }
 
-void MainWindow::error(int error){
+void SVTKWindow::error(int error){
     QMessageBox msgBox;
     msgBox.setWindowTitle("Stereo Vision Toolkit");
     std::string msgBoxMsg;
@@ -2467,7 +2467,7 @@ void MainWindow::error(int error){
     }
 }
 
-void MainWindow::updatePointTexture(int index){
+void SVTKWindow::updatePointTexture(int index){
     if (cameras_connected){
         if(index == 0){
             stereo_cam->setPointCloudTexture(AbstractStereoCamera::POINT_CLOUD_TEXTURE_IMAGE);
@@ -2479,7 +2479,7 @@ void MainWindow::updatePointTexture(int index){
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *) {
+void SVTKWindow::closeEvent(QCloseEvent *) {
     qDebug() << "Releasing cameras...";
     stereoCameraRelease();
 
@@ -2513,7 +2513,7 @@ void MainWindow::closeEvent(QCloseEvent *) {
     qDebug() << "Close event complete.";
 }
 
-MainWindow::~MainWindow() {
+SVTKWindow::~SVTKWindow() {
     qDebug() << "Cleaning up threads...";
     if (streamer)
         delete(streamer);

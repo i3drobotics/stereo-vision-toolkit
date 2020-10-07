@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.3.1a.9
+VERSION = 1.3.1a.10
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
@@ -44,12 +44,10 @@ DEV_BRANCH {
     }
 }
 
-# Setup FEVOR defines
+# Setup FERVOR defines
 DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
-
-#DEFINES += _WINSOCKAPI_
 
 # To use I3DRSGM
 # add 'CONFIG+=WITH_I3DRSGM' to build arguments
@@ -75,13 +73,28 @@ WITH_VIMBA {
 }
 
 # Define resources
-RC_FILE = icon.rc
+RC_FILE = $$_PRO_FILE_PWD_/resources/icon.rc
 
 RESOURCES += \
     $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc \
     $$_PRO_FILE_PWD_/resources/window/window.qrc
 
-include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
+# ---Include modules---
+# QtAwesome
+!include(modules/QtAwesome/QtAwesome.pri) {
+    error("Unable to include QtAwesome.")
+}
+
+# Fervor autoupdater
+!include("modules/fervor/Fervor.pri") {
+        error("Unable to include Fervor autoupdater.")
+}
+
+# Streamer
+!include("modules/Streamer/Streamer.pri") {
+    error("Unable to include Streamer.")
+}
+# ---------------------
 
 # Define search paths for files
 VPATH += $$_PRO_FILE_PWD_/src
@@ -93,7 +106,6 @@ VPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 VPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 VPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
 VPATH += $$_PRO_FILE_PWD_/src/detection
-VPATH += $$_PRO_FILE_PWD_/src/streamer
 INCLUDEPATH += $$_PRO_FILE_PWD_/src
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher
@@ -102,7 +114,6 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
-INCLUDEPATH += $$_PRO_FILE_PWD_/src/streamer
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/detection
 
 WITH_VIMBA {
@@ -112,15 +123,14 @@ WITH_VIMBA {
 
 # Define source files
 SOURCES += \
+    svtkmain.cpp \
+    svtkwindow.cpp \
     arduinocommscameracontrol.cpp \
-    main.cpp\
-    mainwindow.cpp \
     aboutdialog.cpp \
     calibrationdialog.cpp \
     abstractarduinocoms.cpp \
     detectoropencv.cpp \
     detectorsetupdialog.cpp \
-    streamer.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -142,8 +152,7 @@ SOURCES += \
     paramfile.cpp \
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp \
-    virtualcam.cpp \
-    image2string.cpp
+    virtualcam.cpp
 # Deimos source file is windows only for directshow
 win32 {
     SOURCES += stereocameradeimos.cpp
@@ -163,8 +172,8 @@ WITH_I3DRSGM {
 
 # Define header files
 HEADERS += \
+    svtkwindow.h \
     arduinocommscameracontrol.h \
-    mainwindow.h \
     aboutdialog.h \
     calibrationdialog.h \
     asmopencv.h \
@@ -175,7 +184,6 @@ HEADERS += \
     boundingbox.h \
     detectoropencv.h \
     detectorsetupdialog.h \
-    streamer.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -198,8 +206,7 @@ HEADERS += \
     paramfile.h \
     cameradisplaywidget.h \
     cameraimagingsource.h \
-    virtualcam.h \
-    image2string.h
+    virtualcam.h
 # Deimos header file is windows only for directshow
 win32 {
     HEADERS += stereocameradeimos.h
@@ -218,7 +225,7 @@ WITH_I3DRSGM {
 }
 # Define application window forms
 FORMS += \
-    mainwindow.ui \
+    svtkwindow.ui \
     aboutdialog.ui \
     calibrationdialog.ui \
     calibrateconfirmdialog.ui \
@@ -236,14 +243,16 @@ WITH_I3DRSGM {
 
 # For building in a release and debug in seperate folders
 CONFIG(debug, debug|release) { #debug
-    DESTDIR = debug
-    OBJECTS_DIR = .obj_debug
-    MOC_DIR     = .moc_debug
+    DESTDIR = $$TARGET/debug
+    OBJECTS_DIR = $$TARGET/.obj_debug
+    MOC_DIR     = $$TARGET/.moc_debug
 }else {
-    DESTDIR = release
-    OBJECTS_DIR = .obj
-    MOC_DIR     = .moc
+    DESTDIR = $$TARGET/release
+    OBJECTS_DIR = $$TARGET/.obj
+    MOC_DIR     = $$TARGET/.moc
 }
+RCC_DIR = $$TARGET/.qrc
+UI_DIR = $$TARGET/.ui
 
 # Error if running 32-bit system
 # depencies are built to run on 64-bit system
@@ -451,11 +460,6 @@ helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 COPIES += mlExamples
 mlExamples.files = $$files($$_PRO_FILE_PWD_/resources/ml/coco/*, true)
 mlExamples.path = $${DEPLOY_FOLDER}/ml/coco
-
-# Fervor autoupdater
-!include("fervor/Fervor.pri") {
-        error("Unable to include Fervor autoupdater.")
-}
 
 # Auto generate code documenation using doxygen
 CONFIG( doc ){
