@@ -774,7 +774,22 @@ bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int c
     if (filename == "") {
         QDateTime dateTime = dateTime.currentDateTime();
         QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-        video_filename = QString("%1/stereo_video_%2.avi").arg(save_directory, date_string).toStdString();
+        QString file_prefix;
+        switch(vid_src) {
+        case VIDEO_SRC_STEREO:
+            file_prefix = "stereo_video_";
+            break;
+        case VIDEO_SRC_LEFT:
+            file_prefix = "left_video_";
+            break;
+        case VIDEO_SRC_RIGHT:
+            file_prefix = "right_video_";
+            break;
+        case VIDEO_SRC_DISPARITY:
+            file_prefix = "disparity_video_";
+            break;
+        }
+        video_filename = QString("%1/%2%3.avi").arg(save_directory, file_prefix, date_string).toStdString();
     }
 
     if (fps == 0) fps = 30;
