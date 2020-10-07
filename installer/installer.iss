@@ -3,10 +3,10 @@
 ; MUST be installed on x64 bit machine
 
 #define AppName "Stereo Vision Toolkit"
-#define AppVersion "1.3.1a.9"
+#define AppVersion "1.3.1a.10s"
 #define InstallerName "StereoVisionToolkit"
 #define ExeName "StereoVisionToolkit.exe"
-#define IconName "i3dr_logo.ico"
+#define IconName "resources/i3dr_logo.ico"
 #define vcredist "vc_redist.x64"
 ; Some machines use differnetly named vcredist: vcredist_x64 / vc_redist.x64
 
@@ -36,11 +36,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "../build/release/*"; Excludes: "\params\*.xml,*.lic,install_drivers.bat"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "../build/release/{#vcredist}.exe"; DestDir: {tmp}; Flags: deleteafterinstall
-Source: "../build/release/pylon_USB_Camera_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
-Source: "../build/release/pylon_GigE_Filter_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
-Source: "../build/release/pylon_GigE_Performance_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/{#InstallerName}/release/*"; Excludes: "\params\*.xml,*.lic,install_drivers.bat"; DestDir: "{app}"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "../build/{#InstallerName}/release/{#vcredist}.exe"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/{#InstallerName}/release/pylon_USB_Camera_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/{#InstallerName}/release/pylon_GigE_Filter_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
+Source: "../build/{#InstallerName}/release/pylon_GigE_Performance_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../licenses/*"; DestDir: "{app}/licenses"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "../LICENSE"; DestDir: "{app}/licenses"
 Source: "../{#IconName}"; DestDir: "{app}"

@@ -112,10 +112,6 @@ class AbstractStereoMatcher : public QObject {
 
   bool match(cv::Mat left_img, cv::Mat right_img);
 
-  void calcDepth(cv::Mat inDisparity, cv::Mat &outDepth);
-
-  void calcPointCloud(cv::Mat inDepth, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outPoints);
-
 private:
   //!  Set images for matching
   /*!

@@ -80,7 +80,7 @@ Boost requires Visual Studio 2017, and needs cl.exe to be in the path or to run 
 
 #### QT 
 Tested with QT 5.14.2 with Visual Studio 2017.  
-Requires QT Webengine module for use in Fevor. 
+Requires QT Webengine module for use in Fervor. 
 
 #### CUDA
 There is limited usage of CUDA for certain image processing steps (e.g. rectification) and neural network support. If you want to build with CUDA support, you need to build OpenCV manually as the pre-packaged releases don't include it.
