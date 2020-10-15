@@ -1,3 +1,3 @@
 [submodule "fervor"]
-	path = fervor
+	path = modules/fervor
 	url = https://github.com/i3drobotics/fervor.git
