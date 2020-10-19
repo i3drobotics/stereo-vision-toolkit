@@ -90,9 +90,9 @@ RESOURCES += \
         error("Unable to include Fervor autoupdater.")
 }
 
-# Streamer
-!include("modules/Streamer/Streamer.pri") {
-    error("Unable to include Streamer.")
+# StereoStreamer
+!include("modules/StereoStreamer/StereoStreamer.pri") {
+    error("Unable to include StereoStreamer.")
 }
 # ---------------------
 
