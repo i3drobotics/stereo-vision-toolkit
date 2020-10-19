@@ -383,17 +383,12 @@ void SVTKWindow::enableStreamer(bool enable){
         } else {
             connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
         }
-        streamer->startServer();
-        mImageClient.id = -1;
-        mImageClient.socket = INVALID_SOCKET;
-        //mImageClient = streamer->startClient();
-        //mDispClient = streamer->startClient();
+        stereoStreamerServer->startServer();
     } else {
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
         disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updateStreamer()));
-        streamer->stopClient(mImageClient);
-        //streamer->stopClient(mDispClient);
-        streamer->stopServer();
+        stereoStreamerClient->stopClient();
+        stereoStreamerServer->stopServer();
     }
     ui->txtStreamerHostIP->setEnabled(!enable);
     ui->spinBoxStreamPort->setEnabled(!enable);
@@ -444,9 +439,12 @@ void SVTKWindow::detectionInit(){
 void SVTKWindow::streamerInit(){
     std::string ip = ui->txtStreamerHostIP->text().toStdString();
     std::string port = QString::number(ui->spinBoxStreamPort->value()).toStdString();
-    streamer = new Streamer(ip,port);
-    QThread* streamerThread = new QThread;
-    streamer->assignThread(streamerThread);
+    stereoStreamerServer = new StereoStreamer::Server(ip,port);
+    stereoStreamerClient = new StereoStreamer::Client(ip,port,false);
+    QThread* streamerServerThread = new QThread;
+    QThread* streamerClientThread = new QThread;
+    stereoStreamerServer->assignThread(streamerServerThread);
+    stereoStreamerClient->assignThread(streamerClientThread);
 }
 
 void SVTKWindow::configureDetection(){
@@ -652,7 +650,8 @@ void SVTKWindow::setClassFilled(QString class_name, bool fill){
 }
 
 void SVTKWindow::updateStreamer(){
-    if(!streamer) return;
+    if(!stereoStreamerServer) return;
+    if(!stereoStreamerClient) return;
 
     if (this->streaming)
         return;
@@ -663,7 +662,8 @@ void SVTKWindow::updateStreamer(){
         bool isFloatImage = false;
         bool useRectified = ui->checkBoxStreamerUseRectified->isChecked();
         // Select image source
-        switch(ui->comboBoxStreamerSource->currentIndex()) {
+        int source_index = ui->comboBoxStreamerSource->currentIndex();
+        switch(source_index) {
         case 0: // stereo
             if (useRectified){
                 cv::hconcat(stereo_cam->getLeftImage(), stereo_cam->getRightImage(), image_stream);
@@ -699,13 +699,14 @@ void SVTKWindow::updateStreamer(){
             qDebug() << "Empty image passed to streamer";
             return;
         }
-        if (mImageClient.id == -1 || mImageClient.socket == INVALID_SOCKET){
-            mImageClient = streamer->startClient();
+        StereoStreamer::ClientInfo clientInfo = stereoStreamerClient->getClientInfo();
+        if (clientInfo.id == -1 || clientInfo.socket == INVALID_SOCKET){
+            stereoStreamerClient->startClient();
         } else {
             if (isFloatImage){
-                streamer->clientSendFloatImageThreaded(mImageClient,image_stream);
+                stereoStreamerClient->clientSendFloatImageThreaded(image_stream);
             } else {
-                streamer->clientSendUCharImageThreaded(mImageClient,image_stream);
+                stereoStreamerClient->clientSendUCharImageThreaded(image_stream);
             }
         }
     }
@@ -2515,8 +2516,8 @@ void SVTKWindow::closeEvent(QCloseEvent *) {
 
 SVTKWindow::~SVTKWindow() {
     qDebug() << "Cleaning up threads...";
-    if (streamer)
-        delete(streamer);
+    if (stereoStreamerServer)
+        delete(stereoStreamerServer);
     if (object_detector)
         delete(object_detector);
     //if (cam_thread)

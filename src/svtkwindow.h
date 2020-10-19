@@ -9,7 +9,7 @@
 #define _USE_MATH_DEFINES
 
 #include "cmath"
-#include "streamer.h" //defined first to avoid '_WINSOCKAPI_ macro redefinition' errors
+#include "stereostreamer.h" //defined first to avoid '_WINSOCKAPI_ macro redefinition' errors
 
 #include <QtAwesome.h>
 #include <QDebug>
@@ -180,9 +180,8 @@ private:
     Pylon::CTlFactory* pylonTlFactory;
 
     DetectorOpenCV* object_detector;
-    Streamer* streamer;
-    Streamer::client_type mImageClient;
-    Streamer::client_type mDispClient;
+    StereoStreamer::Server* stereoStreamerServer;
+    StereoStreamer::Client* stereoStreamerClient;
     bool detection_enabled = false;
     bool streamer_enabled = false;
     bool detecting = false;
