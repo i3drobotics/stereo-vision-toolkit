@@ -1,4 +1,4 @@
-[submodule "fervor"]
+[submodule "modules/fervor"]
 	path = modules/fervor
 	url = https://github.com/i3drobotics/fervor.git
 [submodule "StereoStreamer"]
