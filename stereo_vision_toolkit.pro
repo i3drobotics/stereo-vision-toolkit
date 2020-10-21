@@ -49,6 +49,14 @@ DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
+# To disable StereoStreamer
+# comment out this line 'CONFIG+=WITH_STEREOSTREAMER'
+CONFIG+=WITH_STEREO_STREAMER
+WITH_STEREO_STREAMER {
+    message("StereoStreamer enabled")
+    DEFINES += WITH_STEREO_STREAMER
+}
+
 # To use I3DRSGM
 # add 'CONFIG+=WITH_I3DRSGM' to build arguments
 WITH_I3DRSGM {

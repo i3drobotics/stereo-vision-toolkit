@@ -783,7 +783,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <item>
-              <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,1,1">
+              <layout class="QGridLayout" name="gridLayoutAppSettings" columnstretch="0,0,0">
                <property name="leftMargin">
                 <number>5</number>
                </property>
@@ -799,10 +799,47 @@
                <property name="verticalSpacing">
                 <number>5</number>
                </property>
-               <item row="0" column="0">
-                <widget class="QLabel" name="lblImageSettings">
+               <item row="9" column="1">
+                <widget class="QComboBox" name="comboBoxStreamerSource">
+                 <item>
+                  <property name="text">
+                   <string>Stereo</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Left</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Right</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Disparity</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="10" column="1">
+                <widget class="QCheckBox" name="checkBoxStreamerUseRectified">
                  <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Image Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>Enable</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0">
+                <widget class="QLabel" name="lblPort">
+                 <property name="text">
+                  <string>Port</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -819,23 +856,95 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="lblSwapLR">
+               <item row="11" column="1">
+                <spacer name="horizontalSpacer_10">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="13" column="1">
+                <spacer name="verticalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="7" column="1">
+                <widget class="QLineEdit" name="txtStreamerHostIP">
+                 <property name="text">
+                  <string>127.0.0.1</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="lblImageSettings">
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Image Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="11" column="2">
+                <spacer name="horizontalSpacer_11">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="1">
+                <widget class="QCheckBox" name="toggleSwapLeftRight">
                  <property name="enabled">
-                  <bool>true</bool>
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>Swap LR</string>
+                  <string>Swap</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0">
+                <widget class="QLabel" name="lblHostIP">
+                 <property name="text">
+                  <string>Host IP</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="0">
-                <widget class="QLabel" name="lblStreamerSettings">
+               <item row="5" column="1">
+                <widget class="QCheckBox" name="checkBoxVideoUseRectified">
                  <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Streamer Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>Enable</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -849,23 +958,23 @@
                  </property>
                 </widget>
                </item>
-               <item row="9" column="0">
-                <widget class="QLabel" name="lblStreamerSource">
+               <item row="10" column="0">
+                <widget class="QLabel" name="label_2">
                  <property name="text">
-                  <string>Source</string>
+                  <string>Use rectified</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
-               <item row="8" column="0">
-                <widget class="QLabel" name="lblPort">
-                 <property name="text">
-                  <string>Port</string>
+               <item row="2" column="2">
+                <widget class="QCheckBox" name="toggleCalibrationDownsample">
+                 <property name="enabled">
+                  <bool>false</bool>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 <property name="text">
+                  <string>Calibration</string>
                  </property>
                 </widget>
                </item>
@@ -904,16 +1013,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="8" column="1">
-                <widget class="QSpinBox" name="spinBoxStreamPort">
-                 <property name="maximum">
-                  <number>9999</number>
-                 </property>
-                 <property name="value">
-                  <number>8000</number>
-                 </property>
-                </widget>
-               </item>
                <item row="4" column="1">
                 <widget class="QComboBox" name="comboBoxVideoSource">
                  <item>
@@ -938,110 +1037,30 @@
                  </item>
                 </widget>
                </item>
-               <item row="7" column="1">
-                <widget class="QLineEdit" name="txtStreamerHostIP">
+               <item row="6" column="0">
+                <widget class="QLabel" name="lblStreamerSettings">
                  <property name="text">
-                  <string>127.0.0.1</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Streamer Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="lblVideoSettings">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Video Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QCheckBox" name="toggleSwapLeftRight">
+               <item row="1" column="0">
+                <widget class="QLabel" name="lblSwapLR">
                  <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Swap</string>
-                 </property>
-                 <property name="checkable">
                   <bool>true</bool>
                  </property>
-                </widget>
-               </item>
-               <item row="5" column="1">
-                <widget class="QCheckBox" name="checkBoxVideoUseRectified">
                  <property name="text">
-                  <string>Enable</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="13" column="1">
-                <spacer name="verticalSpacer_4">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="2" column="2">
-                <widget class="QCheckBox" name="toggleCalibrationDownsample">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>Calibration</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="9" column="1">
-                <widget class="QComboBox" name="comboBoxStreamerSource">
-                 <item>
-                  <property name="text">
-                   <string>Stereo</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Left</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Right</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Disparity</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="7" column="0">
-                <widget class="QLabel" name="lblHostIP">
-                 <property name="text">
-                  <string>Host IP</string>
+                  <string>Swap LR</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
-               <item row="10" column="0">
-                <widget class="QLabel" name="label_2">
+               <item row="9" column="0">
+                <widget class="QLabel" name="lblStreamerSource">
                  <property name="text">
-                  <string>Use rectified</string>
+                  <string>Source</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1061,39 +1080,20 @@
                  </property>
                 </spacer>
                </item>
-               <item row="11" column="1">
-                <spacer name="horizontalSpacer_10">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+               <item row="8" column="1">
+                <widget class="QSpinBox" name="spinBoxStreamPort">
+                 <property name="maximum">
+                  <number>9999</number>
                  </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
+                 <property name="value">
+                  <number>8000</number>
                  </property>
-                </spacer>
+                </widget>
                </item>
-               <item row="11" column="2">
-                <spacer name="horizontalSpacer_11">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="10" column="1">
-                <widget class="QCheckBox" name="checkBoxStreamerUseRectified">
+               <item row="3" column="0">
+                <widget class="QLabel" name="lblVideoSettings">
                  <property name="text">
-                  <string>Enable</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Video Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                 </widget>
                </item>
