@@ -184,7 +184,9 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     pointCloudInit();
     setupMatchers();
     detectionInit();
+#ifdef WITH_STEREO_STREAMER
     streamerInit();
+#endif
 
     hideCameraSettings(false);
 
@@ -437,6 +439,10 @@ void SVTKWindow::detectionInit(){
 }
 
 void SVTKWindow::streamerInit(){
+    // TODO: add streamer settings to UI
+    //stereoStreamerSettings = new StereoStreamerSettings();
+    //ui->gridLayoutAppSettings->addWidget(stereoStreamerSettings,ui->gridLayoutAppSettings->rowCount()-1,0,1,2);
+
     std::string ip = ui->txtStreamerHostIP->text().toStdString();
     std::string port = QString::number(ui->spinBoxStreamPort->value()).toStdString();
     stereoStreamerServer = new StereoStreamer::Server(ip,port);
@@ -706,6 +712,7 @@ void SVTKWindow::updateStreamer(){
             if (isFloatImage){
                 stereoStreamerClient->clientSendFloatImageThreaded(image_stream);
             } else {
+                //stereoStreamerClient->clientSendStringMessage("test");
                 stereoStreamerClient->clientSendUCharImageThreaded(image_stream);
             }
         }
