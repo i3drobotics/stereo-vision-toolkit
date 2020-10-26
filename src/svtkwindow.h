@@ -9,7 +9,7 @@
 #define _USE_MATH_DEFINES
 
 #include "cmath"
-#include "stereostreamer.h"
+#include "stereostreamer2.h"
 #include "stereostreamersettings.h"
 
 #include <QtAwesome.h>
@@ -181,8 +181,8 @@ private:
     Pylon::CTlFactory* pylonTlFactory;
 
     DetectorOpenCV* object_detector;
-    StereoStreamer::Server* stereoStreamerServer;
-    StereoStreamer::Client* stereoStreamerClient;
+    StereoStreamer2::Server* stereoStreamerServer;
+    //StereoStreamer2::Client* stereoStreamerClient;
     StereoStreamerSettings* stereoStreamerSettings;
     bool detection_enabled = false;
     bool streamer_enabled = false;

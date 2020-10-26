@@ -389,7 +389,7 @@ void SVTKWindow::enableStreamer(bool enable){
     } else {
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
         disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updateStreamer()));
-        stereoStreamerClient->stopClient();
+        //stereoStreamerClient->stopClient();
         stereoStreamerServer->stopServer();
     }
     ui->txtStreamerHostIP->setEnabled(!enable);
@@ -445,12 +445,12 @@ void SVTKWindow::streamerInit(){
 
     std::string ip = ui->txtStreamerHostIP->text().toStdString();
     std::string port = QString::number(ui->spinBoxStreamPort->value()).toStdString();
-    stereoStreamerServer = new StereoStreamer::Server(ip,port);
-    stereoStreamerClient = new StereoStreamer::Client(ip,port,false);
+    stereoStreamerServer = new StereoStreamer2::Server(ip,port);
+    //stereoStreamerClient = new StereoStreamer2::Client(ip,port);
     QThread* streamerServerThread = new QThread;
-    QThread* streamerClientThread = new QThread;
+    //QThread* streamerClientThread = new QThread;
     stereoStreamerServer->assignThread(streamerServerThread);
-    stereoStreamerClient->assignThread(streamerClientThread);
+    //stereoStreamerClient->assignThread(streamerClientThread);
 }
 
 void SVTKWindow::configureDetection(){
@@ -657,7 +657,7 @@ void SVTKWindow::setClassFilled(QString class_name, bool fill){
 
 void SVTKWindow::updateStreamer(){
     if(!stereoStreamerServer) return;
-    if(!stereoStreamerClient) return;
+    //if(!stereoStreamerClient) return;
 
     if (this->streaming)
         return;
@@ -705,16 +705,11 @@ void SVTKWindow::updateStreamer(){
             qDebug() << "Empty image passed to streamer";
             return;
         }
-        StereoStreamer::ClientInfo clientInfo = stereoStreamerClient->getClientInfo();
-        if (clientInfo.id == -1 || clientInfo.socket == INVALID_SOCKET){
-            stereoStreamerClient->startClient();
+        if (isFloatImage){
+            stereoStreamerServer->sendFloatImageThreaded(image_stream);
         } else {
-            if (isFloatImage){
-                stereoStreamerClient->clientSendFloatImageThreaded(image_stream);
-            } else {
-                //stereoStreamerClient->clientSendStringMessage("test");
-                stereoStreamerClient->clientSendUCharImageThreaded(image_stream);
-            }
+            stereoStreamerServer->sendStringMessage("test");
+            //stereoStreamerServer->sendUCharImageThreaded(image_stream);
         }
     }
     this->streaming = false;
