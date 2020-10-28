@@ -51,10 +51,18 @@ FV_APP_NAME = $$TARGET
 
 # To disable StereoStreamer
 # comment out this line 'CONFIG+=WITH_STEREOSTREAMER'
-CONFIG+=WITH_STEREO_STREAMER
+#CONFIG+=WITH_STEREO_STREAMER
 WITH_STEREO_STREAMER {
     message("StereoStreamer enabled")
     DEFINES += WITH_STEREO_STREAMER
+}
+
+# To disable Piper
+# comment out this line 'CONFIG+=WITH_PIPER'
+CONFIG+=WITH_PIPER
+WITH_PIPER {
+    message("Piper enabled")
+    DEFINES += WITH_PIPER
 }
 
 # To use I3DRSGM
@@ -98,9 +106,11 @@ RESOURCES += \
         error("Unable to include Fervor autoupdater.")
 }
 
-# StereoStreamer
-!include("modules/StereoStreamer/StereoStreamer.pri") {
-    error("Unable to include StereoStreamer.")
+WITH_STEREO_STREAMER {
+    # StereoStreamer
+    !include("modules/StereoStreamer/StereoStreamer.pri") {
+        error("Unable to include StereoStreamer.")
+    }
 }
 # ---------------------
 

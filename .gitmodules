@@ -4,3 +4,6 @@
 [submodule "modules/StereoStreamer"]
 	path = modules/StereoStreamer
 	url = https://github.com/i3drobotics/StereoStreamer.git
+[submodule "modules/ImagePiper"]
+	path = modules/ImagePiper
+	url = https://github.com/i3drobotics/ImagePiper.git

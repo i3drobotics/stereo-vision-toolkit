@@ -706,7 +706,7 @@ void SVTKWindow::updateStreamer(){
             return;
         }
         if (isFloatImage){
-            stereoStreamerServer->sendFloatImageThreaded(image_stream);
+            stereoStreamerServer->sendImageThreaded(image_stream);
         } else {
             stereoStreamerServer->sendStringMessage("test");
             //stereoStreamerServer->sendUCharImageThreaded(image_stream);
