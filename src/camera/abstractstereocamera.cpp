@@ -280,25 +280,65 @@ bool AbstractStereoCamera::isSavingDisparity() { return savingDisparity; }
 
 bool AbstractStereoCamera::isConnected() { return connected; }
 
-void AbstractStereoCamera::getLeftImage(cv::Mat &dst) { left_output.copyTo(dst); }
+void AbstractStereoCamera::getLeftImage(cv::Mat &dst) {
+    lr_image_mutex.lock();
+    left_output.copyTo(dst);
+    lr_image_mutex.unlock();
+}
 
-void AbstractStereoCamera::getRightImage(cv::Mat &dst) { right_output.copyTo(dst); }
+void AbstractStereoCamera::getRightImage(cv::Mat &dst) {
+    lr_image_mutex.lock();
+    right_output.copyTo(dst);
+    lr_image_mutex.unlock();
+}
 
-cv::Mat AbstractStereoCamera::getLeftImage(void) { return left_output.clone(); }
+cv::Mat AbstractStereoCamera::getLeftImage(void) {
+    lr_image_mutex.lock();
+    return left_output.clone();
+    lr_image_mutex.unlock();
+}
 
-cv::Mat AbstractStereoCamera::getRightImage(void) { return right_output.clone(); }
+cv::Mat AbstractStereoCamera::getRightImage(void) {
+    lr_image_mutex.lock();
+    return right_output.clone();
+    lr_image_mutex.unlock();
+}
 
-void AbstractStereoCamera::getLeftRawImage(cv::Mat &dst) { left_unrectified.copyTo(dst); }
+void AbstractStereoCamera::getLeftRawImage(cv::Mat &dst) {
+    lr_raw_image_mutex.lock();
+    left_unrectified.copyTo(dst);
+    lr_raw_image_mutex.unlock();
+}
 
-void AbstractStereoCamera::getRightRawImage(cv::Mat &dst) { right_unrectified.copyTo(dst); }
+void AbstractStereoCamera::getRightRawImage(cv::Mat &dst) {
+    lr_raw_image_mutex.lock();
+    right_unrectified.copyTo(dst);
+    lr_raw_image_mutex.unlock();
+}
 
-cv::Mat AbstractStereoCamera::getLeftRawImage(void) { return left_unrectified.clone(); }
+cv::Mat AbstractStereoCamera::getLeftRawImage(void) {
+    lr_raw_image_mutex.lock();
+    return left_unrectified.clone();
+    lr_raw_image_mutex.unlock();
+}
 
-cv::Mat AbstractStereoCamera::getRightRawImage(void) { return right_unrectified.clone(); }
+cv::Mat AbstractStereoCamera::getRightRawImage(void) {
+    lr_raw_image_mutex.lock();
+    return right_unrectified.clone();
+    lr_raw_image_mutex.unlock();
+}
 
-void AbstractStereoCamera::getDisparity(cv::Mat &dst) { disparity.copyTo(dst); }
+void AbstractStereoCamera::getDisparity(cv::Mat &dst) {
+    disparity_mutex.lock();
+    disparity.copyTo(dst);
+    disparity_mutex.unlock();
+}
 
-cv::Mat AbstractStereoCamera::getDisparity(){ return disparity.clone();}
+cv::Mat AbstractStereoCamera::getDisparity(){
+    disparity_mutex.lock();
+    return disparity.clone();
+    disparity_mutex.unlock();
+}
 
 void AbstractStereoCamera::generateRectificationMaps(cv::Size image_size){
     cv::initUndistortRectifyMap(l_camera_matrix,l_dist_coeffs,l_rect_mat,l_proj_mat,image_size,CV_32FC1,rectmapx_l,rectmapy_l);
@@ -612,23 +652,33 @@ void AbstractStereoCamera::processStereo(void) {
         cv::resize(right_tmp,right_tmp,cv::Size(),downsample_factor,downsample_factor);
     }
 
+    lr_raw_image_mutex.lock();
     left_tmp.copyTo(left_unrectified);
     right_tmp.copyTo(right_unrectified);
+    lr_raw_image_mutex.unlock();
 
     if (rectifying) {
+        lr_raw_image_mutex.lock();
         bool res = rectifyImages(left_unrectified,right_unrectified,left_remapped,right_remapped);
+        lr_raw_image_mutex.unlock();
         if (!res){
             send_error(RECTIFY_ERROR);
+            lr_raw_image_mutex.lock();
             left_unrectified.copyTo(left_remapped);
             right_unrectified.copyTo(right_remapped);
+            lr_raw_image_mutex.unlock();
         }
     } else {
+        lr_raw_image_mutex.lock();
         left_unrectified.copyTo(left_remapped);
         right_unrectified.copyTo(right_remapped);
+        lr_raw_image_mutex.unlock();
     }
 
+    lr_image_mutex.lock();
     left_remapped.copyTo(left_output);
     right_remapped.copyTo(right_output);
+    lr_image_mutex.unlock();
 
     if (capturing_video){
         if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT){
@@ -668,21 +718,29 @@ void AbstractStereoCamera::processStereo(void) {
 }
 
 void AbstractStereoCamera::processMatch(){
+    qDebug() << "Processing match...";
+    lr_image_mutex.lock();
     if (left_output.empty() || right_output.empty()){
         return;
     }
     cv::Mat left_img, right_img, disp, left_bgr;
     left_img = left_output.clone();
     right_img = right_output.clone();
+    lr_image_mutex.unlock();
 
     if (changed_matcher){
         changed_matcher = false;
         this->matcher = new_matcher;
     }
 
+    qDebug() << "Stereo matching...";
     matcher->match(left_img,right_img);
+    qDebug() << "Getting disparity from stereo match...";
     matcher->getDisparity(disp);
+    disparity_mutex.lock();
     disparity = disp.clone();
+    disparity_mutex.unlock();
+    qDebug() << "Getting left image from stereo match...";
     left_bgr = matcher->getLeftBGRImage();
     emit matched();
 
@@ -697,6 +755,7 @@ void AbstractStereoCamera::processMatch(){
     }
 
     if (reprojecting){
+        qDebug() << "Reprojecting 3D...";
         cv::Mat texture_image;
         if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_IMAGE){
             left_bgr.copyTo(texture_image);
