@@ -575,6 +575,9 @@ private:
     bool capturing_rectified_video = true;
     VideoSource video_src = VIDEO_SRC_STEREO;
     QMutex video_mutex;
+    QMutex disparity_mutex;
+    QMutex lr_image_mutex;
+    QMutex lr_raw_image_mutex;
     bool swappingLeftRight = false;
     bool reprojecting = false;
     bool cuda_device_found = false;

@@ -13,9 +13,9 @@ FV_APP_VERSION = $$VERSION
 
 QT += core gui concurrent widgets xml network quick serialport
 
-#QT version > 5.12.4 uses openssl 1.1.1g
+#QT version > 5.12.4 uses openssl 1.1.1
 versionAtLeast(QT_VERSION, 5.12.4){
-    message("Building with OpenSSL 1.1.1g")
+    message("Building with OpenSSL 1.1.1")
 } else {
     error("Use at least Qt version 5.12.4")
 }
@@ -49,17 +49,15 @@ DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
-# To disable StereoStreamer
-# comment out this line 'CONFIG+=WITH_STEREOSTREAMER'
-#CONFIG+=WITH_STEREO_STREAMER
+# To use StereoStreamer
+# add 'CONFIG+=WITH_STEREO_STREAMER' to build arguments
 WITH_STEREO_STREAMER {
     message("StereoStreamer enabled")
     DEFINES += WITH_STEREO_STREAMER
 }
 
-# To disable Piper
-# comment out this line 'CONFIG+=WITH_PIPER'
-CONFIG+=WITH_PIPER
+# To use Piper
+# add 'CONFIG+=WITH_PIPER' to build arguments
 WITH_PIPER {
     message("Piper enabled")
     DEFINES += WITH_PIPER
@@ -133,6 +131,11 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/detection
+WITH_PIPER {
+    VPATH += $$_PRO_FILE_PWD_/modules/ImagePiper/src
+    VPATH += $$_PRO_FILE_PWD_/modules/ImagePiper/include
+    INCLUDEPATH += $$_PRO_FILE_PWD_/modules/ImagePiper/include
+}
 
 WITH_VIMBA {
     VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
@@ -175,7 +178,14 @@ SOURCES += \
 win32 {
     SOURCES += stereocameradeimos.cpp
 }
-# Optional vimba source files (as currently in development)
+# Optional Piper source files
+WITH_PIPER {
+    SOURCES += \
+        imagepiper.cpp \
+        piper.cpp \
+        image2string.cpp
+}
+# Optional vimba source files
 WITH_VIMBA {
     SOURCES += \
         camera/cameravimba.cpp \
@@ -229,7 +239,14 @@ HEADERS += \
 win32 {
     HEADERS += stereocameradeimos.h
 }
-# Optional vimba header files (as currently in development)
+# Optional Piper header files
+WITH_PIPER {
+    HEADERS += \
+        imagepiper.h \
+        piper.h \
+        image2string.h
+}
+# Optional vimba header files
 WITH_VIMBA {
     HEADERS += \
         camera/cameravimba.h \

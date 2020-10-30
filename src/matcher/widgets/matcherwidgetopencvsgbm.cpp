@@ -49,6 +49,7 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent)
       QString::number(matcher->getSpeckleFilterWindow()));
 
   enableExtendDisparity(ui->checkBoxExtendDisparity->isChecked());
+  enableWLSFilter(ui->checkBoxWLSFilter->isChecked());
 
   connect(ui->blockSizeSlider, SIGNAL(valueChanged(int)), this,
           SLOT(updateBlockSize(int)));
@@ -78,6 +79,9 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent)
           SLOT(enableSpeckleFilter(bool)));
   connect(ui->checkBoxExtendDisparity, SIGNAL(toggled(bool)), this,
           SLOT(enableExtendDisparity(bool)));
+
+  connect(ui->checkBoxWLSFilter, SIGNAL(toggled(bool)), this,
+          SLOT(enableWLSFilter(bool)));
 
   connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
           SLOT(onSaveClicked()));
@@ -118,6 +122,10 @@ void MatcherWidgetOpenCVSGBM::enableSpeckleFilter(bool enable) {
     ui->speckleRangeLabel->setEnabled(false);
     ui->speckleWindowLabel->setEnabled(false);
   }
+}
+
+void MatcherWidgetOpenCVSGBM::enableWLSFilter(bool enable){
+    matcher->setWLSFilterEnabled(enable);
 }
 
 void MatcherWidgetOpenCVSGBM::enableExtendDisparity(bool enable) {

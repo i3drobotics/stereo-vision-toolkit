@@ -186,6 +186,15 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     detectionInit();
 #ifdef WITH_STEREO_STREAMER
     streamerInit();
+#else
+    // hide streamer button from interface
+    ui->enableStreamer->setVisible(false);
+#endif
+#ifdef WITH_PIPER
+    piperInit();
+#else
+    // hide piper button from interface
+    ui->enablePiper->setVisible(false);
 #endif
 
     hideCameraSettings(false);
@@ -236,6 +245,7 @@ void SVTKWindow::disableWindow(){
     ui->enableStereo->setDisabled(true);
     ui->enableDetection->setDisabled(true);
     ui->enableStreamer->setDisabled(true);
+    ui->enablePiper->setDisabled(true);
 
     ui->captureButton->setDisabled(true);
     ui->singleShotButton->setDisabled(true);
@@ -259,7 +269,12 @@ void SVTKWindow::enableWindow(){
     ui->matcherSelectBox->setEnabled(true);
 
     //ui->enableDetection->setEnabled(true);
+#ifdef WITH_STEREO_STREAMER
     ui->enableStreamer->setEnabled(true);
+#endif
+#ifdef WITH_PIPER
+    ui->enablePiper->setEnabled(true);
+#endif
     ui->captureButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
     //ui->saveButton->setEnabled(false);
@@ -335,6 +350,7 @@ void SVTKWindow::controlsInit(void) {
     ui->enableStereo->setIcon(awesome->icon(fa::cubes, icon_options));
     ui->enableDetection->setIcon(awesome->icon(fa::eye, icon_options));
     ui->enableStreamer->setIcon(awesome->icon(fa::wifi, icon_options));
+    ui->enablePiper->setIcon(awesome->icon(fa::exchange, icon_options)); //TODO choose good piper icon
     ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
 
     connect(ui->btnLoadVideo, SIGNAL(clicked(bool)), this,
@@ -374,6 +390,7 @@ void SVTKWindow::enableDetection(bool enable){
     detection_enabled = enable;
 }
 
+#ifdef WITH_STEREO_STREAMER
 void SVTKWindow::enableStreamer(bool enable){
     if (!stereo_cam){
         enable = false;
@@ -395,7 +412,35 @@ void SVTKWindow::enableStreamer(bool enable){
     ui->txtStreamerHostIP->setEnabled(!enable);
     ui->spinBoxStreamPort->setEnabled(!enable);
     ui->comboBoxStreamerSource->setEnabled(!enable);
+    ui->checkBoxStreamerUseRectified->setEnabled(!enable);
 }
+#endif
+#ifdef WITH_PIPER
+void SVTKWindow::enablePiper(bool enable){
+    if (!stereo_cam){
+        enable = false;
+    }
+    piper_enabled = enable;
+    if (enable){
+        if (ui->comboBoxPiperSource->currentIndex() == 3){ //disparity
+            connect(stereo_cam, SIGNAL(matched()), this, SLOT(updatePiper()));
+        } else {
+            connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
+        }
+        //start piper server
+        imagePiperServer->openThreaded();
+    } else {
+        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
+        disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updatePiper()));
+        //stop piper server
+        imagePiperServer->close();
+    }
+    ui->txtPipeName->setEnabled(!enable);
+    ui->spinBoxPipePacketSize->setEnabled(!enable);
+    ui->comboBoxPiperSource->setEnabled(!enable);
+    ui->checkBoxPiperUseRectified->setEnabled(!enable);
+}
+#endif
 
 void SVTKWindow::detectionInit(){
     qDebug() << "Initialising detector...";
@@ -438,6 +483,7 @@ void SVTKWindow::detectionInit(){
     qDebug() << "Detector initalisation complete.";
 }
 
+#ifdef WITH_STEREO_STREAMER
 void SVTKWindow::streamerInit(){
     // TODO: add streamer settings to UI
     //stereoStreamerSettings = new StereoStreamerSettings();
@@ -452,6 +498,15 @@ void SVTKWindow::streamerInit(){
     stereoStreamerServer->assignThread(streamerServerThread);
     //stereoStreamerClient->assignThread(streamerClientThread);
 }
+#endif
+
+#ifdef WITH_PIPER
+void SVTKWindow::piperInit(){
+    std::string pipename = ui->txtPipeName->text().toStdString();
+    int packetsize = ui->spinBoxPipePacketSize->value();
+    imagePiperServer = new Piper::ImageServer(pipename,packetsize);
+}
+#endif
 
 void SVTKWindow::configureDetection(){
     if(object_detector == nullptr) return;
@@ -655,6 +710,7 @@ void SVTKWindow::setClassFilled(QString class_name, bool fill){
         qDebug() << "Setting " << class_name << " class to be filled";
 }
 
+#ifdef WITH_STEREO_STREAMER
 void SVTKWindow::updateStreamer(){
     if(!stereoStreamerServer) return;
     //if(!stereoStreamerClient) return;
@@ -714,6 +770,85 @@ void SVTKWindow::updateStreamer(){
     }
     this->streaming = false;
 }
+#endif
+
+#ifdef WITH_PIPER
+void SVTKWindow::updatePiper(){
+    if(!imagePiperServer) return; // server object missing
+    if(!imagePiperServer->isOpen()){
+        //qDebug() << "Pipe is not open";
+        return; // server not open
+    }
+    if(imagePiperServer->isSendThreadBusy()){
+        //qDebug() << "Pipe busy sending";
+        return; // already busy sending
+    }
+
+    if (this->pipping)
+        return;
+
+    this->pipping = true;
+
+    if (piper_enabled){
+        //qDebug() << "Getting source image...";
+        bool useRectified = ui->checkBoxPiperUseRectified->isChecked();
+        // Select image source
+        int source_index = ui->comboBoxPiperSource->currentIndex();
+        switch(source_index) {
+        case 0: // stereo
+            if (useRectified){
+                cv::hconcat(stereo_cam->getLeftImage(), stereo_cam->getRightImage(), image_stream);
+            } else {
+                cv::hconcat(stereo_cam->getLeftRawImage(), stereo_cam->getRightRawImage(), image_stream);
+            }
+            break;
+        case 1: // left
+            if (useRectified){
+                stereo_cam->getLeftImage(image_stream);
+            } else {
+                stereo_cam->getLeftRawImage(image_stream);
+            }
+            break;
+        case 2: // right
+            if (useRectified){
+                stereo_cam->getRightImage(image_stream);
+            } else {
+                stereo_cam->getRightRawImage(image_stream);
+            }
+            break;
+        case 3: // disparity
+            if (stereo_cam->isMatching()){
+                //qDebug() << "Getting disparity from stereo cam...";
+                stereo_cam->getDisparity(image_stream);
+            } else {
+                image_stream = cv::Mat();
+            }
+            break;
+        }
+
+        if(image_stream.empty()){
+            qDebug() << "Empty image passed to piper";
+            return;
+        }
+
+        bool send_threaded = false;
+        if (send_threaded){
+            imagePiperServer->sendImageThreaded(image_stream);
+        } else {
+            bool res = imagePiperServer->sendImage(image_stream);
+            if (!res){
+                ui->enablePiper->setChecked(false);
+                enablePiper(false);
+                QMessageBox msg;
+                msg.setText("Failed to send data over pipe. Closing pipe.");
+                msg.exec();
+            }
+        }
+    }
+    this->pipping = false;
+    //QCoreApplication::processEvents();
+}
+#endif
 
 void SVTKWindow::updateDetection(){
 
@@ -1215,7 +1350,7 @@ void SVTKWindow::stereoCameraInitConnections(void) {
             SLOT(setPacketDelay(int)));
 
     connect(ui->checkBoxVideoUseRectified, SIGNAL(toggled(bool)), stereo_cam, SLOT(enableCaptureRectifedVideo(bool)));
-    connect(ui->comboBoxVideoSource, SIGNAL(indexChanged(int)), stereo_cam, SLOT(setVideoSource(int)));
+    connect(ui->comboBoxVideoSource, SIGNAL(currentIndexChanged(int)), stereo_cam, SLOT(setVideoSource(int)));
 
     connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateDisplay()));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_view, SLOT(setSize(int, int, int)));
@@ -1239,8 +1374,14 @@ void SVTKWindow::stereoCameraInitConnections(void) {
             SLOT(enableMatching(bool)));
     connect(ui->enableDetection, SIGNAL(clicked(bool)), this,
             SLOT(enableDetection(bool)));
+#ifdef WITH_STEREO_STREAMER
     connect(ui->enableStreamer, SIGNAL(clicked(bool)), this,
             SLOT(enableStreamer(bool)));
+#endif
+#ifdef WITH_PIPER
+    connect(ui->enablePiper, SIGNAL(clicked(bool)), this,
+            SLOT(enablePiper(bool)));
+#endif
     connect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
             SLOT(enableRectify(bool)));
     connect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
@@ -1300,6 +1441,7 @@ void SVTKWindow::stereoCameraRelease(void) {
     ui->enableStereo->setChecked(false);
     ui->enableDetection->setChecked(false);
     ui->enableStreamer->setChecked(false);
+    ui->enablePiper->setChecked(false);
     ui->captureButton->setChecked(false);
     ui->singleShotButton->setChecked(false);
     ui->toggleVideoButton->setChecked(false);
@@ -1335,8 +1477,12 @@ void SVTKWindow::stereoCameraRelease(void) {
         enableRectify(false);
         stereo_cam->enableMatching(false);
         this->enableDetection(false);
+#ifdef WITH_STEREO_STREAMER
         this->enableStreamer(false);
-
+#endif
+#ifdef WITH_PIPER
+        this->enablePiper(false);
+#endif
         progressClose.setLabelText("Closing camera connections...");
         progressClose.setValue(30);
 
@@ -1380,8 +1526,14 @@ void SVTKWindow::stereoCameraRelease(void) {
                    SLOT(enableMatching(bool)));
         disconnect(ui->enableDetection, SIGNAL(clicked(bool)), this,
                    SLOT(enableDetection(bool)));
+#ifdef WITH_STEREO_STREAMER
         disconnect(ui->enableStreamer, SIGNAL(clicked(bool)), this,
                    SLOT(enableStreamer(bool)));
+#endif
+#ifdef WITH_PIPER
+        disconnect(ui->enablePiper, SIGNAL(clicked(bool)), this,
+                   SLOT(enablePiper(bool)));
+#endif
         disconnect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
                    SLOT(enableRectify(bool)));
         disconnect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
@@ -2518,8 +2670,16 @@ void SVTKWindow::closeEvent(QCloseEvent *) {
 
 SVTKWindow::~SVTKWindow() {
     qDebug() << "Cleaning up threads...";
+#ifdef WITH_STEREO_STREAMER
     if (stereoStreamerServer)
         delete(stereoStreamerServer);
+#endif
+#ifdef WITH_PIPER
+    if (imagePiperServer){
+        imagePiperServer->close();
+        delete(imagePiperServer);
+    }
+#endif
     if (object_detector)
         delete(object_detector);
     //if (cam_thread)

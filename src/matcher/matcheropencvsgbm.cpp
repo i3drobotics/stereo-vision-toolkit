@@ -64,6 +64,10 @@ void MatcherOpenCVSGBM::setSpeckleFilterRange(int range) {
   matcher->setSpeckleRange(range);
 }
 
+void MatcherOpenCVSGBM::setWLSFilterEnabled(bool enable) {
+    wls_filter = enable;
+}
+
 int MatcherOpenCVSGBM::getErrorDisparity(void){
     return min_disparity - 1;
 }
@@ -103,8 +107,7 @@ bool MatcherOpenCVSGBM::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 }
 
 bool MatcherOpenCVSGBM::backwardMatch(cv::Mat left_img, cv::Mat right_img) {
-  //NOTE: Removed to try and not use ximageproc
-  /*
+  /* TODO build with opencv contrib by default to use ximg
   auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
   right_matcher->compute(*right, *left, disparity_rl);
   */
