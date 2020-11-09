@@ -93,7 +93,7 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
       if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
         matcher->compute(left_img, right_img, disparity_lr);
         if(wls_filter){
-            /* TODO build with opencv contrib by default to use ximgproc
+#ifdef WITH_OPENCV_CONTRIB
             backwardMatch();
             cv::Mat disparity_filter;
             auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
@@ -102,8 +102,9 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
             wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
 
             disparity_filter.convertTo(disparity_lr, CV_32F);
-            */
+#else
             disparity_lr.convertTo(disparity_lr, CV_32F);
+#endif
         }else{
             disparity_lr.convertTo(disparity_lr, CV_32F);
         }
@@ -122,11 +123,13 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 }
 
 bool MatcherOpenCVBlock::backwardMatch(cv::Mat left_img, cv::Mat right_img) {
-    /* TODO build with opencv contrib by default to use ximg
+#ifdef WITH_OPENCV_CONTRIB
     auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
     right_matcher->compute(*right, *left, disparity_rl);
-    */
+    return true;
+#else
     return false;
+#endif
 }
 
 void MatcherOpenCVBlock::saveParams() {

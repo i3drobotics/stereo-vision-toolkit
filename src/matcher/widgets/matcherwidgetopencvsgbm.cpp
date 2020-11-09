@@ -85,6 +85,14 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent)
 
   connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
           SLOT(onSaveClicked()));
+
+#ifdef WITH_OPENCV_CONTRIB
+    ui->checkBoxWLSFilter->setVisible(true);
+    ui->lblWLSFilter->setVisible(true);
+#else
+    ui->checkBoxWLSFilter->setVisible(false);
+    ui->lblWLSFilter->setVisible(false);
+#endif
 }
 
 AbstractStereoMatcher* MatcherWidgetOpenCVSGBM::getMatcher() { return matcher; }

@@ -77,9 +77,8 @@ bool MatcherOpenCVSGBM::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
   try {
       if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
         matcher->compute(left_img, right_img, disparity_lr);
-        //NOTE: Removed to try and not use ximageproc
-        /*
         if(wls_filter){
+#ifdef WITH_OPENCV_CONTRIB
             backwardMatch();
             cv::Mat disparity_filter;
             auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
@@ -88,12 +87,12 @@ bool MatcherOpenCVSGBM::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
             wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
 
             disparity_filter.convertTo(disparity_lr, CV_32F);
+#else
+            disparity_lr.convertTo(disparity_lr, CV_32F);
+#endif
         }else{
-
             disparity_lr.convertTo(disparity_lr, CV_32F);
         }
-        */
-        disparity_lr.convertTo(disparity_lr, CV_32F);
         return true;
       } else {
           qDebug() << "Invalid image type for stereo matcher. MUST be CV_8UC1.";
@@ -107,11 +106,13 @@ bool MatcherOpenCVSGBM::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 }
 
 bool MatcherOpenCVSGBM::backwardMatch(cv::Mat left_img, cv::Mat right_img) {
-  /* TODO build with opencv contrib by default to use ximg
-  auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
-  right_matcher->compute(*right, *left, disparity_rl);
-  */
+#ifdef WITH_OPENCV_CONTRIB
+    auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
+    right_matcher->compute(*right, *left, disparity_rl);
+    return true;
+#else
     return false;
+#endif
 }
 
 void MatcherOpenCVSGBM::saveParams() {
