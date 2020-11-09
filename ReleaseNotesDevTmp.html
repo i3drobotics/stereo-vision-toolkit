@@ -1,8 +1,13 @@
 Stereo Vision Toolkit v1.3.1a.10 [Development release]
 
 Improvements:
+- Added image streaming using WinSock2
+- Added image streaming using Named Pipes
 
 Bug Fixes:
+- Fix all videos saved with the name 'stereo_video' even when saving left, right or disparity. Now will save as 'left_video', 'right_video', 'disparity_video'.
 
 Known Issues:
+- WinSock2 streaming is slow and unstable when using high resolution images. 
+- Named Pipe streaming is slow when using high resolution images.
 - Stereo videos are saved uncompressed to avoid lossy compression which would cause issues when loading stereo videos. This will create large file sizes.
