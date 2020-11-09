@@ -37,11 +37,6 @@ DEV_BRANCH {
     message("Development build")
     message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING MASTER RELEASE !!")
     DEFINES += DEV_BRANCH
-
-    CONFIG(debug, debug|release) { # debug
-    }else { # release
-        CONFIG += console
-    }
 }
 
 # Setup FERVOR defines
@@ -68,6 +63,11 @@ WITH_PIPER {
 WITH_I3DRSGM {
     message("I3DRSGM enabled")
     DEFINES += WITH_I3DRSGM
+}
+
+WITH_OPENCV_CONTRIB {
+    message("OpenCV Contrib enabled")
+    DEFINES += WITH_OPENCV_CONTRIB
 }
 
 # To use CUDA
