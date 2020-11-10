@@ -34,6 +34,13 @@ public:
     int getErrorDisparity();
     bool isLicenseValid();
 
+    //! Get hostid and hostname (useful for displaying to user)
+    /*! \param hostname string variable to place hostname */
+    /*! \param hostid string varaible to place hostid */
+    static void getHostInfo(std::string & hostname, std::string & hostid){
+        I3DRSGM::getHostInfo(hostname,hostid);
+    }
+
     void setDisparityShift(int shift);
     void setDisparityRange(int n);
     void enableSubpixel(bool enable);

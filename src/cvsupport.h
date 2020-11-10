@@ -42,6 +42,28 @@ public:
         return cv::imwrite(fname, src, params);
     }
 
+    static cv::Mat createRGBD(cv::Mat color_img, cv::Mat disparity){
+        std::vector<cv::Mat> rgbChannels(3);
+        cv::split(color_img, rgbChannels);
+        cv::Mat b = rgbChannels[0];
+        cv::Mat g = rgbChannels[1];
+        cv::Mat r = rgbChannels[2];
+
+        //convert color channels to float to keep precsion in the rgbd image
+        b.convertTo(b,CV_32FC1, 1.0/255.0);
+        g.convertTo(g,CV_32FC1, 1.0/255.0);
+        r.convertTo(r,CV_32FC1, 1.0/255.0);
+
+        std::vector<cv::Mat> channels;
+        channels.push_back(b);
+        channels.push_back(g);
+        channels.push_back(r);
+        channels.push_back(disparity);
+        cv::Mat rgbd;
+        cv::merge(channels, rgbd);
+        return rgbd;
+    }
+
     static void normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity){
         cv::Mat disparity_norm;
 
