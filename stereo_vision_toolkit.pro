@@ -310,7 +310,11 @@ macx {
 }
 
 # Define include folders for libraries
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/include"
+CONFIG(WITH_OPENCV_CONTRIB) {
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/include"
+} else {
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/include"
+}
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/VTK/include/vtk-7.0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/PCL/include/pcl-1.8"
@@ -330,7 +334,12 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/debug" -lhidapi
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440d
+    CONFIG(WITH_OPENCV_CONTRIB) {
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/lib" -lopencv_world440d
+    } else {
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440d
+    }
+
 }else {
     # Define release only libraries
     message("Release mode")
@@ -339,7 +348,11 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/release" -lhidapi
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440
+    CONFIG(WITH_OPENCV_CONTRIB) {
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/lib" -lopencv_world440
+    } else {
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440
+    }
 }
 
 # Define libraries
@@ -395,29 +408,43 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rdparty/pylon/dep/x64/*.dll, true) \
         $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
         $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
-        $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll \
-        #$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/openh264-1.8.0-win64.dll \
         $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
+
+    CONFIG(WITH_OPENCV_CONTRIB) {
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
+    } else {
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
+    }
 
     CONFIG( debug, debug|release ) {
         # Debug only dlls
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440d.dll \
             $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/debug/*.dll, true) \
             $$_PRO_FILE_PWD_/3rdparty/png/libpng16d.dll \
             $$_PRO_FILE_PWD_/3rdparty/tbb/tbb_debug.dll \
             $$_PRO_FILE_PWD_/3rdparty/tis/bin/TIS_UDSHL11d_x64.dll \
             $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/debug/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/debug/*.dll, true)
+
+        CONFIG(WITH_OPENCV_CONTRIB) {
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/bin/opencv_world440d.dll
+        } else {
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440d.dll
+        }
     } else {
         # Release only dlls
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440.dll \
             $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/release/*.dll, true) \
             $$_PRO_FILE_PWD_/3rdparty/png/libpng16.dll \
             $$_PRO_FILE_PWD_/3rdparty/tis/bin/TIS_UDSHL11_x64.dll \
             $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/release/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/release/*.dll, true)
+
+        CONFIG(WITH_OPENCV_CONTRIB) {
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/bin/opencv_world440.dll
+        } else {
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440.dll
+        }
     }
 
     # Define drivers to copy to build folder

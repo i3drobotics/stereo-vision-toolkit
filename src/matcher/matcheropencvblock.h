@@ -7,6 +7,9 @@
 #define MATCHEROPENCVBLOCK_H
 
 #include <abstractstereomatcher.h>
+#ifdef WITH_OPENCV_CONTRIB
+    #include <opencv2/ximgproc.hpp>
+#endif
 #include <QFile>
 
 //!  Matcher OpenCV Block
