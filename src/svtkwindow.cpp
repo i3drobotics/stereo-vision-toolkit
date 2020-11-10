@@ -824,6 +824,19 @@ void SVTKWindow::updatePiper(){
                 image_stream = cv::Mat();
             }
             break;
+        case 4: // rgbd
+            if (stereo_cam->isMatching()){
+                cv::Mat color, disp;
+                if (useRectified){
+                    stereo_cam->getLeftImage(color);
+                } else {
+                    stereo_cam->getLeftRawImage(color);
+                }
+                stereo_cam->getDisparity(disp);
+                image_stream = CVSupport::createRGBD(color,disp);
+            } else {
+                image_stream = cv::Mat();
+            }
         }
 
         if(image_stream.empty()){
@@ -831,7 +844,7 @@ void SVTKWindow::updatePiper(){
             return;
         }
 
-        bool send_threaded = false;
+        bool send_threaded = true;
         if (send_threaded){
             imagePiperServer->sendImageThreaded(image_stream);
         } else {
@@ -2186,10 +2199,17 @@ void SVTKWindow::setupMatchers(void) {
           item->setFlags(disabled ? item->flags() & ~Qt::ItemIsEnabled
                                   : item->flags() | Qt::ItemIsEnabled);
           ui->matcherSelectBox->setCurrentIndex(0);
+
+          std::string hostname, hostid;
+          MatcherI3DRSGM::getHostInfo(hostname,hostid);
+
+          QString machineinfo = QString(std::string("Hostname: " + hostname + "<br>HostID: " + hostid).c_str());
+
           QMessageBox msg;
           msg.setText("No license found for I3DRSGM. <br>"
                       "You will only be able to use OpenSource matchers from OpenCV. <br>"
-                      "Contact info@i3drobotics.com for a license.");
+                      "Contact info@i3drobotics.com with the following details for a license. <br><br>"
+                      + machineinfo);
           msg.exec();
           this->setMatcher(0);
     } else {
