@@ -125,6 +125,9 @@ void MatcherWidgetOpenCVBlock::updateSpeckleWindow(int window) {
 
 void MatcherWidgetOpenCVBlock::enableWLSFilter(bool enable){
     matcher->setWLSFilterEnabled(enable);
+    if (ui->speckleFilterCheck->isChecked()){
+        enableSpeckleFilter(true);
+    }
 }
 
 void MatcherWidgetOpenCVBlock::enableExtendDisparity(bool enable) {

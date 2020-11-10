@@ -94,12 +94,12 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
         matcher->compute(left_img, right_img, disparity_lr);
         if(wls_filter){
 #ifdef WITH_OPENCV_CONTRIB
-            backwardMatch();
+            backwardMatch(left_img,right_img);
             cv::Mat disparity_filter;
             auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
             wls_filter->setLambda(wls_lambda);
             wls_filter->setSigmaColor(wls_sigma);
-            wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
+            wls_filter->filter(disparity_lr,left_img,disparity_filter,disparity_rl);
 
             disparity_filter.convertTo(disparity_lr, CV_32F);
 #else
@@ -125,7 +125,7 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 bool MatcherOpenCVBlock::backwardMatch(cv::Mat left_img, cv::Mat right_img) {
 #ifdef WITH_OPENCV_CONTRIB
     auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
-    right_matcher->compute(*right, *left, disparity_rl);
+    right_matcher->compute(right_img, left_img, disparity_rl);
     return true;
 #else
     return false;

@@ -134,6 +134,9 @@ void MatcherWidgetOpenCVSGBM::enableSpeckleFilter(bool enable) {
 
 void MatcherWidgetOpenCVSGBM::enableWLSFilter(bool enable){
     matcher->setWLSFilterEnabled(enable);
+    if (ui->speckleFilterCheck->isChecked()){
+        enableSpeckleFilter(true);
+    }
 }
 
 void MatcherWidgetOpenCVSGBM::enableExtendDisparity(bool enable) {
