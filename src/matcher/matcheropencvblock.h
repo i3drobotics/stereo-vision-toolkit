@@ -43,7 +43,9 @@ public slots:
     void setSpeckleFilterWindow(int window);
     void setSpeckleFilterRange(int range);
     void setWLSFilterEnabled(bool enable);
+#ifdef WITH_CUDA
     void setGPUEnabled(bool enable);
+#endif
     int getErrorDisparity(void);
 
     int getMinDisparity(){return matcher->getMinDisparity();}
@@ -58,7 +60,9 @@ public slots:
     int getSpeckleFilterWindow(){return matcher->getSpeckleWindowSize();}
     int getSpeckleFilterRange(){return matcher->getSpeckleRange();}
     bool isWLSFilterEnabled(){return wls_filter;}
+#ifdef WITH_CUDA
     bool isGPUEnabled(){return useGPU;}
+#endif
 
     void saveParams();
 
