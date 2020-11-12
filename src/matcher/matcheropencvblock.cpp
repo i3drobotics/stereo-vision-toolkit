@@ -143,6 +143,7 @@ void MatcherOpenCVBlock::setWLSFilterEnabled(bool enable) {
     wls_filter = enable;
 }
 
+#ifdef WITH_CUDA
 void MatcherOpenCVBlock::setGPUEnabled(bool enable) {
     if (enable){
         gpu_matcher->setMinDisparity(matcher->getMinDisparity());
@@ -158,6 +159,7 @@ void MatcherOpenCVBlock::setGPUEnabled(bool enable) {
     }
     useGPU = enable;
 }
+#endif
 
 int MatcherOpenCVBlock::getErrorDisparity(void){
     return min_disparity - 1;

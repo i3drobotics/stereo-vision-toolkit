@@ -416,6 +416,10 @@ win32 {
         EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
     }
 
+    WITH_CUDA {
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/cuda/nppicc64_10.dll
+    }
+
     CONFIG( debug, debug|release ) {
         # Debug only dlls
         EXTRA_FILES += \
