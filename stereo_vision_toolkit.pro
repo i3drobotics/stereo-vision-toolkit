@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.3.1a.10
+VERSION = 1.3.1a.11
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
@@ -311,7 +311,7 @@ macx {
 
 # Define include folders for libraries
 CONFIG(WITH_OPENCV_CONTRIB) {
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/include"
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/include"
 } else {
     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/include"
 }
@@ -335,7 +335,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
     CONFIG(WITH_OPENCV_CONTRIB) {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/lib" -lopencv_world440d
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world440d
     } else {
         LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440d
     }
@@ -349,7 +349,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
     CONFIG(WITH_OPENCV_CONTRIB) {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/lib" -lopencv_world440
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world440
     } else {
         LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440
     }
@@ -411,7 +411,7 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
 
     CONFIG(WITH_OPENCV_CONTRIB) {
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
     } else {
         EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
     }
@@ -427,7 +427,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/debug/*.dll, true)
 
         CONFIG(WITH_OPENCV_CONTRIB) {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/bin/opencv_world440d.dll
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world440d.dll
         } else {
             EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440d.dll
         }
@@ -441,7 +441,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/release/*.dll, true)
 
         CONFIG(WITH_OPENCV_CONTRIB) {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib/opencv/build/x64/vc15/bin/opencv_world440.dll
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world440.dll
         } else {
             EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440.dll
         }
@@ -502,10 +502,15 @@ QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET}
 CONFIG += file_copies
 COPIES += extraFiles
 win32 {
-    message("Copying dependencies")
     extraFiles.files = $${EXTRA_FILES}
 }
 extraFiles.path = $${DEPLOY_FOLDER}
+
+## Replace qmake vcredist with internal vcredist to avoid 'VCRUNTIME_140_1.dll was not found' error
+## this is thought to be due to some 3rdparty packages using vs2015 and some using vs2017
+VCREDIST_DEPLOY_FOLDER = $$shell_quote($$shell_path($${DEPLOY_FOLDER}))
+VCREDIST_EXE = $$shell_quote($$shell_path($$_PRO_FILE_PWD_/3rdparty/vcredist/VC_redist.x64.exe))
+QMAKE_POST_LINK += && $(COPY_DIR) $${VCREDIST_EXE} $${VCREDIST_DEPLOY_FOLDER}
 
 # Install drivers
 win32 {

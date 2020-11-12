@@ -718,7 +718,7 @@ void AbstractStereoCamera::processStereo(void) {
 }
 
 void AbstractStereoCamera::processMatch(){
-    qDebug() << "Processing match...";
+    //qDebug() << "Processing match...";
     lr_image_mutex.lock();
     if (left_output.empty() || right_output.empty()){
         return;
@@ -733,16 +733,20 @@ void AbstractStereoCamera::processMatch(){
         this->matcher = new_matcher;
     }
 
-    qDebug() << "Stereo matching...";
+    //qDebug() << "Stereo matching...";
     matcher->match(left_img,right_img);
-    qDebug() << "Getting disparity from stereo match...";
+    //qDebug() << "Getting disparity from stereo match...";
     matcher->getDisparity(disp);
     disparity_mutex.lock();
     disparity = disp.clone();
     disparity_mutex.unlock();
-    qDebug() << "Getting left image from stereo match...";
+    //qDebug() << "Getting left image from stereo match...";
     left_bgr = matcher->getLeftBGRImage();
     emit matched();
+
+    //double min_disp, max_disp;
+    //CVSupport::getMinMaxDisparity(disp,min_disp,max_disp);
+    //qDebug() << min_disp << "," << max_disp;
 
     cv::Mat disp_colormap;
     if (video_src == VIDEO_SRC_DISPARITY || (reprojecting && getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH)){

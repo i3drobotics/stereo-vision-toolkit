@@ -10,8 +10,7 @@ void MatcherOpenCVSGBM::init(void) {
   QString matcher_parameters = QStandardPaths::AppConfigLocation+"/stereo_bm_params.xml";
   if(QFile(matcher_parameters).exists()){
       try {
-        matcher =
-            cv::StereoSGBM::load<cv::StereoSGBM>(matcher_parameters.toStdString());
+          matcher = cv::StereoSGBM::load<cv::StereoSGBM>(matcher_parameters.toStdString());
       } catch (cv::Exception& e) {
           qDebug() << "Error loading SGBM matching parameters: " << e.msg.c_str();
           setupDefaultMatcher();

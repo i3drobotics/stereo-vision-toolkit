@@ -192,6 +192,9 @@ SVTKWindow::SVTKWindow(QWidget* parent)
 #endif
 #ifdef WITH_PIPER
     piperInit();
+    ui->spinBoxPipePacketSize->setEnabled(true);
+    ui->comboBoxPiperSource->setEnabled(true);
+    ui->checkBoxPiperUseRectified->setEnabled(true);
 #else
     // hide piper button from interface
     ui->enablePiper->setVisible(false);
@@ -274,6 +277,7 @@ void SVTKWindow::enableWindow(){
 #endif
 #ifdef WITH_PIPER
     ui->enablePiper->setEnabled(true);
+    ui->txtPipeName->setEnabled(true);
 #endif
     ui->captureButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
@@ -428,6 +432,8 @@ void SVTKWindow::enablePiper(bool enable){
             connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
         }
         //start piper server
+        imagePiperServer->setPipeName(ui->txtPipeName->text().toStdString());
+        imagePiperServer->setPacketSize(ui->spinBoxPipePacketSize->value());
         imagePiperServer->openThreaded();
     } else {
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
@@ -833,7 +839,8 @@ void SVTKWindow::updatePiper(){
                     stereo_cam->getLeftRawImage(color);
                 }
                 stereo_cam->getDisparity(disp);
-                image_stream = CVSupport::createRGBD(color,disp);
+                //imagePiperServer->sendImagePairThreaded(color,disp);
+                image_stream = CVSupport::createRGBD16UC4(color,disp);
             } else {
                 image_stream = cv::Mat();
             }
@@ -843,6 +850,7 @@ void SVTKWindow::updatePiper(){
             qDebug() << "Empty image passed to piper";
             return;
         }
+
 
         bool send_threaded = true;
         if (send_threaded){

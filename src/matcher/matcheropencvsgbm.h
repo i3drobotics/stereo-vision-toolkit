@@ -57,6 +57,7 @@ public slots:
 
 private:
     cv::Ptr<cv::StereoSGBM> matcher;
+
     void init(void);
     void setupDefaultMatcher(void);
 

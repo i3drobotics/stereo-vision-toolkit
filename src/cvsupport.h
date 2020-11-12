@@ -42,7 +42,7 @@ public:
         return cv::imwrite(fname, src, params);
     }
 
-    static cv::Mat createRGBD(cv::Mat color_img, cv::Mat disparity){
+    static cv::Mat createRGBD32FC4(cv::Mat color_img, cv::Mat disparity){
         std::vector<cv::Mat> rgbChannels(3);
         cv::split(color_img, rgbChannels);
         cv::Mat b = rgbChannels[0];
@@ -59,6 +59,30 @@ public:
         channels.push_back(g);
         channels.push_back(r);
         channels.push_back(disparity);
+        cv::Mat rgbd;
+        cv::merge(channels, rgbd);
+        return rgbd;
+    }
+
+    static cv::Mat createRGBD16UC4(cv::Mat color_img, cv::Mat disparity){
+        std::vector<cv::Mat> rgbChannels(3);
+        cv::split(color_img, rgbChannels);
+        cv::Mat b = rgbChannels[0];
+        cv::Mat g = rgbChannels[1];
+        cv::Mat r = rgbChannels[2];
+        cv::Mat d = disparity.clone();
+
+        //convert color channels to float to keep precsion in the rgbd image
+        b.convertTo(b,CV_16UC1);
+        g.convertTo(g,CV_16UC1);
+        r.convertTo(r,CV_16UC1);
+        d.convertTo(d,CV_16UC1);
+
+        std::vector<cv::Mat> channels;
+        channels.push_back(b);
+        channels.push_back(g);
+        channels.push_back(r);
+        channels.push_back(d);
         cv::Mat rgbd;
         cv::merge(channels, rgbd);
         return rgbd;
