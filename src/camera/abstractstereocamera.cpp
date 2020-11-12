@@ -686,7 +686,7 @@ void AbstractStereoCamera::processStereo(void) {
                 if (capturing_rectified_video){
                     cv::hconcat(left_output, right_output, video_frame);
                 } else {
-                    cv::hconcat(left_unrectified, left_unrectified, video_frame);
+                    cv::hconcat(left_unrectified, right_unrectified, video_frame);
                 }
             } else if (video_src == VIDEO_SRC_LEFT){
                 if (capturing_rectified_video){
