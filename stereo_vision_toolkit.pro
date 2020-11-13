@@ -417,7 +417,7 @@ win32 {
     }
 
     WITH_CUDA {
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/cuda/nppicc64_10.dll
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/cuda/*.dll)
     }
 
     CONFIG( debug, debug|release ) {

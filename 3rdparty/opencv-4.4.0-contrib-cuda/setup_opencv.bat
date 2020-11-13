@@ -50,7 +50,7 @@ if %version_major_i% LEQ 2 (
 )
 
 :: download file
-SET downloadfile=opencv-%opencv_version%-contrib-cuda-vc15.exe
+SET downloadfile=opencv-%opencv_version%-contrib-cuda10.1-vc15.exe
 
 :: url for downloading opencv
 SET url=https://github.com/i3drobotics/build_opencv/releases/download/%opencv_version%/%downloadfile%
