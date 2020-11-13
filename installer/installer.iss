@@ -3,10 +3,11 @@
 ; MUST be installed on x64 bit machine
 
 #define AppName "Stereo Vision Toolkit"
-#define AppVersion "1.3.1a.11"
+#define AppVersion "1.3.1a.12"
 #define InstallerName "StereoVisionToolkit"
 #define ExeName "StereoVisionToolkit.exe"
-#define IconName "resources/i3dr_logo.ico"
+#define IconName "i3dr_logo.ico"
+#define IconPath "../resources"
 #define vcredist "vc_redist.x64"
 ; Some machines use differnetly named vcredist: vcredist_x64 / vc_redist.x64
 
@@ -22,12 +23,12 @@ DefaultDirName={pf64}/i3DR/{#AppName}
 DefaultGroupName=i3D Robotics
 LicenseFile=../LICENSE
 OutputBaseFilename={#InstallerName}-{#AppVersion}-Win64
-SetupIconFile="../{#IconName}"
+SetupIconFile="{#IconPath}/{#IconName}"
 Compression=lzma2
 SolidCompression=yes
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
-UninstallDisplayIcon="../{#IconName}"
+UninstallDisplayIcon="{#IconPath}/{#IconName}"
 AlwaysRestart = yes
 
 [Languages]
@@ -44,7 +45,7 @@ Source: "../build/{#InstallerName}/release/pylon_GigE_Filter_Driver.msi"; DestDi
 Source: "../build/{#InstallerName}/release/pylon_GigE_Performance_Driver.msi"; DestDir: {tmp}; Flags: deleteafterinstall
 Source: "../licenses/*"; DestDir: "{app}/licenses"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "../LICENSE"; DestDir: "{app}/licenses"
-Source: "../{#IconName}"; DestDir: "{app}"
+Source: "{#IconPath}/{#IconName}"; DestDir: "{app}"
 
 [Run]
 Filename: "{tmp}\{#vcredist}.exe"; Parameters: "/q /passive /Q:a /c:""msiexec /q /i vcredist.msi"" "; StatusMsg: Installing VC++ Redistributable...;
