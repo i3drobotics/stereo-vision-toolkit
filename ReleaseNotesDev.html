@@ -1,10 +1,12 @@
-Stereo Vision Toolkit v1.3.1a.10 [Development release]
+Stereo Vision Toolkit v1.3.1a.11 [Development release]
 
 Improvements:
-- Added image streaming using WinSock2
-- Added image streaming using Named Pipes
-- Added WLS filter to OpenCV BM and SGBM matchers
-- Added hostname and hostID to license message if I3DRSGM license is not found
+- RGBD image sent as 16UC4 image over named pipe for improved speed.
+
+Bug fixes:
+- Fix only left image is saved in un-rectified stereo video.
+- Fix missing vcruntime10_1.dll. Changed to using generic 2015-2019 vcredist for compatibility.
+- Fix missing CUDA dlls. 
 
 Known Issues:
 - WLS filter causes speckle filter to sometimes be disabled
