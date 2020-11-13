@@ -55,7 +55,7 @@ This code is provided under the MIT license, which essentially means it's open s
 See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
 
 ## Developer zone
-Download the latest development release v1.3.1a.9 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.9/StereoVisionToolkit-1.3.1a.9-Win64.exe)   
+Download the latest development release v1.3.1a.11 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.11/StereoVisionToolkit-1.3.1a.11-Win64.exe)   
 *WARNING: Development release may contain broken code and untested features. Use at your own risk!*
 
 See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on building from source.
@@ -63,7 +63,7 @@ See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGui
 Documentation can be found [here](https://i3drobotics.github.io/stereo-vision-toolkit/definitions/html/index.html). 
 
 ### 3rd Party Content
-This repository is used for internal development and so we include both debug and release libraries and DLLs. This makes for quite a large repository for a rather small codebase (around 500MB), so be warned.
+This repository is used for internal development and so we include both debug and release libraries and DLLs. This makes for quite a large repository for a rather small codebase (around 500MB), so be warned. 
 
 The project uses OpenCV for image processing, PCL and VTK for point cloud visualisation and hidapi for camera control. PCL requires Boost and Eigen which are included here. These dependencies are provided in accordance with their respective licenses which may be found in the license folder. We also use FontAwesome for icons via QtAwesome, along with QDarkStyle.
 
@@ -76,50 +76,31 @@ cd PATH_TO_REPO/scripts
 ```
 
 #### Boost
-Boost requires Visual Studio 2017, and needs cl.exe to be in the path or to run '3rdparty.bat' in a Visual Studio command prompt. 
+Boost requires Visual Studio 2017, and needs cl.exe to be in the system PATH variable or to run '3rdparty.bat' in a Visual Studio command prompt. 
 
 #### QT 
 Tested with QT 5.14.2 with Visual Studio 2017.  
 Requires QT Webengine module for use in Fervor. 
 
-#### CUDA
-There is limited usage of CUDA for certain image processing steps (e.g. rectification) and neural network support. If you want to build with CUDA support, you need to build OpenCV manually as the pre-packaged releases don't include it.
+#### OpenCV Contrib & CUDA
+There is limited usage of CUDA for certain image processing steps (e.g. rectification) and neural network support and OpenCV's ximageproc from contrib modules for WLS filter. If you want to build with CUDA support & contrib modules, you should use the download script in the 'opencv-4.4.0-contrib-cuda' folder then add the QT build arguments 'CONFIG+=WITH_OPENCV_CONTRIB CONFIG+=WITH_CUDA'.
 
-* First make sure you have an up to date version of CUDA and CUDNN installed. You can merge CUDNN into your CUDA install folder if you like.
-* You need to build OpenCV with the contrib modules to enable CUDA support
-* Then, configure OpenCV using cmake:
-  * Check that you're building for the correct CPU architecture - you must set x64 explicitly in cmake-gui because CUDA provides very limited 32-bit libraries.
-  * Make sure `WITH_CUDA` is on and run configure
-  * CUDA should be discovered automatically, but you will need to set:
-    * `CUDNN_INCLUDE_DIR`
-    * `CUDNN_LIBRARY`
-    * Manually define these entries and set their correct paths
-  * Run configure again and double check:
-    * `CUDA_64_BIT_DEVICE_CODE` is set to true
-    * `CUDA_ARCH_BIN` is appropriate for your device (e.g. 6.0, 6.1 for a GTX 1080). Remove the ones you don't need otherwise building will take forever.
-    * `CUDA_FAST_MATH` can be enabled if you like, it's not mandatory
-    * your GPU architecture as well, if you know it e.g. Pascal
-    * that `CUDA_USE_STATIC_CUDA_RUNTIME` is set, which will integrate it into opencv_world
-    * that `CUDNN_VERSION` is discovered correctly
-  * Make sure that you enable `OPENCV_DNN_CUDA` otherwise inference will fall back to CPU
-* Build and install OpenCV as normal, but it will take a lot longer
-* Point Qt to your standalone OpenCV build, not the bundled 3rdparty one (modify the .pro file)
-* Add `DEFINES+=WITH_CUDA` to your build settings
-* Build!
+#### VCRedist
+There is an issue where QT doesn't use the generic vc redist package and instead pulls from the system. Therefore the generic 2015-2019 vc redist is provided in this repository and can be updated using the script in '3rdparty/vcredist'.
 
 ### Phobos control
 Arduino code for controlling Phobos cameras is provided in src/camera/camera_control.
 This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.
 
 ### Procedure for new development release
-1. Update version numbers in stereo_vision_toolkit.pro, installer.iss, AppcastDev.xml and ReleaseNotesDev.html (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.8). In AppcastDev.xml make sure to also change the version number in the enclosure url.
+1. Update version numbers in stereo_vision_toolkit.pro, installer.iss, AppcastDev.xml and ReleaseNotesDev.html (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.11). In AppcastDev.xml make sure to also change the version number in the enclosure url.
 2. Update ReleaseNotesDev.html with improvements, bug fixes, and known issues. 
 3. Build new version (Make sure to use the build arguments: 'CONFIG+=WITH_VIMBA CONFIG+=DEV_BRANCH CONFIG+=WITH_I3DRSGM')
 4. Create installer using inno setup (right click 'installer.iss' and click 'compile')
 6. Update AppcastDev.xml enclosure length with the file size of the installer
 5. On [GitHub](https://github.com/i3drobotics/stereo-vision-toolkit/releases) create new release   
-a. Tag should match version number of toolkit (e.g. v1.3.1a.8) and target 'dev' branch.    
-  b. Title should have the program name and version (e.g. 'Stereo Vision Toolkit v1.3.1a.8')  
+a. Tag should match version number of toolkit (e.g. v1.3.1a.11) and target 'dev' branch.    
+  b. Title should have the program name and version (e.g. 'Stereo Vision Toolkit v1.3.1a.11')  
   c. Description should have the following header:  
   **WARNING: DO NOT USE THIS UNLESS YOU ARE PART OF THE I3DR DEVELOPMENT TEAM**  
   This release is meant for development use only while some new fixes and features are tested.  
