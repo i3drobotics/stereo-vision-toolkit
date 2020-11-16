@@ -5,8 +5,10 @@ SETLOCAL EnableDelayedExpansion
 SET initcwd=%cd%
 SET scriptpath=%~dp0
 cd %scriptpath:~0,-1%
+
 set opencv_version=4.4.0
-SET "opencv_version_=%opencv_version:.=_%"
+set cuda_version=11.1
+set vc_version=16
 
 :: set default option values
 set option_clean=false
@@ -50,7 +52,7 @@ if %version_major_i% LEQ 2 (
 )
 
 :: download file
-SET downloadfile=opencv-%opencv_version%-contrib-cuda10.1-vc15.exe
+SET downloadfile=opencv-%opencv_version%-contrib-cuda%cuda_version%-vc%vc_version%.exe
 
 :: url for downloading opencv
 SET url=https://github.com/i3drobotics/build_opencv/releases/download/%opencv_version%/%downloadfile%
