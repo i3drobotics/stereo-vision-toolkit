@@ -435,6 +435,20 @@ void SVTKWindow::enablePiper(bool enable){
         imagePiperServer->setPipeName(ui->txtPipeName->text().toStdString());
         imagePiperServer->setPacketSize(ui->spinBoxPipePacketSize->value());
         imagePiperServer->openThreaded();
+
+        QProgressDialog progressPCI("Waiting for connection to client...", "", 0, 100, this);
+        progressPCI.setWindowTitle("SVT");
+        progressPCI.setWindowModality(Qt::WindowModal);
+        progressPCI.setCancelButton(nullptr);
+        progressPCI.setMinimumDuration(0);
+        progressPCI.setValue(0);
+        progressPCI.setMaximum(0);
+        progressPCI.setMinimum(0);
+        progressPCI.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+        QCoreApplication::processEvents();
+        while(!imagePiperServer->isOpen()){
+            QCoreApplication::processEvents();
+        }
     } else {
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
         disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updatePiper()));
@@ -2258,12 +2272,25 @@ void SVTKWindow::setCalibrationFolder(QString dir) {
 
     msgBox.exec();
 
+    QProgressDialog progressPCI("Loading calibration...", "", 0, 100, this);
+    progressPCI.setWindowTitle("SVT");
+    progressPCI.setWindowModality(Qt::WindowModal);
+    progressPCI.setCancelButton(nullptr);
+    progressPCI.setMinimumDuration(0);
+    progressPCI.setValue(0);
+    progressPCI.setMaximum(0);
+    progressPCI.setMinimum(0);
+    progressPCI.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    QCoreApplication::processEvents();
+
     bool res;
     if (msgBox.clickedButton()==pButtonXML) {
         res = stereo_cam->loadCalibration(dir,AbstractStereoCamera::CALIBRATION_TYPE_XML);
     } else if (msgBox.clickedButton()==pButtonYAML) {
         res = stereo_cam->loadCalibration(dir,AbstractStereoCamera::CALIBRATION_TYPE_YAML);
     }
+
+    progressPCI.close();
 
     if(!res) {
         ui->enableStereo->setEnabled(false);

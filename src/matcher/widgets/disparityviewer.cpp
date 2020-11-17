@@ -67,11 +67,12 @@ void DisparityViewer::updateDisparityAsync() {
 }
 
 void DisparityViewer::updateDisparity() {
-    cv::Mat disparity;
+    cv::Mat disparity, disparity_thresh;
     matcher->getDisparity16(disparity);
-    cv::Mat disparity_thresh;
-
     disparity.copyTo(disparity_thresh);
+    //double d_error = 16 * matcher->getErrorDisparity();
+
+    /*
 
     double min_disp = 10000;
     double max_disp = 0;
@@ -112,47 +113,19 @@ void DisparityViewer::updateDisparity() {
         }
     }
 
-    for (int i = 0; i < disparity.rows; i++)
-    {
-        for (int j = 0; j < disparity.cols; j++)
-        {
-            float d = disparity.at<float>(i, j);
-            if (d > max_disp || d < min_disp || d == d_error){
-                disparity_thresh.at<float>(i, j) = 0;
-            }
-        }
-    }
-
     min_depth = (double)CVSupport::genZ(_Q,(double)max_i,(double)max_j,(double)max_disp);
     max_depth = (double)CVSupport::genZ(_Q,(double)min_i,(double)min_j,(double)min_disp);
-
-    /*
-    if (max_depth_tmp < min_depth_tmp){
-        max_depth = min_depth_tmp;
-        min_depth = max_depth_tmp;
-    } else {
-        max_depth = max_depth_tmp;
-        min_depth = min_depth_tmp;
-    }
     */
 
-    /*if (max_depth < 0){
-        max_depth = 0;
-    }
-
-    if (min_depth < 0){
-        min_depth = 0;
-    }
-    */
+    double min_disp, max_disp, min_depth, max_depth;
+    CVSupport::getMinMaxDisparity(disparity_thresh,Q,min_disp,max_disp);
+    CVSupport::getMinMaxDepth(disparity_thresh,Q,min_depth,max_depth);
+    min_depth_ = min_depth;
+    max_depth_ = max_depth;
 
     //use depth rather than disparity for more user readable results
     double range_disp = max_disp - min_disp;
     double range_depth = max_depth - min_depth;
-
-    min_disp_ = min_disp;
-    max_disp_ = max_disp;
-    min_depth_ = min_depth;
-    max_depth_ = max_depth;
 
     ui->minDisparityLabel->setText(
                 QString("%1 px").arg(QString::number(min_disp,'g', 4)));
@@ -168,48 +141,10 @@ void DisparityViewer::updateDisparity() {
     ui->maxDepthLabel->setText(
                 QString("%1 m").arg(QString::number(max_depth,'g', 4)));
 
-    cv::Mat temp;
-    disparity_thresh.convertTo(temp, CV_32F);
-
-    cv::normalize(temp, temp, 0, 255, cv::NORM_MINMAX);
-
-    // Then shift to threshold minimimum displayed disparity
-    //temp -= min_disparity;
-    //cv::threshold(temp, temp, range_disp, 0, cv::THRESH_TRUNC);
-
-    cv::Mat disparity_vis, disparity_scale;
-
-    //double scale_factor = 255.0 / (double)range_disp;
-
-    //temp *= scale_factor;
-    //cv::threshold(temp, temp, 0, 0, cv::THRESH_TOZERO);
-
-    temp.convertTo(disparity_scale, CV_8U);
-
-    // cv::ximgproc::getDisparityVis(temp, disparity_scale, scale_factor);
-
-    cv::applyColorMap(disparity_scale, disparity_vis, colourmap);
-
-    //colour_disparity = disparity_vis;
+    cv::Mat disparity_vis;
+    CVSupport::disparity2colormap(disparity,Q,disparity_vis);
 
     cv::cvtColor(disparity_vis, disparity_vis, cv::COLOR_BGR2RGB);
-
-    for (int x = 0; x < disparity_scale.cols; x++) {
-        for (int y = 0; y < disparity_scale.rows; y++) {
-            if (
-                    disparity_scale.at<uchar>(y, x) == 255 ||
-                    disparity_scale.at<uchar>(y, x) == 0 ||
-                    disparity_thresh.at<float>(y,x) == 0 ||
-                    disparity.at<float>(y, x) == 16 * matcher->getErrorDisparity())
-            {
-                disparity_vis.at<cv::Vec3b>(y, x)[0] = 0;
-                disparity_vis.at<cv::Vec3b>(y, x)[1] = 0;
-                disparity_vis.at<cv::Vec3b>(y, x)[2] = 0;
-            }
-        }
-    }
-
-    colour_disparity = disparity_vis;
 
     QImage dmap(disparity_vis.data, disparity_vis.cols, disparity_vis.rows,
                 QImage::Format_RGB888);
