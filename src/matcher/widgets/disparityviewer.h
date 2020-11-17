@@ -69,13 +69,10 @@ private:
     double focal = 4e-3;
     double pixel_size = 6e-6;
     QLabel *viewer;
-    cv::Mat colour_disparity;
     AbstractStereoMatcher *matcher;
     bool processing_disparity;
     QString save_directory = ".";
 
-    double min_disp_ = 10000;
-    double max_disp_ = 0;
     double min_depth_ = -1;
     double max_depth_ = -1;
 

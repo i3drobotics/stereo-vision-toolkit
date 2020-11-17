@@ -63,28 +63,6 @@ void AbstractStereoMatcher::getMinDisparity(int &val) {
     val = min_disparity;
 }
 
-void AbstractStereoMatcher::saveDisparity(QString filename) {
-    cv::Mat disparity_output;
-
-    getDisparity(disparity_output);
-
-    cv::imwrite(filename.toStdString(), disparity_output);
-
-    return;
-}
-
-void AbstractStereoMatcher::saveDisparityColormap(QString filename) {
-    cv::Mat disparity_main, disparity_output;
-
-    getDisparity(disparity_main);
-    //generate normalised colormap for saving
-    CVSupport::disparity2colormap(disparity_main,disparity_output);
-
-    cv::imwrite(filename.toStdString(), disparity_output);
-
-    return;
-}
-
 void AbstractStereoMatcher::checkLRConsistencyFull(double threshold){
     //TODO access if this is needed
     //NOTE: Removed to try and not use ximageproc

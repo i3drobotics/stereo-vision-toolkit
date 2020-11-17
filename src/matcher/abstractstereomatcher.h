@@ -77,18 +77,6 @@ class AbstractStereoMatcher : public QObject {
   //!  Get the min disparity value
   void getDisparityRange(int &val);
 
-  //!  Save the disparity map
-  /*!
-  * @param[in] filename Output filename
-  */
-  void saveDisparity(QString filename);
-
-  //!  Save the disparity map as normalised colormap
-  /*!
-  * @param[in] filename Output filename
-  */
-  void saveDisparityColormap(QString filename);
-
   //!  Perform a full left-right consistency check (experimental)
   /*!
    * \brief checkLRConsistencyFull

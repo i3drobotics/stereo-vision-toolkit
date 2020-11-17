@@ -230,6 +230,18 @@ public:
   */
     void getDisparity(cv::Mat &dst);
 
+    //! Get the disparity image
+    /*!
+  * @return OpenCV matrix containing disparity image
+  */
+    cv::Mat getDisparityFiltered();
+
+    //! Get the disparity image
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getDisparityFiltered(cv::Mat &dst);
+
 
     //! Get a pointer to the current point cloud
     /*!
@@ -605,6 +617,18 @@ private:
   */
     void saveImage(QString fname);
 
+    //!  Save the disparity map
+    /*!
+    * @param[in] filename Output filename
+    */
+    void saveDisparity(QString filename);
+
+    //!  Save the disparity map as normalised colormap
+    /*!
+    * @param[in] filename Output filename
+    */
+    void saveDisparityColormap(QString filename);
+
     //! Load rectification maps from calibration files
     /*!
   * @param[in] src_l Left image rectification map file
@@ -689,6 +713,7 @@ private:
     cv::Mat right_match_input;
 
     cv::Mat disparity;
+    cv::Mat disparity_filtered;
 
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 5;

@@ -117,6 +117,47 @@ public:
     }
 
     static void getMinMaxDepth(cv::Mat inDisparity, cv::Mat Q, double &min_depth, double &max_depth){
+        min_depth = 10000;
+        max_depth = 0;
+
+        double min_disp = 10000;
+        double max_disp = 0;
+        int min_i = 0;
+        int max_i = 0;
+        int min_j = 0;
+        int max_j = 0;
+
+        cv::Matx44d _Q;
+        Q.convertTo(_Q, CV_64F);
+
+        for (int i = 0; i < inDisparity.rows; i++)
+        {
+            for (int j = 0; j < inDisparity.cols; j++)
+            {
+                float d = inDisparity.at<float>(i, j);
+                if (d < 10000){
+                    float d = inDisparity.at<float>(i, j);
+                    if (d < min_disp){
+                        //TODO find out why issue with disp < ~3 causing negative w and so negative z
+                        if (CVSupport::genZ(_Q,i,j,d) > 0){
+                            min_disp = d;
+                            min_i = i;
+                            min_j = j;
+                        }
+                    }
+                    if (d > max_disp){
+                        max_disp = d;
+                        max_i = i;
+                        max_j = j;
+                    }
+                }
+            }
+        }
+
+        min_depth = (double)CVSupport::genZ(_Q,(double)max_i,(double)max_j,(double)max_disp);
+        max_depth = (double)CVSupport::genZ(_Q,(double)min_i,(double)min_j,(double)min_disp);
+
+        /*
         float min_disp = 10000;
         float max_disp = 0;
 
@@ -144,9 +185,46 @@ public:
                 }
             }
         }
+        */
     }
 
-    static void getMinMaxDisparity(cv::Mat inDisparity, double &min_disp, double &max_disp){
+    static void getMinMaxDisparity(cv::Mat inDisparity, cv::Mat Q, double &min_disp, double &max_disp){
+        min_disp = 10000;
+        max_disp = 0;
+        int min_i = 0;
+        int max_i = 0;
+        int min_j = 0;
+        int max_j = 0;
+
+        cv::Matx44d _Q;
+        Q.convertTo(_Q, CV_64F);
+
+        for (int i = 0; i < inDisparity.rows; i++)
+        {
+            for (int j = 0; j < inDisparity.cols; j++)
+            {
+                float d = inDisparity.at<float>(i, j);
+                if (d < 10000){
+                    float d = inDisparity.at<float>(i, j);
+                    if (d < min_disp){
+                        //TODO find out why issue with disp < ~3 causing negative w and so negative z
+                        if (CVSupport::genZ(_Q,i,j,d) > 0){
+                            min_disp = d;
+                            min_i = i;
+                            min_j = j;
+                        }
+                    }
+                    if (d > max_disp){
+                        max_disp = d;
+                        max_i = i;
+                        max_j = j;
+                    }
+                }
+            }
+        }
+
+
+        /*
         min_disp = 10000;
         max_disp = 0;
 
@@ -166,15 +244,16 @@ public:
                 }
             }
         }
+        */
     }
 
-    static void removeInvalidDisparity(cv::Mat inDisparity, cv::Mat &outValidDisparity){
+    static void removeInvalidDisparity(cv::Mat inDisparity, cv::Mat Q, cv::Mat &outValidDisparity){
         cv::Mat disparity_thresh;
 
         inDisparity.copyTo(disparity_thresh);
 
         double min_disp, max_disp;
-        getMinMaxDisparity(disparity_thresh, min_disp, max_disp);
+        getMinMaxDisparity(disparity_thresh, Q, min_disp, max_disp);
 
         for (int i = 0; i < disparity_thresh.rows; i++)
         {
@@ -187,13 +266,31 @@ public:
             }
         }
 
+        // normalise disparity
+        cv::Mat normDisp;
+        normaliseDisparity(disparity_thresh, normDisp);
+
+        for (int i = 0; i < disparity_thresh.rows; i++)
+        {
+            for (int j = 0; j < disparity_thresh.cols; j++)
+            {
+                if (normDisp.at<uchar>(i, j) != 255 || normDisp.at<uchar>(i, j) != 0){
+                    disparity_thresh.at<float>(i, j) = 0;
+                }
+            }
+        }
+
         outValidDisparity = disparity_thresh;
     }
 
-    static void disparity2colormap(cv::Mat inDisparity, cv::Mat &outColormap){
+    static void disparity2colormap(cv::Mat inDisparity, cv::Mat Q, cv::Mat &outColormap, bool isFiltered=false){
         // threshold value disparity
         cv::Mat validDisp;
-        removeInvalidDisparity(inDisparity, validDisp);
+        if (!isFiltered){
+            removeInvalidDisparity(inDisparity, Q, validDisp);
+        } else {
+            validDisp = inDisparity.clone();
+        }
 
         cv::Mat floatDisp;
         validDisp.convertTo(floatDisp, CV_32F);
