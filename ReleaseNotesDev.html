@@ -1,10 +1,17 @@
-Stereo Vision Toolkit v1.3.1a.12 [Development release]
+Stereo Vision Toolkit v1.3.1a.13 [Development release]
+
+Improvements:
+- Add loading dialog when loading calibration
+- Add 'waiting for client' loading dialog when starting named pipe server
+- Upgraded to using OpenCV v4.5.0 and CUDA 11.1
 
 Bug fixes:
-- Fix missing shortcut icon
+- Stability fixes to named pipe streaming
+- Fix removing invalid disparities from point cloud
 
 Known Issues:
-- WLS filter causes speckle filter to sometimes be disabled
+- Cannot close named pipe server until client connects.
+- WLS filter causes speckle filter to sometimes be disabled.
 - WinSock2 streaming is slow and unstable when using high resolution images. 
 - Named Pipe streaming is slow when using high resolution images.
 - Stereo videos are saved uncompressed to avoid lossy compression which would cause issues when loading stereo videos. This will create large file sizes.
