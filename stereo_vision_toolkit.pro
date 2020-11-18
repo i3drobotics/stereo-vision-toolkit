@@ -311,7 +311,7 @@ macx {
 
 # Define include folders for libraries
 CONFIG(WITH_OPENCV_CONTRIB) {
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/include"
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/include"
 } else {
     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/include"
 }
@@ -335,7 +335,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
     CONFIG(WITH_OPENCV_CONTRIB) {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world440d
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450d
     } else {
         LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440d
     }
@@ -349,7 +349,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
     CONFIG(WITH_OPENCV_CONTRIB) {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world440
+        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450
     } else {
         LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440
     }
@@ -367,11 +367,11 @@ WITH_VIMBA {
 
 WITH_I3DRSGM {
     # I3DRSGM library and include files
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.4/i3drsgm/i3drsgm-1.0.4/lib/" -lI3DRSGM
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.4/i3drsgm/i3drsgm-1.0.4/include"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.5/i3drsgm/i3drsgm-1.0.5/lib/" -lI3DRSGM
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.5/i3drsgm/i3drsgm-1.0.5/include"
     # PhobosIntegration library and include files (required for I3DRSGM)
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.4/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.4/i3drsgm/phobosIntegration-1.0.54/include"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.5/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.5/i3drsgm/phobosIntegration-1.0.54/include"
 }
 
 # Basler library files
@@ -411,13 +411,13 @@ win32 {
         $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
 
     CONFIG(WITH_OPENCV_CONTRIB) {
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg450_64.dll
     } else {
         EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
     }
 
     WITH_CUDA {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/cuda/*.dll)
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/cuda/*.dll)
     }
 
     CONFIG( debug, debug|release ) {
@@ -431,7 +431,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/debug/*.dll, true)
 
         CONFIG(WITH_OPENCV_CONTRIB) {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world440d.dll
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450d.dll
         } else {
             EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440d.dll
         }
@@ -445,7 +445,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/release/*.dll, true)
 
         CONFIG(WITH_OPENCV_CONTRIB) {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world440.dll
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450.dll
         } else {
             EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440.dll
         }
@@ -458,9 +458,9 @@ win32 {
     # I3DRSGM dlls
     WITH_I3DRSGM {
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.4/i3drsgm/i3drsgm-1.0.4/bin/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.4/i3drsgm/i3drsgm-1.0.4/bin/*.param, true) \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.4/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.5/i3drsgm/i3drsgm-1.0.5/bin/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.5/i3drsgm/i3drsgm-1.0.5/bin/*.param, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.5/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
     }
 
     # Vimba dlls

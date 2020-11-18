@@ -274,7 +274,7 @@ public:
         {
             for (int j = 0; j < disparity_thresh.cols; j++)
             {
-                if (normDisp.at<uchar>(i, j) != 255 || normDisp.at<uchar>(i, j) != 0){
+                if (normDisp.at<uchar>(i, j) == 255 || normDisp.at<uchar>(i, j) == 0){
                     disparity_thresh.at<float>(i, j) = 0;
                 }
             }

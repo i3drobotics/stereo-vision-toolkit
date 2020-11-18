@@ -6,8 +6,8 @@ SET initcwd=%cd%
 SET scriptpath=%~dp0
 cd %scriptpath:~0,-1%
 
-set opencv_version=4.4.0
-set cuda_version=10.1
+set opencv_version=4.5.0
+set cuda_version=11.1
 set vc_version=15
 
 :: set default option values
