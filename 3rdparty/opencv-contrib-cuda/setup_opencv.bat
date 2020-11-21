@@ -8,6 +8,7 @@ cd %scriptpath:~0,-1%
 
 set opencv_version=4.5.0
 set cuda_version=11.1
+set cudnn_version=8.0.4
 set vc_version=15
 
 :: set default option values
@@ -52,7 +53,7 @@ if %version_major_i% LEQ 2 (
 )
 
 :: download file
-SET downloadfile=opencv-%opencv_version%-contrib-cuda%cuda_version%-vc%vc_version%.exe
+SET downloadfile=opencv-%opencv_version%-contrib-cuda%cuda_version%-cudnn%cudnn_version%-vc%vc_version%.exe
 
 :: url for downloading opencv
 SET url=https://github.com/i3drobotics/build_opencv/releases/download/%opencv_version%/%downloadfile%

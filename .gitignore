@@ -13,3 +13,5 @@ installer/Output/*
 /3rdparty/boost-1.66.0/boost_1_66_0.tar.gz
 /3rdparty/opencv-contrib-cuda/opencv
 /3rdparty/opencv-contrib-cuda/opencv-contrib-cuda-vc15.exe
+/3rdparty/opencv-contrib-cuda/cuda
+/3rdparty/opencv-contrib-cuda/cudnn

@@ -417,7 +417,10 @@ win32 {
     }
 
     WITH_CUDA {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/cuda/*.dll)
+        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cuda/*.dll)
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn64_8.dll
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_cnn_infer64_8.dll
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_ops_infer64_8.dll
     }
 
     CONFIG( debug, debug|release ) {

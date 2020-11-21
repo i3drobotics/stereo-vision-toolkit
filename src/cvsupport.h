@@ -20,34 +20,12 @@
 class CVSupport
 {
 public:
-    /**
-     * @brief Wrapper around cv::imwrite for saving in parallel
-     * 
-     * Saves an image, can also be called sequentially.
-     * 
-     * @param[in] fname Output filename
-     * @param[in] src Image matrix
-     *
-     * @return True/false if the write was successful
-     */
-    static bool write_parallel(std::string fname, cv::Mat src)
-    {
-        std::vector<int> params;
-        int compression_level = 0;
-        params.push_back(cv::IMWRITE_PNG_COMPRESSION);
-        params.push_back(compression_level);
-        //params.push_back(cv::IMWRITE_PNG_STRATEGY);
-        //params.push_back(cv::IMWRITE_PNG_STRATEGY_DEFAULT)
-
-        return cv::imwrite(fname, src, params);
-    }
-
     static cv::Mat createRGBD32FC4(cv::Mat color_img, cv::Mat disparity){
         std::vector<cv::Mat> rgbChannels(3);
         cv::split(color_img, rgbChannels);
-        cv::Mat b = rgbChannels[0];
+        cv::Mat r = rgbChannels[0];
         cv::Mat g = rgbChannels[1];
-        cv::Mat r = rgbChannels[2];
+        cv::Mat b = rgbChannels[2];
 
         //convert color channels to float to keep precsion in the rgbd image
         b.convertTo(b,CV_32FC1, 1.0/255.0);
@@ -55,9 +33,9 @@ public:
         r.convertTo(r,CV_32FC1, 1.0/255.0);
 
         std::vector<cv::Mat> channels;
-        channels.push_back(b);
-        channels.push_back(g);
         channels.push_back(r);
+        channels.push_back(g);
+        channels.push_back(b);
         channels.push_back(disparity);
         cv::Mat rgbd;
         cv::merge(channels, rgbd);
@@ -67,9 +45,9 @@ public:
     static cv::Mat createRGBD16UC4(cv::Mat color_img, cv::Mat disparity){
         std::vector<cv::Mat> rgbChannels(3);
         cv::split(color_img, rgbChannels);
-        cv::Mat b = rgbChannels[0];
+        cv::Mat r = rgbChannels[0];
         cv::Mat g = rgbChannels[1];
-        cv::Mat r = rgbChannels[2];
+        cv::Mat b = rgbChannels[2];
         cv::Mat d = disparity.clone();
 
         //convert color channels to float to keep precsion in the rgbd image
@@ -79,9 +57,9 @@ public:
         d.convertTo(d,CV_16UC1);
 
         std::vector<cv::Mat> channels;
-        channels.push_back(b);
-        channels.push_back(g);
         channels.push_back(r);
+        channels.push_back(g);
+        channels.push_back(b);
         channels.push_back(d);
         cv::Mat rgbd;
         cv::merge(channels, rgbd);
