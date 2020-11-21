@@ -83,7 +83,7 @@ void MatcherWidgetI3DRSGM::updateMinDisparity(int min_disparity) {
     this->min_disparity = min_disparity;
     if (negative_disparity){
         ui->minDisparityLabel->setNum(-min_disparity);
-        double shift_p = (double)min_disparity / 20;
+        double shift_p = (double)-min_disparity / 20;
         matcher->setDisparityShift(shift_p);
     } else {
         ui->minDisparityLabel->setNum(min_disparity);
