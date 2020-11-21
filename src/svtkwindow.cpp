@@ -814,51 +814,56 @@ void SVTKWindow::updatePiper(){
         bool useRectified = ui->checkBoxPiperUseRectified->isChecked();
         // Select image source
         int source_index = ui->comboBoxPiperSource->currentIndex();
+        cv::Mat left_t, right_t;
         switch(source_index) {
-        case 0: // stereo
-            if (useRectified){
-                cv::hconcat(stereo_cam->getLeftImage(), stereo_cam->getRightImage(), image_stream);
-            } else {
-                cv::hconcat(stereo_cam->getLeftRawImage(), stereo_cam->getRightRawImage(), image_stream);
-            }
-            break;
-        case 1: // left
-            if (useRectified){
-                stereo_cam->getLeftImage(image_stream);
-            } else {
-                stereo_cam->getLeftRawImage(image_stream);
-            }
-            break;
-        case 2: // right
-            if (useRectified){
-                stereo_cam->getRightImage(image_stream);
-            } else {
-                stereo_cam->getRightRawImage(image_stream);
-            }
-            break;
-        case 3: // disparity
-            if (stereo_cam->isMatching()){
-                //qDebug() << "Getting disparity from stereo cam...";
-                stereo_cam->getDisparity(image_stream);
-            } else {
-                image_stream = cv::Mat();
-            }
-            break;
-        case 4: // rgbd
-            if (stereo_cam->isMatching()){
-                cv::Mat color, disp;
+            case 0: // stereo
                 if (useRectified){
-                    stereo_cam->getLeftImage(color);
+                    stereo_cam->getLeftImage(left_t);
+                    stereo_cam->getRightImage(right_t);
                 } else {
-                    stereo_cam->getLeftRawImage(color);
+                    stereo_cam->getLeftRawImage(left_t);
+                    stereo_cam->getRightRawImage(right_t);
                 }
-                stereo_cam->getDisparityFiltered(disp);
-                //imagePiperServer->sendImagePairThreaded(color,disp);
-                //image_stream = CVSupport::createRGBD16UC4(color,disp);
-                image_stream = CVSupport::createRGBD32FC4(color,disp);
-            } else {
-                image_stream = cv::Mat();
-            }
+                cv::hconcat(left_t, right_t, image_stream);
+                break;
+            case 1: // left
+                if (useRectified){
+                    stereo_cam->getLeftImage(image_stream);
+                } else {
+                    stereo_cam->getLeftRawImage(image_stream);
+                }
+                break;
+            case 2: // right
+                if (useRectified){
+                    stereo_cam->getRightImage(image_stream);
+                } else {
+                    stereo_cam->getRightRawImage(image_stream);
+                }
+                break;
+            case 3: // disparity
+                if (stereo_cam->isMatching()){
+                    //qDebug() << "Getting disparity from stereo cam...";
+                    stereo_cam->getDisparity(image_stream);
+                } else {
+                    image_stream = cv::Mat();
+                }
+                break;
+            case 4: // rgbd
+                if (stereo_cam->isMatching()){
+                    cv::Mat color, disp;
+                    if (useRectified){
+                        stereo_cam->getLeftImage(color);
+                    } else {
+                        stereo_cam->getLeftRawImage(color);
+                    }
+                    stereo_cam->getDisparityFiltered(disp);
+                    stereo_cam->getDisparity(disp);
+                    //imagePiperServer->sendImagePairThreaded(color,disp);
+                    //image_stream = CVSupport::createRGBD16UC4(color,disp);
+                    image_stream = CVSupport::createRGBD32FC4(color,disp);
+                } else {
+                    image_stream = cv::Mat();
+                }
         }
 
         if(image_stream.empty()){
