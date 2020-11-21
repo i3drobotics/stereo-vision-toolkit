@@ -119,7 +119,7 @@ void AbstractStereoCamera::imageSaved(bool success){
 void AbstractStereoCamera::saveDisparity(QString filename) {
     cv::Mat disparity_output;
 
-    matcher->getDisparity(disparity_output);
+    getDisparityFiltered(disparity_output);
 
     cv::imwrite(filename.toStdString(), disparity_output);
 
@@ -129,13 +129,25 @@ void AbstractStereoCamera::saveDisparity(QString filename) {
 void AbstractStereoCamera::saveDisparityColormap(QString filename) {
     cv::Mat disparity_main, disparity_output;
 
-    matcher->getDisparity(disparity_main);
+    getDisparity(disparity_main);
     //generate normalised colormap for saving
     CVSupport::disparity2colormap(disparity_main,Q,disparity_output);
 
     cv::imwrite(filename.toStdString(), disparity_output);
 
     return;
+}
+
+void AbstractStereoCamera::saveRGBD(QString filename){
+    cv::Mat left, disp;
+
+    left = left_output.clone();
+    getDisparityFiltered(disp);
+
+    cv::Mat rgbd = CVSupport::createRGBD32FC4(left,disp);
+
+    qDebug() << "Saving rgbd image...";
+    cv::imwrite(filename.toStdString(), rgbd);
 }
 
 void AbstractStereoCamera::saveImage(QString fname) {
@@ -154,10 +166,11 @@ void AbstractStereoCamera::saveImage(QString fname) {
     left = left_output.clone();
     right = right_output.clone();
 
+    std::vector<int> params(cv::IMWRITE_PNG_COMPRESSION,0);
     qDebug() << "Saving left image...";
-    CVSupport::write_parallel(filename_l,left);
+    cv::imwrite(filename_l,left,params);
     qDebug() << "Saving right image...";
-    CVSupport::write_parallel(filename_r,right);
+    cv::imwrite(filename_r,right,params);
     qDebug() << "Image saving complete.";
     imageSaved(true);
 
@@ -178,6 +191,7 @@ void AbstractStereoCamera::saveImage(QString fname) {
     if(matching && savingDisparity){
         saveDisparity(fname + "_disp_raw.tif");
         saveDisparityColormap(fname + "_disp_colormap.png");
+        saveRGBD(fname + "_rgbd.tif");
     }
 }
 

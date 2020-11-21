@@ -629,6 +629,12 @@ private:
     */
     void saveDisparityColormap(QString filename);
 
+    //!  Save the disparity map as normalised colormap
+    /*!
+    * @param[in] filename Output filename
+    */
+    void saveRGBD(QString fname);
+
     //! Load rectification maps from calibration files
     /*!
   * @param[in] src_l Left image rectification map file

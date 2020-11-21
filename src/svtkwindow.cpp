@@ -852,7 +852,7 @@ void SVTKWindow::updatePiper(){
                 } else {
                     stereo_cam->getLeftRawImage(color);
                 }
-                stereo_cam->getDisparity(disp);
+                stereo_cam->getDisparityFiltered(disp);
                 //imagePiperServer->sendImagePairThreaded(color,disp);
                 //image_stream = CVSupport::createRGBD16UC4(color,disp);
                 image_stream = CVSupport::createRGBD32FC4(color,disp);
