@@ -31,7 +31,18 @@ void MatcherOpenCVBlock::init(void) {
 void MatcherOpenCVBlock::setupDefaultMatcher(void){
 #ifdef WITH_CUDA
     matcher = cv::StereoBM::create(64, 9);
-    gpu_matcher = cv::cuda::createStereoBM(64, 9);
+    try
+    {
+        gpu_matcher = cv::cuda::createStereoBM(64, 9);
+    }
+    catch( cv::Exception& e )
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+        std::cout << "Disabling GPU CUDA functions" << std::endl;
+        useGPU = false;
+        gpu_matcher = nullptr;
+    }
 #else
     matcher = cv::StereoBM::create(64, 9);
 #endif
@@ -146,6 +157,7 @@ void MatcherOpenCVBlock::setWLSFilterEnabled(bool enable) {
 #ifdef WITH_CUDA
 void MatcherOpenCVBlock::setGPUEnabled(bool enable) {
     if (enable){
+      if (gpu_matcher != nullptr){
         gpu_matcher->setMinDisparity(matcher->getMinDisparity());
         gpu_matcher->setNumDisparities(matcher->getNumDisparities());
         gpu_matcher->setBlockSize(matcher->getBlockSize());
@@ -156,6 +168,7 @@ void MatcherOpenCVBlock::setGPUEnabled(bool enable) {
         gpu_matcher->setUniquenessRatio(matcher->getUniquenessRatio());
         gpu_matcher->setSpeckleWindowSize(matcher->getSpeckleWindowSize());
         gpu_matcher->setSpeckleRange(matcher->getSpeckleRange());
+      }
     }
     useGPU = enable;
 }

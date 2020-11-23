@@ -66,12 +66,22 @@ void DetectorOpenCV::setTarget(int target){
     }
 #ifdef WITH_CUDA
     else if(preferable_target == cv::dnn::DNN_TARGET_CUDA || preferable_target == cv::dnn::DNN_TARGET_CUDA_FP16){
-        // Check for GPU
-        if (cv::cuda::getCudaEnabledDeviceCount() <= 0) {
-            qDebug() << "OpenCL is not available. Falling back to CPU";
+        try
+        {
+            // Check for GPU
+            if (cv::cuda::getCudaEnabledDeviceCount() <= 0) {
+                qDebug() << "CUDA is not available. Falling back to CPU";
+                preferable_target = cv::dnn::DNN_TARGET_CPU;
+            }else{
+                qDebug() << "NVIDIA GPU detected.";
+            }
+        }
+        catch( cv::Exception& e )
+        {
+            const char* err_msg = e.what();
+            std::cout << "exception caught: " << err_msg << std::endl;
+            qDebug() << "CUDA is not available. Falling back to CPU";
             preferable_target = cv::dnn::DNN_TARGET_CPU;
-        }else{
-            qDebug() << "NVIDIA GPU detected.";
         }
     }
 #endif
