@@ -82,32 +82,30 @@ public:
                     xyz[1] = ((i * downsample_rate) + q13) / w;
                     xyz[2] = wz / w;
 
-                    if (w > 0){ // negative W would give negative z which is not possible (behind camera)
-                        if (xyz[2] > 0){ // negative z is not possible (behind camera)
-                            if (image.type() == CV_8UC1){
-                                intensity = image.at<uchar>(i,j);
-                                b = intensity;
-                                g = intensity;
-                                r = intensity;
-                            } else if (image.type() == CV_8UC3){
-                                b = image.at<cv::Vec3b>(i,j)[0];
-                                g = image.at<cv::Vec3b>(i,j)[1];
-                                r = image.at<cv::Vec3b>(i,j)[2];
-                            } else {
-                                b = 0;
-                                g = 0;
-                                r = 0;
-                                //qDebug() << "Invalid image type. MUST be CV_8UC1 or CV_8UC3";
-                            }
-
-                            point.x = xyz[0];
-                            point.y = xyz[1];
-                            point.z = xyz[2];
-                            point.r = r;
-                            point.g = g;
-                            point.b = b;
-                            ptCloudTemp->points.push_back(point);
+                    if (w > 0 && xyz[2] > 0){ // negative W or Z which is not possible (behind camera)
+                        if (image.type() == CV_8UC1){
+                            intensity = image.at<uchar>(i,j);
+                            b = intensity;
+                            g = intensity;
+                            r = intensity;
+                        } else if (image.type() == CV_8UC3){
+                            b = image.at<cv::Vec3b>(i,j)[0];
+                            g = image.at<cv::Vec3b>(i,j)[1];
+                            r = image.at<cv::Vec3b>(i,j)[2];
+                        } else {
+                            b = 0;
+                            g = 0;
+                            r = 0;
+                            //qDebug() << "Invalid image type. MUST be CV_8UC1 or CV_8UC3";
                         }
+
+                        point.x = xyz[0];
+                        point.y = xyz[1];
+                        point.z = xyz[2];
+                        point.r = r;
+                        point.g = g;
+                        point.b = b;
+                        ptCloudTemp->points.push_back(point);
                     }
                 }
             }

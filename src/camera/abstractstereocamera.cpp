@@ -261,6 +261,10 @@ void AbstractStereoCamera::enableCaptureRectifedVideo(bool rectify) {
     capturing_rectified_video = rectify;
 }
 
+void AbstractStereoCamera::getQ(cv::Mat &Q_){
+    Q.copyTo(Q_);
+}
+
 bool AbstractStereoCamera::setVideoSource(int source_index){
     // 0: stereo, 1: left, 2:right, 3:disparity
     switch(source_index) {
@@ -362,6 +366,18 @@ cv::Mat AbstractStereoCamera::getRightRawImage(void) {
     lr_raw_image_mutex.lock();
     return right_unrectified.clone();
     lr_raw_image_mutex.unlock();
+}
+
+void AbstractStereoCamera::getRightMatchImage(cv::Mat &dst){
+    disparity_mutex.lock();
+    right_match.copyTo(dst);
+    disparity_mutex.unlock();
+}
+
+void AbstractStereoCamera::getLeftMatchImage(cv::Mat &dst){
+    disparity_mutex.lock();
+    left_match.copyTo(dst);
+    disparity_mutex.unlock();
 }
 
 void AbstractStereoCamera::getDisparity(cv::Mat &dst) {
@@ -829,8 +845,10 @@ void AbstractStereoCamera::processMatch(){
     //qDebug() << "Getting disparity from stereo match...";
     matcher->getDisparity(disp);
     disparity_mutex.lock();
+    left_match = left_img.clone();
+    right_match = right_img.clone();
     disparity = disp.clone();
-    CVSupport::removeInvalidDisparity(disparity,Q,disp_filtered);
+    CVSupport::removeInvalidDisparity(disparity/16,Q,disp_filtered);
     disparity_filtered = disp_filtered.clone();
     disparity_mutex.unlock();
     //qDebug() << "Getting left image from stereo match...";
