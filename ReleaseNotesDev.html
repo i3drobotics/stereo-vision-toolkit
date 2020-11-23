@@ -1,7 +1,7 @@
-Stereo Vision Toolkit v1.3.1a.15 [Development release]
+Stereo Vision Toolkit v1.3.1a.16 [Development release]
 
-Improvements
-- Show console for debugging
+Bug Fixes:
+- Fixed crash if no CUDA device found (or using old driver) when calling: 'cv::cuda::getCudaEnabledDeviceCount'
 
 Known Issues:
 - Cannot close named pipe server until client connects.
