@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.3.1a.14
+VERSION = 1.3.1a.15
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
@@ -37,6 +37,11 @@ DEV_BRANCH {
     message("Development build")
     message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING MASTER RELEASE !!")
     DEFINES += DEV_BRANCH
+
+    CONFIG(debug, debug|release) { #debug
+    }else { # release
+        CONFIG += console
+    }
 }
 
 # Setup FERVOR defines
