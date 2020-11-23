@@ -170,6 +170,8 @@ public:
     //! Returns wheather the camera is connected
     bool isConnected();
 
+    void getQ(cv::Mat &Q);
+
     //! Get the left stereo image (un-rectified)
     /*!
   * @param[out] dst OpenCV matrix to store image into
@@ -217,6 +219,18 @@ public:
   * @return OpenCV matrix containing right image
   */
     cv::Mat getRightImage();
+
+    //! Get the left stereo image used in latest stereo match
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getLeftMatchImage(cv::Mat &dst);
+
+    //! Get the right stereo image used in latest stereo match
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getRightMatchImage(cv::Mat &dst);
 
     //! Get the disparity image
     /*!
@@ -299,6 +313,8 @@ public:
     cv::Mat right_remapped;
     cv::Mat left_unrectified;
     cv::Mat right_unrectified;
+    cv::Mat left_match;
+    cv::Mat right_match;
     cv::Mat left_raw;
     cv::Mat right_raw;
     cv::Mat Q;

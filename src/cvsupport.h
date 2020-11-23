@@ -51,10 +51,10 @@ public:
         cv::Mat d = disparity.clone();
 
         //convert color channels to float to keep precsion in the rgbd image
-        b.convertTo(b,CV_16UC1);
-        g.convertTo(g,CV_16UC1);
-        r.convertTo(r,CV_16UC1);
-        d.convertTo(d,CV_16UC1);
+        b.convertTo(b,CV_16SC1*10);
+        g.convertTo(g,CV_16SC1*10);
+        r.convertTo(r,CV_16SC1*10);
+        d.convertTo(d,CV_16SC1*10);
 
         std::vector<cv::Mat> channels;
         channels.push_back(r);
@@ -63,7 +63,32 @@ public:
         channels.push_back(d);
         cv::Mat rgbd;
         cv::merge(channels, rgbd);
+        int merge_type = rgbd.type();
         return rgbd;
+    }
+
+    static cv::Mat genWImage(cv::Mat disp, cv::Mat Q, float downsample_factor = 1.0){
+        float q32 = Q.at<float>(3, 2);
+        float q33 = Q.at<float>(3, 3);
+        float d, w;
+        cv::Mat wImage = cv::Mat(disp.rows, disp.cols, CV_32FC3, cv::Scalar(0));
+
+        float downsample_rate = 1 / downsample_factor;
+
+        for (int i = 0; i < disp.rows; i++)
+        {
+            for (int j = 0; j < disp.cols; j++)
+            {
+                d = disp.at<float>(i, j);
+                if (d != 0)
+                {
+                    w = ((d * downsample_rate) * q32) + q33;
+                    wImage.at<float>(i,j) = w;
+                }
+            }
+        }
+
+        return wImage;
     }
 
     static void normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity){

@@ -241,6 +241,7 @@ void SVTKWindow::disableWindow(){
     ui->toggleSwapLeftRight->setDisabled(true);
     ui->toggleCalibrationDownsample->setDisabled(true);
     ui->spinBoxDownsample->setDisabled(true);
+    ui->spinBoxPipeDownsample->setDisabled(true);
     ui->tabWidget->setDisabled(true);
     ui->tabCameraSettings->setDisabled(true);
     ui->tabApplicationSettings->setDisabled(true);
@@ -266,6 +267,7 @@ void SVTKWindow::enableWindow(){
     ui->toggleSwapLeftRight->setEnabled(true);
     ui->toggleCalibrationDownsample->setEnabled(true);
     ui->spinBoxDownsample->setEnabled(true);
+    ui->spinBoxPipeDownsample->setEnabled(true);
     ui->tabWidget->setEnabled(true);
     ui->tabCameraSettings->setEnabled(true);
     ui->tabApplicationSettings->setEnabled(true);
@@ -426,7 +428,7 @@ void SVTKWindow::enablePiper(bool enable){
     }
     piper_enabled = enable;
     if (enable){
-        if (ui->comboBoxPiperSource->currentIndex() == 3){ //disparity
+        if (ui->comboBoxPiperSource->currentIndex() == 3 || ui->comboBoxPiperSource->currentIndex() == 4){ //disparity or rgbd
             connect(stereo_cam, SIGNAL(matched()), this, SLOT(updatePiper()));
         } else {
             connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
@@ -522,6 +524,7 @@ void SVTKWindow::streamerInit(){
 
 #ifdef WITH_PIPER
 void SVTKWindow::piperInit(){
+    ui->checkBox16->setVisible(false);
     std::string pipename = ui->txtPipeName->text().toStdString();
     int packetsize = ui->spinBoxPipePacketSize->value();
     imagePiperServer = new Piper::ImageServer(pipename,packetsize);
@@ -815,6 +818,10 @@ void SVTKWindow::updatePiper(){
         // Select image source
         int source_index = ui->comboBoxPiperSource->currentIndex();
         cv::Mat left_t, right_t;
+        cv::Mat wImage, Q;
+        double pipe_downsample_factor = (double)ui->spinBoxPipeDownsample->value();
+        double camera_downsample_factor = (double)ui->spinBoxDownsample->value();
+        double pipe_downsample_rate = 1.0f/pipe_downsample_factor;
         switch(source_index) {
             case 0: // stereo
                 if (useRectified){
@@ -825,6 +832,7 @@ void SVTKWindow::updatePiper(){
                     stereo_cam->getRightRawImage(right_t);
                 }
                 cv::hconcat(left_t, right_t, image_stream);
+                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
                 break;
             case 1: // left
                 if (useRectified){
@@ -832,6 +840,7 @@ void SVTKWindow::updatePiper(){
                 } else {
                     stereo_cam->getLeftRawImage(image_stream);
                 }
+                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
                 break;
             case 2: // right
                 if (useRectified){
@@ -839,6 +848,7 @@ void SVTKWindow::updatePiper(){
                 } else {
                     stereo_cam->getRightRawImage(image_stream);
                 }
+                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
                 break;
             case 3: // disparity
                 if (stereo_cam->isMatching()){
@@ -847,20 +857,23 @@ void SVTKWindow::updatePiper(){
                 } else {
                     image_stream = cv::Mat();
                 }
+                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
                 break;
             case 4: // rgbd
                 if (stereo_cam->isMatching()){
                     cv::Mat color, disp;
-                    if (useRectified){
-                        stereo_cam->getLeftImage(color);
-                    } else {
-                        stereo_cam->getLeftRawImage(color);
-                    }
+                    stereo_cam->getLeftMatchImage(color);
                     stereo_cam->getDisparityFiltered(disp);
-                    stereo_cam->getDisparity(disp);
-                    //imagePiperServer->sendImagePairThreaded(color,disp);
-                    //image_stream = CVSupport::createRGBD16UC4(color,disp);
-                    image_stream = CVSupport::createRGBD32FC4(color,disp);
+                    if (!disp.empty() && !color.empty()){
+                        cv::resize(disp, disp, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
+                        cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
+                        if (ui->checkBox16->isChecked()){
+                            image_stream = CVSupport::createRGBD16UC4(color,disp);
+                        } else {
+                            image_stream = CVSupport::createRGBD32FC4(color,disp);
+                        }
+                        //cv::resize(image_stream, image_stream, cv::Size(), f_downsample, f_downsample);
+                    }
                 } else {
                     image_stream = cv::Mat();
                 }
