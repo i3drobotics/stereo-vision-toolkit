@@ -14,8 +14,19 @@ AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, S
 {
 
 #ifdef WITH_CUDA
-    if (cv::cuda::getCudaEnabledDeviceCount() > 0) {
-        cuda_device_found = true;
+    
+    try
+    {
+        if (cv::cuda::getCudaEnabledDeviceCount() > 0) {
+            cuda_device_found = true;
+        }
+    }
+    catch( cv::Exception& e )
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+        std::cout << "Disabling GPU CUDA functions" << std::endl;
+        cuda_device_found = false;
     }
 #endif
     //startThread();
