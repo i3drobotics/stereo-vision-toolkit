@@ -16,7 +16,7 @@ jobs:
               host: 'windows'
               target: 'desktop'
               arch: 'win64_msvc2017_64'
-              dir: '${{ github.workspace }}/example/'
+              dir: '${{ github.workspace }}/qt-install/'
               install-deps: 'true'
               modules: 'qtwebengine'
               tools-only: 'false'
