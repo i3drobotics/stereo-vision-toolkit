@@ -20,6 +20,11 @@ jobs:
               install-deps: 'true'
               modules: 'qtwebengine'
               tools-only: 'false'
+          - name: Install dependencies
+            shell: cmd
+            run: |
+              choco install jom
+              .\scripts\3rdparty.bat
           - name: Build
             shell: cmd
             run: |
