@@ -540,11 +540,6 @@ COPIES += mlExamples
 mlExamples.files = $$files($$_PRO_FILE_PWD_/resources/ml/coco/*, true)
 mlExamples.path = $${DEPLOY_FOLDER}/ml/coco
 
-# Auto generate code documenation using doxygen
-CONFIG( doc ){
-    QMAKE_POST_LINK += && cd /d $${_PRO_FILE_PWD_} && doxygen -u
-}
-
 # Add clean command to remove all files from build directory
 # use 'extraclean' in clean arguments to trigger this clean step
 win32 {
