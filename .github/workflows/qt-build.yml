@@ -20,11 +20,12 @@ jobs:
               install-deps: 'true'
               modules: 'qtwebengine'
               tools-only: 'false'
-          - name: Install dependencies
+          - name: Install jom
             shell: cmd
-            run: |
-              choco install jom
-              .\scripts\3rdparty.bat
+            run: choco install jom
+          - name: Install 3rdparty
+            shell: cmd
+            run: .\scripts\3rdparty.bat
           - name: Build
             shell: cmd
             run: |
@@ -33,7 +34,7 @@ jobs:
               cd build
               qmake.exe ../stereo_vision_toolkit.pro -spec win32-msvc "CONFIG+=qtquickcompiler CONFIG+=DEV_BRANCH CONFIG+=WITH_PIPER CONFIG+=WITH_VIMBA"
               jom.exe
-          - name: Archive build artifacts
+          - name: Upload build artifacts
             uses: actions/upload-artifact@v2
             with:
               name: Build artifact
