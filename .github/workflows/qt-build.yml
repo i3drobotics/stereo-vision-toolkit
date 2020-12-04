@@ -18,3 +18,6 @@ jobs:
               install-deps: 'true'
               modules: 'qtwebengine'
               tools-only: 'false'
+          - name: Build
+            run: |
+              qmake.exe stereo_vision_toolkit.pro -spec win32-msvc "CONFIG+=qtquickcompiler CONFIG+=DEV_BRANCH CONFIG+=WITH_PIPER CONFIG+=WITH_VIMBA && jom.exe qmake_all
