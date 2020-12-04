@@ -3,12 +3,11 @@ name: Build options
 on: [push]
 
 jobs:
-
-build:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Qt
+    build:
+        runs-on: windows-latest
+        steps:
+          - uses: actions/checkout@v2
+          - name: Install Qt
             uses: jurplel/install-qt-action@v2
             with:
               version: '5.14.2'
