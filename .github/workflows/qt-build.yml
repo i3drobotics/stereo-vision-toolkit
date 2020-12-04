@@ -25,7 +25,9 @@ jobs:
             run: choco install jom
           - name: Install 3rdparty
             shell: cmd
-            run: .\scripts\3rdparty.bat
+            run: |
+              call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+              .\scripts\3rdparty.bat
           - name: Build
             shell: cmd
             run: |
