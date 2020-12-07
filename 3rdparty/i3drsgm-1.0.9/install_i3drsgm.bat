@@ -7,7 +7,7 @@ SET scriptpath=%~dp0
 cd %scriptpath:~0,-1%
 
 :: set i3drsgm version
-set version=1.0.5
+set version=1.0.9
 
 :: search for token in first argument
 set token_found=false

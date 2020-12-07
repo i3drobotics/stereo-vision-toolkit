@@ -4,9 +4,9 @@ Doxyfile.bak
 *.tmp
 .vscode/
 installer/Output/*
-/3rdparty/i3drsgm-1.0.5/token.txt
-/3rdparty/i3drsgm-1.0.5/i3drsgm
-/3rdparty/i3drsgm-1.0.5/i3drsgm-1.0.5.exe
+/3rdparty/i3drsgm-1.0.9/token.txt
+/3rdparty/i3drsgm-1.0.9/i3drsgm
+/3rdparty/i3drsgm-1.0.9/i3drsgm-1.0.9.exe
 /3rdparty/opencv-4.5.0/opencv
 /3rdparty/opencv-4.5.0/opencv-4.5.0-vc14_vc15.exe
 /3rdparty/boost-1.66.0/boost_1_66_0
