@@ -36,9 +36,3 @@ jobs:
               cd build
               qmake.exe ../stereo_vision_toolkit.pro -spec win32-msvc "CONFIG+=qtquickcompiler CONFIG+=DEV_BRANCH CONFIG+=WITH_PIPER CONFIG+=WITH_VIMBA"
               jom.exe
-          - name: Upload build artifacts
-            uses: actions/upload-artifact@v2
-            with:
-              name: Build artifact
-              path: |
-                build
