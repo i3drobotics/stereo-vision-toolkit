@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.3.1a.17
+VERSION = 1.3.1a.18
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
@@ -49,6 +49,9 @@ DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
+DEFINES += WITH_OPENCV_CONTRIB
+DEFINES += WITH_CUDA
+
 # To use StereoStreamer
 # add 'CONFIG+=WITH_STEREO_STREAMER' to build arguments
 WITH_STEREO_STREAMER {
@@ -68,18 +71,6 @@ WITH_PIPER {
 WITH_I3DRSGM {
     message("I3DRSGM enabled")
     DEFINES += WITH_I3DRSGM
-}
-
-WITH_OPENCV_CONTRIB {
-    message("OpenCV Contrib enabled")
-    DEFINES += WITH_OPENCV_CONTRIB
-}
-
-# To use CUDA
-# add 'CONFIG+=WITH_CUDA' to build arguments
-WITH_CUDA {
-    message("CUDA enabled")
-    DEFINES += WITH_CUDA
 }
 
 # To use Vimbda camera API (currently optional while being implimented)
@@ -315,11 +306,7 @@ macx {
 }
 
 # Define include folders for libraries
-CONFIG(WITH_OPENCV_CONTRIB) {
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/include"
-} else {
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/include"
-}
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/include"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/VTK/include/vtk-7.0"
 INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/PCL/include/pcl-1.8"
@@ -339,11 +326,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/debug" -lhidapi
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
-    CONFIG(WITH_OPENCV_CONTRIB) {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450d
-    } else {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440d
-    }
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450d
 
 }else {
     # Define release only libraries
@@ -353,11 +336,7 @@ CONFIG(debug, debug|release) {
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/release" -lhidapi
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
-    CONFIG(WITH_OPENCV_CONTRIB) {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450
-    } else {
-        LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/lib" -lopencv_world440
-    }
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450
 }
 
 # Define libraries
@@ -414,12 +393,8 @@ win32 {
         $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
         $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
         $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
-
-    CONFIG(WITH_OPENCV_CONTRIB) {
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg450_64.dll
-    } else {
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg440_64.dll
-    }
+        
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg450_64.dll
 
     WITH_CUDA {
         EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cuda/*.dll)
@@ -438,11 +413,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/debug/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/debug/*.dll, true)
 
-        CONFIG(WITH_OPENCV_CONTRIB) {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450d.dll
-        } else {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440d.dll
-        }
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450d.dll
     } else {
         # Release only dlls
         EXTRA_FILES += \
@@ -452,11 +423,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/release/*.dll, true) \
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/release/*.dll, true)
 
-        CONFIG(WITH_OPENCV_CONTRIB) {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450.dll
-        } else {
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-4.4.0/opencv/build/x64/vc15/bin/opencv_world440.dll
-        }
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450.dll
     }
 
     # Define drivers to copy to build folder
