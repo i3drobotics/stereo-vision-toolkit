@@ -1410,6 +1410,8 @@ void SVTKWindow::stereoCameraInitConnections(void) {
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_view, SLOT(setSize(int, int, int)));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), left_matcher_view, SLOT(setSize(int, int, int)));
     connect(stereo_cam, SIGNAL(update_size(int, int, int)), right_view, SLOT(setSize(int, int, int)));
+    connect(ui->checkBoxShowEpipolar, SIGNAL(clicked(bool)), left_view, SLOT(enableEpipolarLines(bool)));
+    connect(ui->checkBoxShowEpipolar, SIGNAL(clicked(bool)), right_view, SLOT(enableEpipolarLines(bool)));
 
     connect(ui->enabledTriggeredCheckbox, SIGNAL(clicked(bool)), this,
             SLOT(enableTrigger(bool)));

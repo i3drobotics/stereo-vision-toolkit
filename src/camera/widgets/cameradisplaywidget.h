@@ -36,8 +36,11 @@ public:
 
     float getDownsampleRate(){ return downsample_rate; }
 
+    cv::Scalar hsv2bgr(cv::Scalar hsv);
+
 public slots:
     void setSize(int height, int width, int bit_depth);
+    void enableEpipolarLines(bool show){ show_epipolar_lines = show; }
 
 private:
     Ui::CameraDisplayWidget *ui;
@@ -51,6 +54,7 @@ private:
     int max_update_rate = 30;
     int min_update_time = 0;
     float downsample_rate = 1;
+    bool show_epipolar_lines = false;
 
     QPixmap pixmap;
     QImage *display_image = nullptr;
