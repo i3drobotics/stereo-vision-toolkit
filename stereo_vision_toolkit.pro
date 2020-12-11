@@ -277,13 +277,15 @@ CONFIG(debug, debug|release) { #debug
     DESTDIR = $$TARGET/debug
     OBJECTS_DIR = $$TARGET/.obj_debug
     MOC_DIR     = $$TARGET/.moc_debug
+    RCC_DIR = $$TARGET/.qrc_debug
+    UI_DIR = $$TARGET/.ui_debug
 }else {
     DESTDIR = $$TARGET/release
     OBJECTS_DIR = $$TARGET/.obj
     MOC_DIR     = $$TARGET/.moc
+    RCC_DIR = $$TARGET/.qrc
+    UI_DIR = $$TARGET/.ui
 }
-RCC_DIR = $$TARGET/.qrc
-UI_DIR = $$TARGET/.ui
 
 # Error if running 32-bit system
 # depencies are built to run on 64-bit system
@@ -351,11 +353,11 @@ WITH_VIMBA {
 
 WITH_I3DRSGM {
     # I3DRSGM library and include files
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.9/i3drsgm/i3drsgm-1.0.9/lib/" -llibI3DRSGM
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.9/i3drsgm/i3drsgm-1.0.9/include"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.10/lib/" -llibI3DRSGM
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.10/include"
     # PhobosIntegration library and include files (required for I3DRSGM)
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.9/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.9/i3drsgm/phobosIntegration-1.0.54/include"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/phobosIntegration-1.0.54/include"
 }
 
 # Basler library files
@@ -433,9 +435,9 @@ win32 {
     # I3DRSGM dlls
     WITH_I3DRSGM {
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.9/i3drsgm/i3drsgm-1.0.9/bin/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.9/i3drsgm/i3drsgm-1.0.9/bin/*.param, true) \
-            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm-1.0.9/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.10/lib/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.10/lib/*.param, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
     }
 
     # Vimba dlls
