@@ -95,9 +95,9 @@ Arduino code for controlling Phobos cameras is provided in src/camera/camera_con
 This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.
 
 ### Procedure for new development release
-1. Update version numbers in stereo_vision_toolkit.pro, installer.iss, AppcastDev.xml and ReleaseNotesDev.html (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.11). In AppcastDev.xml make sure to also change the version number in the enclosure url.
+1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.11).
 2. Update ReleaseNotesDev.html with improvements, bug fixes, and known issues. 
-3. Build new version (Make sure to use the build arguments: 'CONFIG+=WITH_VIMBA CONFIG+=DEV_BRANCH CONFIG+=WITH_I3DRSGM')
+3. Build new version (Make sure to use the build arguments: 'CONFIG+=DEV_BRANCH CONFIG+=WITH_I3DRSGM CONFIG+=WITH_VIMBA CONFIG+=WITH_PIPER')
 4. Create installer using inno setup (right click 'installer.iss' and click 'compile')
 6. Update AppcastDev.xml enclosure length with the file size of the installer
 5. On [GitHub](https://github.com/i3drobotics/stereo-vision-toolkit/releases) create new release   
@@ -112,7 +112,7 @@ a. Tag should match version number of toolkit (e.g. v1.3.1a.11) and target 'dev'
 6. Once installer is uploaded to release, push the repository file changes, check the changes have been pushed to the GitHub repository and then publish the release. It is important to do this quickly and in the correct order to make sure the updater remains valid. 
 
 ### Procedure for new master release
-1. Update version numbers in stereo_vision_toolkit.pro, installer.iss, Appcast.xml and ReleaseNotes.html (**DO NOT PUSH THESE CHANGES YET**). In Appcast.xml make sure to also change the version number in the enclosure url.
+1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.11).
 2. Update ReleaseNotes.html with improvements, bug fixes, and known issues. 
 3. Build new version (Make sure to use the build arguments: 'CONFIG+=WITH_VIMBA CONFIG+=WITH_I3DRSGM')
 4. Create installer using inno setup (right click 'installer.iss' and click 'compile')
