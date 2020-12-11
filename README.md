@@ -34,8 +34,7 @@ See [issues](https://github.com/i3drobotics/stereo-vision-toolkit/issues) for de
 
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
-I3DR's own 3D matching algorithm (I3DRSGM) can be built into this application however the files required are not included directly in this repository. This is because it uses proprietary libraries owned by I3DR. For this reason, these files cannot be open source and are kept in the submodule i3drsgm. However, releases are built with I3DRSGM support. 
-Please contact info@i3drobotics.com for requesting a license. 
+I3DR's own 3D matching algorithm (I3DRSGM) is also built into this application by default however a license is required to be able to run it. Please contact info@i3drobotics.com for requesting a license. 
 
 ## Installation
 
@@ -86,7 +85,7 @@ Tested with QT 5.14.2 with Visual Studio 2017.
 Requires QT Webengine module for use in Fervor. 
 
 #### OpenCV Contrib & CUDA
-There is limited usage of CUDA for certain image processing steps (e.g. rectification) and neural network support and OpenCV's ximageproc from contrib modules for WLS filter. If you want to build with CUDA support & contrib modules, you should use the download script in the 'opencv-4.4.0-contrib-cuda' folder then add the QT build arguments 'CONFIG+=WITH_OPENCV_CONTRIB CONFIG+=WITH_CUDA'.
+There is limited usage of CUDA for certain image processing steps (e.g. rectification) and neural network support and OpenCV's ximageproc from contrib modules for WLS filter.
 
 #### VCRedist
 There is an issue where QT doesn't use the generic vc redist package and instead pulls from the system. Therefore the generic 2015-2019 vc redist is provided in this repository and can be updated using the script in '3rdparty/vcredist'.

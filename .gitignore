@@ -15,3 +15,4 @@ installer/Output/*
 /3rdparty/opencv-contrib-cuda/opencv-contrib-cuda-vc15.exe
 /3rdparty/opencv-contrib-cuda/cuda
 /3rdparty/opencv-contrib-cuda/cudnn
+/3rdparty/i3drsgm/i3drsgm
