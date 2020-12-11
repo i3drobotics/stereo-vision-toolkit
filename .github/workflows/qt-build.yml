@@ -45,8 +45,7 @@ jobs:
               iscc installer.iss
           - name: Upload installer artifact
             uses: actions/upload-artifact@v2
-            working-directory: installer
             with:
               name: Installer artifact
               path: |
-                Output
+                installer/Output
