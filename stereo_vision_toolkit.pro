@@ -51,6 +51,9 @@ DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
+DEFINES += WITH_CUDA
+DEFINES += WITH_OPENCV_CONTRIB
+
 # To use StereoStreamer
 # add 'CONFIG+=WITH_STEREO_STREAMER' to build arguments
 WITH_STEREO_STREAMER {
@@ -351,7 +354,7 @@ WITH_VIMBA {
 
 WITH_I3DRSGM {
     # I3DRSGM library and include files
-    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.10/lib/" -llibI3DRSGM
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.10/lib/" -lI3DRSGM
     INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.10/include"
     # PhobosIntegration library and include files (required for I3DRSGM)
     LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
