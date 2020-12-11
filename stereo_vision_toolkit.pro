@@ -7,13 +7,15 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.3.1a.18
+# Read version from version.txt
+VERSION = $$cat($$_PRO_FILE_PWD_/version.txt)
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
+# Define QT modules
 QT += core gui concurrent widgets xml network quick serialport
 
-#QT version > 5.12.4 uses openssl 1.1.1
+# QT version > 5.12.4 uses openssl 1.1.1
 versionAtLeast(QT_VERSION, 5.12.4){
     message("Building with OpenSSL 1.1.1")
 } else {
@@ -49,9 +51,6 @@ DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
 
-DEFINES += WITH_OPENCV_CONTRIB
-DEFINES += WITH_CUDA
-
 # To use StereoStreamer
 # add 'CONFIG+=WITH_STEREO_STREAMER' to build arguments
 WITH_STEREO_STREAMER {
@@ -84,7 +83,6 @@ WITH_VIMBA {
 
 # Define resources
 RC_FILE = $$_PRO_FILE_PWD_/resources/icon.rc
-
 RESOURCES += \
     $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc \
     $$_PRO_FILE_PWD_/resources/window/window.qrc
@@ -398,12 +396,10 @@ win32 {
         
     EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg450_64.dll
 
-    WITH_CUDA {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cuda/*.dll)
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn64_8.dll
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_cnn_infer64_8.dll
-        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_ops_infer64_8.dll
-    }
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cuda/*.dll)
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn64_8.dll
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_cnn_infer64_8.dll
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_ops_infer64_8.dll
 
     CONFIG( debug, debug|release ) {
         # Debug only dlls
