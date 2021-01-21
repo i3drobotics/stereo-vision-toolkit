@@ -524,7 +524,7 @@ void SVTKWindow::streamerInit(){
 
 #ifdef WITH_PIPER
 void SVTKWindow::piperInit(){
-    ui->checkBox16->setVisible(false);
+    ui->checkBox16->setVisible(true);
     std::string pipename = ui->txtPipeName->text().toStdString();
     int packetsize = ui->spinBoxPipePacketSize->value();
     imagePiperServer = new Piper::ImageServer(pipename,packetsize);
@@ -868,9 +868,9 @@ void SVTKWindow::updatePiper(){
                         cv::resize(disp, disp, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
                         cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
                         if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16UC4(color,disp);
+                            image_stream = CVSupport::createRGBD16(color,disp,10.0,true);
                         } else {
-                            image_stream = CVSupport::createRGBD32FC4(color,disp);
+                            image_stream = CVSupport::createRGBD32(color,disp);
                         }
                         //cv::resize(image_stream, image_stream, cv::Size(), f_downsample, f_downsample);
                     }

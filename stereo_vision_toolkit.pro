@@ -415,6 +415,7 @@ win32 {
             $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/debug/*.dll, true)
 
         EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450d.dll
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450.dll
     } else {
         # Release only dlls
         EXTRA_FILES += \

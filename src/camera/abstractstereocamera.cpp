@@ -155,7 +155,7 @@ void AbstractStereoCamera::saveRGBD(QString filename){
     left = left_output.clone();
     getDisparityFiltered(disp);
 
-    cv::Mat rgbd = CVSupport::createRGBD32FC4(left,disp);
+    cv::Mat rgbd = CVSupport::createRGBD32(left,disp);
 
     qDebug() << "Saving rgbd image...";
     cv::imwrite(filename.toStdString(), rgbd);

@@ -20,7 +20,7 @@
 class CVSupport
 {
 public:
-    static cv::Mat createRGBD32FC4(cv::Mat color_img, cv::Mat disparity){
+    static cv::Mat createRGBD32(cv::Mat color_img, cv::Mat disparity){
         std::vector<cv::Mat> rgbChannels(3);
         cv::split(color_img, rgbChannels);
         cv::Mat r = rgbChannels[0];
@@ -42,7 +42,20 @@ public:
         return rgbd;
     }
 
-    static cv::Mat createRGBD16UC4(cv::Mat color_img, cv::Mat disparity){
+    static cv::Mat translate(cv::Mat input, double fromMin, double fromMax, double toMin, double toMax){
+        //Figure out how 'wide' each range is
+        double fromSpan = fromMax - fromMin;
+        double toSpan = toMax - toMin;
+
+        //Convert the left range into a 0-1 range (float)
+        cv::Mat valueScaled = input - fromMin / fromSpan;
+
+        //Convert the 0-1 range into a value in the right range.
+        cv::Mat translated = toMin + (valueScaled * toSpan);
+        return translated;
+    }
+
+    static cv::Mat createRGBD16(cv::Mat color_img, cv::Mat disparity, double scaling_factor=1.0, bool allow_negatives=true){
         std::vector<cv::Mat> rgbChannels(3);
         cv::split(color_img, rgbChannels);
         cv::Mat r = rgbChannels[0];
@@ -50,11 +63,29 @@ public:
         cv::Mat b = rgbChannels[2];
         cv::Mat d = disparity.clone();
 
+        int CV_TYPE = CV_16UC1;
+        if (allow_negatives){
+            //CV_TYPE = CV_16SC1; //TODO find way to send 16SC1 over PNG encoder
+        }
+
         //convert color channels to float to keep precsion in the rgbd image
-        b.convertTo(b,CV_16SC1*10);
-        g.convertTo(g,CV_16SC1*10);
-        r.convertTo(r,CV_16SC1*10);
-        d.convertTo(d,CV_16SC1*10);
+        b.convertTo(b,CV_TYPE);
+        g.convertTo(g,CV_TYPE);
+        r.convertTo(r,CV_TYPE);
+
+        double min_d, max_d;
+        cv::minMaxLoc(d, &min_d, &max_d);
+        std::cout << "Disp range (32bit): " << min_d << max_d << std::endl;
+        if (allow_negatives){
+            d = d + d.size().width;
+        }
+        cv::minMaxLoc(d, &min_d, &max_d);
+        std::cout << "Disp range (32bit no negatives): " << min_d << max_d << std::endl;
+        d.convertTo(d,CV_TYPE, scaling_factor);
+        cv::minMaxLoc(d, &min_d, &max_d);
+        std::cout << "Disp range (16bit): " << min_d << max_d << std::endl;
+
+        //d.convertTo(d,CV_16UC1, 1.0/255.0);
 
         std::vector<cv::Mat> channels;
         channels.push_back(r);
@@ -63,7 +94,7 @@ public:
         channels.push_back(d);
         cv::Mat rgbd;
         cv::merge(channels, rgbd);
-        int merge_type = rgbd.type();
+        std::cout << "Disp type (16bit): " << rgbd.type() << std::endl;
         return rgbd;
     }
 
