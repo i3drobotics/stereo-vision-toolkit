@@ -861,7 +861,7 @@ void SVTKWindow::updatePiper(){
                 break;
             case 4: // rgbd
                 if (stereo_cam->isMatching()){
-                    cv::Mat color, disp;
+                    cv::Mat color, disp, Q;
                     stereo_cam->getLeftMatchImage(color);
                     stereo_cam->getDisparityFiltered(disp);
                     if (!disp.empty() && !color.empty()){
@@ -872,11 +872,36 @@ void SVTKWindow::updatePiper(){
                         } else {
                             image_stream = CVSupport::createRGBD32(color,disp);
                         }
-                        //cv::resize(image_stream, image_stream, cv::Size(), f_downsample, f_downsample);
+                    } else {
+                        std::cerr << "Disparity image or camera image is empty." << std::endl;
                     }
                 } else {
                     image_stream = cv::Mat();
                 }
+                break;
+            case 5: // rgbdq
+                if (stereo_cam->isMatching()){
+                    cv::Mat color, disp, Q;
+                    stereo_cam->getLeftMatchImage(color);
+                    stereo_cam->getDisparityFiltered(disp);
+                    stereo_cam->getQ(Q);
+                    if (!disp.empty() && !color.empty()){
+                        cv::resize(disp, disp, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
+                        cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
+                        //embedd Q in disparity image
+                        cv::Mat dispQ = CVSupport::embedQinDisp(disp,Q);
+                        if (ui->checkBox16->isChecked()){
+                            image_stream = CVSupport::createRGBD16(color,dispQ,10.0,true);
+                        } else {
+                            image_stream = CVSupport::createRGBD32(color,dispQ);
+                        }
+                    } else {
+                        std::cerr << "Disparity image or camera image is empty." << std::endl;
+                    }
+                } else {
+                    image_stream = cv::Mat();
+                }
+                break;
         }
 
         if(image_stream.empty()){

@@ -861,35 +861,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="16" column="1">
-                <widget class="QComboBox" name="comboBoxPiperSource">
-                 <item>
-                  <property name="text">
-                   <string>Stereo</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Left</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Right</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Disparity</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>RGBD</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
                <item row="9" column="0">
                 <widget class="QLabel" name="lblPort">
                  <property name="text">
@@ -927,13 +898,6 @@
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="18" column="1">
-                <widget class="QCheckBox" name="checkBox16">
-                 <property name="text">
-                  <string>16bit</string>
                  </property>
                 </widget>
                </item>
@@ -1257,6 +1221,63 @@
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
+                </widget>
+               </item>
+               <item row="18" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="text">
+                  <string>Bit depth</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="18" column="1">
+                <widget class="QCheckBox" name="checkBox16">
+                 <property name="text">
+                  <string>16bit</string>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="16" column="1">
+                <widget class="QComboBox" name="comboBoxPiperSource">
+                 <property name="currentIndex">
+                  <number>5</number>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Stereo</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Left</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Right</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Disparity</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RGBD</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RGBDQ</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
               </layout>
