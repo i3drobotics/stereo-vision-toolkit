@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2009-2019 Basler AG
+//  Copyright (c) 2009-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author: Andreas Gau
 //-----------------------------------------------------------------------------
@@ -88,6 +88,8 @@ namespace Pylon
     static const VersionInfo Sfnc_2_3_0(2, 3, 0);
     /// Constant for SFNC version 2.4.0
     static const VersionInfo Sfnc_2_4_0(2, 4, 0);
+    /// Constant for SFNC version 2.5.0
+    static const VersionInfo Sfnc_2_5_0(2, 5, 0);
 
 
     /**

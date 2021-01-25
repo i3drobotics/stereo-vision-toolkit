@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Andreas Gau
 //-----------------------------------------------------------------------------
@@ -18,12 +18,13 @@
 #   pragma pack(push, PYLON_PACKING)
 #endif /* _MSC_VER */
 
-#include <GenApi/INode.h>
-
 #if _MSC_VER
 #   pragma warning( push)
 #   pragma warning( disable : 4100) //warning C4100: 'identifier' : unreferenced formal parameter
 #endif
+
+#include <GenApi/INode.h>
+
 
 namespace Pylon
 {

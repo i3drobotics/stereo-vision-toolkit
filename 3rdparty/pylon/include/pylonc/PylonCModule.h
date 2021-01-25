@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
     Basler pylon C SDK
-    Copyright (c) 2012-2019 Basler AG
+    Copyright (c) 2012-2020 Basler AG
     http://www.baslerweb.com
 -----------------------------------------------------------------------------*/
 #ifndef PYLON_PYLONMODULE_H_
@@ -20,9 +20,9 @@
 #  define GENAPIC_MODULE PYLONC_MODULE  // as long we share the same module as GenApiC, prevent the GenApiC headers from creating its own module the module
 [module(name=PYLONC_MODULE, type=unspecified, uuid=PYLONC_TYPELIB_GUID)]
 #  ifdef _DEBUG
-[idl_module(name=PYLONC_MODULE, dllname="PylonC_v6_0d.dll")];
+[idl_module(name=PYLONC_MODULE, dllname="PylonC_v6_1d.dll")];
 #  else
-[idl_module(name=PYLONC_MODULE, dllname="PylonC_v6_0.dll")];
+[idl_module(name=PYLONC_MODULE, dllname="PylonC_v6_1.dll")];
 #  endif
 #endif
 

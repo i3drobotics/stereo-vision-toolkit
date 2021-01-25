@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2011-2019 Basler AG
+//  Copyright (c) 2011-2020 Basler AG
 //  http://www.baslerweb.com
 //-----------------------------------------------------------------------------
 /*!
@@ -35,9 +35,6 @@ namespace Pylon
         PayloadType_ChunkData, ///< The buffer contains chunk data.
         PayloadType_DeviceSpecific = 0x8000 ///< The buffer contains device specific data.
     };
-
-    // pylon 2.x compatibility.
-    typedef EPayloadType PayloadType;
 }
 
 #ifdef _MSC_VER

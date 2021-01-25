@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2008-2019 Basler AG
+//  Copyright (c) 2008-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Thomas Koeller
 //-----------------------------------------------------------------------------
@@ -61,13 +61,6 @@
 // packing used for pylon structs/classes
 #   define PYLON_PACKING 8
 
-// mark char8_t and uchar8_t as deprecated
-// We'll typedef them here again, so can use declspec(deprecated) instead of #deprecated
-PYLON_DEPRECATED("The type 'char8_t' is deprecated. Please use 'int8_t' instead.")           typedef char            char8_t;
-PYLON_DEPRECATED("The type 'uchar8_t' is deprecated. Please use 'uint8_t' instead.")         typedef unsigned char   uchar8_t;
-PYLON_DEPRECATED("The type 'pcchar8_t' is deprecated. Please use 'const char *' instead.")   typedef const char *    pcchar8_t;
-PYLON_DEPRECATED("The type 'pchar8_t' is deprecated. Please use 'char *' instead.")          typedef char *          pchar8_t;
-
 #elif (defined(__GNUC__) && defined(__linux__)) || defined(__APPLE__)
 // Platform Linux, gcc or Darwin, llvm toolchain
 
@@ -90,9 +83,15 @@ PYLON_DEPRECATED("The type 'pchar8_t' is deprecated. Please use 'char *' instead
 #   define PYLON_HAS_POSIX_THREADS
 
 //TODO this works only on a C99 compiler. We must ensure, that things like SIZE_MAX UINTPTR_MAX are always defined
+#if !defined(__STDC_LIMIT_MACROS)
 #   define  __STDC_LIMIT_MACROS
+#endif
+#if !defined(__STDC_CONSTANT_MACROS)
 #   define  __STDC_CONSTANT_MACROS
+#endif
+#if !defined(__STDC_FORMAT_MACROS)
 #   define  __STDC_FORMAT_MACROS    // for PRI* in inttypes.h
+#endif
 
 #   include <pylon/api_autoconf.h>
 #   include <stdint.h>
@@ -127,6 +126,16 @@ PYLON_DEPRECATED("The type 'pchar8_t' is deprecated. Please use 'char *' instead
 #   error Unsupported platform
 
 #endif
+
+// Architecture
+#if defined(__arm__) || defined(__thumb__) || defined(_ARM) || defined(_M_ARM) || defined(_M_ARMT) || defined(__arm) || defined(__aarch64__) || defined(_M_ARM64)
+#   define PYLON_ARM_BUILD
+#endif
+
+#if defined(i386) || defined(__i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(_M_I86) || defined(_M_IX86) || defined(_X86_) || defined(__X86__) || defined(__I86__) || defined(_M_AMD64) || defined(_M_X64)
+#   define PYLON_INTEL_BUILD
+#endif
+
 
 // The GENICAM_BUILD define has been removed in GenICam 3.0.
 #if defined(GENICAM_BUILD) && defined(PYLON_WIN_BUILD)

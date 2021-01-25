@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2006-2019 Basler AG
+//  Copyright (c) 2006-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  AH
 //-----------------------------------------------------------------------------
@@ -114,13 +114,13 @@ interface PUBLIC_INTERFACE IDeviceFactory
     /// Currently only one injected xml string is supported.
     virtual IPylonDevice* CreateFirstDevice( const CDeviceInfo& di, const StringList_t& InjectedXmlStrings ) = 0;
 
-    /// This method is deprecated. Use CreateDevice receiving a CDeviceInfo object that contains the full name as property.
+    /// This method is deprecated. Use CreateDevice and pass a CDeviceInfo object containing the full name as a property.
     /// Example: IPylonDevice* device = TlFactory.CreateDevice( CDeviceInfo().SetFullName( fullname));
-    /// Creates a device by its unique name (i.e. fullname as returned by CDeviceInfo::GetFullName ).
+    /// creates a device that matches its full name (i.e., as returned by CDeviceInfo::GetFullName).
     virtual IPylonDevice* CreateDevice( const String_t& ) = 0;
 
     /// Destroys a device.
-    /** \note: Never try to delete a pointer to a camera device by calling free or delete.
+    /** \note Never try to delete a pointer to a camera device by calling free or delete.
         Always use the DestroyDevice method.
     */
     virtual void DestroyDevice( IPylonDevice* ) = 0;

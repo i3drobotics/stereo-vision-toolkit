@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Andreas Gau
 //-----------------------------------------------------------------------------
@@ -9,6 +9,8 @@
 \brief Low Level API: Contains an adapter adapting a grab result to Pylon::IImage.
 */
 
+#pragma once
+
 #ifndef INCLUDED_RESULTIMAGE_H_0326044
 #define INCLUDED_RESULTIMAGE_H_0326044
 
@@ -16,11 +18,6 @@
 
 namespace Pylon
 {
-#if _MSC_VER
-#   pragma warning( push)
-#   pragma warning( disable : 4512) //warning C4512: 'Pylon::CGrabResultImage<GrabResultPtrT>' : assignment operator could not be generated
-#endif
-
     /*!
     \brief Low Level API: Adapts grab result to Pylon::IImage.
 
@@ -131,10 +128,6 @@ namespace Pylon
         GrabResultT m_grabResult; ///< The grab result that is adapted to IImage.
         bool m_isUnique; ///< User provided info whether the buffer is referenced only by this adapter.
     };
-
-#if _MSC_VER
-#   pragma warning( pop)
-#endif
-}
+} // namespace Pylon
 
 #endif /* INCLUDED_RESULTIMAGE_H_0326044 */

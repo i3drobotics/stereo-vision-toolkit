@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2006-2019 Basler AG
+//  Copyright (c) 2006-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  AH
 //-----------------------------------------------------------------------------
@@ -67,6 +67,8 @@ namespace Pylon
         const char* const TLTypeIPCam = "IPCam";
         ///Value for the CoaXPress transport layer
         const char* const TLTypeCXP = "CXP";
+        ///Value for the "Custom" transport layer
+        const char* const TLTypeCustom = "Custom";
     }
 
     ///This namespace contains keys for accessing the properties of pylon info objects
@@ -114,7 +116,7 @@ namespace Pylon
         /*!
         \brief Compares CInfoBase objects by device class.
         \param[in]  rhs The right-hand side object of the comparison.
-        \return Returns true according to this rule: USB < GigE < CameraLink < 1394 < Bcon < Less than compare of device class text < CamEmu.
+        \return Returns true according to this rule: USB < GigE < CameraLink < 1394 < GenTL (incl. CXP) < Bcon < unknown device classes < CamEmu.
         \error
         Does not throw C++ exceptions.
         */

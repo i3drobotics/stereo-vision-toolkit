@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Andreas Gau
 //-----------------------------------------------------------------------------
@@ -92,9 +92,9 @@ namespace Pylon
         /// Get the current payload size in bytes.
         size_t GetPayloadSize() const;
 
+        /// Get the size of the buffer returned by GetBuffer in bytes.
+        size_t GetBufferSize() const;
 
-        /// Deprecated: GetBlockID() should be used instead. Get the index of the grabbed frame (camera device specific).
-        PYLON_DEPRECATED("GetFrameNumber() has been deprecated. Use GetBlockID() instead.")  uint32_t GetFrameNumber() const;
 
         /// Get the block ID of the grabbed frame (camera device specific).
         /*!
@@ -227,8 +227,8 @@ namespace Pylon
 
         // The grab result data
         const void*& m_pBuffer;
+        size_t& m_bufferSize;
         bool& m_grabSucceeded;
-        uint32_t& m_frameNr;
         EPayloadType& m_payloadType;
         EPixelType& m_pixelType;
         uint64_t& m_timeStamp;

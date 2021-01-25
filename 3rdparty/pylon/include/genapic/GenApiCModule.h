@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
     Basler pylon C SDK
-    Copyright (c) 2012-2019 Basler AG
+    Copyright (c) 2012-2020 Basler AG
     http://www.baslerweb.com
 -----------------------------------------------------------------------------*/
 #ifndef GENAPI_GENAPICMODULE_H_
@@ -20,9 +20,9 @@
 #  define GENAPIC_MODULE "GenApiC"
 [module(name=GENAPIC_MODULE, type=unspecified)]
 #  ifdef _DEBUG
-[idl_module(name=GENAPIC_MODULE, dllname="GenApiC_v6_0d.dll")];
+[idl_module(name=GENAPIC_MODULE, dllname="GenApiC_v6_1d.dll")];
 #  else
-[idl_module(name=GENAPIC_MODULE, dllname="GenApiC_v6_0.dll")];
+[idl_module(name=GENAPIC_MODULE, dllname="GenApiC_v6_1.dll")];
 #  endif
 #endif
 

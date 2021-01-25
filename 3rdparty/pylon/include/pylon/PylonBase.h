@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2006-2019 Basler AG
+//  Copyright (c) 2006-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  AH
 //-----------------------------------------------------------------------------
@@ -178,7 +178,7 @@ PYLONBASE_API void CDECL GetProperty( int propertyId, void* pData, size_t* pSize
         // unimplemented new operator to prevent creation on the heap which is a bad idea.
         // This object must be created in the local stack frame (see sample above)
         void* operator new(size_t);
-
+        void* operator new[](size_t);
     };
 
 } // namespace Pylon

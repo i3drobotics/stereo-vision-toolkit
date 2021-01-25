@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Andreas Gau
 //-----------------------------------------------------------------------------
@@ -23,6 +23,7 @@
 
 #include <pylon/InstantCamera.h>
 #include <pylon/ParameterIncludes.h>
+#include <pylon/ConfigurationHelper.h>
 
 namespace Pylon
 {
@@ -45,6 +46,9 @@ namespace Pylon
         static void ApplyConfiguration( GENAPI_NAMESPACE::INodeMap& nodemap)
         {
             using namespace GENAPI_NAMESPACE;
+
+            //Disable compression mode.
+            CConfigurationHelper::DisableCompression( nodemap );
 
             // Disable all trigger types except the trigger type used for triggering the acquisition of
             // frames.

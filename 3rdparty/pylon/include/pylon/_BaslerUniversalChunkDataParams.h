@@ -1,12 +1,15 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2019 Basler AG
+//  Copyright (c) 2019-2020 Basler AG
 //  http://www.baslerweb.com
 //-----------------------------------------------------------------------------
 
 /*!
 \file
-\brief A parameter class containing all parameters as members that are available for ace USB, and GigE
+\brief A parameter class containing all parameters as members that are available for chunk data of Basler camera devices
+
+The parameter class is used by the \link Pylon::CBaslerUniversalGrabResultPtr \c CBaslerUniversalGrabResultPtr \endlink class.
+More information can be found in the code of the \ref sample_Grab_ChunkImage sample.
 */
 
 //-----------------------------------------------------------------------------
@@ -23,97 +26,95 @@
 #include <pylon/ParameterIncludes.h>
 #include <pylon/EnumParameterT.h>
 
-#ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4250 ) // warning C4250: 'Pylon::CXYZParameter': inherits 'Pylon::CParameter::Pylon::CParameter::ZYX' via dominance
-#endif
-
-//! The namespace containing the device's control interface and related enumeration types
 namespace Basler_UniversalChunkDataParams
 {
-
     //**************************************************************************************************
     // Enumerations
     //**************************************************************************************************
-
     //! Valid values for ChunkCounterSelector
     enum ChunkCounterSelectorEnums
     {
-        ChunkCounterSelector_Counter1,  //!< Chunk data can be retrieved from counter 1. - Applies to: ace USB
-        ChunkCounterSelector_Counter2  //!< Chunk data can be retrieved from counter 2. - Applies to: ace USB
+        ChunkCounterSelector_Counter1,  //!< Chunk data can be retrieved from counter 1 - Applies to: ace USB
+        ChunkCounterSelector_Counter2  //!< Chunk data can be retrieved from counter 2 - Applies to: ace USB
     };
 
     //! Valid values for ChunkGainSelector
     enum ChunkGainSelectorEnums
     {
-        ChunkGainSelector_All  //!< Chunk data can be retrieved from all gain channels. - Applies to: ace USB
+        ChunkGainSelector_All  //!< Chunk data can be retrieved from all gain channels - Applies to: ace USB
     };
 
     //! Valid values for ChunkPixelFormat
     enum ChunkPixelFormatEnums
     {
-        ChunkPixelFormat_Mono8,  //!< Indicates that the pixel data in the acquired image is in the Mono 8 format - Applies to: GigE
-        ChunkPixelFormat_Mono8Signed,  //!< Indicates that the pixel data in the acquired image is in the Mono 8 signed format - Applies to: GigE
-        ChunkPixelFormat_Mono10,  //!< Indicates that the pixel data in the acquired image is in the Mono 10 format - Applies to: GigE
-        ChunkPixelFormat_Mono10Packed,  //!< Indicates that the pixel data in the acquired image is in the Mono 10 Packed format - Applies to: GigE
-        ChunkPixelFormat_Mono10p,  //!< Indicates that the pixel data in the acquired image is in the Mono 10p format - Applies to: GigE
-        ChunkPixelFormat_Mono12,  //!< Indicates that the pixel data in the acquired image is in the Mono 12 format - Applies to: GigE
-        ChunkPixelFormat_Mono12Packed,  //!< Indicates that the pixel data in the acquired image is in the Mono 12 Packed format - Applies to: GigE
-        ChunkPixelFormat_Mono16,  //!< Indicates that the pixel data in the acquired image is in the Mono 16 format - Applies to: GigE
-        ChunkPixelFormat_BayerGR8,  //!< Indicates that the pixel data in the acquired image is in the Bayer GR 8 format - Applies to: GigE
-        ChunkPixelFormat_BayerRG8,  //!< Indicates that the pixel data in the acquired image is in the Bayer RG 8 format - Applies to: GigE
-        ChunkPixelFormat_BayerGB8,  //!< Indicates that the pixel data in the acquired image is in the Bayer GB 8 format - Applies to: GigE
-        ChunkPixelFormat_BayerBG8,  //!< Indicates that the pixel data in the acquired image is in the Bayer BG 8 format - Applies to: GigE
-        ChunkPixelFormat_BayerGR10,  //!< Indicates that the pixel data in the acquired image is in the Bayer GR 10 format - Applies to: GigE
-        ChunkPixelFormat_BayerRG10,  //!< Indicates that the pixel data in the acquired image is in the Bayer RG 10 format - Applies to: GigE
-        ChunkPixelFormat_BayerGB10,  //!< Indicates that the pixel data in the acquired image is in the Bayer GB 10 format - Applies to: GigE
-        ChunkPixelFormat_BayerBG10,  //!< Indicates that the pixel data in the acquired image is in the Bayer BG 10 format - Applies to: GigE
-        ChunkPixelFormat_BayerGR12,  //!< Indicates that the pixel data in the acquired image is in the Bayer GR 12 format - Applies to: GigE
-        ChunkPixelFormat_BayerRG12,  //!< Indicates that the pixel data in the acquired image is in the Bayer RG 12 format - Applies to: GigE
-        ChunkPixelFormat_BayerGB12,  //!< Indicates that the pixel data in the acquired image is in the Bayer GB 12 format - Applies to: GigE
-        ChunkPixelFormat_BayerBG12,  //!< Indicates that the pixel data in the acquired image is in the Bayer BG 12 format - Applies to: GigE
-        ChunkPixelFormat_BayerGR16,  //!< Indicates that the pixel data in the acquired image is in the Bayer GR 16 format - Applies to: GigE
-        ChunkPixelFormat_BayerRG16,  //!< Indicates that the pixel data in the acquired image is in the Bayer RG 16 format - Applies to: GigE
-        ChunkPixelFormat_BayerGB16,  //!< Indicates that the pixel data in the acquired image is in the Bayer GB 16 format - Applies to: GigE
-        ChunkPixelFormat_BayerBG16,  //!< Indicates that the pixel data in the acquired image is in the Bayer BG 16 format - Applies to: GigE
-        ChunkPixelFormat_RGB8Packed,  //!< Indicates that the pixel data in the acquired image is in the RGB 8 Packed format - Applies to: GigE
-        ChunkPixelFormat_BGR8Packed,  //!< Indicates that the pixel data in the acquired image is in the BGR 8 Packed format - Applies to: GigE
-        ChunkPixelFormat_RGBA8Packed,  //!< Indicates that the pixel data in the acquired image is in the RGBA 8 Packed format - Applies to: GigE
-        ChunkPixelFormat_BGRA8Packed,  //!< Indicates that the pixel data in the acquired image is in the BGRA 8 Packed format - Applies to: GigE
-        ChunkPixelFormat_RGB10Packed,  //!< Indicates that the pixel data in the acquired image is in the RGB 10 Packed format - Applies to: GigE
-        ChunkPixelFormat_BGR10Packed,  //!< Indicates that the pixel data in the acquired image is in the BGR 10 Packed format - Applies to: GigE
-        ChunkPixelFormat_RGB12Packed,  //!< Indicates that the pixel data in the acquired image is in the RGB 12 Packed format - Applies to: GigE
-        ChunkPixelFormat_BGR12Packed,  //!< Indicates that the pixel data in the acquired image is in the BGR 12 Packed format - Applies to: GigE
-        ChunkPixelFormat_RGB10V1Packed,  //!< Indicates that the pixel data in the acquired image is in the RGB 10V1 Packed format - Applies to: GigE
-        ChunkPixelFormat_RGB10V2Packed,  //!< Indicates that the pixel data in the acquired image is in the RGB 10V2 Packed format - Applies to: GigE
-        ChunkPixelFormat_YUV411Packed,  //!< Indicates that the pixel data in the acquired image is in the YUV 411 Packed format - Applies to: GigE
-        ChunkPixelFormat_YUV422Packed,  //!< Indicates that the pixel data in the acquired image is in the YUV 422 Packed format - Applies to: GigE
-        ChunkPixelFormat_YUV444Packed,  //!< Indicates that the pixel data in the acquired image is in the YUV 444 Packed format - Applies to: GigE
-        ChunkPixelFormat_RGB8Planar,  //!< Indicates that the pixel data in the acquired image is in the RGB 8 Planar format - Applies to: GigE
-        ChunkPixelFormat_RGB10Planar,  //!< Indicates that the pixel data in the acquired image is in the RGB 10 Planar format - Applies to: GigE
-        ChunkPixelFormat_RGB12Planar,  //!< Indicates that the pixel data in the acquired image is in the RGB 12 Planar format - Applies to: GigE
-        ChunkPixelFormat_RGB16Planar,  //!< Indicates that the pixel data in the acquired image is in the RGB 16 Planar format - Applies to: GigE
-        ChunkPixelFormat_YUV422_YUYV_Packed,  //!< Indicates that the pixel data in the acquired image is in the YUV 422 (YUYV) Packed format - Applies to: GigE
-        ChunkPixelFormat_BayerGB12Packed,  //!< Indicates that the pixel data in the acquired image is in the Bayer GB 12 Packed format - Applies to: GigE
-        ChunkPixelFormat_BayerGR12Packed,  //!< Indicates that the pixel data in the acquired image is in the Bayer GR 12 Packed format - Applies to: GigE
-        ChunkPixelFormat_BayerRG12Packed,  //!< Indicates that the pixel data in the acquired image is in the Bayer RG 12 Packed format - Applies to: GigE
-        ChunkPixelFormat_BayerBG12Packed,  //!< Indicates that the pixel data in the acquired image is in the Bayer BG 12 Packed format - Applies to: GigE
-        ChunkPixelFormat_RGB12V1Packed,  //!< Indicates that the pixel data in the acquired image is in RGB 12 Packed  - Applies to: GigE
-        ChunkPixelFormat_BayerGB10p,  //!< Indicates that the pixel data in the acquired image is in the Bayer GB 10p format - Applies to: GigE
-        ChunkPixelFormat_BayerGR10p,  //!< Indicates that the pixel data in the acquired image is in the Bayer GR 10p format - Applies to: GigE
-        ChunkPixelFormat_BayerRG10p,  //!< Indicates that the pixel data in the acquired image is in the Bayer RG 10p format - Applies to: GigE
-        ChunkPixelFormat_BayerBG10p  //!< Indicates that the pixel data in the acquired image is in the Bayer BG 10p format - Applies to: GigE
+        ChunkPixelFormat_BGR10Packed,  //!< The pixel data in the acquired image is in the BGR 10 Packed format - Applies to: GigE
+        ChunkPixelFormat_BGR12Packed,  //!< The pixel data in the acquired image is in the BGR 12 Packed format - Applies to: GigE
+        ChunkPixelFormat_BGR8Packed,  //!< The pixel data in the acquired image is in the BGR 8 Packed format - Applies to: GigE
+        ChunkPixelFormat_BGRA8Packed,  //!< The pixel data in the acquired image is in the BGRA 8 Packed format - Applies to: GigE
+        ChunkPixelFormat_BayerBG10,  //!< The pixel data in the acquired image is in the Bayer BG 10 format - Applies to: GigE
+        ChunkPixelFormat_BayerBG10p,  //!< The pixel data in the acquired image is in the Bayer BG 10p format - Applies to: GigE
+        ChunkPixelFormat_BayerBG12,  //!< The pixel data in the acquired image is in the Bayer BG 12 format - Applies to: GigE
+        ChunkPixelFormat_BayerBG12Packed,  //!< The pixel data in the acquired image is in the Bayer BG 12 Packed format - Applies to: GigE
+        ChunkPixelFormat_BayerBG16,  //!< The pixel data in the acquired image is in the Bayer BG 16 format - Applies to: GigE
+        ChunkPixelFormat_BayerBG8,  //!< The pixel data in the acquired image is in the Bayer BG 8 format - Applies to: GigE
+        ChunkPixelFormat_BayerGB10,  //!< The pixel data in the acquired image is in the Bayer GB 10 format - Applies to: GigE
+        ChunkPixelFormat_BayerGB10p,  //!< The pixel data in the acquired image is in the Bayer GB 10p format - Applies to: GigE
+        ChunkPixelFormat_BayerGB12,  //!< The pixel data in the acquired image is in the Bayer GB 12 format - Applies to: GigE
+        ChunkPixelFormat_BayerGB12Packed,  //!< The pixel data in the acquired image is in the Bayer GB 12 Packed format - Applies to: GigE
+        ChunkPixelFormat_BayerGB16,  //!< The pixel data in the acquired image is in the Bayer GB 16 format - Applies to: GigE
+        ChunkPixelFormat_BayerGB8,  //!< The pixel data in the acquired image is in the Bayer GB 8 format - Applies to: GigE
+        ChunkPixelFormat_BayerGR10,  //!< The pixel data in the acquired image is in the Bayer GR 10 format - Applies to: GigE
+        ChunkPixelFormat_BayerGR10p,  //!< The pixel data in the acquired image is in the Bayer GR 10p format - Applies to: GigE
+        ChunkPixelFormat_BayerGR12,  //!< The pixel data in the acquired image is in the Bayer GR 12 format - Applies to: GigE
+        ChunkPixelFormat_BayerGR12Packed,  //!< The pixel data in the acquired image is in the Bayer GR 12 Packed format - Applies to: GigE
+        ChunkPixelFormat_BayerGR16,  //!< The pixel data in the acquired image is in the Bayer GR 16 format - Applies to: GigE
+        ChunkPixelFormat_BayerGR8,  //!< The pixel data in the acquired image is in the Bayer GR 8 format - Applies to: GigE
+        ChunkPixelFormat_BayerRG10,  //!< The pixel data in the acquired image is in the Bayer RG 10 format - Applies to: GigE
+        ChunkPixelFormat_BayerRG10p,  //!< The pixel data in the acquired image is in the Bayer RG 10p format - Applies to: GigE
+        ChunkPixelFormat_BayerRG12,  //!< The pixel data in the acquired image is in the Bayer RG 12 format - Applies to: GigE
+        ChunkPixelFormat_BayerRG12Packed,  //!< The pixel data in the acquired image is in the Bayer RG 12 Packed format - Applies to: GigE
+        ChunkPixelFormat_BayerRG16,  //!< The pixel data in the acquired image is in the Bayer RG 16 format - Applies to: GigE
+        ChunkPixelFormat_BayerRG8,  //!< The pixel data in the acquired image is in the Bayer RG 8 format - Applies to: GigE
+        ChunkPixelFormat_Mono10,  //!< The pixel data in the acquired image is in the Mono 10 format - Applies to: GigE
+        ChunkPixelFormat_Mono10Packed,  //!< The pixel data in the acquired image is in the Mono 10 Packed format - Applies to: GigE
+        ChunkPixelFormat_Mono10p,  //!< The pixel data in the acquired image is in the Mono 10p format - Applies to: GigE
+        ChunkPixelFormat_Mono12,  //!< The pixel data in the acquired image is in the Mono 12 format - Applies to: GigE
+        ChunkPixelFormat_Mono12Packed,  //!< The pixel data in the acquired image is in the Mono 12 Packed format - Applies to: GigE
+        ChunkPixelFormat_Mono16,  //!< The pixel data in the acquired image is in the Mono 16 format - Applies to: GigE
+        ChunkPixelFormat_Mono8,  //!< The pixel data in the acquired image is in the Mono 8 format - Applies to: GigE
+        ChunkPixelFormat_Mono8Signed,  //!< The pixel data in the acquired image is in the Mono 8 Signed format - Applies to: GigE
+        ChunkPixelFormat_RGB10Packed,  //!< The pixel data in the acquired image is in the RGB 10 Packed format - Applies to: GigE
+        ChunkPixelFormat_RGB10Planar,  //!< The pixel data in the acquired image is in the RGB 10 Planar format - Applies to: GigE
+        ChunkPixelFormat_RGB10V1Packed,  //!< The pixel data in the acquired image is in the RGB 10V1 Packed format - Applies to: GigE
+        ChunkPixelFormat_RGB10V2Packed,  //!< The pixel data in the acquired image is in the RGB 10V2 Packed format - Applies to: GigE
+        ChunkPixelFormat_RGB12Packed,  //!< The pixel data in the acquired image is in the RGB 12 Packed format - Applies to: GigE
+        ChunkPixelFormat_RGB12Planar,  //!< The pixel data in the acquired image is in the RGB 12 Planar format - Applies to: GigE
+        ChunkPixelFormat_RGB12V1Packed,  //!< The pixel data in the acquired image is in RGB 12 V1 Packed format - Applies to: GigE
+        ChunkPixelFormat_RGB16Planar,  //!< The pixel data in the acquired image is in the RGB 16 Planar format - Applies to: GigE
+        ChunkPixelFormat_RGB8Packed,  //!< The pixel data in the acquired image is in the RGB 8 Packed format - Applies to: GigE
+        ChunkPixelFormat_RGB8Planar,  //!< The pixel data in the acquired image is in the RGB 8 Planar format - Applies to: GigE
+        ChunkPixelFormat_RGBA8Packed,  //!< The pixel data in the acquired image is in the RGBA 8 Packed format - Applies to: GigE
+        ChunkPixelFormat_YUV411Packed,  //!< The pixel data in the acquired image is in the YUV 411 Packed format - Applies to: GigE
+        ChunkPixelFormat_YUV422Packed,  //!< The pixel data in the acquired image is in the YUV 422 Packed format - Applies to: GigE
+        ChunkPixelFormat_YUV422_YUYV_Packed,  //!< The pixel data in the acquired image is in the YUV 422 (YUYV) Packed format - Applies to: GigE
+        ChunkPixelFormat_YUV444Packed  //!< The pixel data in the acquired image is in the YUV 444 Packed format - Applies to: GigE
     };
 
 
-
+    
+    
     //**************************************************************************************************
-    // Parameter class
+    // Parameter class CUniversalChunkDataParams_Params_v6_1_0
     //**************************************************************************************************
     
 
-    //! A parameter class containing all parameters as members that are available for ace USB, and GigE
-    class PYLONBASE_API CUniversalChunkDataParams_Params
+    /*!
+    \brief A parameter class containing all parameters as members that are available for chunk data of Basler camera devices
+
+    The parameter class is used by the \link Pylon::CBaslerUniversalGrabResultPtr \c CBaslerUniversalGrabResultPtr \endlink class.
+    More information can be found in the code of the \ref sample_Grab_ChunkImage sample.
+    */
+    class PYLONBASE_API CUniversalChunkDataParams_Params_v6_1_0
     {
     //----------------------------------------------------------------------------------------------------------------
     // Implementation
@@ -124,515 +125,530 @@ namespace Basler_UniversalChunkDataParams
         //! \cond HIDE_CLASS_METHODS
         
             //! Constructor
-            CUniversalChunkDataParams_Params(void);
+            CUniversalChunkDataParams_Params_v6_1_0(void);
 
             //! Destructor
-            ~CUniversalChunkDataParams_Params(void);
+            ~CUniversalChunkDataParams_Params_v6_1_0(void);
 
             //! Initializes the references
             void _Initialize(GENAPI_NAMESPACE::INodeMap*);
 
-            //! Return the vendor of the camera
-            const char* _GetVendorName(void);
-
-            //! Returns the camera model name
-            const char* _GetModelName(void);
-        
-        //! \endcond
+    //! \endcond
 
     private:
-        class CUniversalChunkDataParams_ParamsData;
-        CUniversalChunkDataParams_ParamsData* m_pData;
+        class CUniversalChunkDataParams_Params_v6_1_0_Data;
+        CUniversalChunkDataParams_Params_v6_1_0_Data* m_pCUniversalChunkDataParams_Params_v6_1_0_Data;
 
 
     //----------------------------------------------------------------------------------------------------------------
     // References to features
     //----------------------------------------------------------------------------------------------------------------
     public:
-        
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
         \brief Sets which counter to retrieve chunk data from - Applies to: ace USB
 
     
-        \b Visibility = Expert
+        Visibility: Expert
+
+        Selecting Parameters: ChunkCounterValue
 
     */
     Pylon::IEnumParameterT<ChunkCounterSelectorEnums>& ChunkCounterSelector;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
         \brief Value of the selected chunk counter - Applies to: ace USB
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
-        \b Selected by : ChunkCounterSelector
+        Selected by: ChunkCounterSelector
 
     */
     Pylon::IIntegerEx& ChunkCounterValue;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the maximum possible pixel value in the acquired image - Applies to: GigE
+        \brief Maximum possible pixel value in the acquired image - Applies to: GigE
 
-        This value indicates indicates the maximum possible pixel value acquired in the image
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkDynamicRangeMax;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the minimum possible pixel value in the acquired image - Applies to: GigE
+        \brief Minimum possible pixel value in the acquired image - Applies to: GigE
 
-        This value indicates the minimum possible pixel value in the acquired image.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkDynamicRangeMin;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Exposure time used to acquire the image - Applies to: ace USB and GigE
+        \brief Exposure time used to acquire the image - Applies to: GigE and ace USB
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IFloatEx& ChunkExposureTime;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the frame trigger counter when the image was acquired - Applies to: GigE
+        \brief Value of the Frame Trigger counter when the image was acquired - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkFrameTriggerCounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the frame trigger ignored counter when the image was acquired - Applies to: GigE
+        \brief Value of the Frame Trigger Ignored counter when the image was acquired - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkFrameTriggerIgnoredCounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the value of the frame counter when the image was acquired - Applies to: GigE
+        \brief Value of the Frame counter when the image was acquired - Applies to: GigE
 
-        This integer indicates the value of the frame counter when the image was acquired.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkFramecounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the frames per trigger counter when the image was acquired - Applies to: GigE
+        \brief Value of the Frames per Trigger counter when the image was acquired - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkFramesPerTriggerCounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Gain used to acquire the image - Applies to: ace USB
+        \brief Gain used during image acquisition - Applies to: ace USB
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
-        \b Selected by : ChunkGainSelector
+        Selected by: ChunkGainSelector
 
     */
     Pylon::IFloatEx& ChunkGain;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Gain all setting of the acquired image - Applies to: GigE
+        \brief Gain All value of the acquired image - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkGainAll;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
         \brief Sets which gain channel to retrieve chunk data from - Applies to: ace USB
 
     
-        \b Visibility = Expert
+        Visibility: Expert
+
+        Selecting Parameters: ChunkGain
 
     */
     Pylon::IEnumParameterT<ChunkGainSelectorEnums>& ChunkGainSelector;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the height of the area of interest represented in the acquired image - Applies to: GigE
+        \brief AOI height of the acquired image - Applies to: GigE
 
-        This value Indicates the height of the area of interest represented in the acquired image.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkHeight;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Number of bits per status - Applies to: GigE
+        \brief Number of bits per line used for the Input Status At Line Trigger parameter - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkInputStatusAtLineTriggerBitsPerLine;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Used to select a certain status - Applies to: GigE
+        \brief Index number used for the Input Status At Line Trigger parameter - Applies to: GigE
 
+        Index number used for the Input Status At Line Trigger parameter. The index number can be used to get the state of the camera's input lines when a specific line was acquired. For example, if you want to know the state of the camera's input lines when line 30 was acquired, set the index to 30, then retrieve the value of Status Index parameter.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkInputStatusAtLineTriggerIndex;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the status selected by 'Index' - Applies to: GigE
+        \brief Value indicating the status of the camera's input lines when a specific line was acquired - Applies to: GigE
 
+        Value indicating the status of the camera's input lines when a specific line was acquired. The information is stored in a 4-bit value (bit 0 = input line 1 state, bit 1 = input line 2 state etc.). For more information, see the Status Index parameter documentation.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkInputStatusAtLineTriggerValue;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief A bit field that indicates the status of all of the camera's input and output lines when the image was acquired - Applies to: ace USB and GigE
+        \brief Bit field that indicates the status of all of the camera's input and output lines when the image was acquired - Applies to: GigE and ace USB
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkLineStatusAll;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the line trigger counter when the image was acquired - Applies to: GigE
+        \brief Value of the Line Trigger counter when the image was acquired - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkLineTriggerCounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the line trigger end to end counter when the image was acquired - Applies to: GigE
+        \brief Value of the Line Trigger End to End counter when the image was acquired - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkLineTriggerEndToEndCounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the line trigger ignored counter when the image was acquired - Applies to: GigE
+        \brief Value of the Line Trigger Ignored counter when the image was acquired - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkLineTriggerIgnoredCounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the X offset of the area of interest represented in the acquired image - Applies to: GigE
+        \brief X offset of the AOI of the acquired image - Applies to: GigE
 
-        This value Indicates the X offset of the area of interest represented in the acquired image.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkOffsetX;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the Y offset of the area of interest represented in the acquired image - Applies to: GigE
+        \brief Y offset of the AOI of the acquired image - Applies to: GigE
 
-        This value Indicates the Y offset of the area of interest represented in the acquired image.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkOffsetY;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief CRC checksum of the acquired image - Applies to: ace USB and GigE
+        \brief CRC checksum of the acquired image - Applies to: GigE and ace USB
 
         CRC checksum of the acquired image. The checksum is calculated using all of the image data and all of the appended chunks except for the checksum itself.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkPayloadCRC16;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the format of the pixel data in the acquired image - Applies to: GigE
+        \brief Indicates the pixel format of the acquired image - Applies to: GigE
 
-        This enumeration lists the pixel formats that can be indicated by the pixel format chunk.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IEnumParameterT<ChunkPixelFormatEnums>& ChunkPixelFormat;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the sequence set index number related to the acquired image - Applies to: GigE
+        \brief Sequence set index number related to the acquired image - Applies to: GigE
 
-        This value indicates the sequence set index number related to the acquired image.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkSequenceSetIndex;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
         \brief Index of the active sequencer set - Applies to: ace USB
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkSequencerSetActive;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Shaft encoder counter at frame trigger - Applies to: GigE
+        \brief Value of the Shaft Encoder counter when the image was acquired - Applies to: GigE
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkShaftEncoderCounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the number of bytes of data between the beginning of one line in the acquired image and the beginning of the next line in the acquired image - Applies to: GigE
+        \brief Number of bytes of data between the beginning of one line in the acquired image and the beginning of the next line in the acquired image - Applies to: GigE
 
-        This value indicates the number of bytes of data between the beginning of one line in the acquired image and the beginning of the next line in the acquired image.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkStride;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Value of the timestamp when the image was acquired - Applies to: ace USB and GigE
+        \brief Value of the timestamp when the image was acquired - Applies to: GigE and ace USB
 
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkTimestamp;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the value of the trigger input counter when the image was acquired - Applies to: GigE
+        \brief Value of the Trigger Input counter when the image was acquired - Applies to: GigE
 
-        This integer indicates the value of the trigger input counter when the image was acquired.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkTriggerinputcounter;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief A bit field that indicates the status of all of the camera's virtual input and output lines when the image was acquired - Applies to: GigE
+        \brief Status of all of the camera's virtual input and output lines when the image was acquired - Applies to: GigE
 
-        This value is a bit field that indicates the status of all of the camera's virtual input and output lines when the image was acquired.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkVirtLineStatusAll;
-    
+
     //@}
 
 
-    //! \name Root - Contains parameters to append chunk data to the image data.
+    //! \name Categories: Root
     //@{
     /*!
-        \brief Indicates the widtth of the area of interest represented in the acquired image - Applies to: GigE
+        \brief Width of the AOI of the acquired image - Applies to: GigE
 
-        This value Indicates the width of the area of interest represented in the acquired image.
     
-        \b Visibility = Beginner
+        Visibility: Beginner
 
     */
     Pylon::IIntegerEx& ChunkWidth;
-    
+
     //@}
 
 
-
-    private:
+        private:
         //! \cond HIDE_CLASS_METHODS
 
             //! not implemented copy constructor
-            CUniversalChunkDataParams_Params(CUniversalChunkDataParams_Params&);
+            CUniversalChunkDataParams_Params_v6_1_0(CUniversalChunkDataParams_Params_v6_1_0&);
 
             //! not implemented assignment operator
-            CUniversalChunkDataParams_Params& operator=(CUniversalChunkDataParams_Params&);
+            CUniversalChunkDataParams_Params_v6_1_0& operator=(CUniversalChunkDataParams_Params_v6_1_0&);
 
         //! \endcond
     };
 
 
-} // namespace Basler_UniversalChunkDataParams
+    /*!
+    \brief A parameter class containing all parameters as members that are available for chunk data of Basler camera devices
 
-#ifdef _MSC_VER
-#pragma warning( pop )
-#endif
+    The parameter class is used by the \link Pylon::CBaslerUniversalGrabResultPtr \c CBaslerUniversalGrabResultPtr \endlink class.
+    More information can be found in the code of the \ref sample_Grab_ChunkImage sample.
+    */
+    class CUniversalChunkDataParams_Params : public CUniversalChunkDataParams_Params_v6_1_0
+    {
+    //----------------------------------------------------------------------------------------------------------------
+    // Implementation
+    //----------------------------------------------------------------------------------------------------------------
+    protected:
+        // If you want to show the following methods in the help file
+        // add the string HIDE_CLASS_METHODS to the ENABLED_SECTIONS tag in the doxygen file
+        //! \cond HIDE_CLASS_METHODS
+        
+            //! Constructor
+            CUniversalChunkDataParams_Params(void)
+            {
+            }
+
+            //! Destructor
+            ~CUniversalChunkDataParams_Params(void)
+            {
+            }
+
+            //! Initializes the references
+            void _Initialize(GENAPI_NAMESPACE::INodeMap* pNodeMap)
+            {
+                CUniversalChunkDataParams_Params_v6_1_0::_Initialize(pNodeMap);
+            }
+        //! \endcond            
+    };
+} // namespace Basler_UniversalChunkDataParams
 
 #endif // BASLER_PYLON_UNIVERSALCHUNKDATAPARAMS_H

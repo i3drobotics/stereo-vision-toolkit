@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2006-2019 Basler AG
+//  Copyright (c) 2006-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Hartmut Nebelung, Edgar Katzer, AG
 //-----------------------------------------------------------------------------
@@ -128,7 +128,7 @@ namespace Pylon
         PixelType_BayerRG10p         = PIXEL_MONO | PIXEL_BIT_COUNT(10) | 0x0058,  ///< alias PixelFormat_BayerRG10p.
         PixelType_BayerGB10p         = PIXEL_MONO | PIXEL_BIT_COUNT(10) | 0x0054,  ///< alias PixelFormat_BayerGB10p.
         PixelType_BayerBG10p         = PIXEL_MONO | PIXEL_BIT_COUNT(10) | 0x0052,  ///< alias PixelFormat_BayerBG10p.
-                                     
+
         PixelType_BayerGR12p         = PIXEL_MONO | PIXEL_BIT_COUNT(12) | 0x0057,  ///< alias PixelFormat_BayerGR12p. The memory layouts of PixelType_BayerGR12Packed and PixelType_BayerGR12p are different.
         PixelType_BayerRG12p         = PIXEL_MONO | PIXEL_BIT_COUNT(12) | 0x0059,  ///< alias PixelFormat_BayerRG12p. The memory layouts of PixelType_BayerRG12Packed and PixelType_BayerRG12p are different.
         PixelType_BayerGB12p         = PIXEL_MONO | PIXEL_BIT_COUNT(12) | 0x0055,  ///< alias PixelFormat_BayerGB12p. The memory layouts of PixelType_BayerGB12Packed and PixelType_BayerGB12p are different.
@@ -141,11 +141,8 @@ namespace Pylon
 
         PixelType_RGB12V1packed      = PIXEL_COLOR | PIXEL_BIT_COUNT(36) | 0x0034,  ///< alias PixelFormat_RGB12V1Packed
 
-        PixelType_Double             = PIXEL_CUSTOMTYPE | PIXEL_MONO | PIXEL_BIT_COUNT(48) | 0x100,  ///< alias PixelFormat_Double
+        PixelType_Double             = PIXEL_CUSTOMTYPE | PIXEL_MONO | PIXEL_BIT_COUNT(64) | 0x100,  ///< alias PixelFormat_Double
     };
-
-    // pylon 2.x compatibility.
-    typedef EPixelType PixelType;
 
     /// Returns true if the pixel type is Mono and the pixel values are not byte aligned.
     inline bool IsMonoPacked(EPixelType pixelType)
@@ -280,9 +277,6 @@ namespace Pylon
         PCF_BayerBG, ///<blue green
         PCF_Undefined ///< undefined color filter or not applicable
     };
-
-    // pylon 2.x compatibility.
-    typedef EPixelColorFilter PixelColorFilter;
 
     /// Returns the Bayer color filter type.
     inline EPixelColorFilter GetPixelColorFilter(EPixelType pixelType)
@@ -589,113 +583,6 @@ namespace Pylon
         Throws an exception when the preconditions are not met.
     */
     PYLONBASE_API size_t ComputeBufferSize( EPixelType pixelType, uint32_t width, uint32_t height, size_t paddingX = 0);
-
-    //-----------------------------------------------------------------------
-    //  Deprecated functions: These functions will be removed in future releases.
-    //-----------------------------------------------------------------------
-
-    inline bool PYLON_BASE_3_0_DEPRECATED("This function has been deprecated. Use the IsRGB and IsRGBA functions instead. However, there is no exact replacement available.")
-        IsValidRGB(EPixelType pixelType)
-    {
-        if (PixelType_RGB8packed == pixelType)   return true;
-        if (PixelType_RGBA8packed == pixelType)  return true;
-        if (PixelType_RGB10packed == pixelType)  return true;
-        if (PixelType_RGB12packed == pixelType)  return true;
-        if (PixelType_RGB16packed == pixelType)  return true;
-        if (PixelType_RGB12V1packed == pixelType)return true;
-
-        return false;
-    };
-
-
-    inline bool PYLON_BASE_3_0_DEPRECATED("This function has been deprecated. Use the IsBGR and IsBGRA functions instead. However, there is no exact replacement available.")
-        IsValidBGR(EPixelType pixelType)
-    {
-        if (PixelType_BGR8packed == pixelType)   return true;
-        if (PixelType_BGRA8packed == pixelType)  return true;
-        if (PixelType_BGR10packed == pixelType)  return true;
-        if (PixelType_BGR12packed == pixelType)  return true;
-
-        return false;
-    };
-
-    enum PYLON_BASE_3_0_DEPRECATED("This enumeration has been deprecated. Use the more secure BitPerPixel function which throws exceptions instead.")
-    {
-        PS_Undefined = -1
-    };
-
-
-    inline int PYLON_BASE_3_0_DEPRECATED("This function has been deprecated. Use the BitDepth and BitPerPixel functions instead. However, there is no exact replacement available.")
-        PixelSize(EPixelType pixelType)
-    {
-        switch (pixelType)
-        {
-            case PixelType_Mono8:
-            case PixelType_Mono8signed:
-            case PixelType_BayerGR8:
-            case PixelType_BayerRG8:
-            case PixelType_BayerGB8:
-            case PixelType_BayerBG8:
-                return 8;
-
-            case PixelType_Mono10:
-            case PixelType_Mono10packed:
-            case PixelType_Mono10p:
-            case PixelType_BayerGR10:
-            case PixelType_BayerRG10:
-            case PixelType_BayerGB10:
-            case PixelType_BayerBG10:
-            case PixelType_BayerGB10p:
-            case PixelType_BayerGR10p:
-            case PixelType_BayerRG10p:
-            case PixelType_BayerBG10p:
-                return 10;
-
-            case PixelType_Mono12:
-            case PixelType_Mono12packed:
-            case PixelType_Mono12p:
-            case PixelType_BayerGR12:
-            case PixelType_BayerRG12:
-            case PixelType_BayerGB12:
-            case PixelType_BayerBG12:
-            case PixelType_BayerGB12Packed:
-            case PixelType_BayerGR12Packed:
-            case PixelType_BayerRG12Packed:
-            case PixelType_BayerBG12Packed:
-            case PixelType_BayerGB12p:
-            case PixelType_BayerGR12p:
-            case PixelType_BayerRG12p:
-            case PixelType_BayerBG12p:
-                return 12;
-
-            case PixelType_Mono16:
-            case PixelType_BayerGR16:
-            case PixelType_BayerRG16:
-            case PixelType_BayerGB16:
-            case PixelType_BayerBG16:
-                return 16;
-
-            case PixelType_RGB8packed:
-            case PixelType_BGR8packed:
-                return 24;
-
-            case PixelType_RGBA8packed:
-            case PixelType_BGRA8packed:
-                return 32;
-
-            case PixelType_RGB12V1packed:
-                return 36;
-
-            case PixelType_RGB10packed:
-            case PixelType_BGR10packed:
-            case PixelType_RGB12packed:
-            case PixelType_BGR12packed:
-                return 48;
-            default:
-                return PS_Undefined;      //  used as invalid code
-        }
-    };
-
 
     /*!
     \brief Returns the pixel types needed for conversion from packed to unpacked image formats using the CImageFormatConverter class.

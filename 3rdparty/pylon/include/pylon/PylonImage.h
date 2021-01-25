@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Andreas Gau
 //------------------------------------------------------------------------------
@@ -235,6 +235,44 @@ namespace Pylon
             size_t paddingX,
             EImageOrientation orientation = ImageOrientation_TopDown);
 
+        /*!
+        \brief Attaches a grab result buffer using additional hints.
+
+        This allows to display grabbed data in a user-defined way.
+
+        \param[in]   grabResult The source buffer.
+        \param[in]   pixelType The pixel type of the source image.
+        \param[in]   width     The number of pixels in a row in the source image.
+        \param[in]   height    The number of rows in the source image.
+        \param[in]   paddingX  The number of extra data bytes at the end of each row.
+        \param[in]   orientation The vertical orientation of the image in the image buffer.
+
+        \pre
+        <ul>
+        <li> The \c grabResult must be valid.
+        <li> The \c pixelType must be valid.
+        <li> The \c width value must be >= 0 and < _I32_MAX.
+        <li> The \c height value must be >= 0 and < _I32_MAX.
+        </ul>
+
+        \post
+        <ul>
+        <li> The image properties are taken from the \c width, \c height, \c pixelType, \c paddingX and \c orientation parameters.
+        <li> The grab result buffer is used by the image class.
+        <li> Another reference to the grab result buffer is created. This prevents the buffer's reuse for grabbing.
+        </ul>
+
+        \error
+             Throws an exception if the preconditions are not met.
+             Throws an exception if the buffer size of the grabresult is too small for an image with the given parameters.
+        */
+        virtual void AttachGrabResultBufferWithUserHints(
+            const CGrabResultPtr& grabResult,
+            EPixelType pixelType,
+            uint32_t width,
+            uint32_t height,
+            size_t paddingX,
+            EImageOrientation orientation = ImageOrientation_TopDown );
 
         /*!
         \brief Attaches a grab result buffer.
@@ -243,7 +281,7 @@ namespace Pylon
 
         \post
         <ul>
-        <li> The image properties are taken over from the grab result.
+        <li> The image properties are taken from the grab result.
         <li> The grab result buffer is used by the image class.
         <li> Another reference to the grab result buffer is created. This prevents the buffer's reuse for grabbing.
         <li> Creates an invalid image if the \c grabResult is invalid.
@@ -279,7 +317,7 @@ namespace Pylon
 
         \post
         <ul>
-        <li> The image properties are taken over from the passed parameters.
+        <li> The image properties are taken from the passed parameters.
         <li> The user buffer is used by the image class.
         <li> The buffer must not be freed while being attached.
         </ul>

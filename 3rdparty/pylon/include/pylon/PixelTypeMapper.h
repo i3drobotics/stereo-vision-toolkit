@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  JS
 //-----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ namespace Pylon
         void SetPixelFormatEnumNode(GENAPI_NAMESPACE::IEnumeration* pEnum);
 
     public:
-        /*! \brief Converts a enumeration node value to a Pylon::EPixelType enum
+        /*! \brief Converts an enumeration node value to a Pylon::EPixelType enum
 
             \param nodeValue node value to convert. You can obtain this value by calling GENAPI_NAMESPACE::IEnumeration::GetIntValue.
             \return Returns the Pylon::EPixelType for a given pixelformat enum value defined in the Enum passed in c'tor
@@ -242,7 +242,7 @@ namespace Pylon
             return CPixelTypeMapper::GetPylonPixelTypeByName(symbolicName.c_str());
         }
 
-        /*! \copydoc CPixelTypeMapper::GetNameByPixelType(PixelType, SFNCVersion sfncVer = SFNCVersion_pre2_0)
+        /*! \copydoc CPixelTypeMapper::GetNameByPixelType(EPixelType, SFNCVersion sfncVer = SFNCVersion_pre2_0)
         */
         static const char* GetNameByPixelType(EPixelType pixelType, SFNCVersion sfncVer = SFNCVersion_pre2_0)
         {

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author: Hartmut Nebelung
 //-----------------------------------------------------------------------------
@@ -22,6 +22,7 @@
 
 #include <pylon/InstantCamera.h>
 #include <pylon/ParameterIncludes.h>
+#include <pylon/ConfigurationHelper.h>
 
 namespace Pylon
 {
@@ -103,6 +104,9 @@ namespace Pylon
         static void ApplyConfiguration( GENAPI_NAMESPACE::INodeMap& deviceNodeMap, uint32_t DeviceKey, uint32_t GroupKey, uint32_t GroupMask = AllGroupMask )
         {
             using namespace GenApi;
+                        
+            //Disable compression mode.
+            CConfigurationHelper::DisableCompression( deviceNodeMap );
 
             //////////////////////////////////////////////////////////////////
             // get the nodes we need and do a check before we start changing the camera configuration

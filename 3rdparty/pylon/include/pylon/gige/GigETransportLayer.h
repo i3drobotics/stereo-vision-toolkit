@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2008-2019 Basler AG
+//  Copyright (c) 2008-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Thomas Koeller, Hartmut Nebelung
 //-----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ namespace Pylon
         /*!
             \note This device must be reachable, a route is configured.
             \param IpAddress address of device in "dot notation"
-            \param pInfo This optional parameter  holds the full device info iff found
+            \param pInfo This optional parameter holds the full device info if found
         */
         virtual bool AnnounceRemoteDevice( const String_t& IpAddress, CDeviceInfo* pInfo=NULL ) = 0;
         //! \brief Stop using remote device.

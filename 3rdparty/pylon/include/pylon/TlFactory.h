@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2006-2019 Basler AG
+//  Copyright (c) 2006-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  AH
 //-----------------------------------------------------------------------------
@@ -52,46 +52,81 @@ namespace Pylon
     class PYLONBASE_API CTlFactory : public IDeviceFactory
     {
     public:
+        ///////////////////////////////////////////////////////////////////////
         /// Retrieve the transport layer factory singleton.
         /// Throws an exception when Pylon::PylonInitialize() has not been called before.
         static CTlFactory& GetInstance();
 
-        /// Retrieve a list of available transport layers
-        int EnumerateTls( TlInfoList_t& );
+        /**
+            \brief Retrieves a list of available transport layers.
+    
+            The list contains Pylon::CTlInfo objects used for transport layer creation.
 
-        /// Create a transport layer object from a TlInfo object
-        ITransportLayer* CreateTl( const CTlInfo& );
+            \param list List to be filled with transport layer info objects.
+            \return Number of transport layers found.
+        */
+        int EnumerateTls( TlInfoList_t& list);
 
-        /// Create a transport layer object specified by the transport layer's device class identifier
-        ITransportLayer* CreateTl( const String_t& DeviceClass );
+        /**
+            \brief Creates a transport layer object from a transport layer info object.
 
-        /// Destroys a transport layer object
-        void ReleaseTl( const ITransportLayer* );
+            This method accepts a transport layer info object which can be obtained by calling EnumerateTls.
+            For each successfully returned transport layer object, you must call ReleaseTl to free the transport layer object.
 
-        /// returns a list of available devices, see IDeviceFactory for more information
+            If the creation fails, a GenApi::GenericException will be thrown.
+    
+            \param ti Transport layer info object specifying which transport layer to create.
+            \return Pointer to the transport layer object created. If no matching transport layer could be found, NULL will be returned.
+        */
+        ITransportLayer* CreateTl( const CTlInfo& ti );
+
+        /**
+            \brief Creates a transport layer object from a device class string.
+    
+            This method accepts a device class string. You can see a list of available device classes in the DeviceClass.h file.
+            For each successfully returned transport layer object, you must call ReleaseTl to free the transport layer object.
+
+            If the creation fails, a GenApi::GenericException will be thrown.
+
+            \param deviceClass Transport layer info object specifying which transport layer to create.
+            \return Pointer to the transport layer object created. If no matching transport layer could be found, NULL will be returned.
+        */
+        ITransportLayer* CreateTl( const String_t& deviceClass );
+
+        /**
+            \brief Releases a transport layer object created by a call to CreateTl().
+    
+            For each successfully returned transport layer object from any CreateTl() function,
+            you must call this function to free the transport layer object.
+
+            \param pTl Pointer to the transport layer object to be released.
+        */
+        void ReleaseTl( const ITransportLayer* pTl );
+
+        // returns a list of available devices, see IDeviceFactory for more information
         virtual int EnumerateDevices( DeviceInfoList_t&, bool addToList = false );
 
-        /// returns a list of available devices that match the filter, see IDeviceFactory for more information
+        // returns a list of available devices that match the filter, see IDeviceFactory for more information
         virtual int EnumerateDevices( DeviceInfoList_t& list, const DeviceInfoList_t& filter, bool addToList = false );
 
-        /// creates a device from a device info object, see IDeviceFactory for more information
+        // creates a device from a device info object, see IDeviceFactory for more information
         virtual IPylonDevice* CreateDevice( const CDeviceInfo& di );
 
-        /// creates first found device from a device info object, see IDeviceFactory for more information
+        // creates first found device from a device info object, see IDeviceFactory for more information
         virtual IPylonDevice* CreateFirstDevice( const CDeviceInfo& di = CDeviceInfo());
 
-        /// creates a device from a device info object, injecting additional GenICam XML definition strings
+        // creates a device from a device info object, injecting additional GenICam XML definition strings
         virtual IPylonDevice* CreateDevice( const CDeviceInfo& di, const StringList_t& InjectedXmlStrings );
 
-        /// creates first found device from a device info object, injecting additional GenICam XML definition strings
+        // creates first found device from a device info object, injecting additional GenICam XML definition strings
         virtual IPylonDevice* CreateFirstDevice( const CDeviceInfo& di, const StringList_t& InjectedXmlStrings );
 
-        /// This method is deprecated. Use CreateDevice receiving a CDeviceInfo object containing the full name as property.
-        /// example: IPylonDevice* device = TlFactory.CreateDevice( CDeviceInfo().SetFullName( fullname));
-        /// creates a device by its unique name (i.e. fullname)
+        // Use CreateDevice and pass a CDeviceInfo object containing the full name as a property.
+        // example: IPylonDevice* device = TlFactory.CreateDevice(CDeviceInfo().SetFullName(fullname));
+        // creates a device that matches its full name (i.e., as returned by CDeviceInfo::GetFullName).
         virtual IPylonDevice* CreateDevice( const String_t& );
 
-        /// destroys a device
+        // destroys a device
         virtual void DestroyDevice( IPylonDevice* );
 
         // implements IDeviceFactory::IsDeviceAccessible

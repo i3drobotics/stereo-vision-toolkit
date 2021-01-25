@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2011-2019 Basler AG
+//  Copyright (c) 2011-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  NN
 //-----------------------------------------------------------------------------
@@ -17,9 +17,7 @@ Instead, you should include \c pylon/PylonGUIIncludes.h.
 
 #include <pylon/stdinclude.h>
 
-#ifdef _MSC_VER
-#   pragma pack(push, PYLON_PACKING)
-#endif /* _MSC_VER */
+#pragma pack(push, PYLON_PACKING)
 
 #include <pylon/PylonLinkage.h>
 
@@ -382,5 +380,6 @@ namespace Pylon
 
 #endif /* __cplusplus */
 
+#pragma pack(pop)
 
 #endif /* PYLON_GUI_H_INCLUDED__ */

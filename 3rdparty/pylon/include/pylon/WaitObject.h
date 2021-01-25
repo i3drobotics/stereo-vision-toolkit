@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2006-2019 Basler AG
+//  Copyright (c) 2006-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Urs Helmig
 //-----------------------------------------------------------------------------
@@ -48,9 +48,6 @@ namespace Pylon
         waitex_abandoned     = 2, ///< Windows only (see MSDN for more information)
         waitex_alerted       = -1 ///< The wait was interrupted (Windows: queued APC or I/O completion routine; UNIX: signal)
     };
-
-    // pylon 2.x compatibility.
-    typedef EWaitExResult waitex_result_t;
 
 #if defined(PYLON_WIN_BUILD)
     typedef HANDLE WaitObject_t;

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2008-2019 Basler AG
+//  Copyright (c) 2008-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  JS
 //-----------------------------------------------------------------------------
@@ -125,6 +125,8 @@
 #include <pylon/InstantCameraArray.h>                   // CInstantCameraArray, includes CInstantCamera
 #include <pylon/AcquireContinuousConfiguration.h>       // CAcquireContinuousConfiguration
 #include <pylon/SoftwareTriggerConfiguration.h>         // CSoftwareTriggerConfiguration
+
+#include <pylon/InstantInterface.h>  // CInstantInterface, IInterface
 
 #include <pylon/ParameterIncludes.h> // Parameter classes
 

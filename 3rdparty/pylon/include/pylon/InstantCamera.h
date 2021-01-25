@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Andreas Gau
 //------------------------------------------------------------------------------
@@ -78,11 +78,7 @@ namespace Pylon
     {
         Cleanup_None,                               ///< The caller is responsible for deleting the passed object. The object needs to be detached or deregistered before deletion.
         Cleanup_Delete,                             ///< The passed object is deleted if it is not needed anymore.
-        Ownership_ExternalOwnership = Cleanup_None, ///< Deprecated: Use Cleanup_None instead.
-        Ownership_TakeOwnership = Cleanup_Delete    ///< Deprecated: Use Cleanup_Delete instead.
     };
-    ///Deprecated: Use ECleanup instead.
-    typedef ECleanup EOwnership;
 
     ///Defines the use of an additional grab loop thread.
     enum EGrabLoop
@@ -180,9 +176,10 @@ namespace Pylon
         <li> If the pDevice parameter is NULL, nothing more is done.
         <li> The OnAttach configuration event is fired. Possible C++ exceptions from event calls are caught and ignored. All event handlers are notified.
         <li> The new %Pylon device is attached.
+        <li> The instant camera migration mode setting is applied to the %Pylon device transport layer node map.
         <li> If the passed %Pylon device is open, callbacks for camera events are registered at the camera node map. (This may fail)
         <li> If the passed %Pylon device is open, a device removal call back is registered. (This may fail)
-        <li> If the passed %Pylon device is open, access modifiers (see IPylonDevice::Open()) are overtaken as camera parameters.
+        <li> If the passed %Pylon device is open, access modifiers (see IPylonDevice::Open()) are carried over as camera parameters.
         <li> The OnAttached configuration event is fired. Possible C++ exceptions from event calls are caught and ignored. All event handlers are notified.
         </ul>
 
@@ -222,11 +219,13 @@ namespace Pylon
         /*!
         \brief Returns the connection state of the camera device.
 
+		\attention Due to technical reasons, the IsCameraDeviceRemoved() property may not be updated immediately after the first error caused by a device removal occurs.
+
         The device removal is only detected while the Instant Camera and therefore the attached %Pylon device are open.
 
         The attached %Pylon device is not operable anymore if the camera device has been removed from the PC.
         After it is made sure that no access to the %Pylon device or any of its node maps is made anymore
-        the %Pylon device should be destroyed using InstantCamera::DeviceDestroy().
+        the %Pylon device should be destroyed using CInstantCamera::DeviceDestroy().
         The access to the %Pylon device can be protected using the lock provided by GetLock(), e.g. when accessing parameters.
 
         \return True if the camera device removal from the PC has been detected.
@@ -317,6 +316,7 @@ namespace Pylon
         <li> If the %Pylon device is already open, nothing more is done.
         <li> The OnOpen configuration event is fired. The notification of event handlers stops when an event call triggers an exception.
         <li> The %Pylon device is opened and a connection to the camera device is established.
+        <li> The instant camera migration mode setting is applied to the %Pylon device transport layer node map.
         <li> A device removal call back is registered at the %Pylon device.
         <li> Callbacks for camera events are registered at the camera node map.
         <li> The OnOpened configuration event is fired if the %Pylon device has been opened successfully. The notification of event handlers stops when an event call triggers an exception.

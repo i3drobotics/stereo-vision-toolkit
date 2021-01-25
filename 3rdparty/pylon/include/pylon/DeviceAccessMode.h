@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2006-2019 Basler AG
+//  Copyright (c) 2006-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Hartmut Nebelung
 //-----------------------------------------------------------------------------
@@ -39,9 +39,6 @@ namespace Pylon
         Exclusive = 0x5,    ///< exclusive access to the device
         _NumModes
     };
-
-    // pylon 2.x compatibility.
-    typedef EDeviceAccessMode AccessMode;
 
     // --------------------------------------------------------------------------
     // class AccessModeSet

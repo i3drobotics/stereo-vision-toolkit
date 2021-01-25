@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Basler pylon SDK
-//  Copyright (c) 2010-2019 Basler AG
+//  Copyright (c) 2010-2020 Basler AG
 //  http://www.baslerweb.com
 //  Author:  Andreas Gau
 //-----------------------------------------------------------------------------
@@ -22,6 +22,7 @@
 
 #include <pylon/InstantCamera.h>
 #include <pylon/ParameterIncludes.h>
+#include <pylon/ConfigurationHelper.h>
 
 namespace Pylon
 {
@@ -53,26 +54,10 @@ namespace Pylon
             using namespace GENAPI_NAMESPACE;
 
             //Disable all trigger types.
-            {
-                // Get required enumerations.
-                CEnumParameter triggerSelector(nodemap, "TriggerSelector");
-                CEnumParameter triggerMode(nodemap, "TriggerMode");
+            CConfigurationHelper::DisableAllTriggers( nodemap );
 
-                if (triggerSelector.IsWritable())
-                {
-                    // Get all settable enumeration entries of Trigger Selector.
-                    StringList_t triggerSelectorEntries;
-                    triggerSelector.GetSettableValues(triggerSelectorEntries);
-
-                    // Turn Trigger Mode off For all Trigger Selector entries.
-                    for (StringList_t::const_iterator it = triggerSelectorEntries.begin(); it != triggerSelectorEntries.end(); ++it)
-                    {
-                        // Set Trigger Mode to off if the trigger is available.
-                        triggerSelector.SetValue(*it);
-                        triggerMode.SetValue("Off");
-                    }
-                }
-            }
+            //Disable compression mode.
+            CConfigurationHelper::DisableCompression( nodemap );
 
             //Set acquisition mode.
             CEnumParameter(nodemap, "AcquisitionMode").SetValue("Continuous");

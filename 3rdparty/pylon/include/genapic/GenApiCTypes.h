@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
     Basler pylon C SDK
-    Copyright (c) 2009-2019 Basler AG
+    Copyright (c) 2009-2020 Basler AG
     http://www.baslerweb.com
     Author:  AH, TK
 -----------------------------------------------------------------------------*/
@@ -19,8 +19,12 @@
 #if __STDC_VERSION__ >= 199901L
 
 /* Compiler is c99-compliant. */
+#if !defined(__STDC_LIMIT_MACROS)
 #   define  __STDC_LIMIT_MACROS
+#endif
+#if !defined(__STDC_CONSTANT_MACROS)
 #   define  __STDC_CONSTANT_MACROS
+#endif
 #   include <inttypes.h>
 #   include <stdint.h>
 

@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------
     Basler pylon C SDK
-    Copyright (c) 2012-2019 Basler AG
+    Copyright (c) 2012-2020 Basler AG
     http://www.baslerweb.com
 -----------------------------------------------------------------------------*/
 #ifndef PYLON_ENUMS_H
@@ -153,7 +153,7 @@ typedef enum
     PixelType_RGB12V1packed   = PIXEL_COLOR | PIXEL_BIT_COUNT(36) | 0X0034, /*!< \brief Indicates the RGB 12 V1 packed pixel format. */
 
     /* custom codes */
-    PixelType_Double            =  PIXEL_CUSTOMTYPE | PIXEL_MONO | PIXEL_BIT_COUNT(48) | 0x100 /*!< \brief Indicates the Double pixel format. */
+    PixelType_Double            =  PIXEL_CUSTOMTYPE | PIXEL_MONO | PIXEL_BIT_COUNT(64) | 0x100 /*!< \brief Indicates the Double pixel format. */
 } EPylonPixelType;
 
 #ifndef PYLON_TLB_ONLY
