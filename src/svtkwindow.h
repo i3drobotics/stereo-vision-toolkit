@@ -47,11 +47,14 @@
 #ifdef WITH_I3DRSGM
     #include "matcherwidgeti3drsgm.h"
 #endif
+#include "stereocameratara.h"
 #include "stereocameradeimos.h"
 #include "stereocamerafromvideo.h"
 #include "stereocameraopencv.h"
 #include "stereocameratis.h"
 #include "stereocamerabasler.h"
+#include "stereocameraphobos.h"
+#include "stereocameratitania.h"
 #ifdef WITH_VIMBA
     #include "stereocameravimba.h"
 #endif
@@ -114,11 +117,18 @@ private:
     AbstractStereoCamera::StereoCameraSettings default_basler_gige_init_settings;
     AbstractStereoCamera::StereoCameraSettings default_basler_usb_init_settings;
     AbstractStereoCamera::StereoCameraSettings default_tis_init_settings;
-    AbstractStereoCamera::StereoCameraSettings default_deimos_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_tara_init_settings;
     AbstractStereoCamera::StereoCameraSettings default_usb_init_settings;
     AbstractStereoCamera::StereoCameraSettings default_video_init_settings;
     AbstractStereoCamera::StereoCameraSettings current_camera_settings;
     AbstractStereoCamera::StereoCameraSettings default_vimba_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_deimos_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_phobos_basler_gige_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_phobos_basler_usb_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_phobos_tis_usb_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_titania_basler_gige_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_titania_basler_usb_init_settings;
+    AbstractStereoCamera::StereoCameraSettings default_titania_vimba_usb_init_settings;
 
     QPixmap pmap_left;
     QPixmap pmap_right;

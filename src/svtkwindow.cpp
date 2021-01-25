@@ -39,9 +39,9 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     // TODO replace this by reading current value from camera
     default_basler_usb_init_settings.exposure = 5;
     default_basler_usb_init_settings.gain = 0;
-    default_basler_usb_init_settings.fps = 10;
+    default_basler_usb_init_settings.fps = 1; // 10
     default_basler_usb_init_settings.binning = 1;
-    default_basler_usb_init_settings.trigger = true;
+    default_basler_usb_init_settings.trigger = false; // true
     default_basler_usb_init_settings.hdr = -1;
     default_basler_usb_init_settings.autoExpose = false;
     default_basler_usb_init_settings.autoGain = false;
@@ -85,6 +85,18 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     default_tis_init_settings.packetDelay = -1;
     default_tis_init_settings.packetSize = -1;
 
+    default_tara_init_settings.exposure = 5;
+    default_tara_init_settings.gain = -1;
+    default_tara_init_settings.fps = 60;
+    default_tara_init_settings.binning = -1;
+    default_tara_init_settings.trigger = -1;
+    default_tara_init_settings.hdr = false;
+    default_tara_init_settings.autoExpose = false;
+    default_tara_init_settings.autoGain = -1;
+    default_tara_init_settings.isGige = -1;
+    default_tara_init_settings.packetDelay = -1;
+    default_tara_init_settings.packetSize = -1;
+
     default_deimos_init_settings.exposure = 5;
     default_deimos_init_settings.gain = -1;
     default_deimos_init_settings.fps = 60;
@@ -96,6 +108,78 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     default_deimos_init_settings.isGige = -1;
     default_deimos_init_settings.packetDelay = -1;
     default_deimos_init_settings.packetSize = -1;
+
+    default_phobos_basler_usb_init_settings.exposure = 5;
+    default_phobos_basler_usb_init_settings.gain = 0;
+    default_phobos_basler_usb_init_settings.fps = 1; // 10
+    default_phobos_basler_usb_init_settings.binning = 1;
+    default_phobos_basler_usb_init_settings.trigger = false; // true
+    default_phobos_basler_usb_init_settings.hdr = -1;
+    default_phobos_basler_usb_init_settings.autoExpose = false;
+    default_phobos_basler_usb_init_settings.autoGain = false;
+    default_phobos_basler_usb_init_settings.isGige = false;
+    default_phobos_basler_usb_init_settings.packetDelay = -1;
+    default_phobos_basler_usb_init_settings.packetSize = -1;
+
+    default_phobos_basler_gige_init_settings.exposure = 5;
+    default_phobos_basler_gige_init_settings.gain = 0;
+    default_phobos_basler_gige_init_settings.fps = 5;
+    default_phobos_basler_gige_init_settings.binning = 1;
+    default_phobos_basler_gige_init_settings.trigger = true;
+    default_phobos_basler_gige_init_settings.hdr = -1;
+    default_phobos_basler_gige_init_settings.autoExpose = false;
+    default_phobos_basler_gige_init_settings.autoGain = false;
+    default_phobos_basler_gige_init_settings.isGige = 1;
+    default_phobos_basler_gige_init_settings.packetDelay = 0;
+    default_phobos_basler_gige_init_settings.packetSize = 1500;
+
+    default_phobos_tis_usb_init_settings.exposure = 5;
+    default_phobos_tis_usb_init_settings.gain = 0;
+    default_phobos_tis_usb_init_settings.fps = 10;
+    default_phobos_tis_usb_init_settings.binning = -1;
+    default_phobos_tis_usb_init_settings.trigger = false;
+    default_phobos_tis_usb_init_settings.hdr = -1;
+    default_phobos_tis_usb_init_settings.autoExpose = false;
+    default_phobos_tis_usb_init_settings.autoGain = false;
+    default_phobos_tis_usb_init_settings.isGige = -1;
+    default_phobos_tis_usb_init_settings.packetDelay = -1;
+    default_phobos_tis_usb_init_settings.packetSize = -1;
+
+    default_titania_basler_usb_init_settings.exposure = 5;
+    default_titania_basler_usb_init_settings.gain = 0;
+    default_titania_basler_usb_init_settings.fps = 1; // 10
+    default_titania_basler_usb_init_settings.binning = 1;
+    default_titania_basler_usb_init_settings.trigger = false; // true
+    default_titania_basler_usb_init_settings.hdr = -1;
+    default_titania_basler_usb_init_settings.autoExpose = false;
+    default_titania_basler_usb_init_settings.autoGain = false;
+    default_titania_basler_usb_init_settings.isGige = false;
+    default_titania_basler_usb_init_settings.packetDelay = -1;
+    default_titania_basler_usb_init_settings.packetSize = -1;
+
+    default_titania_basler_gige_init_settings.exposure = 5;
+    default_titania_basler_gige_init_settings.gain = 0;
+    default_titania_basler_gige_init_settings.fps = 5;
+    default_titania_basler_gige_init_settings.binning = 1;
+    default_titania_basler_gige_init_settings.trigger = true;
+    default_titania_basler_gige_init_settings.hdr = -1;
+    default_titania_basler_gige_init_settings.autoExpose = false;
+    default_titania_basler_gige_init_settings.autoGain = false;
+    default_titania_basler_gige_init_settings.isGige = 1;
+    default_titania_basler_gige_init_settings.packetDelay = 0;
+    default_titania_basler_gige_init_settings.packetSize = 1500;
+
+    default_titania_vimba_usb_init_settings.exposure = 5;
+    default_titania_vimba_usb_init_settings.gain = 0;
+    default_titania_vimba_usb_init_settings.fps = 30;
+    default_titania_vimba_usb_init_settings.binning = 1;
+    default_titania_vimba_usb_init_settings.trigger = true;
+    default_titania_vimba_usb_init_settings.hdr = -1;
+    default_titania_vimba_usb_init_settings.autoExpose = false;
+    default_titania_vimba_usb_init_settings.autoGain = false;
+    default_titania_vimba_usb_init_settings.isGige = false;
+    default_titania_vimba_usb_init_settings.packetDelay = -1;
+    default_titania_vimba_usb_init_settings.packetSize = -1;
 
     default_usb_init_settings.exposure = -1;
     default_usb_init_settings.gain = -1;
@@ -1699,6 +1783,12 @@ int SVTKWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_s
         cameras_connected = stereo_cam_deimos->openCamera();
         stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_deimos);
         qDebug() << "Connecting to Deimos system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TARA){
+        current_camera_settings = default_tara_init_settings;
+        StereoCameraTara* stereo_cam_tara = new StereoCameraTara(camera_serial_info,current_camera_settings);
+        cameras_connected = stereo_cam_tara->openCamera();
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tara);
+        qDebug() << "Connecting to Tara system";
     } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
         if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
             current_camera_settings = default_basler_gige_init_settings;
@@ -1720,7 +1810,7 @@ int SVTKWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_s
         StereoCameraTIS* stereo_cam_tis = new StereoCameraTIS(camera_serial_info,current_camera_settings);
         cameras_connected = stereo_cam_tis->openCamera();
         stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_tis);
-        qDebug() << "Connecting to Phobos system";
+        qDebug() << "Connecting to TIS system";
     } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
 #ifdef WITH_VIMBA
        current_camera_settings = default_vimba_init_settings;
@@ -1729,7 +1819,41 @@ int SVTKWindow::openCamera(AbstractStereoCamera::StereoCameraSerialInfo camera_s
        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_vimba);
        qDebug() << "Connecting to Titania system";
 #endif
-   }
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_USB){
+        if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_GIGE){
+            current_camera_settings = default_phobos_basler_gige_init_settings;
+        } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_USB){
+            current_camera_settings = default_phobos_basler_usb_init_settings;
+        }
+        StereoCameraPhobosBasler* stereo_cam_phobos_basler = new StereoCameraPhobosBasler(camera_serial_info,current_camera_settings);
+        cameras_connected = stereo_cam_phobos_basler->openCamera();
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_phobos_basler);
+        qDebug() << "Connecting to Phobos system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_TIS_USB){
+        current_camera_settings = default_phobos_tis_usb_init_settings;
+        StereoCameraPhobosTIS* stereo_cam_phobos_tis = new StereoCameraPhobosTIS(camera_serial_info,current_camera_settings);
+        cameras_connected = stereo_cam_phobos_tis->openCamera();
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_phobos_tis);
+        qDebug() << "Connecting to Phobos system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_USB){
+        if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_GIGE){
+            current_camera_settings = default_titania_basler_gige_init_settings;
+        } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_USB){
+            current_camera_settings = default_titania_basler_usb_init_settings;
+        }
+        StereoCameraTitaniaBasler* stereo_cam_titania_basler = new StereoCameraTitaniaBasler(camera_serial_info,current_camera_settings);
+        cameras_connected = stereo_cam_titania_basler->openCamera();
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_titania_basler);
+        qDebug() << "Connecting to Titania system";
+    } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_VIMBA_USB){
+#ifdef WITH_VIMBA
+       current_camera_settings = default_titania_vimba_usb_init_settings;
+       StereoCameraTitaniaVimba * stereo_cam_titania_vimba = new StereoCameraTitaniaVimba(camera_serial_info,current_camera_settings);
+       cameras_connected = stereo_cam_titania_vimba->openCamera();
+       stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_titania_vimba);
+       qDebug() << "Connecting to Titania system";
+#endif
+    }
 
     QCoreApplication::processEvents();
 
@@ -1819,6 +1943,7 @@ void SVTKWindow::refreshCameraListGUI(){
 
     QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_50.png");
     QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_50.png");
+    QPixmap pixmapTitania(":/mainwindow/images/deimos_square_50.png");
     QPixmap pixmapCamera(":/mainwindow/images/camera_square_50.png");
 
     //Clear layout list
@@ -1855,16 +1980,32 @@ void SVTKWindow::refreshCameraListGUI(){
                 camera_type = "Deimos";
                 camera_serial = camera_serial_info.i3dr_serial;
                 camera_icon = pixmapDeimos;
-            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TARA){
+                camera_type = "Tara";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapCamera;
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
+                camera_type = "Basler";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapCamera;
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_USB || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_TIS_USB){
                 camera_type = "Phobos";
                 camera_serial = camera_serial_info.i3dr_serial;
                 camera_icon = pixmapPhobos;
             } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+                camera_type = "Vimba";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapCamera;
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_USB || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_VIMBA_USB){
                 camera_type = "Titania";
                 camera_serial = camera_serial_info.i3dr_serial;
-                camera_icon = pixmapPhobos;
+                camera_icon = pixmapTitania;
+            } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
+                camera_type = "TIS";
+                camera_serial = camera_serial_info.i3dr_serial;
+                camera_icon = pixmapCamera;
             } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_USB){
-                camera_type = "Generic";
+                camera_type = "GenericUSB";
                 camera_serial = camera_serial_info.i3dr_serial;
                 camera_icon = pixmapCamera;
             }

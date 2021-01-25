@@ -5,6 +5,21 @@
 
 #include "abstractstereocamera.h"
 
+std::string AbstractStereoCamera::CAMERA_NAME_TARA = "tara";
+std::string AbstractStereoCamera::CAMERA_NAME_TIS = "tis";
+std::string AbstractStereoCamera::CAMERA_NAME_VIMBA = "vimba";
+std::string AbstractStereoCamera::CAMERA_NAME_USB = "usb";
+std::string AbstractStereoCamera::CAMERA_NAME_BASLER_GIGE = "baslergige";
+std::string AbstractStereoCamera::CAMERA_NAME_BASLER_USB = "baslerusb";
+std::string AbstractStereoCamera::CAMERA_NAME_DEIMOS = "deimos";
+std::string AbstractStereoCamera::CAMERA_NAME_PHOBOS_BASLER_GIGE = "phobosbaslergige";
+std::string AbstractStereoCamera::CAMERA_NAME_PHOBOS_BASLER_USB = "phobosbaslerusb";
+std::string AbstractStereoCamera::CAMERA_NAME_PHOBOS_TIS_USB = "phobostisusb";
+std::string AbstractStereoCamera::CAMERA_NAME_TITANIA_BASLER_GIGE = "titaniabaslergige";
+std::string AbstractStereoCamera::CAMERA_NAME_TITANIA_BASLER_USB = "titaniabaslerusb";
+std::string AbstractStereoCamera::CAMERA_NAME_TITANIA_VIMBA_USB = "titaniavimbausb";
+std::string AbstractStereoCamera::CAMERA_NAME_INVALID = "invalid";
+
 AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, StereoCameraSettings camera_settings, QObject *parent) :
     QObject(parent),
     ptCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>)),
@@ -54,30 +69,53 @@ void AbstractStereoCamera::stopThread(){
 std::string AbstractStereoCamera::StereoCameraType2String(StereoCameraType camera_type){
     switch(camera_type)
     {
-        case CAMERA_TYPE_DEIMOS  : return "deimos"; break;
-        case CAMERA_TYPE_BASLER_GIGE  : return "baslergige"; break;
-        case CAMERA_TYPE_BASLER_USB  : return "baslerusb"; break;
-        case CAMERA_TYPE_TIS  : return "tis"; break;
-        case CAMERA_TYPE_VIMBA  : return "vimba"; break;
-        default  : return ""; break;
+        case CAMERA_TYPE_TARA : return CAMERA_NAME_TARA; break;
+        case CAMERA_TYPE_TIS : return CAMERA_NAME_TIS; break;
+        case CAMERA_TYPE_VIMBA : return CAMERA_NAME_VIMBA; break;
+        case CAMERA_TYPE_USB : return CAMERA_NAME_USB; break;
+        case CAMERA_TYPE_BASLER_GIGE : return CAMERA_NAME_BASLER_GIGE; break;
+        case CAMERA_TYPE_BASLER_USB : return CAMERA_NAME_BASLER_USB; break;
+        case CAMERA_TYPE_DEIMOS : return CAMERA_NAME_DEIMOS; break;
+        case CAMERA_TYPE_PHOBOS_BASLER_GIGE : return CAMERA_NAME_PHOBOS_BASLER_GIGE; break;
+        case CAMERA_TYPE_PHOBOS_BASLER_USB : return CAMERA_NAME_PHOBOS_BASLER_USB; break;
+        case CAMERA_TYPE_PHOBOS_TIS_USB : return CAMERA_NAME_PHOBOS_TIS_USB; break;
+        case CAMERA_TYPE_TITANIA_BASLER_GIGE : return CAMERA_NAME_TITANIA_BASLER_GIGE; break;
+        case CAMERA_TYPE_TITANIA_BASLER_USB : return CAMERA_NAME_TITANIA_BASLER_USB; break;
+        case CAMERA_TYPE_TITANIA_VIMBA_USB : return CAMERA_NAME_TITANIA_VIMBA_USB; break;
+        default  : return CAMERA_NAME_INVALID; break;
     }
 }
 
 AbstractStereoCamera::StereoCameraType AbstractStereoCamera::String2StereoCameraType(std::string camera_type){
-    if (camera_type.compare("deimos") == 0){
-        return CAMERA_TYPE_DEIMOS;
-    } else if (camera_type.compare("usb") == 0){
-        return CAMERA_TYPE_USB;
-    } else if (camera_type.compare("baslergige") == 0){
-        return CAMERA_TYPE_BASLER_GIGE;
-    } else if (camera_type.compare("baslerusb") == 0){
-        return CAMERA_TYPE_BASLER_USB;
-    } else if (camera_type.compare("tis") == 0){
+    if (camera_type.compare(CAMERA_NAME_TARA) == 0){
+        return CAMERA_TYPE_TARA;
+    } else if (camera_type.compare(CAMERA_NAME_TIS) == 0){
         return CAMERA_TYPE_TIS;
-    } else if (camera_type.compare("vimba") == 0){
+    } else if (camera_type.compare(CAMERA_NAME_VIMBA) == 0){
         return CAMERA_TYPE_VIMBA;
+    } else if (camera_type.compare(CAMERA_NAME_USB) == 0){
+        return CAMERA_TYPE_USB;
+    } else if (camera_type.compare(CAMERA_NAME_BASLER_GIGE) == 0){
+        return CAMERA_TYPE_BASLER_GIGE;
+    } else if (camera_type.compare(CAMERA_NAME_BASLER_USB) == 0){
+        return CAMERA_TYPE_BASLER_USB;
+    } else if (camera_type.compare(CAMERA_NAME_DEIMOS) == 0){
+        return CAMERA_TYPE_DEIMOS;
+    } else if (camera_type.compare(CAMERA_NAME_PHOBOS_BASLER_GIGE) == 0){
+        return CAMERA_TYPE_PHOBOS_BASLER_GIGE;
+    } else if (camera_type.compare(CAMERA_NAME_PHOBOS_BASLER_USB) == 0){
+        return CAMERA_TYPE_PHOBOS_BASLER_USB;
+    } else if (camera_type.compare(CAMERA_NAME_PHOBOS_TIS_USB) == 0){
+        return CAMERA_TYPE_PHOBOS_TIS_USB;
+    } else if (camera_type.compare(CAMERA_NAME_TITANIA_BASLER_GIGE) == 0){
+        return CAMERA_TYPE_TITANIA_BASLER_GIGE;
+    } else if (camera_type.compare(CAMERA_NAME_TITANIA_BASLER_USB) == 0){
+        return CAMERA_TYPE_TITANIA_BASLER_USB;
+    } else if (camera_type.compare(CAMERA_NAME_TITANIA_VIMBA_USB) == 0){
+        return CAMERA_TYPE_TITANIA_VIMBA_USB;
+    } else {
+        return CAMERA_TYPE_INVALID;
     }
-    return CAMERA_TYPE_INVALID;
 }
 
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> AbstractStereoCamera::loadSerials(AbstractStereoCamera::StereoCameraType camera_type, std::string filename){

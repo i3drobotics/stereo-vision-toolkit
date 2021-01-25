@@ -170,9 +170,12 @@ SOURCES += \
     paramfile.cpp \
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp \
-    virtualcam.cpp
-# Deimos source file is windows only for directshow
+    virtualcam.cpp \
+    stereocameraphobos.cpp \
+    stereocameratitania.cpp
+# Tara and Deimos source file is windows only for directshow
 win32 {
+    SOURCES += stereocameratara.cpp
     SOURCES += stereocameradeimos.cpp
 }
 # Optional Piper source files
@@ -231,9 +234,12 @@ HEADERS += \
     paramfile.h \
     cameradisplaywidget.h \
     cameraimagingsource.h \
-    virtualcam.h
-# Deimos header file is windows only for directshow
+    virtualcam.h \
+    stereocameraphobos.h \
+    stereocameratitania.h
+# Tara and Deimos header file is windows only for directshow
 win32 {
+    HEADERS += stereocameratara.h
     HEADERS += stereocameradeimos.h
 }
 # Optional Piper header files
