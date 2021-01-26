@@ -576,8 +576,7 @@ bool StereoCameraBasler::enableAutoExposure(bool enable){
     }
 }
 
-bool StereoCameraBasler::captureSingle(){
-    cv::Mat left_tmp, right_tmp;
+bool StereoCameraBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_right_image){
     // set maximum timeout of capure to 2xfps
     int max_timeout = 10*(1000*(1.0f/(float)frame_rate));
     if (max_timeout > 1000){
@@ -594,8 +593,8 @@ bool StereoCameraBasler::captureSingle(){
                     cameras->operator[](0).RetrieveResult(max_timeout, ptrGrabResult_left, Pylon::TimeoutHandling_ThrowException);
                     cameras->operator[](1).RetrieveResult(max_timeout, ptrGrabResult_right, Pylon::TimeoutHandling_ThrowException);
 
-                    bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_tmp);
-                    bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_tmp);
+                    bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,cam_left_image);
+                    bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,cam_right_image);
 
                     ptrGrabResult_left.Release();
                     ptrGrabResult_right.Release();
@@ -619,8 +618,8 @@ bool StereoCameraBasler::captureSingle(){
                 cameras->operator[](0).GrabOne( max_timeout, ptrGrabResult_left);
                 cameras->operator[](1).GrabOne( max_timeout, ptrGrabResult_right);
 
-                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_tmp);
-                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_tmp);
+                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,cam_left_image);
+                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,cam_right_image);
 
                 ptrGrabResult_left.Release();
                 ptrGrabResult_right.Release();
@@ -645,6 +644,12 @@ bool StereoCameraBasler::captureSingle(){
                   << e.GetDescription() << std::endl;
         res = false;
     }
+    return res;
+}
+
+bool StereoCameraBasler::captureSingle(){
+    cv::Mat left_tmp, right_tmp;
+    bool res = getCameraFrame(left_tmp,right_tmp);
     if (!res){
         send_error(CAPTURE_ERROR);
         emit captured_fail();

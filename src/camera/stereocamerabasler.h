@@ -66,6 +66,9 @@ private:
 
     bool grab();
     void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth);
+
+protected:
+    bool getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_righ_image);
 };
 
 #endif //STEREOCAMERABASLER_H

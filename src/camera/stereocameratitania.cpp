@@ -153,6 +153,14 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
     return connected_serial_infos;
 }
 
+bool StereoCameraTitaniaBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_right_image){
+    cv::Mat left_tmp, right_tmp;
+    bool res = StereoCameraBasler::getCameraFrame(left_tmp,right_tmp);
+    cam_left_image = left_tmp.clone();
+    cam_right_image = right_tmp.clone();
+    return res;
+}
+
 #ifdef WITH_VIMBA
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaVimba::listSystems(){
 
