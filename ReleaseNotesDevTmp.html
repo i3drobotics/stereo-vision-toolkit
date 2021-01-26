@@ -1,0 +1,12 @@
+Stereo Vision Toolkit v1.3.1a.19 [Development release]
+
+Improvements:
+- Improved named pipe speed with 16 bit disparity option
+- Seperated camera device classes for unique identification of Deimos, Phobos and Titania
+
+Known Issues:
+- Cannot close named pipe server until client connects.
+- WLS filter causes speckle filter to sometimes be disabled.
+- WinSock2 streaming is slow and unstable when using high resolution images. 
+- Named Pipe streaming is slow when using high resolution images.
+- Stereo videos are saved uncompressed to avoid lossy compression which would cause issues when loading stereo videos. This will create large file sizes.
