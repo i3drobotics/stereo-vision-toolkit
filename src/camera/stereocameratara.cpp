@@ -161,7 +161,8 @@ std::string StereoCameraTara::get_device_path_serial(IMoniker *pMoniker){
 }
 
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTara::listSystems(std::string friendly_name){
-    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(CAMERA_TYPE_TARA);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_tara_serial_infos = loadSerials(CAMERA_TYPE_TARA);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_deimos_serial_infos = loadSerials(CAMERA_TYPE_DEIMOS);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
 
     // Create the System Device Enumerator.
@@ -203,24 +204,33 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTara::list
                     std::wstring str(var.bstrVal);
                     if (std::string(str.begin(), str.end()) == friendly_name) {
                         std::string device_path_serial = get_device_path_serial(pMoniker);
-                        bool device_known = false;
+                        bool device_known_tara = false;
+                        bool device_known_deimos = false;
                         AbstractStereoCamera::StereoCameraSerialInfo serial_info;
-                        for (auto& known_serial_info : known_serial_infos) {
+                        for (auto& known_serial_info : known_tara_serial_infos) {
                             if (device_path_serial == known_serial_info.left_camera_serial){
                                 serial_info = known_serial_info;
-                                device_known = true;
+                                device_known_tara = true;
                                 break;
                             }
                         }
-                        if (!device_known){
-                            serial_info.camera_type = CAMERA_TYPE_DEIMOS;
+                        for (auto& known_serial_info : known_deimos_serial_infos) {
+                            if (device_path_serial == known_serial_info.left_camera_serial){
+                                serial_info = known_serial_info;
+                                device_known_deimos = true;
+                                break;
+                            }
+                        }
+                        if (!device_known_tara){
+                            serial_info.camera_type = CAMERA_TYPE_TARA;
                             serial_info.left_camera_serial = device_path_serial;
                             serial_info.right_camera_serial = device_path_serial;
                             std::string tmp_identity = QString::number(i).rightJustified(5, '0').toStdString();
-                            serial_info.i3dr_serial = tmp_identity;
-                            //serial_info.filename
+                            serial_info.i3dr_serial = device_path_serial;
                         }
-                        connected_serial_infos.push_back(serial_info);
+                        if (!device_known_deimos){ //Only add tara devices that are not known deimos'
+                            connected_serial_infos.push_back(serial_info);
+                        }
                         i++;
                     }
                     VariantClear(&var);

@@ -39,9 +39,9 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     // TODO replace this by reading current value from camera
     default_basler_usb_init_settings.exposure = 5;
     default_basler_usb_init_settings.gain = 0;
-    default_basler_usb_init_settings.fps = 1; // 10
+    default_basler_usb_init_settings.fps = 10;
     default_basler_usb_init_settings.binning = 1;
-    default_basler_usb_init_settings.trigger = false; // true
+    default_basler_usb_init_settings.trigger = true;
     default_basler_usb_init_settings.hdr = -1;
     default_basler_usb_init_settings.autoExpose = false;
     default_basler_usb_init_settings.autoGain = false;
@@ -1425,22 +1425,22 @@ void SVTKWindow::stereoCameraInitWindow(void){
     int step_packetSize = 4;
 
     AbstractStereoCamera::StereoCameraSerialInfo cam_info = stereo_cam->getCameraSerialInfo();
-    if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS){
+    if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_DEIMOS || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TARA){
         min_fps = 30;
         step_fps = 30;
-    } else if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE){
+    } else if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_GIGE || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_GIGE){
         max_binning = 4;
         min_binning = 1;
         step_binning = 1;
-    } else if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
+    } else if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_BASLER_USB || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_USB){
         max_binning = 4;
         min_binning = 1;
         step_binning = 1;
-    } else if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS){
+    } else if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TIS || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_PHOBOS_TIS_USB){
         max_gain = 48;
         min_gain = 0;
         step_gain = 1;
-    } else  if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA){
+    } else  if (cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_VIMBA || cam_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TITANIA_VIMBA_USB){
         min_fps = 1;
         max_fps = 100;
     }
@@ -1943,7 +1943,10 @@ void SVTKWindow::refreshCameraListGUI(){
 
     QPixmap pixmapDeimos(":/mainwindow/images/deimos_square_50.png");
     QPixmap pixmapPhobos(":/mainwindow/images/phobos_square_50.png");
-    QPixmap pixmapTitania(":/mainwindow/images/deimos_square_50.png");
+    QPixmap pixmapTitania(":/mainwindow/images/titania_square_50.png");
+    // TODO: Set this to tara image when the problem of deimos' showing as tara when the hid is malfunctioning is fixed
+    // This is currently set to a generic 3D camera so that the inner tara for deimos' is not shown to customers.
+    QPixmap pixmapTara(":/mainwindow/images/camera_square_50.png");
     QPixmap pixmapCamera(":/mainwindow/images/camera_square_50.png");
 
     //Clear layout list
@@ -1983,7 +1986,7 @@ void SVTKWindow::refreshCameraListGUI(){
             } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_TARA){
                 camera_type = "Tara";
                 camera_serial = camera_serial_info.i3dr_serial;
-                camera_icon = pixmapCamera;
+                camera_icon = pixmapTara;
             } else if (camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE || camera_serial_info.camera_type == AbstractStereoCamera::CAMERA_TYPE_BASLER_USB){
                 camera_type = "Basler";
                 camera_serial = camera_serial_info.i3dr_serial;

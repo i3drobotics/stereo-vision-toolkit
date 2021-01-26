@@ -84,9 +84,11 @@ public slots:
     bool enableHDR(bool enable);
     void captureThreaded();
 
+protected:
+    static std::string get_device_path_serial(IMoniker *pMoniker);
+
 private:
     static std::string serial_from_device_path(std::string usb_device_path);
-    static std::string get_device_path_serial(IMoniker *pMoniker);
     static std::string wchar_to_string(WCHAR * buffer);
 
     cv::VideoCapture camera;

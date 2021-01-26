@@ -153,7 +153,7 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraPhobosBasl
     return connected_serial_infos;
 }
 
-std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTIS::listSystemsQuick(DShowLib::Grabber* handle){
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraPhobosTIS::listSystemsQuick(DShowLib::Grabber* handle){
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_PHOBOS_TIS_USB);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
 
@@ -190,7 +190,7 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTIS::listS
     return connected_serial_infos;
 }
 
-std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTIS::listSystems(){
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraPhobosTIS::listSystems(){
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos = loadSerials(AbstractStereoCamera::CAMERA_TYPE_PHOBOS_TIS_USB);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
 
