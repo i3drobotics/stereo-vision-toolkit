@@ -125,6 +125,12 @@ bool StereoCameraBasler::openCamera(){
             cameras->operator[](i).ClearBufferModeEnable();
         }
 
+        //Set device link throughput to fix data collision issue
+        Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimitMode").SetValue(true);
+        Pylon::CBooleanParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimitMode").SetValue(true);
+        Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
+        Pylon::CIntegerParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
+
         formatConverter = new Pylon::CImageFormatConverter();
 
         //formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
