@@ -330,6 +330,34 @@ public:
         outValidDisparity = disparity_thresh;
     }
 
+    static double getHFOVFromQ(cv::Mat Q)
+    {
+        // Get horitonzal Field Of View of camera from Q matrix
+        // Useful for reconstructing XYZ depth from Z only depth
+        // Can be embedded in top left corner pixel of RGBD image to simplify reconstruction
+
+        // Q Matrix has the format
+        // [ 1 0   0       -cx     ]
+        // [ 0 1   0       -cy     ]
+        // [ 0 0   0        fx     ]
+        // [ 0 0 -1/Tx (cx-cxr)/Tx ]
+
+        // Cx and Cy are principal point of the left camera (in pixels so half the resolution)
+        // Fx is horizontal focal length of left camera (in pixels)
+
+        // Extract focal length and principal point from Q
+        double fx = Q.at<double>(2, 3);
+        double cx = -Q.at<double>(0, 3);
+
+        // Calculate FOV
+        // See here for explaination of the geometric reasoning
+        // https://photo.stackexchange.com/questions/41273/how-to-calculate-the-fov-in-degrees-from-focal-length-or-distance
+        double fov_x = 2 * atan(cx / fx);
+
+        // Return horizonal FOV in radians
+        return fov_x;
+    }
+
     static void disparity2CVPointCloud(cv::Mat disparity, cv::Mat image, cv::Mat Q, cv::Mat &depth, cv::Mat &depthColors, float max_z = 10000){
         cv::Mat disparity16;
         disparity.copyTo(disparity16);
@@ -394,9 +422,11 @@ public:
         }
     }
 
-    static void disparity2Depth(cv::Mat disparity, cv::Mat Q, cv::Mat &depth, float max_z = 10000){
+    static void disparity2Depth(cv::Mat disparity, cv::Mat Q, cv::Mat &depth, float max_z = 10000, float downsample_factor = 1.0){
         cv::Mat disparity16;
         disparity.copyTo(disparity16);
+
+        float downsample_rate = 1 / downsample_factor;
 
         if (Q.empty() || disparity16.empty()) {
             return;
@@ -420,9 +450,9 @@ public:
                 d = disparity16.at<float>(i, j);
                 if (d != 0)
                 {
-                    w = (d * q32) + q33;
-                    xyz[0] = (j + q03) / w;
-                    xyz[1] = (i + q13) / w;
+                    w = ((d * downsample_rate) * q32) + q33;
+                    xyz[0] = ((j * downsample_rate) + q03) / w;
+                    xyz[1] = ((i * downsample_rate) + q13) / w;
                     xyz[2] = wz / w;
 
                     if (w > 0 && xyz[2] > 0 && xyz[2] < max_z){ // negative W or Z which is not possible (behind camera)

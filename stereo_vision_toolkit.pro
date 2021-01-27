@@ -141,6 +141,7 @@ WITH_VIMBA {
 
 # Define source files
 SOURCES += \
+    src/camera/widgets/loadstereoimagepairdialog.cpp \
     svtkmain.cpp \
     svtkwindow.cpp \
     arduinocommscameracontrol.cpp \
@@ -161,6 +162,7 @@ SOURCES += \
     stereocameraopencv.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
+    stereocamerafromimage.cpp \
     matcheropencvblock.cpp \
     matcherwidgetopencvblock.cpp \
     matcheropencvsgbm.cpp \
@@ -200,6 +202,7 @@ WITH_I3DRSGM {
 
 # Define header files
 HEADERS += \
+    src/camera/widgets/loadstereoimagepairdialog.h \
     svtkwindow.h \
     arduinocommscameracontrol.h \
     aboutdialog.h \
@@ -224,6 +227,7 @@ HEADERS += \
     stereocameraopencv.h \
     stereocameratis.h \
     stereocamerafromvideo.h \
+    stereocamerafromimage.h \
     stereocamerasupport.h \
     matcheropencvblock.h \
     matcherwidgetopencvblock.h \
@@ -263,6 +267,7 @@ WITH_I3DRSGM {
 }
 # Define application window forms
 FORMS += \
+    src/camera/widgets/loadstereoimagepairdialog.ui \
     svtkwindow.ui \
     aboutdialog.ui \
     calibrationdialog.ui \

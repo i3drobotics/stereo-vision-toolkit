@@ -32,12 +32,6 @@ public:
 
         float downsample_rate = 1 / downsample_factor;
 
-        // By default the disparity maps are scaled by a factor of 16.0
-        disparity16 /= 16.0;
-
-        // remove invalid disparies
-        CVSupport::removeInvalidDisparity(disparity16,Q,disparity16);
-
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp(
                     new pcl::PointCloud<pcl::PointXYZRGB>);
 
@@ -82,7 +76,7 @@ public:
                     xyz[1] = ((i * downsample_rate) + q13) / w;
                     xyz[2] = wz / w;
 
-                    if (w > 0 && xyz[2] > 0){ // negative W or Z which is not possible (behind camera)
+                    if (w > 0 && xyz[2] > 0){ // negative W or Z is not possible (behind camera)
                         if (image.type() == CV_8UC1){
                             intensity = image.at<uchar>(i,j);
                             b = intensity;
@@ -107,6 +101,72 @@ public:
                         point.b = b;
                         ptCloudTemp->points.push_back(point);
                     }
+                }
+            }
+        }
+
+        if(ptCloudTemp->points.empty()){
+            //qDebug() << "Failed to create Point cloud. Point cloud is empty";
+            return ptCloudTemp;
+        }
+
+        return ptCloudTemp;
+    }
+
+    static pcl::PointCloud<pcl::PointXYZRGB>::Ptr depth2PointCloud(cv::Mat depth, cv::Mat image) {
+
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp(
+                    new pcl::PointCloud<pcl::PointXYZRGB>);
+
+        if (depth.empty()) {
+            //qDebug() << "Q or disparity map is empty";
+            return ptCloudTemp;
+        }
+
+        // Add inital point at (0,0,0)
+        pcl::PointXYZRGB point;
+        point.x = 0;
+        point.y = 0;
+        point.z = 0;
+        point.r = 255;
+        point.g = 255;
+        point.b = 255;
+        ptCloudTemp->points.push_back(point);
+
+        uchar b,g,r;
+        uchar intensity;
+
+        cv::Vec3f xyz;
+
+        for (int i = 0; i < depth.rows; i++)
+        {
+            for (int j = 0; j < depth.cols; j++)
+            {
+                xyz = depth.at<cv::Vec3f>(i, j);
+                if (xyz[2] > 0){ // negative Z is not possible (behind camera)
+                    if (image.type() == CV_8UC1){
+                        intensity = image.at<uchar>(i,j);
+                        b = intensity;
+                        g = intensity;
+                        r = intensity;
+                    } else if (image.type() == CV_8UC3){
+                        b = image.at<cv::Vec3b>(i,j)[0];
+                        g = image.at<cv::Vec3b>(i,j)[1];
+                        r = image.at<cv::Vec3b>(i,j)[2];
+                    } else {
+                        b = 0;
+                        g = 0;
+                        r = 0;
+                        //qDebug() << "Invalid image type. MUST be CV_8UC1 or CV_8UC3";
+                    }
+
+                    point.x = xyz[0];
+                    point.y = xyz[1];
+                    point.z = xyz[2];
+                    point.r = r;
+                    point.g = g;
+                    point.b = b;
+                    ptCloudTemp->points.push_back(point);
                 }
             }
         }

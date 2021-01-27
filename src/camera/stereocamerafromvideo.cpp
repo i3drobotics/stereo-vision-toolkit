@@ -10,7 +10,7 @@ bool StereoCameraFromVideo::openCamera(){
         closeCamera();
     }
     int fps = stereoCameraSettings_.fps;
-    std::string fname = stereoCameraSerialInfo_.filename;
+    std::string fname = stereoCameraSerialInfo_.left_camera_serial;
 
     stream = cv::VideoCapture(fname);
 

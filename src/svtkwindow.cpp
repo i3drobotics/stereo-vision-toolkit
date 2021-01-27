@@ -426,6 +426,7 @@ void SVTKWindow::controlsInit(void) {
     connect(ui->setSaveDirButton, SIGNAL(clicked()), this, SLOT(setSaveDirectory()));
     connect(ui->toggleVideoButton, SIGNAL(clicked(bool)), this, SLOT(enableVideoCapture(bool)));
     connect(ui->btnLoadCalibration, SIGNAL(clicked(bool)),this, SLOT(setCalibrationFolder()));
+    connect(ui->actionLoad_Calibration, SIGNAL(triggered(bool)),this, SLOT(setCalibrationFolder()));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), ui->exposureSpinBox, SLOT(setDisabled(bool)));
     connect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), ui->gainSpinBox, SLOT(setDisabled(bool)));
 
@@ -443,8 +444,10 @@ void SVTKWindow::controlsInit(void) {
     ui->enablePiper->setIcon(awesome->icon(fa::exchange, icon_options)); //TODO choose good piper icon
     ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
 
-    connect(ui->btnLoadVideo, SIGNAL(clicked(bool)), this,
+    connect(ui->actionLoad_Stereo_Video, SIGNAL(triggered(bool)), this,
             SLOT(videoStreamLoad()));
+    connect(ui->actionLoad_Stereo_Image_Pair, SIGNAL(triggered(bool)), this,
+            SLOT(stereoImageLoad()));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this,
             SLOT(enable3DViz(int)));
@@ -945,16 +948,26 @@ void SVTKWindow::updatePiper(){
                 break;
             case 4: // rgbd
                 if (stereo_cam->isMatching()){
-                    cv::Mat color, disp, Q;
+                    cv::Mat color, Q, depth, depth_z, depth_split[3];
                     stereo_cam->getLeftMatchImage(color);
-                    stereo_cam->getDisparityFiltered(disp);
-                    if (!disp.empty() && !color.empty()){
-                        cv::resize(disp, disp, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
+                    stereo_cam->getDepth(depth);
+                    stereo_cam->getQ(Q);
+                    // extract Z only channel from depth (xyz) image
+                    cv::split(depth, depth_split);
+                    depth_z = depth_split[0];
+                    // get horizontal fov from Q matrix
+                    double hfov = CVSupport::getHFOVFromQ(Q);
+                    // embed horizontal fov in top left pixel of z only depth image to simplify reconstruction
+                    depth_z.at<float>(0,0) = (float)hfov;
+                    if (!depth_z.empty() && !color.empty()){
+                        // Downsample images based on parameters
+                        cv::resize(depth_z, depth_z, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
                         cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
+                        // Create RGBD image from color image and z only depth image
                         if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16(color,disp,10.0,true);
+                            image_stream = CVSupport::createRGBD16(color,depth_z,10.0,true);
                         } else {
-                            image_stream = CVSupport::createRGBD32(color,disp);
+                            image_stream = CVSupport::createRGBD32(color,depth_z);
                         }
                     } else {
                         std::cerr << "Disparity image or camera image is empty." << std::endl;
@@ -963,21 +976,20 @@ void SVTKWindow::updatePiper(){
                     image_stream = cv::Mat();
                 }
                 break;
-            case 5: // rgbdq
+            case 5: // rgbdisp
                 if (stereo_cam->isMatching()){
-                    cv::Mat color, disp, Q;
+                    cv::Mat color, disp;
                     stereo_cam->getLeftMatchImage(color);
                     stereo_cam->getDisparityFiltered(disp);
-                    stereo_cam->getQ(Q);
                     if (!disp.empty() && !color.empty()){
+                        // Downsample image based on parameters
                         cv::resize(disp, disp, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
                         cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                        //embedd Q in disparity image
-                        cv::Mat dispQ = CVSupport::embedQinDisp(disp,Q);
+                        // Create RGBD image from color image and disparity image
                         if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16(color,dispQ,10.0,true);
+                            image_stream = CVSupport::createRGBD16(color,disp,10.0,true);
                         } else {
-                            image_stream = CVSupport::createRGBD32(color,dispQ);
+                            image_stream = CVSupport::createRGBD32(color,disp);
                         }
                     } else {
                         std::cerr << "Disparity image or camera image is empty." << std::endl;
@@ -1614,8 +1626,6 @@ void SVTKWindow::stereoCameraRelease(void) {
     ui->toggleRectifyCheckBox->setChecked(false);
     ui->toggleSwapLeftRight->setChecked(false);
 
-    ui->btnLoadVideo->setText("Load Stereo Video");
-
     //TODO enable this when implimented
     ui->toggleCalibrationDownsample->setVisible(false);
     ui->toggleCalibrationDownsample->setChecked(false);
@@ -2154,31 +2164,33 @@ void SVTKWindow::stopDeviceListTimer() {
     ui->btnRefreshCameras->setEnabled(false);
 }
 
-void SVTKWindow::videoStreamLoad(void) {
-    if (ui->btnLoadVideo->text() == "Load Stereo Video"){
-        QMessageBox msg;
+void SVTKWindow::stereoImageLoad(void) {
+    QMessageBox msg;
 
-        QString fname = QFileDialog::getOpenFileName(
-                    this, tr("Open Stereo Video"), "/home", tr("Videos (*.avi *.mp4)"));
-        if (fname != "") {
+    // Select left and right image pair from custom dialog
+    load_stereo_image_pair_dialog = new LoadStereoImagePairDialog(this);
+    load_stereo_image_pair_dialog->setModal(true);
+    int return_code = load_stereo_image_pair_dialog->exec();
+
+    if (return_code == QDialog::Accepted) {
+        if (load_stereo_image_pair_dialog->isFilepathsValid()) {
             stereoCameraRelease();
             //stopDeviceListTimer();
-            ui->btnLoadVideo->setText("Disconnect Stereo Video");
 
             AbstractStereoCamera::StereoCameraSerialInfo scis;
-            scis.filename = fname.toStdString();
+            // Store left and right image filename in serial strings
+            scis.left_camera_serial = load_stereo_image_pair_dialog->getLeftImageFilepath();
+            scis.right_camera_serial = load_stereo_image_pair_dialog->getRightImageFilepath();
 
             current_camera_settings = default_video_init_settings;
 
             cam_thread = new QThread;
-            StereoCameraFromVideo* stereo_cam_video = new StereoCameraFromVideo(scis,current_camera_settings);
-            cameras_connected = stereo_cam_video->openCamera();
-            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_video);
+            StereoCameraFromImage* stereo_cam_image = new StereoCameraFromImage(scis,current_camera_settings);
+            cameras_connected = stereo_cam_image->openCamera();
+            stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_image);
             if (cameras_connected){
                 stereo_cam->assignThread(cam_thread);
                 ui->frameCountSlider->setEnabled(true);
-                connect(stereo_cam, SIGNAL(videoPosition(int)),ui->frameCountSlider, SLOT(setValue(int)));
-                connect(ui->frameCountSlider, SIGNAL(sliderMoved(int)),stereo_cam, SLOT(setPosition(int)));
                 connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(setFPS(int)));
                 stereoCameraInit();
                 stereoCameraInitWindow();
@@ -2186,7 +2198,7 @@ void SVTKWindow::videoStreamLoad(void) {
 
                 // Ask user if to load rectified frames
                 QMessageBox msgBox;
-                msgBox.setText(tr("Was video recorded with rectified images? (This is asked to avoid double rectification)"));
+                msgBox.setText(tr("Was image captured with rectified images? (This is asked to avoid double rectification)"));
                 QAbstractButton* pButtonRect = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
                 QAbstractButton* pButtonNonRect = msgBox.addButton(tr("No"), QMessageBox::NoRole);
 
@@ -2201,15 +2213,68 @@ void SVTKWindow::videoStreamLoad(void) {
                 // Start frame capture
                 enableCapture(true);
             } else {
-                msg.setText("Failed to open video stream.");
+                msg.setText("Failed to open images.");
                 msg.exec();
                 ui->statusBar->showMessage("Disconnected.");
-                //ui->toggleVideoButton->setDisabled(true);
-                ui->btnLoadVideo->setText("Load Stereo Video");
             }
+        } else {
+            msg.setText("Failed to load image files.");
+            msg.exec();
+            ui->statusBar->showMessage("Disconnected.");
         }
-    } else {
+    }
+}
+
+void SVTKWindow::videoStreamLoad(void) {
+    QMessageBox msg;
+
+    QString fname = QFileDialog::getOpenFileName(
+                this, tr("Open Stereo Video"), "/home", tr("Videos (*.avi *.mp4)"));
+    if (fname != "") {
         stereoCameraRelease();
+        //stopDeviceListTimer();
+
+        AbstractStereoCamera::StereoCameraSerialInfo scis;
+        scis.left_camera_serial = fname.toStdString(); //store video filename in left serial string
+
+        current_camera_settings = default_video_init_settings;
+
+        cam_thread = new QThread;
+        StereoCameraFromVideo* stereo_cam_video = new StereoCameraFromVideo(scis,current_camera_settings);
+        cameras_connected = stereo_cam_video->openCamera();
+        stereo_cam = static_cast<AbstractStereoCamera*>(stereo_cam_video);
+        if (cameras_connected){
+            stereo_cam->assignThread(cam_thread);
+            ui->frameCountSlider->setEnabled(true);
+            connect(stereo_cam, SIGNAL(videoPosition(int)),ui->frameCountSlider, SLOT(setValue(int)));
+            connect(ui->frameCountSlider, SIGNAL(sliderMoved(int)),stereo_cam, SLOT(setPosition(int)));
+            connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), stereo_cam, SLOT(setFPS(int)));
+            stereoCameraInit();
+            stereoCameraInitWindow();
+            //ui->toggleVideoButton->setDisabled(true);
+
+            // Ask user if to load rectified frames
+            QMessageBox msgBox;
+            msgBox.setText(tr("Was video recorded with rectified images? (This is asked to avoid double rectification)"));
+            QAbstractButton* pButtonRect = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
+            QAbstractButton* pButtonNonRect = msgBox.addButton(tr("No"), QMessageBox::NoRole);
+
+            msgBox.exec();
+
+            if (msgBox.clickedButton()==pButtonRect) {
+                enableRectify(false);
+            } else if (msgBox.clickedButton()==pButtonNonRect) {
+                enableRectify(true);
+            }
+
+            // Start frame capture
+            enableCapture(true);
+        } else {
+            msg.setText("Failed to open video stream.");
+            msg.exec();
+            ui->statusBar->showMessage("Disconnected.");
+            //ui->toggleVideoButton->setDisabled(true);
+        }
     }
 }
 

@@ -50,6 +50,7 @@
 #include "stereocameratara.h"
 #include "stereocameradeimos.h"
 #include "stereocamerafromvideo.h"
+#include "stereocamerafromimage.h"
 #include "stereocameraopencv.h"
 #include "stereocameratis.h"
 #include "stereocamerabasler.h"
@@ -68,6 +69,8 @@
 
 #include "detectoropencv.h"
 #include "detectorsetupdialog.h"
+
+#include "loadstereoimagepairdialog.h"
 
 #include "paramfile.h"
 #ifdef WITH_FERVOR
@@ -184,6 +187,7 @@ private:
     AboutDialog* about_dialog;
     CalibrationDialog* calibration_dialog;
     CalibrateFromImagesDialog* calibration_images_dialog;
+    LoadStereoImagePairDialog* load_stereo_image_pair_dialog;
 
     QString calibration_directory = "";
     QString save_directory = "";
@@ -288,6 +292,7 @@ public slots:
     void hideCameraSettings(bool hide);
 
     void videoStreamLoad(void);
+    void stereoImageLoad(void);
 
     void setSaveDirectory(QString dir = "");
     void setCalibrationFolder(QString dir = "");

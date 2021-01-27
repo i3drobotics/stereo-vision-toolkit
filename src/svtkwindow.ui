@@ -136,7 +136,7 @@
             </attribute>
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="0" column="0">
-              <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0,0">
+              <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,0">
                <property name="bottomMargin">
                 <number>5</number>
                </property>
@@ -166,14 +166,10 @@
                <item>
                 <widget class="QLabel" name="lblStereoVideoHelp">
                  <property name="text">
-                  <string>Or load a stereo video using 'Load Stereo Video' button</string>
+                  <string>Or load a stereo video using 'Load Stereo Video' button in the 'File' menu</string>
                  </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="btnLoadVideo">
-                 <property name="text">
-                  <string>Load Stereo Video</string>
+                 <property name="wordWrap">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -206,7 +202,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>310</width>
-                    <height>193</height>
+                    <height>201</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1275,7 +1271,7 @@
                  </item>
                  <item>
                   <property name="text">
-                   <string>RGBDQ</string>
+                   <string>RGBDisp</string>
                   </property>
                  </item>
                 </widget>
@@ -2542,6 +2538,8 @@
      <string>File</string>
     </property>
     <addaction name="actionExit"/>
+    <addaction name="actionLoad_Stereo_Video"/>
+    <addaction name="actionLoad_Stereo_Image_Pair"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -2557,6 +2555,7 @@
     </property>
     <addaction name="actionCalibration_wizard"/>
     <addaction name="actionCalibrate_from_images"/>
+    <addaction name="actionLoad_Calibration"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCalibration"/>
@@ -2604,6 +2603,21 @@
   <action name="actionCheckUpdates">
    <property name="text">
     <string>Check for Updates</string>
+   </property>
+  </action>
+  <action name="actionLoad_Stereo_Video">
+   <property name="text">
+    <string>Load Stereo Video</string>
+   </property>
+  </action>
+  <action name="actionLoad_Stereo_Image_Pair">
+   <property name="text">
+    <string>Load Stereo Image Pair</string>
+   </property>
+  </action>
+  <action name="actionLoad_Calibration">
+   <property name="text">
+    <string>Load Calibration</string>
    </property>
   </action>
  </widget>

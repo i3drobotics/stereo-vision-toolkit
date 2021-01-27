@@ -453,6 +453,18 @@ cv::Mat AbstractStereoCamera::getDisparityFiltered(){
     disparity_mutex.unlock();
 }
 
+void AbstractStereoCamera::getDepth(cv::Mat &dst) {
+    disparity_mutex.lock();
+    depth.copyTo(dst);
+    disparity_mutex.unlock();
+}
+
+cv::Mat AbstractStereoCamera::getDepth(){
+    disparity_mutex.lock();
+    return depth.clone();
+    disparity_mutex.unlock();
+}
+
 void AbstractStereoCamera::generateRectificationMaps(cv::Size image_size){
     /*
     cv::Mat dl_camera_matrix = l_camera_matrix.clone();
@@ -879,7 +891,7 @@ void AbstractStereoCamera::processMatch(){
     if (left_output.empty() || right_output.empty()){
         return;
     }
-    cv::Mat left_img, right_img, disp, left_bgr, disp_filtered;
+    cv::Mat left_img, right_img, disp, left_bgr, disp_filtered, depth_tmp;
     left_img = left_output.clone();
     right_img = right_output.clone();
     lr_image_mutex.unlock();
@@ -899,14 +911,12 @@ void AbstractStereoCamera::processMatch(){
     disparity = disp.clone();
     CVSupport::removeInvalidDisparity(disparity/16,Q,disp_filtered);
     disparity_filtered = disp_filtered.clone();
+    CVSupport::disparity2Depth(disp_filtered, Q, depth_tmp, 10000, downsample_factor);
+    depth = depth_tmp.clone();
     disparity_mutex.unlock();
     //qDebug() << "Getting left image from stereo match...";
     left_bgr = matcher->getLeftBGRImage();
     emit matched();
-
-    //double min_disp, max_disp;
-    //CVSupport::getMinMaxDisparity(disp,min_disp,max_disp);
-    //qDebug() << min_disp << "," << max_disp;
 
     cv::Mat disp_colormap;
     if (video_src == VIDEO_SRC_DISPARITY || (reprojecting && getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH)){
@@ -916,6 +926,7 @@ void AbstractStereoCamera::processMatch(){
             if (capturing_video)
                 addVideoStreamFrame(disp_colormap);
         }
+        //TODO add RGBD support for with VIDEO_SRC_RGBD
     }
 
     if (reprojecting){
@@ -927,11 +938,12 @@ void AbstractStereoCamera::processMatch(){
             disp_colormap.copyTo(texture_image);
         }
 
-        if (disp.empty() || texture_image.empty()){
+        if (depth_tmp.empty() || texture_image.empty()){
             return;
         }
 
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp = PCLSupport::disparity2PointCloud(disp,texture_image,Q, downsample_factor);
+        //pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp = PCLSupport::disparity2PointCloud(disp,texture_image,Q, downsample_factor);
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp = PCLSupport::depth2PointCloud(depth_tmp,texture_image);
 
         pcl::PassThrough<pcl::PointXYZRGB> pass;
         pass.setInputCloud (ptCloudTemp);
@@ -1010,6 +1022,9 @@ bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int c
             break;
         case VIDEO_SRC_DISPARITY:
             file_prefix = "disparity_video_";
+            break;
+        case VIDEO_SRC_RGBD:
+            file_prefix = "rgbd_video_";
             break;
         }
         video_filename = QString("%1/%2%3.avi").arg(save_directory, file_prefix, date_string).toStdString();

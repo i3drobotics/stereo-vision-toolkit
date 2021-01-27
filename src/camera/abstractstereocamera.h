@@ -90,7 +90,7 @@ public:
 
     enum PointCloudTexture { POINT_CLOUD_TEXTURE_IMAGE, POINT_CLOUD_TEXTURE_DEPTH };
 
-    enum VideoSource { VIDEO_SRC_STEREO, VIDEO_SRC_LEFT, VIDEO_SRC_RIGHT, VIDEO_SRC_DISPARITY };
+    enum VideoSource { VIDEO_SRC_STEREO, VIDEO_SRC_LEFT, VIDEO_SRC_RIGHT, VIDEO_SRC_DISPARITY, VIDEO_SRC_RGBD };
 
     //! Structure to hold camera settings
     struct StereoCameraSettings {
@@ -113,7 +113,6 @@ public:
         std::string right_camera_serial;
         StereoCameraType camera_type; // type of camera
         std::string i3dr_serial; // defined i3dr serial for camera pair
-        std::string filename; // filename for video [only used for stereoCameraFromVideo]
     };
 
     explicit AbstractStereoCamera(StereoCameraSerialInfo serial_info,
@@ -265,6 +264,18 @@ public:
   * @param[out] dst OpenCV matrix to store image into
   */
     void getDisparityFiltered(cv::Mat &dst);
+
+    //! Get the depth image
+    /*!
+  * @return OpenCV matrix containing depth image
+  */
+    cv::Mat getDepth();
+
+    //! Get the depth image
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getDepth(cv::Mat &dst);
 
 
     //! Get a pointer to the current point cloud
@@ -746,6 +757,7 @@ private:
 
     cv::Mat disparity;
     cv::Mat disparity_filtered;
+    cv::Mat depth;
 
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 5;
