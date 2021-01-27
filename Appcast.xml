@@ -9,7 +9,7 @@
 	<channel>
 		<title>Stereo Vision Toolkit Changelog</title>
 		<link>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/master/Appcast.xml</link>
-		<description>Most recent changes with links to updates.</description>
+		<description>Improvements, bug fixes, and known issues for latest release.</description>
 		<language>en</language>
 		<atom:link href="https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/master/Appcast.xml" rel="self" type="application/rss+xml" />
 

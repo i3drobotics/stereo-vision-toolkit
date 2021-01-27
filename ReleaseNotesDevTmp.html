@@ -1,8 +1,14 @@
 Stereo Vision Toolkit v1.3.1a.19 [Development release]
 
 Improvements:
+- Add loading of stereo image pair from image files (.png, .jpg, .jpeg)
 - Improved named pipe speed with 16 bit disparity option
+- Add RGBD depth pipe with embedded horizontal FOV in top right corner of depth image
 - Seperated camera device classes for unique identification of Deimos, Phobos and Titania
+- Update to using Pylon v6.1.1.18345 library for Basler cameras
+
+Bug fixes:
+- Add DeviceLinkThroughputLimit for basler cameras to fix Titania data collision when using hardware triggering
 
 Known Issues:
 - Cannot close named pipe server until client connects.
