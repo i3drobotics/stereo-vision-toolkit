@@ -334,7 +334,7 @@ void StereoCameraBasler::enableDeviceLinkThroughputLimit(bool enable){
         }
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
-            //cameras->operator[](i).Open();
+            cameras->operator[](i).Open();
             //Set device link throughput mode
             Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode.c_str());
         }
@@ -352,7 +352,7 @@ void StereoCameraBasler::setDeviceLinkThroughput(int value){
     {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
-            //cameras->operator[](i).Open();
+            cameras->operator[](i).Open();
             //Set device link throughput limit
             Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(value);
         } 
@@ -538,9 +538,9 @@ bool StereoCameraBasler::enableTrigger(bool enable){
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            cameras->operator[](i).TriggerSource.SetValue(TriggerSource_Line1);
-            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSource").FromString("Line 1");
-            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").FromString(enable_str.c_str());
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSelector").SetValue("FrameStart");
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSource").SetValue("Line1");
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").SetValue("On");
         }
         return true;
     }

@@ -164,6 +164,25 @@ bool StereoCameraTitaniaBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat 
     return res;
 }
 
+bool StereoCameraTitaniaBasler::captureSingle(){
+    cv::Mat left_tmp, right_tmp;
+    bool res = getCameraFrame(left_tmp,right_tmp);
+    if (!res){
+        send_error(CAPTURE_ERROR);
+        emit captured_fail();
+    } else {
+        left_raw = left_tmp.clone();
+        right_raw = right_tmp.clone();
+        emit captured_success();
+    }
+    emit captured();
+    return res;
+}
+
+void StereoCameraTitaniaBasler::captureThreaded() {
+    future = QtConcurrent::run(this, &StereoCameraTitaniaBasler::captureSingle);
+}
+
 #ifdef WITH_VIMBA
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaVimba::listSystems(){
 
