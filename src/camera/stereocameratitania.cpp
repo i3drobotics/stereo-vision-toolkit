@@ -157,8 +157,8 @@ bool StereoCameraTitaniaBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat 
     cv::Mat left_tmp, right_tmp;
     bool res = StereoCameraBasler::getCameraFrame(left_tmp,right_tmp);
     // Rotate right camera as it is mounted upside down
-    right_tmp = cv::flip(right_tmp,0);
-    right_tmp = cv::flip(right_tmp,1);
+    left_tmp = cv::flip(left_tmp,0);
+    left_tmp = cv::flip(left_tmp,1);
     cam_left_image = left_tmp.clone();
     cam_right_image = right_tmp.clone();
     return res;
