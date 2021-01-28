@@ -540,7 +540,7 @@ bool StereoCameraBasler::enableTrigger(bool enable){
             cameras->operator[](i).Open();
             Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSelector").SetValue("FrameStart");
             Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSource").SetValue("Line1");
-            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").SetValue("On");
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").SetValue(enable_str.c_str());
         }
         return true;
     }
