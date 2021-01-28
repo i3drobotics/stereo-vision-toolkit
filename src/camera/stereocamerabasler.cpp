@@ -125,12 +125,6 @@ bool StereoCameraBasler::openCamera(){
             cameras->operator[](i).ClearBufferModeEnable();
         }
 
-        //Set device link throughput to fix data collision issue
-        Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimitMode").SetValue(true);
-        Pylon::CBooleanParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimitMode").SetValue(true);
-        Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
-        Pylon::CIntegerParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
-
         formatConverter = new Pylon::CImageFormatConverter();
 
         //formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
@@ -146,6 +140,11 @@ bool StereoCameraBasler::openCamera(){
         return connected;
     }
 
+    // Set device link throughput to fix data collision
+    enableDeviceLinkThroughputLimit(true);
+    setDeviceLinkThroughput(100000000);
+
+    // Set device parameters
     setBinning(binning);
     enableTrigger(trigger);
     setPacketSize(packet_size);
@@ -323,6 +322,40 @@ void StereoCameraBasler::getImageSize(Pylon::CInstantCamera &camera, int &width,
         // Error handling.
         std::cerr << "An exception occurred whilst getting camera image size." << std::endl
                   << e.GetDescription() << std::endl;
+    }
+}
+
+void StereoCameraBasler::enableDeviceLinkThroughputLimit(bool enable){
+    try
+    {
+        std::string mode = "Off";
+        if (enable){
+            mode = "On";
+        }
+        //Set device link throughput mode
+        Pylon::CEnumParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode);
+        Pylon::CEnumParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode);
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred whilst setting device link throughput parameter." << std::endl
+                    << e.GetDescription() << std::endl;
+    }
+}
+
+void StereoCameraBasler::setDeviceLinkThroughput(int value){
+    try
+    {
+        //Set device link throughput limit
+        Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
+        Pylon::CIntegerParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred whilst setting device link throughput parameter." << std::endl
+                    << e.GetDescription() << std::endl;
     }
 }
 

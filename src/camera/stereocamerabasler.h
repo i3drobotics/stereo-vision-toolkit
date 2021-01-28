@@ -66,6 +66,8 @@ private:
 
     bool grab();
     void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth);
+    void enableDeviceLinkThroughputLimit(bool enable);
+    void setDeviceLinkThroughput(int value);
 
 protected:
     bool getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_righ_image);
