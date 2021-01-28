@@ -22,10 +22,10 @@ SVTK is under active development. At the moment the software only officially sup
 
 Currently SVTK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your I3DR stereo camera quickly. There are a number of features/improvements in development including:
 
-- Automated camera calibration (currently in beta)
+- Live camera calibration (currently in beta)
+- Automated calibration correction
 - Linux support
 - ROS support
-- Vimba camera support
 - Unit tests and other deployment improvements
 
 See [issues](https://github.com/i3drobotics/stereo-vision-toolkit/issues) for details on known bugs and future enhancements
@@ -57,7 +57,7 @@ This code is provided under the MIT license, which essentially means it's open s
 See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
 
 ## Developer zone
-Download the latest development release v1.3.1a.17 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.17/StereoVisionToolkit-1.3.1a.17-Win64.exe)   
+Download the latest development release v1.3.1a.20 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.20/StereoVisionToolkit-1.3.1a.20-Win64.exe)   
 *WARNING: Development release may contain broken code and untested features. Use at your own risk!*
 
 See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on building from source.
@@ -71,7 +71,8 @@ The project uses OpenCV for image processing, PCL and VTK for point cloud visual
 
 #### Automatic install
 Some libraries have been moved to be externally downloaded to reduce the repostiory size. To download these libraries use the '3rdparty.bat' script provided in 'scripts'. This will download the libraries of the correct versions to the correct folders.  
-*Note: This process builds boost with the required boost libraries so will take some time to complete.*
+*Note: This process builds boost with the required boost libraries so will take some time to complete.*  
+*Note: These scripts use command line features that are only avaiable in Windows 10 'curl' and 'tar'. If you are on a Windows 8 or lower machine you will need to install the Windows version of these commands and add them to your PATH variable.*
 ```
 cd PATH_TO_REPO/scripts
 3rdparty.bat

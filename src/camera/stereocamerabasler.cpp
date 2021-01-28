@@ -333,8 +333,8 @@ void StereoCameraBasler::enableDeviceLinkThroughputLimit(bool enable){
             mode = "On";
         }
         //Set device link throughput mode
-        Pylon::CEnumParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode);
-        Pylon::CEnumParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode);
+        Pylon::CEnumParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode.c_str());
+        Pylon::CEnumParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode.c_str());
     }
     catch (const Pylon::GenericException &e)
     {
