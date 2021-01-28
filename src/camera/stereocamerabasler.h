@@ -55,8 +55,6 @@ public slots:
     bool enableFPS(bool enable);
 
 private:
-    QFuture<void> future;
-
     ArduinoCommsCameraControl* camControl;
 
     bool hardware_triggered = false;
@@ -70,6 +68,8 @@ private:
     void setDeviceLinkThroughput(int value);
 
 protected:
+    QFuture<void> future;
+
     bool getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_righ_image);
 };
 

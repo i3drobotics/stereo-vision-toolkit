@@ -34,7 +34,7 @@ public:
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystemsQuick(Pylon::CTlFactory* tlFactory);
 
-public slot:
+public slots:
     bool captureSingle();
     void captureThreaded();
 
