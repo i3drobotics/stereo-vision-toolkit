@@ -94,6 +94,10 @@ bool StereoCameraBasler::openCamera(){
             return false;
         }
 
+        // Set device link throughput to fix data collision
+        enableDeviceLinkThroughputLimit(true);
+        setDeviceLinkThroughput(100000000);
+
         //check open
         bool connected = true;
         try{
@@ -139,10 +143,6 @@ bool StereoCameraBasler::openCamera(){
         connected = false;
         return connected;
     }
-
-    // Set device link throughput to fix data collision
-    enableDeviceLinkThroughputLimit(true);
-    setDeviceLinkThroughput(100000000);
 
     // Set device parameters
     setBinning(binning);
@@ -332,9 +332,12 @@ void StereoCameraBasler::enableDeviceLinkThroughputLimit(bool enable){
         if (enable){
             mode = "On";
         }
-        //Set device link throughput mode
-        Pylon::CEnumParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode.c_str());
-        Pylon::CEnumParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode.c_str());
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            //cameras->operator[](i).Open();
+            //Set device link throughput mode
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode.c_str());
+        }
     }
     catch (const Pylon::GenericException &e)
     {
@@ -347,9 +350,12 @@ void StereoCameraBasler::enableDeviceLinkThroughputLimit(bool enable){
 void StereoCameraBasler::setDeviceLinkThroughput(int value){
     try
     {
-        //Set device link throughput limit
-        Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
-        Pylon::CIntegerParameter(cameras->operator[](1).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(100000000);
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            //cameras->operator[](i).Open();
+            //Set device link throughput limit
+            Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(value);
+        } 
     }
     catch (const Pylon::GenericException &e)
     {
@@ -381,6 +387,7 @@ bool StereoCameraBasler::setPacketDelay(int interPacketDelay)
 {
     try
     {
+        //Apply only to left camera as this should be the delay betwen left and right
         if (interPacketDelay >= 0){
             cameras->operator[](0).Open();
             Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "GevSCPD").SetValue(interPacketDelay);
@@ -531,6 +538,8 @@ bool StereoCameraBasler::enableTrigger(bool enable){
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
+            cameras->operator[](i).TriggerSource.SetValue(TriggerSource_Line1);
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSource").FromString("Line 1");
             Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").FromString(enable_str.c_str());
         }
         return true;
