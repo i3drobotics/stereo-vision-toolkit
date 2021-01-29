@@ -330,7 +330,7 @@ public:
         outValidDisparity = disparity_thresh;
     }
 
-    static double getHFOVFromQ(cv::Mat Q)
+    static float getHFOVFromQ(cv::Mat Q)
     {
         // Get horitonzal Field Of View of camera from Q matrix
         // Useful for reconstructing XYZ depth from Z only depth
@@ -346,13 +346,13 @@ public:
         // Fx is horizontal focal length of left camera (in pixels)
 
         // Extract focal length and principal point from Q
-        double fx = Q.at<double>(2, 3);
-        double cx = -Q.at<double>(0, 3);
+        float fx = Q.at<float>(2, 3);
+        float cx = -Q.at<float>(0, 3);
 
         // Calculate FOV
         // See here for explaination of the geometric reasoning
         // https://photo.stackexchange.com/questions/41273/how-to-calculate-the-fov-in-degrees-from-focal-length-or-distance
-        double fov_x = 2 * atan(cx / fx);
+        float fov_x = 2 * atan(cx / fx);
 
         // Return horizonal FOV in radians
         return fov_x;

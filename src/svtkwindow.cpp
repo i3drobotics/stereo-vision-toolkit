@@ -954,9 +954,9 @@ void SVTKWindow::updatePiper(){
                     stereo_cam->getQ(Q);
                     // extract Z only channel from depth (xyz) image
                     cv::split(depth, depth_split);
-                    depth_z = depth_split[0];
+                    depth_z = depth_split[2];
                     // get horizontal fov from Q matrix
-                    double hfov = CVSupport::getHFOVFromQ(Q);
+                    float hfov = CVSupport::getHFOVFromQ(Q);
                     // embed horizontal fov in top left pixel of z only depth image to simplify reconstruction
                     depth_z.at<float>(0,0) = (float)hfov;
                     if (!depth_z.empty() && !color.empty()){
@@ -965,7 +965,7 @@ void SVTKWindow::updatePiper(){
                         cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
                         // Create RGBD image from color image and z only depth image
                         if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16(color,depth_z,10.0,true);
+                            image_stream = CVSupport::createRGBD16(color,depth_z,200.0,false);
                         } else {
                             image_stream = CVSupport::createRGBD32(color,depth_z);
                         }
