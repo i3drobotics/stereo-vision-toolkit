@@ -432,10 +432,9 @@ bool StereoCameraBasler::setFPS(int val){
             for (size_t i = 0; i < cameras->GetSize(); ++i)
             {
                 cameras->operator[](i).Open();
-                if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
+                if (stereoCameraSettings_.isGige){
                     Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateAbs").SetValue(fps_f);
-                }
-                if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
+                } else {
                     Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRate").SetValue(fps_f);
                 }
             }
@@ -458,6 +457,7 @@ bool StereoCameraBasler::enableFPS(bool enable){
     {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
+            qDebug() << "AcquisitionFrameRateEnable: " << enable;
             cameras->operator[](i).Open();
             Pylon::CBooleanParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateEnable").SetValue(enable);
         }
@@ -481,10 +481,9 @@ bool StereoCameraBasler::setExposure(double val) {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
+            if (stereoCameraSettings_.isGige){
                 Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "ExposureTimeRaw").SetValue(exposure_i);
-            }
-            if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
+            } else {
                 Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "ExposureTime").SetValue(exposure_i);
             }
         }
@@ -503,6 +502,7 @@ bool StereoCameraBasler::setBinning(int val){
     try
     {
         if (val >= 1){
+            qDebug() << "Setting binning... " << val;
             for (size_t i = 0; i < cameras->GetSize(); ++i)
             {
                 cameras->operator[](i).Open();
@@ -535,6 +535,7 @@ bool StereoCameraBasler::enableTrigger(bool enable){
         if (enable){
             enable_str = "On";
         }
+        qDebug() << "Enable hardware trigger: " << enable_str.c_str();
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
@@ -560,10 +561,9 @@ bool StereoCameraBasler::setGain(int val) {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
+            if (stereoCameraSettings_.isGige){
                 Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "GainRaw").SetValue(gain_i);
-            }
-            if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
+            } else {
                 Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "Gain").SetValue(gain_i);
             }
         }

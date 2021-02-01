@@ -147,9 +147,9 @@ SVTKWindow::SVTKWindow(QWidget* parent)
 
     default_titania_basler_usb_init_settings.exposure = 5;
     default_titania_basler_usb_init_settings.gain = 0;
-    default_titania_basler_usb_init_settings.fps = 1;
+    default_titania_basler_usb_init_settings.fps = 10;
     default_titania_basler_usb_init_settings.binning = 1;
-    default_titania_basler_usb_init_settings.trigger = false;
+    default_titania_basler_usb_init_settings.trigger = true;
     default_titania_basler_usb_init_settings.hdr = -1;
     default_titania_basler_usb_init_settings.autoExpose = false;
     default_titania_basler_usb_init_settings.autoGain = false;
