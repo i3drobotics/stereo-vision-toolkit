@@ -58,6 +58,8 @@ private:
     ArduinoCommsCameraControl* camControl;
 
     bool hardware_triggered = false;
+    int lineStatusTimerId;
+    int lineStatusTimerDelay = 1000;
 
     Pylon::CInstantCameraArray *cameras;
     Pylon::CImageFormatConverter *formatConverter;
@@ -66,11 +68,13 @@ private:
     void getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth);
     void enableDeviceLinkThroughputLimit(bool enable);
     void setDeviceLinkThroughput(int value);
+    void getLineStatus(int line, bool &status_l, bool &status_r);
 
 protected:
     QFuture<void> future;
 
     bool getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_righ_image);
+    void timerEvent(QTimerEvent *event);
 };
 
 #endif //STEREOCAMERABASLER_H

@@ -156,6 +156,8 @@ bool StereoCameraBasler::openCamera(){
     setGain(gain);
     setPacketDelay(packet_delay);
 
+    lineStatusTimerId = startTimer(lineStatusTimerDelay);
+
     connected = true;
     return connected;
 }
@@ -306,6 +308,40 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::li
 
     //Pylon::PylonTerminate();
     return connected_serial_infos;
+}
+
+void StereoCameraBasler::timerEvent(QTimerEvent *event)
+{
+    if(event->timerId() == lineStatusTimerId) {
+        bool status_l, status_r;
+        getLineStatus(2,status_l,status_r);
+        //TODO enable this
+        //qDebug() << "Line Status.. (" << status_l << ", " << status_r << ")";
+    }
+}
+
+void StereoCameraBasler::getLineStatus(int line, bool &status_l, bool &status_r){
+    try
+    {
+        std::string line_str = "Line" + std::to_string(line); //LineX
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            cameras->operator[](0).Open();
+            Pylon::CEnumParameter(cameras->operator[](0).GetNodeMap().GetNode("LineSelector")).FromString(line_str.c_str());
+            //get device line status
+            if (i == 0){
+                status_l = Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "LineStatus").GetValue();;
+            } else if (i == 1){
+                status_r = Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "LineStatus").GetValue();;
+            }
+        }
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred whilst getting device line status." << std::endl
+                    << e.GetDescription() << std::endl;
+    }
 }
 
 void StereoCameraBasler::getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth)
@@ -754,4 +790,5 @@ bool StereoCameraBasler::closeCamera() {
 }
 
 StereoCameraBasler::~StereoCameraBasler() {
+    killTimer(lineStatusTimerId);
 }
