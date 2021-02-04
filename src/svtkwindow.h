@@ -60,6 +60,7 @@
     #include "stereocameravimba.h"
 #endif
 #include "stereocamerasupport.h"
+#include "cvsharedmemory.hpp"
 
 #include <disparityviewer.h>
 #include "calibratefromimagesdialog.h"
@@ -207,6 +208,7 @@ private:
 #ifdef WITH_PIPER
     Piper::ImageServer* imagePiperServer;
 #endif
+    cvSharedMemory* sharedMemoryInst;
     bool detection_enabled = false;
     bool streamer_enabled = false;
     bool piper_enabled = false;
@@ -326,6 +328,7 @@ public slots:
     void updatePiper(void);
     void enablePiper(bool);
     void piperInit(void);
+    void updateSharedMemory(void);
 #endif
     void enableDetection(bool);
     void configureDetection(void);

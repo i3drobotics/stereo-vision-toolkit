@@ -12,7 +12,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <abstractstereomatcher.h>
-#include <cvsupport.h>
+#include <cvsupport.hpp>
 
 namespace Ui {
 class DisparityViewer;

@@ -18,8 +18,8 @@
 #include <opencv2/cudawarping.hpp>
 #endif
 
-#include "cvsupport.h"
-#include "pclsupport.h"
+#include "cvsupport.hpp"
+#include "pclsupport.hpp"
 
 // Point Cloud Library
 #include <pcl/point_cloud.h>

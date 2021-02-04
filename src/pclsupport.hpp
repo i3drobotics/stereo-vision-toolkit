@@ -16,7 +16,7 @@
 #include <pcl/point_types.h>
 #include <pcl/filters/passthrough.h>
 #include <opencv2/opencv.hpp>
-#include "cvsupport.h"
+#include "cvsupport.hpp"
 
 /**
  * @brief Support class for using PCL

@@ -13,8 +13,8 @@ bool StereoCameraFromImage::openCamera(){
     std::string fname_l = stereoCameraSerialInfo_.left_camera_serial;
     std::string fname_r = stereoCameraSerialInfo_.right_camera_serial;
 
-    left_raw = cv::imread(fname_l,cv::IMREAD_UNCHANGED);
-    right_raw = cv::imread(fname_r,cv::IMREAD_UNCHANGED);
+    left_raw = cv::imread(fname_l,cv::IMREAD_COLOR);
+    right_raw = cv::imread(fname_r,cv::IMREAD_COLOR);
 
     //TODO check image files exist
 

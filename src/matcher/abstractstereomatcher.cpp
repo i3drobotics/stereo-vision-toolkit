@@ -20,18 +20,26 @@ void AbstractStereoMatcher::assignThread(QThread *thread) {
 void AbstractStereoMatcher::convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_bgr_conv_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img) {
     cv::Mat right_tmp, left_tmp, left_bgr_tmp;
 
-    if (left_img.type() == CV_8UC3){
+    if (left_img.type() == CV_8UC1){
+        left_img.copyTo(left_bgr_tmp);
+        left_img.copyTo(left_tmp);
+    } else if (left_img.type() == CV_8UC3){
         left_img.copyTo(left_bgr_tmp);
         cv::cvtColor(left_bgr_tmp,left_tmp,cv::COLOR_BGR2GRAY);
         left_tmp.convertTo(left_tmp, CV_8UC1);
     } else {
+        std::cerr << "Unknown image type in left image for stereo matching: " << left_img.type() << ". Expected CV_8U1 or CV_8UC3" << std::endl;
         left_img.copyTo(left_bgr_tmp);
         left_img.copyTo(left_tmp);
     }
-    if (right_img.type() == CV_8UC3){
+
+    if (right_img.type() == CV_8UC1){
+        right_img.copyTo(right_tmp);
+    } else if (right_img.type() == CV_8UC3){
         cv::cvtColor(right_img,right_tmp,cv::COLOR_BGR2GRAY);
         right_tmp.convertTo(right_tmp, CV_8UC1);
     } else {
+        std::cerr << "Unknown image type in right image for stereo matching: " << right_img.type() << ". Expected CV_8U1 or CV_8UC3" << std::endl;
         right_img.copyTo(right_tmp);
     }
 

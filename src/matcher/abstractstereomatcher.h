@@ -21,7 +21,7 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
-#include "cvsupport.h"
+#include "cvsupport.hpp"
 
 //!  Stereo matcher base class
 /*!

@@ -209,8 +209,9 @@ HEADERS += \
     calibrationdialog.h \
     asmopencv.h \
     abstractarduinocoms.h \
-    cvsupport.h \
-    pclsupport.h \
+    cvsupport.hpp \
+    pclsupport.hpp \
+    cvsharedmemory.hpp \
     pylonsupport.h \
     boundingbox.h \
     detectoropencv.h \

@@ -1,5 +1,5 @@
 /*!
- * @file cvsupport.h
+ * @file cvsupport.hpp
  * @authors Ben Knight (bknight@i3drobotics.com)
  * @brief Support class for using openCV
  * @version 1.3
