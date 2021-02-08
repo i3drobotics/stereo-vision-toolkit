@@ -201,8 +201,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>310</width>
-                    <height>201</height>
+                    <width>126</width>
+                    <height>63</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -779,7 +779,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_11">
              <item>
-              <layout class="QGridLayout" name="gridLayoutAppSettings" columnstretch="0,0,0">
+              <layout class="QGridLayout" name="gridLayoutAppSettings" columnstretch="0,0,0" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
                <property name="leftMargin">
                 <number>5</number>
                </property>
@@ -795,6 +795,62 @@
                <property name="verticalSpacing">
                 <number>5</number>
                </property>
+               <item row="7" column="0">
+                <widget class="QLabel" name="lblSharedMemSettings">
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Shared Memory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="16" column="0">
+                <spacer name="horizontalSpacer_9">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="1">
+                <widget class="QCheckBox" name="toggleSwapLeftRight">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Swap</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="lblVideoSource">
+                 <property name="text">
+                  <string>Source</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="lblVideoSettings">
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
                <item row="6" column="1">
                 <widget class="QCheckBox" name="checkBoxVideoUseRectified">
                  <property name="text">
@@ -805,79 +861,21 @@
                  </property>
                 </widget>
                </item>
-               <item row="13" column="0">
-                <widget class="QLabel" name="lblPiperPacketSize">
-                 <property name="text">
-                  <string>Packet size</string>
+               <item row="8" column="1">
+                <widget class="QComboBox" name="comboBoxSharedMemSource">
+                 <property name="currentIndex">
+                  <number>0</number>
                  </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="22" column="1">
-                <spacer name="horizontalSpacer_10">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="22" column="2">
-                <spacer name="horizontalSpacer_11">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="13" column="1">
-                <widget class="QSpinBox" name="spinBoxPipePacketSize">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="minimum">
-                  <number>2</number>
-                 </property>
-                 <property name="maximum">
-                  <number>1073741824</number>
-                 </property>
-                 <property name="value">
-                  <number>4194304</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="9" column="0">
-                <widget class="QLabel" name="lblPort">
-                 <property name="text">
-                  <string>Port</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="9" column="1">
-                <widget class="QSpinBox" name="spinBoxStreamPort">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="maximum">
-                  <number>9999</number>
-                 </property>
-                 <property name="value">
-                  <number>8000</number>
-                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Stereo</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>RGBD</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item row="0" column="0">
@@ -887,54 +885,18 @@
                  </property>
                 </widget>
                </item>
-               <item row="15" column="0">
-                <widget class="QLabel" name="lblPipeName">
+               <item row="2" column="0">
+                <widget class="QLabel" name="lblImageEpipolar">
                  <property name="text">
-                  <string>Pipe name</string>
+                  <string>Epipolar</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="lblSwapLR">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string>Swap LR</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="0">
-                <widget class="QLabel" name="lblVideoUseRectified">
-                 <property name="text">
-                  <string>Use rectified</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="24" column="1">
-                <spacer name="verticalSpacer_4">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
                </item>
                <item row="3" column="1">
-                <widget class="QSpinBox" name="spinBoxDownsample">
+                <widget class="QSpinBox" name="spinBoxImageDownsample">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -958,32 +920,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="10" column="1">
-                <widget class="QComboBox" name="comboBoxStreamerSource">
-                 <item>
-                  <property name="text">
-                   <string>Stereo</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Left</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Right</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Disparity</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="14" column="0">
-                <widget class="QLabel" name="lblPipeUseRectified">
+               <item row="6" column="0">
+                <widget class="QLabel" name="lblVideoUseRectified">
                  <property name="text">
                   <string>Use rectified</string>
                  </property>
@@ -992,58 +930,15 @@
                  </property>
                 </widget>
                </item>
-               <item row="17" column="0">
-                <widget class="QLabel" name="label">
+               <item row="2" column="1">
+                <widget class="QCheckBox" name="checkBoxShowEpipolar">
                  <property name="text">
-                  <string>Downsample</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="0">
-                <widget class="QLabel" name="lblVideoSource">
-                 <property name="text">
-                  <string>Source</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="11" column="0">
-                <widget class="QLabel" name="lblStreamerUseRectified">
-                 <property name="text">
-                  <string>Use rectified</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="8" column="1">
-                <widget class="QLineEdit" name="txtStreamerHostIP">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>127.0.0.1</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="16" column="0">
-                <widget class="QLabel" name="lblPipeSource">
-                 <property name="text">
-                  <string>Source</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  <string>Show</string>
                  </property>
                 </widget>
                </item>
                <item row="3" column="0">
-                <widget class="QLabel" name="lblDownsample">
+                <widget class="QLabel" name="lblImageDownsample">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -1055,25 +950,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="lblVideoSettings">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Video&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="14" column="1">
-                <widget class="QCheckBox" name="checkBoxPiperUseRectified">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="22" column="0">
-                <spacer name="horizontalSpacer_9">
+               <item row="16" column="1">
+                <spacer name="horizontalSpacer_10">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -1084,60 +962,6 @@
                   </size>
                  </property>
                 </spacer>
-               </item>
-               <item row="8" column="0">
-                <widget class="QLabel" name="lblHostIP">
-                 <property name="text">
-                  <string>Host IP</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="15" column="1" colspan="2">
-                <widget class="QLineEdit" name="txtPipeName">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>i3dr_image_pipe</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="12" column="0">
-                <widget class="QLabel" name="lblPipeSettings">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pipe&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="2">
-                <widget class="QCheckBox" name="toggleCalibrationDownsample">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>Calibration</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="0">
-                <widget class="QLabel" name="lblStreamerSettings">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Stream&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="10" column="0">
-                <widget class="QLabel" name="lblStreamerSource">
-                 <property name="text">
-                  <string>Source</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
                </item>
                <item row="5" column="1">
                 <widget class="QComboBox" name="comboBoxVideoSource">
@@ -1163,64 +987,67 @@
                  </item>
                 </widget>
                </item>
-               <item row="11" column="1">
-                <widget class="QCheckBox" name="checkBoxStreamerUseRectified">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="17" column="1">
-                <widget class="QSpinBox" name="spinBoxPipeDownsample">
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>10</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QCheckBox" name="toggleSwapLeftRight">
+               <item row="1" column="0">
+                <widget class="QLabel" name="lblSwapLR">
                  <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Swap</string>
-                 </property>
-                 <property name="checkable">
                   <bool>true</bool>
                  </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QCheckBox" name="checkBoxShowEpipolar">
                  <property name="text">
-                  <string>Show</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Epipolar</string>
+                  <string>Swap LR</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
-               <item row="18" column="0">
-                <widget class="QLabel" name="label_3">
+               <item row="8" column="0">
+                <widget class="QLabel" name="lblSharedMemSource">
+                 <property name="text">
+                  <string>Source</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="17" column="1">
+                <spacer name="verticalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="3" column="2">
+                <widget class="QCheckBox" name="toggleCalibrationDownsample">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Calibration</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="16" column="2">
+                <spacer name="horizontalSpacer_11">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="11" column="0">
+                <widget class="QLabel" name="lblSharedMemBitDepth">
                  <property name="text">
                   <string>Bit depth</string>
                  </property>
@@ -1229,8 +1056,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="18" column="1">
-                <widget class="QCheckBox" name="checkBox16">
+               <item row="11" column="1">
+                <widget class="QCheckBox" name="checkBoxSharedMem16bit">
                  <property name="text">
                   <string>16bit</string>
                  </property>
@@ -1239,41 +1066,84 @@
                  </property>
                 </widget>
                </item>
-               <item row="16" column="1">
-                <widget class="QComboBox" name="comboBoxPiperSource">
-                 <property name="currentIndex">
-                  <number>4</number>
+               <item row="12" column="0">
+                <widget class="QLabel" name="lblSharedMemMap">
+                 <property name="text">
+                  <string>Map name</string>
                  </property>
-                 <item>
-                  <property name="text">
-                   <string>Stereo</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Left</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Right</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Disparity</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>RGBD</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>RGBDisp</string>
-                  </property>
-                 </item>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="12" column="1" colspan="2">
+                <widget class="QLineEdit" name="txtSharedMemMap">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>opencv_unity_buffer</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="13" column="0">
+                <widget class="QLabel" name="lblSharedMemMutex">
+                 <property name="text">
+                  <string>Mutex name</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="13" column="1" colspan="2">
+                <widget class="QLineEdit" name="txtSharedMemMutex">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>opencv_unity_mutex</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="0">
+                <widget class="QLabel" name="lblSharedMemUseRectified">
+                 <property name="text">
+                  <string>Use rectified</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="0">
+                <widget class="QLabel" name="lblSharedMemDownsample">
+                 <property name="text">
+                  <string>Downsample</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="1">
+                <widget class="QSpinBox" name="spinBoxSharedMemDownsample">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>10</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="1">
+                <widget class="QCheckBox" name="checkBoxSharedMemUseRectified">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -2419,41 +2289,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="enableStreamer">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Streamer</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>25</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="enablePiper">
+       <widget class="QPushButton" name="enableSharedMem">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>

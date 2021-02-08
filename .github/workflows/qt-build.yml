@@ -36,7 +36,7 @@ jobs:
               call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
               mkdir build
               cd build
-              qmake.exe ../stereo_vision_toolkit.pro -spec win32-msvc "CONFIG+=qtquickcompiler CONFIG+=DEV_BRANCH CONFIG+=WITH_PIPER CONFIG+=WITH_VIMBA CONFIG+=WITH_I3DRSGM"
+              qmake.exe ../stereo_vision_toolkit.pro -spec win32-msvc "CONFIG+=qtquickcompiler CONFIG+=DEV_BRANCH CONFIG+=WITH_VIMBA CONFIG+=WITH_I3DRSGM"
               jom.exe
           - name: Build Installer
             working-directory: installer

@@ -34,8 +34,6 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     cam_thread = new QThread;
     device_list_timer = new QTimer(this);
 
-    sharedMemoryInst = new cvSharedMemory();
-
     // define default settings for cameras
     // if the camera does not use the setting then should be set to -1
     // TODO replace this by reading current value from camera
@@ -270,21 +268,9 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     pointCloudInit();
     setupMatchers();
     detectionInit();
-#ifdef WITH_STEREO_STREAMER
-    streamerInit();
-#else
-    // hide streamer button from interface
-    ui->enableStreamer->setVisible(false);
-#endif
-#ifdef WITH_PIPER
-    piperInit();
-    ui->spinBoxPipePacketSize->setEnabled(true);
-    ui->comboBoxPiperSource->setEnabled(true);
-    ui->checkBoxPiperUseRectified->setEnabled(true);
-#else
-    // hide piper button from interface
-    ui->enablePiper->setVisible(false);
-#endif
+
+    // Initalise shared memory class
+    sharedMemoryInst = new cvSharedMemory();
 
     hideCameraSettings(false);
 
@@ -326,16 +312,15 @@ void SVTKWindow::checkUpdates(){
 void SVTKWindow::disableWindow(){
     ui->toggleSwapLeftRight->setDisabled(true);
     ui->toggleCalibrationDownsample->setDisabled(true);
-    ui->spinBoxDownsample->setDisabled(true);
-    ui->spinBoxPipeDownsample->setDisabled(true);
+    ui->spinBoxImageDownsample->setDisabled(true);
+    ui->spinBoxSharedMemDownsample->setDisabled(true);
     ui->tabWidget->setDisabled(true);
     ui->tabCameraSettings->setDisabled(true);
     ui->tabApplicationSettings->setDisabled(true);
     ui->matcherSelectBox->setDisabled(true);
     ui->enableStereo->setDisabled(true);
     ui->enableDetection->setDisabled(true);
-    ui->enableStreamer->setDisabled(true);
-    ui->enablePiper->setDisabled(true);
+    ui->enableSharedMem->setDisabled(true);
 
     ui->captureButton->setDisabled(true);
     ui->singleShotButton->setDisabled(true);
@@ -352,21 +337,17 @@ void SVTKWindow::enableWindow(){
 
     ui->toggleSwapLeftRight->setEnabled(true);
     ui->toggleCalibrationDownsample->setEnabled(true);
-    ui->spinBoxDownsample->setEnabled(true);
-    ui->spinBoxPipeDownsample->setEnabled(true);
+    ui->spinBoxImageDownsample->setEnabled(true);
+    ui->spinBoxSharedMemDownsample->setEnabled(true);
     ui->tabWidget->setEnabled(true);
     ui->tabCameraSettings->setEnabled(true);
     ui->tabApplicationSettings->setEnabled(true);
     ui->matcherSelectBox->setEnabled(true);
 
     //ui->enableDetection->setEnabled(true);
-#ifdef WITH_STEREO_STREAMER
-    ui->enableStreamer->setEnabled(true);
-#endif
-#ifdef WITH_PIPER
-    ui->enablePiper->setEnabled(true);
-    ui->txtPipeName->setEnabled(true);
-#endif
+    ui->enableSharedMem->setEnabled(true);
+    ui->txtSharedMemMap->setEnabled(true);
+    ui->txtSharedMemMutex->setEnabled(true);
     ui->captureButton->setEnabled(true);
     ui->singleShotButton->setEnabled(true);
     //ui->saveButton->setEnabled(false);
@@ -442,8 +423,7 @@ void SVTKWindow::controlsInit(void) {
     ui->singleShotButton->setIcon(awesome->icon(fa::camera, icon_options));
     ui->enableStereo->setIcon(awesome->icon(fa::cubes, icon_options));
     ui->enableDetection->setIcon(awesome->icon(fa::eye, icon_options));
-    ui->enableStreamer->setIcon(awesome->icon(fa::wifi, icon_options));
-    ui->enablePiper->setIcon(awesome->icon(fa::exchange, icon_options)); //TODO choose good piper icon
+    ui->enableSharedMem->setIcon(awesome->icon(fa::exchange, icon_options)); //TODO choose good shared memory icon
     ui->toggleVideoButton->setIcon(awesome->icon(fa::videocamera, icon_options));
 
     connect(ui->actionLoad_Stereo_Video, SIGNAL(triggered(bool)), this,
@@ -485,91 +465,49 @@ void SVTKWindow::enableDetection(bool enable){
     detection_enabled = enable;
 }
 
-#ifdef WITH_STEREO_STREAMER
-void SVTKWindow::enableStreamer(bool enable){
-    if (!stereo_cam){
-        enable = false;
-    }
-    streamer_enabled = enable;
-    if (enable){
-        if (ui->comboBoxStreamerSource->currentIndex() == 3){ //disparity
-            connect(stereo_cam, SIGNAL(matched()), this, SLOT(updateStreamer()));
-        } else {
-            connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
-        }
-        stereoStreamerServer->startServer();
-    } else {
-        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateStreamer()));
-        disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updateStreamer()));
-        //stereoStreamerClient->stopClient();
-        stereoStreamerServer->stopServer();
-    }
-    ui->txtStreamerHostIP->setEnabled(!enable);
-    ui->spinBoxStreamPort->setEnabled(!enable);
-    ui->comboBoxStreamerSource->setEnabled(!enable);
-    ui->checkBoxStreamerUseRectified->setEnabled(!enable);
-}
-#endif
-#ifdef WITH_PIPER
-void SVTKWindow::enablePiper(bool enable){
+void SVTKWindow::enableSharedMemory(bool enable){
     if (!stereo_cam){
         enable = false;
     }
     if (enable){
-        if (ui->comboBoxPiperSource->currentIndex() == 3 || ui->comboBoxPiperSource->currentIndex() == 4){ //disparity or rgbd
-            connect(stereo_cam, SIGNAL(matched()), this, SLOT(updatePiper()));
+        std::string mapname = ui->txtSharedMemMap->text().toStdString();
+        std::string mutexname = ui->txtSharedMemMutex->text().toStdString();
+        if (ui->comboBoxSharedMemSource->currentText() == "RGBD"){
             connect(stereo_cam, SIGNAL(matched()), this, SLOT(updateSharedMemory()));
-            // initalise shared memory
+            // clear shared memory if open
             if (sharedMemoryInst->isOpen()){
                 sharedMemoryInst->close();
             }
-            if (ui->checkBox16->isChecked()){
-                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(int), CV_16UC4);
+            if (ui->checkBoxSharedMem16bit->isChecked()){
+                // create shared memory file to store 4 channel rgbd image with element size 4*integer size
+                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(int), CV_16UC4, mapname, mutexname);
             } else {
-                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(float), CV_32FC4);
+                // create shared memory file to store 4 channel rgbd image with element size 4*float size
+                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(float), CV_32FC4, mapname, mutexname);
             }
         } else {
-            connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
             connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateSharedMemory()));
-            // initalise shared memory
+            // clear shared memory if open
             if (sharedMemoryInst->isOpen()){
                 sharedMemoryInst->close();
             }
-            sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 3, 3*sizeof(unsigned char), CV_8UC3);
+            // create shared memory file to store 3 channel rgb image with element size 3*uchar size
+            sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 3, 3*sizeof(unsigned char), CV_8UC3, mapname, mutexname);
         }
-        //start piper server
-        //imagePiperServer->setPipeName(ui->txtPipeName->text().toStdString());
-        //imagePiperServer->setPacketSize(ui->spinBoxPipePacketSize->value());
-        //imagePiperServer->openThreaded();
-        /*
-        QProgressDialog progressPCI("Waiting for connection to client...", "", 0, 100, this);
-        progressPCI.setWindowTitle("SVT");
-        progressPCI.setWindowModality(Qt::WindowModal);
-        progressPCI.setCancelButton(nullptr);
-        progressPCI.setMinimumDuration(0);
-        progressPCI.setValue(0);
-        progressPCI.setMaximum(0);
-        progressPCI.setMinimum(0);
-        progressPCI.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-        QCoreApplication::processEvents();
-        while(!imagePiperServer->isOpen()){
-            QCoreApplication::processEvents();
-        }
-        */
     } else {
-        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updatePiper()));
-        disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updatePiper()));
-        //stop piper server
-        //imagePiperServer->close();
+        disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateSharedMemory()));
+        disconnect(stereo_cam, SIGNAL(matched()), this, SLOT(updateSharedMemory()));
+        //stop shared memory server
         sharedMemoryInst->close();
     }
-    piper_enabled = enable;
-    ui->txtPipeName->setEnabled(!enable);
-    ui->spinBoxPipePacketSize->setEnabled(!enable);
-    ui->comboBoxPiperSource->setEnabled(!enable);
-    ui->checkBoxPiperUseRectified->setEnabled(!enable);
+    shared_memory_enabled = enable;
+    ui->txtSharedMemMap->setEnabled(!enable);
+    ui->txtSharedMemMutex->setEnabled(!enable);
+    ui->comboBoxSharedMemSource->setEnabled(!enable);
+    ui->checkBoxSharedMemUseRectified->setEnabled(!enable);
+    ui->checkBoxSharedMem16bit->setEnabled(!enable);
+    ui->spinBoxSharedMemDownsample->setEnabled(!enable);
 }
-#endif
 
 void SVTKWindow::detectionInit(){
     qDebug() << "Initialising detector...";
@@ -611,32 +549,6 @@ void SVTKWindow::detectionInit(){
 
     qDebug() << "Detector initalisation complete.";
 }
-
-#ifdef WITH_STEREO_STREAMER
-void SVTKWindow::streamerInit(){
-    // TODO: add streamer settings to UI
-    //stereoStreamerSettings = new StereoStreamerSettings();
-    //ui->gridLayoutAppSettings->addWidget(stereoStreamerSettings,ui->gridLayoutAppSettings->rowCount()-1,0,1,2);
-
-    std::string ip = ui->txtStreamerHostIP->text().toStdString();
-    std::string port = QString::number(ui->spinBoxStreamPort->value()).toStdString();
-    stereoStreamerServer = new StereoStreamer2::Server(ip,port);
-    //stereoStreamerClient = new StereoStreamer2::Client(ip,port);
-    QThread* streamerServerThread = new QThread;
-    //QThread* streamerClientThread = new QThread;
-    stereoStreamerServer->assignThread(streamerServerThread);
-    //stereoStreamerClient->assignThread(streamerClientThread);
-}
-#endif
-
-#ifdef WITH_PIPER
-void SVTKWindow::piperInit(){
-    ui->checkBox16->setVisible(true);
-    std::string pipename = ui->txtPipeName->text().toStdString();
-    int packetsize = ui->spinBoxPipePacketSize->value();
-    imagePiperServer = new Piper::ImageServer(pipename,packetsize);
-}
-#endif
 
 void SVTKWindow::configureDetection(){
     if(object_detector == nullptr) return;
@@ -839,211 +751,6 @@ void SVTKWindow::setClassFilled(QString class_name, bool fill){
     if(fill)
         qDebug() << "Setting " << class_name << " class to be filled";
 }
-
-#ifdef WITH_STEREO_STREAMER
-void SVTKWindow::updateStreamer(){
-    if(!stereoStreamerServer) return;
-    //if(!stereoStreamerClient) return;
-
-    if (this->streaming)
-        return;
-
-    this->streaming = true;
-
-    if (streamer_enabled){
-        bool isFloatImage = false;
-        bool useRectified = ui->checkBoxStreamerUseRectified->isChecked();
-        // Select image source
-        int source_index = ui->comboBoxStreamerSource->currentIndex();
-        switch(source_index) {
-        case 0: // stereo
-            if (useRectified){
-                cv::hconcat(stereo_cam->getLeftImage(), stereo_cam->getRightImage(), image_stream);
-            } else {
-                cv::hconcat(stereo_cam->getLeftRawImage(), stereo_cam->getRightRawImage(), image_stream);
-            }
-            break;
-        case 1: // left
-            if (useRectified){
-                stereo_cam->getLeftImage(image_stream);
-            } else {
-                stereo_cam->getLeftRawImage(image_stream);
-            }
-            break;
-        case 2: // right
-            if (useRectified){
-                stereo_cam->getRightImage(image_stream);
-            } else {
-                stereo_cam->getRightRawImage(image_stream);
-            }
-            break;
-        case 3: // disparity
-            if (stereo_cam->isMatching()){
-                isFloatImage = true;
-                stereo_cam->getDisparity(image_stream);
-            } else {
-                image_stream = cv::Mat();
-            }
-            break;
-        }
-
-        if(image_stream.empty()){
-            qDebug() << "Empty image passed to streamer";
-            return;
-        }
-        if (isFloatImage){
-            stereoStreamerServer->sendImageThreaded(image_stream);
-        } else {
-            stereoStreamerServer->sendStringMessage("test");
-            //stereoStreamerServer->sendUCharImageThreaded(image_stream);
-        }
-    }
-    this->streaming = false;
-}
-#endif
-
-#ifdef WITH_PIPER
-void SVTKWindow::updatePiper(){
-    if(!imagePiperServer) return; // server object missing
-    if(!imagePiperServer->isOpen()){
-        //qDebug() << "Pipe is not open";
-        return; // server not open
-    }
-    if(imagePiperServer->isSendThreadBusy()){
-        //qDebug() << "Pipe busy sending";
-        return; // already busy sending
-    }
-
-    if (this->pipping)
-        return;
-
-    this->pipping = true;
-
-    if (piper_enabled){
-        //qDebug() << "Getting source image...";
-        bool useRectified = ui->checkBoxPiperUseRectified->isChecked();
-        // Select image source
-        int source_index = ui->comboBoxPiperSource->currentIndex();
-        cv::Mat left_t, right_t;
-        cv::Mat wImage, Q;
-        double pipe_downsample_factor = (double)ui->spinBoxPipeDownsample->value();
-        double camera_downsample_factor = (double)ui->spinBoxDownsample->value();
-        double pipe_downsample_rate = 1.0f/pipe_downsample_factor;
-        switch(source_index) {
-            case 0: // stereo
-                if (useRectified){
-                    stereo_cam->getLeftImage(left_t);
-                    stereo_cam->getRightImage(right_t);
-                } else {
-                    stereo_cam->getLeftRawImage(left_t);
-                    stereo_cam->getRightRawImage(right_t);
-                }
-                cv::hconcat(left_t, right_t, image_stream);
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 1: // left
-                if (useRectified){
-                    stereo_cam->getLeftImage(image_stream);
-                } else {
-                    stereo_cam->getLeftRawImage(image_stream);
-                }
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 2: // right
-                if (useRectified){
-                    stereo_cam->getRightImage(image_stream);
-                } else {
-                    stereo_cam->getRightRawImage(image_stream);
-                }
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 3: // disparity
-                if (stereo_cam->isMatching()){
-                    //qDebug() << "Getting disparity from stereo cam...";
-                    stereo_cam->getDisparity(image_stream);
-                } else {
-                    image_stream = cv::Mat();
-                }
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 4: // rgbd
-                if (stereo_cam->isMatching()){
-                    cv::Mat color, Q, depth, depth_z, depth_split[3];
-                    stereo_cam->getLeftMatchImage(color);
-                    stereo_cam->getDepth(depth);
-                    stereo_cam->getQ(Q);
-                    // extract Z only channel from depth (xyz) image
-                    cv::split(depth, depth_split);
-                    depth_z = depth_split[2];
-                    // get horizontal fov from Q matrix
-                    float hfov = CVSupport::getHFOVFromQ(Q);
-                    // embed horizontal fov in top left pixel of z only depth image to simplify reconstruction
-                    depth_z.at<float>(0,0) = (float)hfov;
-                    if (!depth_z.empty() && !color.empty()){
-                        // Downsample images based on parameters
-                        cv::resize(depth_z, depth_z, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
-                        cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                        // Create RGBD image from color image and z only depth image
-                        if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16(color,depth_z,200.0,false);
-                        } else {
-                            image_stream = CVSupport::createRGBD32(color,depth_z);
-                        }
-                    } else {
-                        std::cerr << "Disparity image or camera image is empty." << std::endl;
-                    }
-                } else {
-                    image_stream = cv::Mat();
-                }
-                break;
-            case 5: // rgbdisp
-                if (stereo_cam->isMatching()){
-                    cv::Mat color, disp;
-                    stereo_cam->getLeftMatchImage(color);
-                    stereo_cam->getDisparityFiltered(disp);
-                    if (!disp.empty() && !color.empty()){
-                        // Downsample image based on parameters
-                        cv::resize(disp, disp, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
-                        cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                        // Create RGBD image from color image and disparity image
-                        if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16(color,disp,10.0,true);
-                        } else {
-                            image_stream = CVSupport::createRGBD32(color,disp);
-                        }
-                    } else {
-                        std::cerr << "Disparity image or camera image is empty." << std::endl;
-                    }
-                } else {
-                    image_stream = cv::Mat();
-                }
-                break;
-        }
-
-        if(image_stream.empty()){
-            qDebug() << "Empty image passed to piper";
-            return;
-        }
-
-
-        bool send_threaded = true;
-        if (send_threaded){
-            imagePiperServer->sendImageThreaded(image_stream);
-        } else {
-            bool res = imagePiperServer->sendImage(image_stream);
-            if (!res){
-                ui->enablePiper->setChecked(false);
-                enablePiper(false);
-                QMessageBox msg;
-                msg.setText("Failed to send data over pipe. Closing pipe.");
-                msg.exec();
-            }
-        }
-    }
-    this->pipping = false;
-    //QCoreApplication::processEvents();
-}
-#endif
 
 void SVTKWindow::updateDetection(){
 
@@ -1571,21 +1278,15 @@ void SVTKWindow::stereoCameraInitConnections(void) {
             SLOT(enableMatching(bool)));
     connect(ui->enableDetection, SIGNAL(clicked(bool)), this,
             SLOT(enableDetection(bool)));
-#ifdef WITH_STEREO_STREAMER
-    connect(ui->enableStreamer, SIGNAL(clicked(bool)), this,
-            SLOT(enableStreamer(bool)));
-#endif
-#ifdef WITH_PIPER
-    connect(ui->enablePiper, SIGNAL(clicked(bool)), this,
-            SLOT(enablePiper(bool)));
-#endif
+    connect(ui->enableSharedMem, SIGNAL(clicked(bool)), this,
+            SLOT(enableSharedMemory(bool)));
     connect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
             SLOT(enableRectify(bool)));
     connect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
             SLOT(enableSwapLeftRight(bool)));
     connect(ui->toggleCalibrationDownsample, SIGNAL(clicked(bool)), stereo_cam,
             SLOT(enableDownsampleCalibration(bool)));
-    connect(ui->spinBoxDownsample, SIGNAL(valueChanged(int)), stereo_cam,
+    connect(ui->spinBoxImageDownsample, SIGNAL(valueChanged(int)), stereo_cam,
             SLOT(setDownsampleFactor(int)));
     connect(stereo_cam, SIGNAL(matched()), disparity_view,
             SLOT(updateDisparityAsync(void)));
@@ -1618,160 +1319,87 @@ void SVTKWindow::stereoCameraInitConnections(void) {
 }
 
 void SVTKWindow::updateSharedMemory(){
-    if (piper_enabled){
+    if (shared_memory_enabled){
         //qDebug() << "Getting source image...";
-        bool useRectified = ui->checkBoxPiperUseRectified->isChecked();
+        bool useRectified = ui->checkBoxSharedMemUseRectified->isChecked();
         // Select image source
-        int source_index = ui->comboBoxPiperSource->currentIndex();
+        int source_index = ui->comboBoxSharedMemSource->currentIndex();
         cv::Mat left_t, right_t;
         cv::Mat wImage, Q;
-        double pipe_downsample_factor = (double)ui->spinBoxPipeDownsample->value();
-        double pipe_downsample_rate = 1.0f/pipe_downsample_factor;
-        switch(source_index) {
-            case 0: // stereo
-                if (useRectified){
-                    stereo_cam->getLeftImage(left_t);
-                    stereo_cam->getRightImage(right_t);
-                } else {
-                    stereo_cam->getLeftRawImage(left_t);
-                    stereo_cam->getRightRawImage(right_t);
-                }
-                // convert image to rgb
-                if (left_t.type() == CV_8UC1){
-                    cvtColor(left_t,left_t,CV_GRAY2RGB);
-                } else if (left_t.type() == CV_8UC3){
-                    cvtColor(left_t,left_t,CV_BGR2RGB);
-                } else {
-                    std::cerr << "Invalid image type for shared memory" << std::endl;
-                }
-                if (right_t.type() == CV_8UC1){
-                    cvtColor(right_t,right_t,CV_GRAY2RGB);
-                } else if (right_t.type() == CV_8UC3){
-                    cvtColor(right_t,right_t,CV_BGR2RGB);
-                } else {
-                    std::cerr << "Invalid image type for shared memory" << std::endl;
-                }
-                cv::hconcat(left_t, right_t, image_stream);
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 1: // left
-                if (useRectified){
-                    stereo_cam->getLeftImage(image_stream);
-                } else {
-                    stereo_cam->getLeftRawImage(image_stream);
-                }
-                // convert image to rgb
-                if (image_stream.type() == CV_8UC1){
-                    cvtColor(image_stream,image_stream,CV_GRAY2RGB);
-                } else if (image_stream.type() == CV_8UC3){
-                    cvtColor(image_stream,image_stream,CV_BGR2RGB);
-                } else {
-                    std::cerr << "Invalid image type for shared memory" << std::endl;
-                }
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 2: // right
-                if (useRectified){
-                    stereo_cam->getRightImage(image_stream);
-                } else {
-                    stereo_cam->getRightRawImage(image_stream);
-                }
-                // convert image to rgb
-                if (image_stream.type() == CV_8UC1){
-                    cvtColor(image_stream,image_stream,CV_GRAY2RGB);
-                } else if (image_stream.type() == CV_8UC3){
-                    cvtColor(image_stream,image_stream,CV_BGR2RGB);
-                } else {
-                    std::cerr << "Invalid image type for shared memory" << std::endl;
-                }
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 3: // disparity
-                if (stereo_cam->isMatching()){
-                    //qDebug() << "Getting disparity from stereo cam...";
-                    stereo_cam->getDisparity(image_stream);
-                } else {
-                    image_stream = cv::Mat();
-                }
-                cv::resize(image_stream, image_stream, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                break;
-            case 4: // rgbd
-                if (stereo_cam->isMatching()){
-                    cv::Mat color, Q, depth, depth_z, depth_split[3];
-                    stereo_cam->getLeftMatchImage(color);
-                    stereo_cam->getDepth(depth);
-                    stereo_cam->getQ(Q);
-                    // extract Z only channel from depth (xyz) image
-                    cv::split(depth, depth_split);
-                    depth_z = depth_split[2];
-                    // get horizontal fov from Q matrix
-                    float hfov = CVSupport::getHFOVFromQ(Q);
-                    // embed horizontal fov in top left pixel of z only depth image to simplify reconstruction
-                    depth_z.at<float>(0,0) = (float)hfov;
-                    if (!depth_z.empty() && !color.empty()){
-                        // convert image to rgb
-                        if (color.type() == CV_8UC1){
-                            cvtColor(color,color,CV_GRAY2RGB);
-                        } else if (color.type() == CV_8UC3){
-                            cvtColor(color,color,CV_BGR2RGB);
-                        } else {
-                            std::cerr << "Invalid image type for shared memory" << std::endl;
-                        }
-                        // Downsample images based on parameters
-                        cv::resize(depth_z, depth_z, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
-                        cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                        // Create RGBD image from color image and z only depth image
-                        if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16(color,depth_z,200.0,false);
-                        } else {
-                            image_stream = CVSupport::createRGBD32(color,depth_z);
-                        }
+        double downsample_rate = 1.0f/(double)ui->spinBoxSharedMemDownsample->value();
+        if (ui->comboBoxSharedMemSource->currentText() == "Stereo"){
+            if (useRectified){
+                stereo_cam->getLeftImage(left_t);
+                stereo_cam->getRightImage(right_t);
+            } else {
+                stereo_cam->getLeftRawImage(left_t);
+                stereo_cam->getRightRawImage(right_t);
+            }
+            // convert image to rgb
+            if (left_t.type() == CV_8UC1){
+                cvtColor(left_t,left_t,CV_GRAY2RGB);
+            } else if (left_t.type() == CV_8UC3){
+                cvtColor(left_t,left_t,CV_BGR2RGB);
+            } else {
+                std::cerr << "Invalid image type for shared memory" << std::endl;
+            }
+            if (right_t.type() == CV_8UC1){
+                cvtColor(right_t,right_t,CV_GRAY2RGB);
+            } else if (right_t.type() == CV_8UC3){
+                cvtColor(right_t,right_t,CV_BGR2RGB);
+            } else {
+                std::cerr << "Invalid image type for shared memory" << std::endl;
+            }
+            cv::hconcat(left_t, right_t, image_stream);
+            cv::resize(image_stream, image_stream, cv::Size(), downsample_rate, downsample_rate);
+        } else if (ui->comboBoxSharedMemSource->currentText() == "RGBD"){
+            if (stereo_cam->isMatching()){
+                cv::Mat color, Q, depth, depth_z, depth_split[3];
+                stereo_cam->getLeftMatchImage(color);
+                stereo_cam->getDepth(depth);
+                stereo_cam->getQ(Q);
+                // extract Z only channel from depth (xyz) image
+                cv::split(depth, depth_split);
+                depth_z = depth_split[2];
+                // get horizontal fov from Q matrix
+                float hfov = CVSupport::getHFOVFromQ(Q);
+                // embed horizontal fov in top left pixel of z only depth image to simplify reconstruction
+                depth_z.at<float>(0,0) = (float)hfov;
+                if (!depth_z.empty() && !color.empty()){
+                    // convert image to rgb
+                    if (color.type() == CV_8UC1){
+                        cvtColor(color,color,CV_GRAY2RGB);
+                    } else if (color.type() == CV_8UC3){
+                        cvtColor(color,color,CV_BGR2RGB);
                     } else {
-                        image_stream = cv::Mat();
-                        std::cerr << "Disparity image or camera image is empty." << std::endl;
+                        std::cerr << "Invalid image type for shared memory" << std::endl;
+                    }
+                    // Downsample images based on parameters
+                    cv::resize(depth_z, depth_z, cv::Size(), downsample_rate, downsample_rate, cv::INTER_NEAREST_EXACT);
+                    cv::resize(color, color, cv::Size(), downsample_rate, downsample_rate);
+                    // Create RGBD image from color image and z only depth image
+                    if (ui->checkBoxSharedMem16bit->isChecked()){
+                        image_stream = CVSupport::createRGBD16(color,depth_z,200.0,false);
+                    } else {
+                        image_stream = CVSupport::createRGBD32(color,depth_z);
                     }
                 } else {
                     image_stream = cv::Mat();
+                    std::cerr << "Disparity image or camera image is empty." << std::endl;
                 }
-                break;
-            case 5: // rgbdisp
-                if (stereo_cam->isMatching()){
-                    cv::Mat color, disp;
-                    stereo_cam->getLeftMatchImage(color);
-                    stereo_cam->getDisparityFiltered(disp);
-                    if (!disp.empty() && !color.empty()){
-                        // convert image to rgb
-                        if (color.type() == CV_8UC1){
-                            cvtColor(color,color,CV_GRAY2RGB);
-                        } else if (color.type() == CV_8UC3){
-                            cvtColor(color,color,CV_BGR2RGB);
-                        } else {
-                            std::cerr << "Invalid image type for shared memory" << std::endl;
-                        }
-                        // Downsample image based on parameters
-                        cv::resize(disp, disp, cv::Size(), pipe_downsample_rate, pipe_downsample_rate, cv::INTER_NEAREST_EXACT);
-                        cv::resize(color, color, cv::Size(), pipe_downsample_rate, pipe_downsample_rate);
-                        // Create RGBD image from color image and disparity image
-                        if (ui->checkBox16->isChecked()){
-                            image_stream = CVSupport::createRGBD16(color,disp,10.0,true);
-                        } else {
-                            image_stream = CVSupport::createRGBD32(color,disp);
-                        }
-                    } else {
-                        std::cerr << "Disparity image or camera image is empty." << std::endl;
-                    }
-                } else {
-                    image_stream = cv::Mat();
-                }
-                break;
+            } else {
+                std::cerr << "Missing disparity for sending rgbd in shared memory." << std::endl;
+                image_stream = cv::Mat();
+            }
+        } else {
+            std::cerr << "Invalid shared memory source: " << ui->comboBoxSharedMemSource->currentText().toStdString();
         }
 
         if(image_stream.empty()){
-            qDebug() << "Empty image passed to piper";
+            qDebug() << "Empty image passed to shared memory";
             return;
         }
 
-        //sharedMemoryInst->write(image_stream);
         sharedMemoryInst->write_threaded(image_stream);
     }
 }
@@ -1796,8 +1424,7 @@ void SVTKWindow::stereoCameraRelease(void) {
 
     ui->enableStereo->setChecked(false);
     ui->enableDetection->setChecked(false);
-    ui->enableStreamer->setChecked(false);
-    ui->enablePiper->setChecked(false);
+    ui->enableSharedMem->setChecked(false);
     ui->captureButton->setChecked(false);
     ui->singleShotButton->setChecked(false);
     ui->toggleVideoButton->setChecked(false);
@@ -1831,12 +1458,7 @@ void SVTKWindow::stereoCameraRelease(void) {
         enableRectify(false);
         stereo_cam->enableMatching(false);
         this->enableDetection(false);
-#ifdef WITH_STEREO_STREAMER
-        this->enableStreamer(false);
-#endif
-#ifdef WITH_PIPER
-        this->enablePiper(false);
-#endif
+        this->enableSharedMemory(false);
         progressClose.setLabelText("Closing camera connections...");
         progressClose.setValue(30);
 
@@ -1880,21 +1502,15 @@ void SVTKWindow::stereoCameraRelease(void) {
                    SLOT(enableMatching(bool)));
         disconnect(ui->enableDetection, SIGNAL(clicked(bool)), this,
                    SLOT(enableDetection(bool)));
-#ifdef WITH_STEREO_STREAMER
-        disconnect(ui->enableStreamer, SIGNAL(clicked(bool)), this,
-                   SLOT(enableStreamer(bool)));
-#endif
-#ifdef WITH_PIPER
-        disconnect(ui->enablePiper, SIGNAL(clicked(bool)), this,
-                   SLOT(enablePiper(bool)));
-#endif
+        disconnect(ui->enableSharedMem, SIGNAL(clicked(bool)), this,
+                   SLOT(enableSharedMemory(bool)));
         disconnect(ui->toggleRectifyCheckBox, SIGNAL(clicked(bool)), this,
                    SLOT(enableRectify(bool)));
         disconnect(ui->toggleSwapLeftRight, SIGNAL(clicked(bool)), stereo_cam,
                    SLOT(enableSwapLeftRight(bool)));
         disconnect(ui->toggleCalibrationDownsample, SIGNAL(clicked(bool)), stereo_cam,
                 SLOT(enableDownsampleCalibration(bool)));
-        disconnect(ui->spinBoxDownsample, SIGNAL(valueChanged(int)), stereo_cam,
+        disconnect(ui->spinBoxImageDownsample, SIGNAL(valueChanged(int)), stereo_cam,
                 SLOT(setDownsampleFactor(int)));
         disconnect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(enableAutoExpose(bool)));
         disconnect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableAutoGain(bool)));
@@ -2674,7 +2290,7 @@ void SVTKWindow::setupMatchers(void) {
         this->setMatcher(2);
     }
 #else
-    ui->matcherSelectBox->setCurrentIndex(0);
+    CONFIG+=WITH_I3DRSGMui->matcherSelectBox->setCurrentIndex(0);
     this->setMatcher(0);
 #endif
 
@@ -3159,20 +2775,8 @@ void SVTKWindow::closeEvent(QCloseEvent *) {
 
 SVTKWindow::~SVTKWindow() {
     qDebug() << "Cleaning up threads...";
-#ifdef WITH_STEREO_STREAMER
-    if (stereoStreamerServer)
-        delete(stereoStreamerServer);
-#endif
-#ifdef WITH_PIPER
-    if (imagePiperServer){
-        imagePiperServer->close();
-        delete(imagePiperServer);
-    }
-#endif
     if (object_detector)
         delete(object_detector);
-    //if (cam_thread)
-        //delete(cam_thread);
     qDebug() << "Closing ui...";
     delete ui;
     QApplication::quit();

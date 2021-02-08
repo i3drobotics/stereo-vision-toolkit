@@ -54,20 +54,6 @@ FV_APP_NAME = $$TARGET
 DEFINES += WITH_CUDA
 DEFINES += WITH_OPENCV_CONTRIB
 
-# To use StereoStreamer
-# add 'CONFIG+=WITH_STEREO_STREAMER' to build arguments
-WITH_STEREO_STREAMER {
-    message("StereoStreamer enabled")
-    DEFINES += WITH_STEREO_STREAMER
-}
-
-# To use Piper
-# add 'CONFIG+=WITH_PIPER' to build arguments
-WITH_PIPER {
-    message("Piper enabled")
-    DEFINES += WITH_PIPER
-}
-
 # To use I3DRSGM
 # add 'CONFIG+=WITH_I3DRSGM' to build arguments
 WITH_I3DRSGM {
@@ -100,13 +86,6 @@ RESOURCES += \
 !include("modules/fervor/Fervor.pri") {
         error("Unable to include Fervor autoupdater.")
 }
-
-WITH_STEREO_STREAMER {
-    # StereoStreamer
-    !include("modules/StereoStreamer/StereoStreamer.pri") {
-        error("Unable to include StereoStreamer.")
-    }
-}
 # ---------------------
 
 # Define search paths for files
@@ -128,11 +107,6 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/detection
-WITH_PIPER {
-    VPATH += $$_PRO_FILE_PWD_/modules/ImagePiper/src
-    VPATH += $$_PRO_FILE_PWD_/modules/ImagePiper/include
-    INCLUDEPATH += $$_PRO_FILE_PWD_/modules/ImagePiper/include
-}
 
 WITH_VIMBA {
     VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
@@ -179,13 +153,6 @@ SOURCES += \
 win32 {
     SOURCES += stereocameratara.cpp
     SOURCES += stereocameradeimos.cpp
-}
-# Optional Piper source files
-WITH_PIPER {
-    SOURCES += \
-        imagepiper.cpp \
-        piper.cpp \
-        image2string.cpp
 }
 # Optional vimba source files
 WITH_VIMBA {
@@ -246,13 +213,6 @@ HEADERS += \
 win32 {
     HEADERS += stereocameratara.h
     HEADERS += stereocameradeimos.h
-}
-# Optional Piper header files
-WITH_PIPER {
-    HEADERS += \
-        imagepiper.h \
-        piper.h \
-        image2string.h
 }
 # Optional vimba header files
 WITH_VIMBA {

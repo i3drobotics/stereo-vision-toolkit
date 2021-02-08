@@ -9,13 +9,6 @@
 #define _USE_MATH_DEFINES
 
 #include "cmath"
-#ifdef WITH_STEREO_STREAMER
-    #include "stereostreamer2.h"
-    #include "stereostreamersettings.h"
-#endif
-#ifdef WITH_PIPER
-    #include "imagepiper.h"
-#endif
 #include <QtAwesome.h>
 #include <QDebug>
 #include <QDir>
@@ -200,21 +193,10 @@ private:
     Pylon::CTlFactory* pylonTlFactory;
 
     DetectorOpenCV* object_detector;
-#ifdef WITH_STEREO_STREAMER
-    StereoStreamer2::Server* stereoStreamerServer;
-    //StereoStreamer2::Client* stereoStreamerClient;
-    StereoStreamerSettings* stereoStreamerSettings;
-#endif
-#ifdef WITH_PIPER
-    Piper::ImageServer* imagePiperServer;
-#endif
     cvSharedMemory* sharedMemoryInst;
     bool detection_enabled = false;
-    bool streamer_enabled = false;
-    bool piper_enabled = false;
+    bool shared_memory_enabled = false;
     bool detecting = false;
-    bool streaming = false;
-    bool pipping = false;
     cv::Mat image_detection;
     cv::Mat image_stream;
     cv::Mat disparity_stream;
@@ -319,17 +301,8 @@ public slots:
     void pointCloudSaveStatus(QString);
 
     void updateDetection(void);
-#ifdef WITH_STEREO_STREAMER
-    void updateStreamer(void);
-    void enableStreamer(bool);
-    void streamerInit(void);
-#endif
-#ifdef WITH_PIPER
-    void updatePiper(void);
-    void enablePiper(bool);
-    void piperInit(void);
+    void enableSharedMemory(bool);
     void updateSharedMemory(void);
-#endif
     void enableDetection(bool);
     void configureDetection(void);
     void drawBoundingBoxes(cv::Mat image, std::vector<BoundingBox> bboxes, double scale_x, double scale_y);
