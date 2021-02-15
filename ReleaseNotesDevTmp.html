@@ -5,10 +5,8 @@ Improvements:
 
 Bug fixes:
 - Fix 4 channel stereo image pair unable to match 3D due to missing conversion
+- RGBD image will now save depth rather than disparity (with scaling x6553 and hFOV in top left pixel of depth)
 
 Known Issues:
-- Cannot close named pipe server until client connects.
 - WLS filter causes speckle filter to sometimes be disabled.
-- WinSock2 streaming is slow and unstable when using high resolution images. 
-- Named Pipe streaming is slow when using high resolution images.
 - Stereo videos are saved uncompressed to avoid lossy compression which would cause issues when loading stereo videos. This will create large file sizes.
