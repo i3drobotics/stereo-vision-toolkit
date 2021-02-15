@@ -479,8 +479,8 @@ void SVTKWindow::enableSharedMemory(bool enable){
                 sharedMemoryInst->close();
             }
             if (ui->checkBoxSharedMem16bit->isChecked()){
-                // create shared memory file to store 4 channel rgbd image with element size 4*integer size
-                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(int), CV_16UC4, mapname, mutexname);
+                // create shared memory file to store 4 channel rgbd image with element size 4*unsigned short size
+                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(unsigned short), CV_16UC4, mapname, mutexname);
             } else {
                 // create shared memory file to store 4 channel rgbd image with element size 4*float size
                 sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(float), CV_32FC4, mapname, mutexname);
@@ -1377,7 +1377,7 @@ void SVTKWindow::updateSharedMemory(){
                     cv::resize(color, color, cv::Size(), downsample_rate, downsample_rate);
                     // Create RGBD image from color image and z only depth image
                     if (ui->checkBoxSharedMem16bit->isChecked()){
-                        image_stream = CVSupport::createRGBD16(color,depth_z,200.0,false);
+                        image_stream = CVSupport::createRGBD16(color,depth_z,6553.0,false);
                     } else {
                         image_stream = CVSupport::createRGBD32(color,depth_z);
                     }

@@ -22,7 +22,7 @@ class cvSharedMemory{
     cvSharedMemory(){}
 
     void open(int rows, int cols, int channels, int elementsize, int cvtype,
-              std::string map_file = "opencv_unity_buffer",std::string mutex_file = "opencv_unity_mutex"){
+              std::string map_file = "SVTK_shared_buffer",std::string mutex_file = "SVTK_shared_mutex"){
         this->map_file_name = std::wstring(map_file.begin(), map_file.end());
         this->mutex_file_name = std::wstring(mutex_file.begin(), mutex_file.end());
         this->rows = rows;
@@ -63,6 +63,8 @@ class cvSharedMemory{
                 ::ReleaseMutex(mutex);
             } else {
                 std::cerr << "Invalid image size for shared memory. Re-initalise share memory for new image size." << std::endl;
+                std::cerr << "Image data size: " << img_data_size << ". Expected: " << (rows * cols * elementsize) << std::endl;
+                std::cerr << "Element size: " << image.elemSize() << ". Expected: " << elementsize << std::endl;
             }
         } else {
             std::cerr << "Shared memory not initalised. Run 'open' before calling 'write'" << std::endl;
