@@ -187,17 +187,41 @@ void AbstractStereoCamera::saveDisparityColormap(QString filename) {
     return;
 }
 
-void AbstractStereoCamera::saveRGBD(QString filename){
-    cv::Mat left, disp;
+void AbstractStereoCamera::saveRGBD(QString filename, bool enable_16bit, float scale_16bit){
+    cv::Mat rgbd, color, depth, Q, depth_z, depth_split[3];;
+    getLeftMatchImage(color);
+    getDepth(depth);
+    getQ(Q);
 
-    left = left_output.clone();
-    getDisparityFiltered(disp);
-
-    cv::Mat rgbd = CVSupport::createRGBD32(left,disp);
-
-    qDebug() << "Saving rgbd image...";
-    cv::imwrite(filename.toStdString(), rgbd);
-}
+    // extract Z only channel from depth (xyz) image
+    cv::split(depth, depth_split);
+    depth_z = depth_split[2];
+    // get horizontal fov from Q matrix
+    float hfov = CVSupport::getHFOVFromQ(Q);
+    // embed horizontal fov in top left pixel of z only depth image to simplify reconstruction
+    depth_z.at<float>(0,0) = (float)hfov;
+    if (!depth_z.empty() && !color.empty()){
+        // convert image to rgb
+        if (color.type() == CV_8UC1){
+            cvtColor(color,color,cv::COLOR_GRAY2RGB);
+        } else if (color.type() == CV_8UC3){
+            cvtColor(color,color,cv::COLOR_BGR2RGB);
+        } else {
+            std::cerr << "Invalid image type for saving RGBD" << std::endl;
+        }
+        // Create RGBD image from color image and z only depth image
+        if (enable_16bit){
+            rgbd = CVSupport::createRGBD16(color,depth_z,scale_16bit,false);
+        } else {
+            rgbd = CVSupport::createRGBD32(color,depth_z);
+        }
+        qDebug() << "Saving rgbd image...";
+        cv::imwrite(filename.toStdString(), rgbd);
+    } else {
+        std::cerr << "Depth image or camera image is empty." << std::endl;
+        return;
+    }
+}  
 
 void AbstractStereoCamera::saveImage(QString fname) {
     setFileSaveDirectory(fname);
@@ -240,7 +264,7 @@ void AbstractStereoCamera::saveImage(QString fname) {
     if(matching && savingDisparity){
         saveDisparity(fname + "_disp_raw.tif");
         saveDisparityColormap(fname + "_disp_colormap.png");
-        saveRGBD(fname + "_rgbd.tif");
+        saveRGBD(fname + "_rgbd.png");
     }
 }
 

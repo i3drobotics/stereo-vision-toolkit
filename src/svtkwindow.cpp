@@ -1335,16 +1335,16 @@ void SVTKWindow::updateSharedMemory(){
             }
             // convert image to rgb
             if (left_t.type() == CV_8UC1){
-                cvtColor(left_t,left_t,CV_GRAY2RGB);
+                cvtColor(left_t,left_t,COLOR_GRAY2RGB);
             } else if (left_t.type() == CV_8UC3){
-                cvtColor(left_t,left_t,CV_BGR2RGB);
+                cvtColor(left_t,left_t,COLOR_BGR2RGB);
             } else {
                 std::cerr << "Invalid image type for shared memory" << std::endl;
             }
             if (right_t.type() == CV_8UC1){
-                cvtColor(right_t,right_t,CV_GRAY2RGB);
+                cvtColor(right_t,right_t,COLOR_GRAY2RGB);
             } else if (right_t.type() == CV_8UC3){
-                cvtColor(right_t,right_t,CV_BGR2RGB);
+                cvtColor(right_t,right_t,COLOR_BGR2RGB);
             } else {
                 std::cerr << "Invalid image type for shared memory" << std::endl;
             }
@@ -1383,7 +1383,7 @@ void SVTKWindow::updateSharedMemory(){
                     }
                 } else {
                     image_stream = cv::Mat();
-                    std::cerr << "Disparity image or camera image is empty." << std::endl;
+                    std::cerr << "Depth image or camera image is empty." << std::endl;
                 }
             } else {
                 std::cerr << "Missing disparity for sending rgbd in shared memory." << std::endl;

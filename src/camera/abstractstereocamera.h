@@ -669,8 +669,10 @@ private:
     //!  Save the disparity map as normalised colormap
     /*!
     * @param[in] filename Output filename
+    * @param[in] enable_16bit Save with 16 bit depth
+    * @param[in] scale_16bit Scaling factor to apply to depth before converting to 16-bit to increase precision
     */
-    void saveRGBD(QString fname);
+    void saveRGBD(QString fname, bool enable_16bit=true, float scale_16bit=6553.0);
 
     //! Load rectification maps from calibration files
     /*!
