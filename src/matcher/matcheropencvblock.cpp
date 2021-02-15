@@ -197,7 +197,7 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
 #else
         matcher->compute(left_img, right_img, disparity_lr);
 #endif
-        if(wls_filter){
+        if(wls_filter && !useGPU){
 #ifdef WITH_OPENCV_CONTRIB
             backwardMatch(left_img,right_img);
             cv::Mat disparity_filter;
@@ -213,6 +213,11 @@ bool MatcherOpenCVBlock::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
         }else{
             disparity_lr.convertTo(disparity_lr, CV_32F);
         }
+#ifdef WITH_CUDA
+        if (useGPU){
+            disparity_lr = disparity_lr * 16;
+        }
+#endif
         return true;
       } else {
           qDebug() << "Invalid image type for stereo matcher. MUST be CV_8UC1.";

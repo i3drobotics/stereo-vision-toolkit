@@ -75,15 +75,15 @@ public:
 
         double min_d, max_d;
         cv::minMaxLoc(d, &min_d, &max_d);
-        std::cout << "Disp range (32bit): " << min_d << max_d << std::endl;
+        //std::cout << "Disp range (32bit): " << min_d << max_d << std::endl;
         if (allow_negatives){
             d = d + d.size().width;
         }
         cv::minMaxLoc(d, &min_d, &max_d);
-        std::cout << "Disp range (32bit no negatives): " << min_d << max_d << std::endl;
+        //std::cout << "Disp range (32bit no negatives): " << min_d << max_d << std::endl;
         d.convertTo(d,CV_TYPE, scaling_factor);
         cv::minMaxLoc(d, &min_d, &max_d);
-        std::cout << "Disp range (16bit): " << min_d << max_d << std::endl;
+        //std::cout << "Disp range (16bit): " << min_d << max_d << std::endl;
 
         //d.convertTo(d,CV_16UC1, 1.0/255.0);
 
@@ -94,7 +94,7 @@ public:
         channels.push_back(d);
         cv::Mat rgbd;
         cv::merge(channels, rgbd);
-        std::cout << "Disp type (16bit): " << rgbd.type() << std::endl;
+        //std::cout << "Disp type (16bit): " << rgbd.type() << std::endl;
         return rgbd;
     }
 
