@@ -1322,8 +1322,6 @@ void SVTKWindow::updateSharedMemory(){
     if (shared_memory_enabled){
         //qDebug() << "Getting source image...";
         bool useRectified = ui->checkBoxSharedMemUseRectified->isChecked();
-        // Select image source
-        int source_index = ui->comboBoxSharedMemSource->currentIndex();
         cv::Mat left_t, right_t;
         cv::Mat wImage, Q;
         double downsample_rate = 1.0f/(double)ui->spinBoxSharedMemDownsample->value();
@@ -2290,7 +2288,7 @@ void SVTKWindow::setupMatchers(void) {
         this->setMatcher(2);
     }
 #else
-    CONFIG+=WITH_I3DRSGMui->matcherSelectBox->setCurrentIndex(0);
+    ui->matcherSelectBox->setCurrentIndex(0);
     this->setMatcher(0);
 #endif
 
