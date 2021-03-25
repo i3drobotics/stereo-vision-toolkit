@@ -56,14 +56,16 @@ class cvSharedMemory{
     void write(cv::Mat image){
         if (ready){
             int img_data_size = image.total() * image.elemSize();
-            if (img_data_size == (rows * cols * elementsize)){
+            int expected_data_size = (rows * cols * elementsize);
+            if (img_data_size == expected_data_size){
                 /* Copy to Shared memory */
                 WaitForSingleObject(mutex, INFINITE);
                 memcpy(data_buf, image.ptr(), (rows * cols * elementsize));
                 ::ReleaseMutex(mutex);
             } else {
                 std::cerr << "Invalid image size for shared memory. Re-initalise share memory for new image size." << std::endl;
-                std::cerr << "Image data size: " << img_data_size << ". Expected: " << (rows * cols * elementsize) << std::endl;
+                std::cerr << "Image data size: " << img_data_size << ". Expected: " << expected_data_size << std::endl;
+                std::cerr << "Image size: (" << image.rows << ", " << image.cols << ", " << image.channels() <<  "). Expected: (" << rows << ", " << cols << ", " << channels << ")" << std::endl;
                 std::cerr << "Element size: " << image.elemSize() << ". Expected: " << elementsize << std::endl;
             }
         } else {

@@ -58,6 +58,7 @@ public slots:
     void setColourmap(int);
     void setCalibration(cv::Mat &Q, double baseline = 1.0, double focal = 1.0);
     void saveDisparityChanged(bool enable);
+    void setDownsampleFactor(int factor);
 
 private:
     Ui::DisparityViewer *ui;
@@ -72,6 +73,8 @@ private:
     AbstractStereoMatcher *matcher;
     bool processing_disparity;
     QString save_directory = ".";
+
+    int downsample_factor = 1;
 
     double min_depth_ = -1;
     double max_depth_ = -1;

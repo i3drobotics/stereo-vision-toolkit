@@ -472,6 +472,11 @@ void SVTKWindow::enableSharedMemory(bool enable){
     if (enable){
         std::string mapname = ui->txtSharedMemMap->text().toStdString();
         std::string mutexname = ui->txtSharedMemMutex->text().toStdString();
+        int shared_mem_downsample_factor = ui->spinBoxSharedMemDownsample->value();
+        int camera_downsample_factor = ui->spinBoxImageDownsample->value();
+        double downsample_rate = (1.0/(double)shared_mem_downsample_factor) * (1.0/(double)camera_downsample_factor);
+        int img_height = round(stereo_cam->getHeight() * downsample_rate);
+        int img_width = round(stereo_cam->getWidth() * downsample_rate);
         if (ui->comboBoxSharedMemSource->currentText() == "RGBD"){
             connect(stereo_cam, SIGNAL(matched()), this, SLOT(updateSharedMemory()));
             // clear shared memory if open
@@ -480,10 +485,10 @@ void SVTKWindow::enableSharedMemory(bool enable){
             }
             if (ui->checkBoxSharedMem16bit->isChecked()){
                 // create shared memory file to store 4 channel rgbd image with element size 4*unsigned short size
-                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(unsigned short), CV_16UC4, mapname, mutexname);
+                sharedMemoryInst->open(img_height, img_width, 4, 4*sizeof(unsigned short), CV_16UC4, mapname, mutexname);
             } else {
                 // create shared memory file to store 4 channel rgbd image with element size 4*float size
-                sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 4, 4*sizeof(float), CV_32FC4, mapname, mutexname);
+                sharedMemoryInst->open(img_height, img_width, 4, 4*sizeof(float), CV_32FC4, mapname, mutexname);
             }
         } else {
             connect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateSharedMemory()));
@@ -492,7 +497,7 @@ void SVTKWindow::enableSharedMemory(bool enable){
                 sharedMemoryInst->close();
             }
             // create shared memory file to store 3 channel rgb image with element size 3*uchar size
-            sharedMemoryInst->open(stereo_cam->getHeight(), stereo_cam->getWidth(), 3, 3*sizeof(unsigned char), CV_8UC3, mapname, mutexname);
+            sharedMemoryInst->open(img_height, img_width, 3, 3*sizeof(unsigned char), CV_8UC3, mapname, mutexname);
         }
     } else {
         disconnect(stereo_cam, SIGNAL(stereopair_processed()), this, SLOT(updateSharedMemory()));
@@ -1288,6 +1293,8 @@ void SVTKWindow::stereoCameraInitConnections(void) {
             SLOT(enableDownsampleCalibration(bool)));
     connect(ui->spinBoxImageDownsample, SIGNAL(valueChanged(int)), stereo_cam,
             SLOT(setDownsampleFactor(int)));
+    connect(ui->spinBoxImageDownsample, SIGNAL(valueChanged(int)), disparity_view,
+            SLOT(setDownsampleFactor(int)));
     connect(stereo_cam, SIGNAL(matched()), disparity_view,
             SLOT(updateDisparityAsync(void)));
     connect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(enableAutoExpose(bool)));
@@ -1509,6 +1516,8 @@ void SVTKWindow::stereoCameraRelease(void) {
         disconnect(ui->toggleCalibrationDownsample, SIGNAL(clicked(bool)), stereo_cam,
                 SLOT(enableDownsampleCalibration(bool)));
         disconnect(ui->spinBoxImageDownsample, SIGNAL(valueChanged(int)), stereo_cam,
+                SLOT(setDownsampleFactor(int)));
+        disconnect(ui->spinBoxImageDownsample, SIGNAL(valueChanged(int)), disparity_view,
                 SLOT(setDownsampleFactor(int)));
         disconnect(ui->autoExposeCheck, SIGNAL(clicked(bool)), this, SLOT(enableAutoExpose(bool)));
         disconnect(ui->autoGainCheckBox, SIGNAL(clicked(bool)), this, SLOT(enableAutoGain(bool)));

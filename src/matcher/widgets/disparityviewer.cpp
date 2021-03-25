@@ -22,6 +22,10 @@ void DisparityViewer::saveDisparityChanged(bool enable){
     emit disparitySaveCheckChanged(enable);
 }
 
+void DisparityViewer::setDownsampleFactor(int factor){
+    this->downsample_factor = factor;
+}
+
 void DisparityViewer::assignThread(QThread *thread) {
     this->moveToThread(thread);
     connect(this, SIGNAL(finished()), thread, SLOT(quit()));
@@ -120,8 +124,8 @@ void DisparityViewer::updateDisparity() {
     double min_disp, max_disp, min_depth, max_depth;
     CVSupport::getMinMaxDisparity(disparity_thresh,Q,min_disp,max_disp);
     CVSupport::getMinMaxDepth(disparity_thresh,Q,min_depth,max_depth);
-    min_depth_ = min_depth;
-    max_depth_ = max_depth;
+    min_depth_ = min_depth * this->downsample_factor;
+    max_depth_ = max_depth * this->downsample_factor;
 
     //use depth rather than disparity for more user readable results
     double range_disp = max_disp - min_disp;
