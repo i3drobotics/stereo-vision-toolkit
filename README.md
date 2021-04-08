@@ -57,7 +57,7 @@ This code is provided under the MIT license, which essentially means it's open s
 See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
 
 ## Developer zone
-Download the latest development release v1.3.1a.20 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.20/StereoVisionToolkit-1.3.1a.20-Win64.exe)   
+Download the latest development release v1.3.1a.23 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.20/StereoVisionToolkit-1.3.1a.23-Win64.exe)   
 *WARNING: Development release may contain broken code and untested features. Use at your own risk!*
 
 See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on building from source.
@@ -96,14 +96,14 @@ Arduino code for controlling Phobos cameras is provided in src/camera/camera_con
 This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.
 
 ### Procedure for new development release
-1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.19).
+1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.23).
 2. Update ReleaseNotesDev.html with improvements, bug fixes, and known issues. 
 3. Build new version (Make sure to use the build arguments: 'CONFIG+=DEV_BRANCH CONFIG+=WITH_I3DRSGM CONFIG+=WITH_VIMBA')
 4. Create installer using inno setup (right click 'installer.iss' and click 'compile')
 6. Update AppcastDev.xml enclosure length with the file size of the installer
 5. On [GitHub](https://github.com/i3drobotics/stereo-vision-toolkit/releases) create new release   
-a. Tag should match version number of toolkit (e.g. v1.3.1a.19) and target 'dev' branch.    
-  b. Title should have the program name and version (e.g. 'Stereo Vision Toolkit v1.3.1a.19')  
+a. Tag should match version number of toolkit (e.g. v1.3.1a.23) and target 'dev' branch.    
+  b. Title should have the program name and version (e.g. 'Stereo Vision Toolkit v1.3.1a.23')  
   c. Description should have the following header:  
   **WARNING: DO NOT USE THIS UNLESS YOU ARE PART OF THE I3DR DEVELOPMENT TEAM**  
   This release is meant for development use only while some new fixes and features are tested.  
