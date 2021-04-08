@@ -71,7 +71,7 @@ class AbstractStereoCamera : public QObject {
 public:
 
     //! Enum defined errors. This defines the type of error that occured.
-    enum StereoCameraError { CONNECT_ERROR, CAPTURE_ERROR, TIMEOUT_ERROR, RECTIFY_ERROR, MATCH_ERROR };
+    enum StereoCameraError { CONNECT_ERROR, CAPTURE_ERROR, LOST_FRAMES_ERROR, RECTIFY_ERROR, MATCH_ERROR };
     //! Enum defined camera type. This defines the type of camera being used.
     enum StereoCameraType { CAMERA_TYPE_TARA, CAMERA_TYPE_TIS, CAMERA_TYPE_VIMBA, CAMERA_TYPE_USB,
                             CAMERA_TYPE_BASLER_GIGE, CAMERA_TYPE_BASLER_USB,
@@ -796,7 +796,7 @@ protected:
         if (stereo_error == CAPTURE_ERROR){
             failed_frames += 1;
             if (failed_frames > max_failed_frames){
-                send_error(TIMEOUT_ERROR);
+                send_error(LOST_FRAMES_ERROR);
             }
         }
         int error_index = stereo_error;

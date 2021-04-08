@@ -132,6 +132,8 @@ private:
     QPixmap pmap_disparity;
     QTimer* status_bar_timer;
 
+    QMessageBox* error_msgBox = NULL;
+
     QFuture<void> qfuture_refreshcameralist;
 
     //QTimer* frame_timer;

@@ -2707,15 +2707,13 @@ void SVTKWindow::enableMatching(bool enable){
 }
 
 void SVTKWindow::error(int error){
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Stereo Vision Toolkit");
     std::string msgBoxMsg;
+    bool msg_box_required = false;
     if (error == AbstractStereoCamera::RECTIFY_ERROR){
         enableRectify(false);
         ui->statusBar->showMessage("Failed to apply calibration.");
         msgBoxMsg = "Failed to apply calibration to images received. Calibration requires images of the same size as calibrated. Fix this an re-load calibration.";
-        msgBox.setText(msgBoxMsg.c_str());
-        msgBox.exec();
+        msg_box_required = true;
     } else if (error == AbstractStereoCamera::CAPTURE_ERROR){
         ui->statusBar->showMessage("Failed to capture image from cameras.");
     } else if (error == AbstractStereoCamera::MATCH_ERROR){
@@ -2723,14 +2721,21 @@ void SVTKWindow::error(int error){
     } else if  (error == AbstractStereoCamera::CONNECT_ERROR){
         ui->statusBar->showMessage("Failed to connect to camera.");
         msgBoxMsg = "Failed to connect to camera.";
-        msgBox.setText(msgBoxMsg.c_str());
-        msgBox.exec();
-    } else if (error == AbstractStereoCamera::TIMEOUT_ERROR){
+        msg_box_required = true;
+    } else if (error == AbstractStereoCamera::LOST_FRAMES_ERROR){
         stereoCameraRelease();
         ui->statusBar->showMessage("Lost too many camera frames.");
         msgBoxMsg = "Lost too many camera frames, camera was closed.";
-        msgBox.setText(msgBoxMsg.c_str());
-        msgBox.exec();
+        msg_box_required = true;
+    }
+    if (msg_box_required){
+        if (error_msgBox == NULL){
+            error_msgBox = new QMessageBox();
+            error_msgBox->setAttribute(Qt::WA_DeleteOnClose);
+            error_msgBox->setText(msgBoxMsg.c_str());
+            error_msgBox->exec();
+            error_msgBox->setWindowTitle("Stereo Vision Toolkit");
+        }
     }
 }
 

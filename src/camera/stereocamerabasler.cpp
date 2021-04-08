@@ -124,9 +124,9 @@ bool StereoCameraBasler::openCamera(){
 
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
-            cameras->operator[](i).MaxNumBuffer = 1;
-            cameras->operator[](i).OutputQueueSize = 1;
-            cameras->operator[](i).ClearBufferModeEnable();
+            //cameras->operator[](i).MaxNumBuffer = 1;
+            //cameras->operator[](i).OutputQueueSize = 1;
+            //cameras->operator[](i).ClearBufferModeEnable();
         }
 
         formatConverter = new Pylon::CImageFormatConverter();
@@ -156,7 +156,7 @@ bool StereoCameraBasler::openCamera(){
     setGain(gain);
     setPacketDelay(packet_delay);
 
-    lineStatusTimerId = startTimer(lineStatusTimerDelay);
+    //lineStatusTimerId = startTimer(lineStatusTimerDelay);
 
     connected = true;
     return connected;
@@ -454,10 +454,13 @@ bool StereoCameraBasler::setFPS(int val){
                 camControl->updateFPS(val);
             } else {
                 qDebug() << "Failed to open connection to camera control device";
+                // TODO remove this when camcontrol consistently working
+                frame_rate = val;
                 return false;
             }
         } else {
             camControl->updateFPS(val);
+            frame_rate = val;
             return true;
         }
     } else {
@@ -662,7 +665,7 @@ bool StereoCameraBasler::enableAutoExposure(bool enable){
 
 bool StereoCameraBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_right_image){
     // set maximum timeout of capure to 2xfps
-    int max_timeout = 10*(1000*(1.0f/(float)frame_rate));
+    int max_timeout = 2*(1000*(1.0f/(float)frame_rate));
     if (max_timeout > 1000){
         max_timeout = 1000;
     }
@@ -689,7 +692,6 @@ bool StereoCameraBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_ri
                             qDebug() << "Failed to convert grab result to mat";
                         } else {
                             qDebug() << "Failed to convert grab result to mat but not grabbing so will just ignore this frame.";
-                            return false;
                         }
                     }
                 } else {
@@ -756,6 +758,7 @@ bool StereoCameraBasler::enableCapture(bool enable){
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImageOnly);
+            //cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_OneByOne);
         }
         //TODO replace this with pylon callback
         connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
