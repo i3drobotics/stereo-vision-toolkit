@@ -87,14 +87,16 @@ CalibrateFromImagesDialog::~CalibrateFromImagesDialog() { delete ui; }
 void CalibrateFromImagesDialog::setLeftImages() {
   QModelIndex parentIndex = left_file_model->index(left_path);
   int numRows = left_file_model->rowCount(parentIndex);
+//  left_image_list = QList<cv::Mat>();
+  left_image_path_list = QList<std::string>();
 
   for (int row = 0; row < numRows; ++row) {
     QModelIndex childIndex = left_file_model->index(row, 0, parentIndex);
     QString path = left_file_model->data(childIndex).toString();
     QString fname = left_path + "/" + path;
-    cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
-    //left_image_list.append(left_path + "/" + path);
-    left_image_list.append(im);
+//    cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
+//    left_image_list.append(im);
+    left_image_path_list.append(fname.toStdString());
   }
 
    checkImageCount();
@@ -103,14 +105,16 @@ void CalibrateFromImagesDialog::setLeftImages() {
 void CalibrateFromImagesDialog::setRightImages() {
   QModelIndex parentIndex = right_file_model->index(left_path);
   int numRows = right_file_model->rowCount(parentIndex);
+//  right_image_list = QList<cv::Mat>();
+  right_image_path_list = QList<std::string>();
 
   for (int row = 0; row < numRows; ++row) {
     QModelIndex childIndex = right_file_model->index(row, 0, parentIndex);
     QString path = right_file_model->data(childIndex).toString();
-    //right_image_list.append(right_path + "/" + path);
     QString fname = right_path + "/" + path;
-    cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
-    right_image_list.append(im);
+//    cv::Mat im = cv::imread(fname.toStdString(), cv::IMREAD_GRAYSCALE);
+//    right_image_list.append(im);
+    right_image_path_list.append(fname.toStdString());
   }
 
    checkImageCount();
@@ -165,8 +169,10 @@ void CalibrateFromImagesDialog::findImages() {
 
 void CalibrateFromImagesDialog::checkImageCount(void){
     // Only allow user to continue if we've got enough cal images
-    int n_left_images = left_image_list.size();
-    int n_right_images = right_image_list.size();
+//    int n_left_images = left_image_list.size();
+//    int n_right_images = right_image_list.size();
+    int n_left_images = left_image_path_list.size();
+    int n_right_images = right_image_path_list.size();
 
     if(n_left_images >= 1 && n_right_images >= 1 && n_left_images == n_right_images){
         ui->okPushButton->setEnabled(true);

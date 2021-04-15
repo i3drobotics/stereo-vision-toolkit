@@ -32,6 +32,8 @@ class StereoCalibrate : public QObject {
   explicit StereoCalibrate(QObject* parent = 0,
                             AbstractStereoCamera* stereo_camera = 0);
 
+  enum YamlFileFormat { CV_FILESTORAGE_YAML, ROS_PERCEPTION_YAML };
+
   cv::Mat left_camera_matrix;
   cv::Mat left_distortion;
   cv::Mat left_r_vecs;
@@ -56,6 +58,9 @@ class StereoCalibrate : public QObject {
   cv::Mat right_rectification_x;
   cv::Mat right_rectification_y;
 
+  bool success = false;
+  QDir output_folder = QCoreApplication::applicationDirPath() + "/params/";
+
  private:
 
   QLabel* left_view;
@@ -76,8 +81,6 @@ class StereoCalibrate : public QObject {
 
   bool save_ros = false;
 
-  QDir output_folder = QCoreApplication::applicationDirPath() + "/params/";
-
   std::vector<cv::Point3f> pattern_points;
 
   int total_poses = 0;
@@ -95,7 +98,7 @@ class StereoCalibrate : public QObject {
   bool calibrating_left = true;
   bool calibrating_right = false;
 
-  void finishedCalibration();
+  void finishedCalibration(bool success);
   bool findCorners(cv::Mat image, std::vector<cv::Point2f>& corners, int flags);
 
   cv::Mat left_image_overlay;
@@ -121,7 +124,7 @@ class StereoCalibrate : public QObject {
   void overlayArrow(cv::Mat& image, std::vector<cv::Point2f>& points,
                     cv::Point2f offset, cv::Scalar colour, int thickness = 3);
   bool jointCalibration(void);
-  bool outputRosYaml(QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R);
+  bool outputYaml(YamlFileFormat yaml_file_format, QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R);
 
  signals:
   void doneCalibration(bool);

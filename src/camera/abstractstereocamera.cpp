@@ -641,44 +641,263 @@ bool AbstractStereoCamera::loadCalibrationXMLFiles(QString left_cal, QString rig
 
 bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString right_cal) {
     // implimented from (https://github.com/i3drobotics/pyStereo3D/blob/master/Stereo3D/Stereo3D/StereoCalibration.py)
-    int flags = cv::FileStorage::READ;
-
-    cv::FileStorage fs_l(left_cal.toStdString(), flags);
-
-    if (fs_l.isOpened()) {
-        fs_l["image_width"] >> cal_image_width;
-        fs_l["image_height"] >> cal_image_height;
-        fs_l["camera_matrix"] >> l_camera_matrix;
-        fs_l["distortion_coefficients"] >> l_dist_coeffs;
-        fs_l["rectification_matrix"] >> l_rect_mat;
-        fs_l["projection_matrix"] >> l_proj_mat;
-    } else {
-        return false;
-    }
-
-    fs_l.release();
-    QCoreApplication::processEvents();
-
-    if (cal_image_width != image_width || cal_image_height != image_height){
-        qDebug() << "Image size does not match calibrated image size";
-        return false;
-    }
-
-    cv::FileStorage fs_r(right_cal.toStdString(), flags);
-
     int cal_r_image_width, cal_r_image_height;
-    if (fs_r.isOpened()) {
-        fs_r["image_width"] >> cal_r_image_width;
-        fs_r["image_height"] >> cal_r_image_height;
-        fs_r["camera_matrix"] >> r_camera_matrix;
-        fs_r["distortion_coefficients"] >> r_dist_coeffs;
-        fs_r["rectification_matrix"] >> r_rect_mat;
-        fs_r["projection_matrix"] >> r_proj_mat;
+
+    // Detect yaml format type (cv or ros)
+    // Read first line of file
+    QFile yamlFile(left_cal);
+    QString first_line = "";
+    if (yamlFile.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&yamlFile);
+       first_line = in.readLine();
+       yamlFile.close();
+    }
+    if (first_line.contains("%YAML:1.0")){
+        // CV Filestorage yaml
+        int flags = cv::FileStorage::READ;
+
+        cv::FileStorage fs_l(left_cal.toStdString(), flags);
+
+        if (fs_l.isOpened()) {
+            fs_l["image_width"] >> cal_image_width;
+            fs_l["image_height"] >> cal_image_height;
+            fs_l["camera_matrix"] >> l_camera_matrix;
+            fs_l["distortion_coefficients"] >> l_dist_coeffs;
+            fs_l["rectification_matrix"] >> l_rect_mat;
+            fs_l["projection_matrix"] >> l_proj_mat;
+        } else {
+            return false;
+        }
+
+        fs_l.release();
+        QCoreApplication::processEvents();
+
+        if (cal_image_width != image_width || cal_image_height != image_height){
+            qDebug() << "Image size does not match calibrated image size";
+            return false;
+        }
+
+        cv::FileStorage fs_r(right_cal.toStdString(), flags);
+
+        if (fs_r.isOpened()) {
+            fs_r["image_width"] >> cal_r_image_width;
+            fs_r["image_height"] >> cal_r_image_height;
+            fs_r["camera_matrix"] >> r_camera_matrix;
+            fs_r["distortion_coefficients"] >> r_dist_coeffs;
+            fs_r["rectification_matrix"] >> r_rect_mat;
+            fs_r["projection_matrix"] >> r_proj_mat;
+        } else {
+            return false;
+        }
+
+        fs_r.release();
+    } else if (first_line.contains("image_width")){
+        // ROS Perception yaml
+
+        //TODO support badly formatted yaml
+
+        // Read left yaml
+        QFile leftYamlFile(left_cal);
+        QList<QString> left_lines;
+        if (leftYamlFile.open(QIODevice::ReadOnly))
+        {
+           QTextStream in(&leftYamlFile);
+           while (!in.atEnd())
+           {
+              QString line = in.readLine();
+              left_lines.append(line);
+           }
+           leftYamlFile.close();
+        }
+        if (left_lines.length() == 20){
+
+            if (left_lines[0].contains("image_width:")){
+                QStringList split_line = left_lines[0].split(':');
+                cal_image_width = split_line[1].toInt();
+            } else {
+                return false;
+            }
+            if (left_lines[1].contains("image_height:")){
+                QStringList split_line = left_lines[1].split(':');
+                cal_image_height = split_line[1].toInt();
+            } else {
+                return false;
+            }
+            if (left_lines[6].contains("data:")){
+                QStringList camera_matrix_line = left_lines[6].split(':');
+                QStringList camera_matrix_data = camera_matrix_line[1].split(',');
+                l_camera_matrix = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                l_camera_matrix.at<double>(0,0) = camera_matrix_data[0].split('[')[1].toDouble();
+                l_camera_matrix.at<double>(0,1) = camera_matrix_data[1].toDouble();
+                l_camera_matrix.at<double>(0,2) = camera_matrix_data[2].toDouble();
+                l_camera_matrix.at<double>(1,0) = camera_matrix_data[3].toDouble();
+                l_camera_matrix.at<double>(1,1) = camera_matrix_data[4].toDouble();
+                l_camera_matrix.at<double>(1,2) = camera_matrix_data[5].toDouble();
+                l_camera_matrix.at<double>(2,0) = camera_matrix_data[6].toDouble();
+                l_camera_matrix.at<double>(2,1) = camera_matrix_data[7].toDouble();
+                l_camera_matrix.at<double>(2,2) = camera_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (left_lines[11].contains("data:")){
+                QStringList dist_matrix_line = left_lines[11].split(':');
+                QStringList dist_matrix_data = dist_matrix_line[1].split(',');
+                l_dist_coeffs = cv::Mat(1, 5, CV_64F, cv::Scalar(0));
+
+                l_dist_coeffs.at<double>(0,0) = dist_matrix_data[0].split('[')[1].toDouble();
+                l_dist_coeffs.at<double>(0,1) = dist_matrix_data[1].toDouble();
+                l_dist_coeffs.at<double>(0,2) = dist_matrix_data[2].toDouble();
+                l_dist_coeffs.at<double>(0,3) = dist_matrix_data[3].toDouble();
+                l_dist_coeffs.at<double>(0,4) = dist_matrix_data[4].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (left_lines[15].contains("data:")){
+                QStringList rect_matrix_line = left_lines[15].split(':');
+                QStringList rect_matrix_data = rect_matrix_line[1].split(',');
+                l_rect_mat = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                l_rect_mat.at<double>(0,0) = rect_matrix_data[0].split('[')[1].toDouble();
+                l_rect_mat.at<double>(0,1) = rect_matrix_data[1].toDouble();
+                l_rect_mat.at<double>(0,2) = rect_matrix_data[2].toDouble();
+                l_rect_mat.at<double>(1,0) = rect_matrix_data[3].toDouble();
+                l_rect_mat.at<double>(1,1) = rect_matrix_data[4].toDouble();
+                l_rect_mat.at<double>(1,2) = rect_matrix_data[5].toDouble();
+                l_rect_mat.at<double>(2,0) = rect_matrix_data[6].toDouble();
+                l_rect_mat.at<double>(2,1) = rect_matrix_data[7].toDouble();
+                l_rect_mat.at<double>(2,2) = rect_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (left_lines[19].contains("data:")){
+                QStringList proj_matrix_line = left_lines[19].split(':');
+                QStringList proj_matrix_data = proj_matrix_line[1].split(',');
+                l_proj_mat = cv::Mat(3, 4, CV_64F, cv::Scalar(0));
+
+                l_proj_mat.at<double>(0,0) = proj_matrix_data[0].split('[')[1].toDouble();
+                l_proj_mat.at<double>(0,1) = proj_matrix_data[1].toDouble();
+                l_proj_mat.at<double>(0,2) = proj_matrix_data[2].toDouble();
+                l_proj_mat.at<double>(0,3) = proj_matrix_data[3].toDouble();
+                l_proj_mat.at<double>(1,0) = proj_matrix_data[4].toDouble();
+                l_proj_mat.at<double>(1,1) = proj_matrix_data[5].toDouble();
+                l_proj_mat.at<double>(1,2) = proj_matrix_data[6].toDouble();
+                l_proj_mat.at<double>(1,3) = proj_matrix_data[7].toDouble();
+                l_proj_mat.at<double>(2,0) = proj_matrix_data[8].toDouble();
+                l_proj_mat.at<double>(2,1) = proj_matrix_data[9].toDouble();
+                l_proj_mat.at<double>(2,2) = proj_matrix_data[10].toDouble();
+                l_proj_mat.at<double>(2,3) = proj_matrix_data[11].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+
+        } else {
+            return false;
+        }
+
+        // Read right yaml
+        QFile rightYamlFile(right_cal);
+        QList<QString> right_lines;
+        if (rightYamlFile.open(QIODevice::ReadOnly))
+        {
+           QTextStream in(&rightYamlFile);
+           while (!in.atEnd())
+           {
+              QString line = in.readLine();
+              right_lines.append(line);
+           }
+           rightYamlFile.close();
+        }
+
+        if (right_lines.length() == 20){
+
+            if (right_lines[0].contains("image_width:")){
+                QStringList split_line = right_lines[0].split(':');
+                cal_r_image_width = split_line[1].toInt();
+            }
+            if (right_lines[1].contains("image_height:")){
+                QStringList split_line = right_lines[1].split(':');
+                cal_r_image_height = split_line[1].toInt();
+            }
+
+            if (right_lines[6].contains("data:")){
+                QStringList camera_matrix_line = right_lines[6].split(':');
+                QStringList camera_matrix_data = camera_matrix_line[1].split(',');
+                r_camera_matrix = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                r_camera_matrix.at<double>(0,0) = camera_matrix_data[0].split('[')[1].toDouble();
+                r_camera_matrix.at<double>(0,1) = camera_matrix_data[1].toDouble();
+                r_camera_matrix.at<double>(0,2) = camera_matrix_data[2].toDouble();
+                r_camera_matrix.at<double>(1,0) = camera_matrix_data[3].toDouble();
+                r_camera_matrix.at<double>(1,1) = camera_matrix_data[4].toDouble();
+                r_camera_matrix.at<double>(1,2) = camera_matrix_data[5].toDouble();
+                r_camera_matrix.at<double>(2,0) = camera_matrix_data[6].toDouble();
+                r_camera_matrix.at<double>(2,1) = camera_matrix_data[7].toDouble();
+                r_camera_matrix.at<double>(2,2) = camera_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (right_lines[11].contains("data:")){
+                QStringList dist_matrix_line = right_lines[11].split(':');
+                QStringList dist_matrix_data = dist_matrix_line[1].split(',');
+                r_dist_coeffs = cv::Mat(1, 5, CV_64F, cv::Scalar(0));
+
+                r_dist_coeffs.at<double>(0,0) = dist_matrix_data[0].split('[')[1].toDouble();
+                r_dist_coeffs.at<double>(0,1) = dist_matrix_data[1].toDouble();
+                r_dist_coeffs.at<double>(0,2) = dist_matrix_data[2].toDouble();
+                r_dist_coeffs.at<double>(0,3) = dist_matrix_data[3].toDouble();
+                r_dist_coeffs.at<double>(0,4) = dist_matrix_data[4].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (right_lines[15].contains("data:")){
+                QStringList rect_matrix_line = right_lines[15].split(':');
+                QStringList rect_matrix_data = rect_matrix_line[1].split(',');
+                r_rect_mat = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                r_rect_mat.at<double>(0,0) = rect_matrix_data[0].split('[')[1].toDouble();
+                r_rect_mat.at<double>(0,1) = rect_matrix_data[1].toDouble();
+                r_rect_mat.at<double>(0,2) = rect_matrix_data[2].toDouble();
+                r_rect_mat.at<double>(1,0) = rect_matrix_data[3].toDouble();
+                r_rect_mat.at<double>(1,1) = rect_matrix_data[4].toDouble();
+                r_rect_mat.at<double>(1,2) = rect_matrix_data[5].toDouble();
+                r_rect_mat.at<double>(2,0) = rect_matrix_data[6].toDouble();
+                r_rect_mat.at<double>(2,1) = rect_matrix_data[7].toDouble();
+                r_rect_mat.at<double>(2,2) = rect_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (right_lines[19].contains("data:")){
+                QStringList proj_matrix_line = right_lines[19].split(':');
+                QStringList proj_matrix_data = proj_matrix_line[1].split(',');
+                r_proj_mat = cv::Mat(3, 4, CV_64F, cv::Scalar(0));
+
+                r_proj_mat.at<double>(0,0) = proj_matrix_data[0].split('[')[1].toDouble();
+                r_proj_mat.at<double>(0,1) = proj_matrix_data[1].toDouble();
+                r_proj_mat.at<double>(0,2) = proj_matrix_data[2].toDouble();
+                r_proj_mat.at<double>(0,3) = proj_matrix_data[3].toDouble();
+                r_proj_mat.at<double>(1,0) = proj_matrix_data[4].toDouble();
+                r_proj_mat.at<double>(1,1) = proj_matrix_data[5].toDouble();
+                r_proj_mat.at<double>(1,2) = proj_matrix_data[6].toDouble();
+                r_proj_mat.at<double>(1,3) = proj_matrix_data[7].toDouble();
+                r_proj_mat.at<double>(2,0) = proj_matrix_data[8].toDouble();
+                r_proj_mat.at<double>(2,1) = proj_matrix_data[9].toDouble();
+                r_proj_mat.at<double>(2,2) = proj_matrix_data[10].toDouble();
+                r_proj_mat.at<double>(2,3) = proj_matrix_data[11].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+
+       } else {
+            return false;
+        }
+
     } else {
+        qDebug() << "Cannot detect yaml type in calibration file. Invalid first line.";
         return false;
     }
 
-    fs_r.release();
     QCoreApplication::processEvents();
 
     if (cal_r_image_width != image_width || cal_r_image_height != image_height){

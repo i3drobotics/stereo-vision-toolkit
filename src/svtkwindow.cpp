@@ -2143,17 +2143,52 @@ void SVTKWindow::runCalibrationFromImages(void){
     if(calibration_images_dialog == nullptr) return;
     qDebug() << "Getting parameters";
 
+    //calibration_images_dialog->setLeftImages();
+    //calibration_images_dialog->setRightImages();
     int cols = calibration_images_dialog->getPatternCols();
     int rows = calibration_images_dialog->getPatternRows();
     double square_size_mm = calibration_images_dialog->getSquareSizeMm();
-    auto left_images = calibration_images_dialog->getLeftImages();
-    auto right_images = calibration_images_dialog->getRightImages();
+//    auto left_images = calibration_images_dialog->getLeftImages();
+//    auto right_images = calibration_images_dialog->getRightImages();
+    QList<std::string> left_image_paths = calibration_images_dialog->getLeftImagePaths();
+    QList<std::string> right_image_paths = calibration_images_dialog->getRightImagePaths();
     bool save_ros = calibration_images_dialog->getSaveROS();
 
     calibration_images_dialog->close();
 
+    // Load images from paths
+    QProgressDialog progressImages("Loading images...", "", 0, 100, this);
+    progressImages.setWindowTitle("SVT");
+    progressImages.setWindowModality(Qt::WindowModal);
+    progressImages.setCancelButton(nullptr);
+    progressImages.setMinimumDuration(0);
+    progressImages.setValue(0);
+    progressImages.setMaximum(0);
+    progressImages.setMinimum(0);
+    progressImages.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+
+    QList<cv::Mat> left_images;
+    foreach (std::string image_path, left_image_paths){
+        cv::Mat im = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
+        left_images.append(im);
+        QCoreApplication::processEvents();
+    }
+    QList<cv::Mat> right_images;
+    foreach (std::string image_path, right_image_paths){
+        cv::Mat im = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
+        right_images.append(im);
+        QCoreApplication::processEvents();
+    }
+
+    progressImages.close();
+
     calibrator = new StereoCalibrate(this, nullptr);
     cv::Size pattern(cols, rows);
+
+    stopDeviceListTimer();
+
+    connect(calibrator, SIGNAL(doneCalibration(bool)), this,
+               SLOT(doneCalibration(bool)));
 
     calibrator->setOutputPath(calibration_images_dialog->getOutputPath());
     calibrator->setPattern(pattern, square_size_mm);
@@ -2193,6 +2228,7 @@ void SVTKWindow::runAutoCalibration(void){
     qDebug() << "Rows: " << rows;
 
     calibration_dialog->close();
+    calibration_dialog = nullptr;
 
     calibrator = new StereoCalibrate(this, nullptr);
     cv::Size pattern(cols, rows);
@@ -2204,13 +2240,25 @@ void SVTKWindow::runAutoCalibration(void){
     calibrator->jointCalibration();
 }
 
-void SVTKWindow::doneCalibration(bool) {
+void SVTKWindow::doneCalibration(bool success) {
     //connect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay())); TODO check this
 
-    disconnect(calibration_dialog, SIGNAL(stopCalibration()), calibrator,
-               SLOT(abortCalibration()));
+       //TODO fix this for auto calibration
+//    if(calibration_dialog != nullptr){
+//        disconnect(calibration_dialog, SIGNAL(stopCalibration()), calibrator,
+//                   SLOT(abortCalibration()));
+//    }
     disconnect(calibrator, SIGNAL(doneCalibration(bool)), this,
                SLOT(doneCalibration(bool)));
+    startDeviceListTimer();
+
+    QMessageBox alert;
+    if (success) {
+        alert.setText(QString("Written calibration files to: %1").arg(calibrator->output_folder.absolutePath()));
+    } else {
+        alert.setText("Stereo camera calibration failed.");
+    }
+    alert.exec();
     //stereo_cam->enableCapture(true);
 }
 
@@ -2315,9 +2363,11 @@ void SVTKWindow::setCalibrationFolder(QString dir) {
     if(dir == "") return;
 
     bool reset_capture = false;
-    if (stereo_cam->isCapturing()){
-        reset_capture = true;
-        stereo_cam->enableCapture(false);
+    if (stereo_cam){
+        if (stereo_cam->isCapturing()){
+            reset_capture = true;
+            stereo_cam->enableCapture(false);
+        }
     }
 
     // ask user for calibration type (xml or yaml)
@@ -2574,6 +2624,7 @@ void SVTKWindow::toggleCameraActiveSettings(bool enable){
     ui->autoGainCheckBox->setEnabled(enable);
     ui->enableHDRCheckbox->setEnabled(enable);
     ui->btnLoadCalibration->setEnabled(enable);
+    ui->actionLoad_Calibration->setEnabled(enable);
 }
 
 void SVTKWindow::toggleCameraPassiveSettings(bool enable){
