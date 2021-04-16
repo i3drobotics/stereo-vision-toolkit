@@ -1030,101 +1030,98 @@ void AbstractStereoCamera::processStereo(void) {
     frames++;
     emit framecount(frames);
 
-    if (right_raw.empty() || left_raw.empty()){
-        return;
-    }
+    if (!right_raw.empty() && !left_raw.empty()){
 
-    cv::Mat left_tmp, right_tmp;
+        cv::Mat left_tmp, right_tmp;
 
-    if (isSwappingLeftRight()){
-        right_raw.copyTo(left_tmp);
-        left_raw.copyTo(right_tmp);
-    } else {
-        left_raw.copyTo(left_tmp);
-        right_raw.copyTo(right_tmp);
-    }
-
-    if (downsample_factor != 1){
-        cv::resize(left_tmp,left_tmp,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(right_tmp,right_tmp,cv::Size(),downsample_factor,downsample_factor);
-        /*
-        if (calibration_valid){
-            if (rectmapx_l.size() != left_tmp.size()){
-                //adjust rectification maps to downsampled size
-                generateRectificationMaps(left_tmp.size());
-                emit update_size((float)right_tmp.size().width, (float)right_tmp.size().height, getBitDepth());
-            }
+        if (isSwappingLeftRight()){
+            right_raw.copyTo(left_tmp);
+            left_raw.copyTo(right_tmp);
+        } else {
+            left_raw.copyTo(left_tmp);
+            right_raw.copyTo(right_tmp);
         }
-        */
-    }
 
-    lr_raw_image_mutex.lock();
-    left_tmp.copyTo(left_unrectified);
-    right_tmp.copyTo(right_unrectified);
-    lr_raw_image_mutex.unlock();
-
-    if (rectifying) {
-        lr_raw_image_mutex.lock();
-        //bool res = rectifyImages(left_unrectified,right_unrectified,left_remapped,right_remapped);
-        bool res = rectifyImages(left_raw,right_raw,left_remapped,right_remapped);
         if (downsample_factor != 1){
-            cv::resize(left_remapped,left_remapped,cv::Size(),downsample_factor,downsample_factor);
-            cv::resize(right_remapped,right_remapped,cv::Size(),downsample_factor,downsample_factor);
+            cv::resize(left_tmp,left_tmp,cv::Size(),downsample_factor,downsample_factor);
+            cv::resize(right_tmp,right_tmp,cv::Size(),downsample_factor,downsample_factor);
+            /*
+            if (calibration_valid){
+                if (rectmapx_l.size() != left_tmp.size()){
+                    //adjust rectification maps to downsampled size
+                    generateRectificationMaps(left_tmp.size());
+                    emit update_size((float)right_tmp.size().width, (float)right_tmp.size().height, getBitDepth());
+                }
+            }
+            */
         }
+
+        lr_raw_image_mutex.lock();
+        left_tmp.copyTo(left_unrectified);
+        right_tmp.copyTo(right_unrectified);
         lr_raw_image_mutex.unlock();
-        if (!res){
-            send_error(RECTIFY_ERROR);
+
+        if (rectifying) {
+            lr_raw_image_mutex.lock();
+            //bool res = rectifyImages(left_unrectified,right_unrectified,left_remapped,right_remapped);
+            bool res = rectifyImages(left_raw,right_raw,left_remapped,right_remapped);
+            if (downsample_factor != 1){
+                cv::resize(left_remapped,left_remapped,cv::Size(),downsample_factor,downsample_factor);
+                cv::resize(right_remapped,right_remapped,cv::Size(),downsample_factor,downsample_factor);
+            }
+            lr_raw_image_mutex.unlock();
+            if (!res){
+                send_error(RECTIFY_ERROR);
+                lr_raw_image_mutex.lock();
+                left_unrectified.copyTo(left_remapped);
+                right_unrectified.copyTo(right_remapped);
+                lr_raw_image_mutex.unlock();
+            }
+        } else {
             lr_raw_image_mutex.lock();
             left_unrectified.copyTo(left_remapped);
             right_unrectified.copyTo(right_remapped);
             lr_raw_image_mutex.unlock();
         }
-    } else {
-        lr_raw_image_mutex.lock();
-        left_unrectified.copyTo(left_remapped);
-        right_unrectified.copyTo(right_remapped);
-        lr_raw_image_mutex.unlock();
-    }
 
-    lr_image_mutex.lock();
-    left_remapped.copyTo(left_output);
-    right_remapped.copyTo(right_output);
-    lr_image_mutex.unlock();
+        lr_image_mutex.lock();
+        left_remapped.copyTo(left_output);
+        right_remapped.copyTo(right_output);
+        lr_image_mutex.unlock();
 
-    if (capturing_video){
-        if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT){
-            if (video_src == VIDEO_SRC_STEREO){
-                if (capturing_rectified_video){
-                    cv::hconcat(left_output, right_output, video_frame);
-                } else {
-                    cv::hconcat(left_unrectified, right_unrectified, video_frame);
+        if (capturing_video){
+            if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT){
+                if (video_src == VIDEO_SRC_STEREO){
+                    if (capturing_rectified_video){
+                        cv::hconcat(left_output, right_output, video_frame);
+                    } else {
+                        cv::hconcat(left_unrectified, right_unrectified, video_frame);
+                    }
+                } else if (video_src == VIDEO_SRC_LEFT){
+                    if (capturing_rectified_video){
+                        left_output.copyTo(video_frame);
+                    } else {
+                        left_unrectified.copyTo(video_frame);
+                    }
+                } else if (video_src == VIDEO_SRC_RIGHT){
+                    if (capturing_rectified_video){
+                        right_output.copyTo(video_frame);
+                    } else {
+                        right_unrectified.copyTo(video_frame);
+                    }
                 }
-            } else if (video_src == VIDEO_SRC_LEFT){
-                if (capturing_rectified_video){
-                    left_output.copyTo(video_frame);
-                } else {
-                    left_unrectified.copyTo(video_frame);
-                }
-            } else if (video_src == VIDEO_SRC_RIGHT){
-                if (capturing_rectified_video){
-                    right_output.copyTo(video_frame);
-                } else {
-                    right_unrectified.copyTo(video_frame);
-                }
+                addVideoStreamFrame(video_frame);
             }
-            addVideoStreamFrame(video_frame);
         }
+
+        emit stereopair_processed();
+        if (!first_image_received){
+            first_image_received = true;
+            emit first_image_ready(true);
+        }
+        emit frametime(frametimer.elapsed());
+        frametimer.restart();
     }
-
-    emit stereopair_processed();
-    if (!first_image_received){
-        first_image_received = true;
-        emit first_image_ready(true);
-    }
-
-    emit frametime(frametimer.elapsed());
-    frametimer.restart();
-
     processing_busy = false;
 }
 

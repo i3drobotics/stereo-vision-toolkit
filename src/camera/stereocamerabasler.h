@@ -12,6 +12,30 @@
 #include "arduinocommscameracontrol.h"
 #include "pylonsupport.h"
 
+// Image event handler
+class CStereoCameraBaslerImageEventHandler : public Pylon::CImageEventHandler
+{
+public:
+    CStereoCameraBaslerImageEventHandler(std::string left_serial, std::string right_serial, Pylon::CImageFormatConverter *formatConverter);
+    void OnImageGrabbed( Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& ptrGrabResult);
+    bool getImagePair(cv::Mat &left, cv::Mat &right, int timeout);
+
+private:
+    enum captureSide {CAPTURE_LEFT, CAPTURE_RIGHT};
+    std::string left_serial;
+    std::string right_serial;
+    Pylon::CImageFormatConverter *formatConverter;
+    cv::Mat live_left_image;
+    cv::Mat live_right_image;
+    cv::Mat left_image;
+    cv::Mat right_image;
+    int timestamp_left = 0;
+    int timestamp_right = 0;
+    std::mutex mtx;
+    captureSide capSide = captureSide::CAPTURE_LEFT;
+    bool newFrames = false;
+};
+
 //!  Stereo balser cameras
 /*!
   Control of stereo pair of basler cameras and generation of 3D
@@ -56,10 +80,14 @@ public slots:
 
 private:
     ArduinoCommsCameraControl* camControl;
+    CStereoCameraBaslerImageEventHandler* imageEventHandler;
 
     bool hardware_triggered = false;
     int lineStatusTimerId;
     int lineStatusTimerDelay = 1000;
+
+    cv::Mat tmp_left_img;
+    cv::Mat tmp_right_img;
 
     Pylon::CInstantCameraArray *cameras;
     Pylon::CImageFormatConverter *formatConverter;

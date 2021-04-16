@@ -5,6 +5,68 @@
 
 #include "stereocamerabasler.h"
 
+// Image event handler
+CStereoCameraBaslerImageEventHandler::CStereoCameraBaslerImageEventHandler(std::string left_serial, std::string right_serial, Pylon::CImageFormatConverter *formatConverter){
+    this->left_serial = left_serial;
+    this->right_serial = right_serial;
+    this->formatConverter = formatConverter;
+}
+
+void CStereoCameraBaslerImageEventHandler::OnImageGrabbed( Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& ptrGrabResult)
+{
+    const auto now = std::chrono::system_clock::now();
+    int frame_timestamp_milli = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    // left camera
+    if (camera.GetDeviceInfo().GetSerialNumber() == this->left_serial.c_str()){
+        bool res = PylonSupport::grabImage2mat(ptrGrabResult,this->formatConverter,this->live_left_image);
+        if (res){
+            timestamp_left = frame_timestamp_milli;
+        }
+    }
+    // right camera
+    if (camera.GetDeviceInfo().GetSerialNumber() == this->right_serial.c_str()){
+        bool res = PylonSupport::grabImage2mat(ptrGrabResult,this->formatConverter,this->live_right_image);
+        if (res){
+            timestamp_right = frame_timestamp_milli;
+        }
+    }
+    mtx.lock();
+    int lr_diff = abs(timestamp_left - timestamp_right);
+    if (lr_diff <= 5){
+        newFrames = true;
+        this->left_image = this->live_left_image.clone();
+        this->right_image = this->live_right_image.clone();
+    } else {
+        newFrames = false;
+    }
+    mtx.unlock();
+}
+
+bool CStereoCameraBaslerImageEventHandler::getImagePair(cv::Mat &left, cv::Mat &right, int timeout=1000){
+    int time_count = 0;
+    bool timed_out = true;
+    while(time_count < timeout){
+        mtx.lock();
+        if (newFrames){
+            left = this->left_image.clone();
+            right = this->right_image.clone();
+            newFrames = false;
+            timed_out = false;
+            mtx.unlock();
+            break;
+        }
+        mtx.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        time_count += 5;
+    }
+    return !timed_out;
+}
+
+//!  Stereo balser cameras
+/*!
+  Control of stereo pair of basler cameras and generation of 3D
+*/
+
 //see: https://github.com/basler/pypylon/blob/master/samples/grabmultiplecameras.py
 
 bool StereoCameraBasler::openCamera(){
@@ -122,18 +184,21 @@ bool StereoCameraBasler::openCamera(){
         getImageSize(cameras->operator[](0),image_width,image_height,image_bitdepth);
         emit update_size(image_width, image_height, image_bitdepth);
 
-        for (size_t i = 0; i < cameras->GetSize(); ++i)
-        {
-            //cameras->operator[](i).MaxNumBuffer = 1;
-            //cameras->operator[](i).OutputQueueSize = 1;
-            //cameras->operator[](i).ClearBufferModeEnable();
-        }
-
         formatConverter = new Pylon::CImageFormatConverter();
 
         //formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
         formatConverter->OutputPixelFormat = Pylon::PixelType_BGR8packed;
         formatConverter->OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
+
+        imageEventHandler = new CStereoCameraBaslerImageEventHandler(camera_left_serial,camera_right_serial,formatConverter);
+
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            //cameras->operator[](i).MaxNumBuffer = 1;
+            //cameras->operator[](i).OutputQueueSize = 1;
+            //cameras->operator[](i).ClearBufferModeEnable();
+            cameras->operator[](i).RegisterImageEventHandler( imageEventHandler, Pylon::RegistrationMode_Append, Pylon::Cleanup_Delete);
+        }
     }
     catch (const Pylon::GenericException &e)
     {
@@ -674,6 +739,8 @@ bool StereoCameraBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_ri
     {
         if (this->connected){
             if (capturing){
+                res = imageEventHandler->getImagePair(cam_left_image, cam_right_image, max_timeout);
+                /*
                 if (cameras->operator[](0).IsGrabbing() && cameras->operator[](1).IsGrabbing())
                 {
                     Pylon::CGrabResultPtr ptrGrabResult_left,ptrGrabResult_right;
@@ -698,6 +765,7 @@ bool StereoCameraBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_ri
                     res = false;
                     qDebug() << "Camera is not grabbing. Should use cameras->StartGrabbing()";
                 }
+                */
             } else {
                 qDebug() << "Camera isn't grabbing images. Will grab one";
                 Pylon::CGrabResultPtr ptrGrabResult_left,ptrGrabResult_right;
@@ -757,7 +825,7 @@ bool StereoCameraBasler::enableCapture(bool enable){
         //Start capture thread
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
-            cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImageOnly);
+            cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImageOnly, Pylon::GrabLoop_ProvidedByInstantCamera);
             //cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_OneByOne);
         }
         //TODO replace this with pylon callback
