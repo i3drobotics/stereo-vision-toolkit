@@ -57,7 +57,7 @@ This code is provided under the MIT license, which essentially means it's open s
 See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
 
 ## Developer zone
-Download the latest development release v1.3.1a.23 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.20/StereoVisionToolkit-1.3.1a.23-Win64.exe)   
+Download the latest development release v1.3.1a.24 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.24/StereoVisionToolkit-1.3.1a.24-Win64.exe)   
 *WARNING: Development release may contain broken code and untested features. Use at your own risk!*
 
 See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on building from source.
