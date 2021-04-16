@@ -1064,7 +1064,7 @@ void AbstractStereoCamera::processStereo(void) {
         if (rectifying) {
             lr_raw_image_mutex.lock();
             //bool res = rectifyImages(left_unrectified,right_unrectified,left_remapped,right_remapped);
-            bool res = rectifyImages(left_raw,right_raw,left_remapped,right_remapped);
+            bool res = rectifyImages(left_tmp,right_tmp,left_remapped,right_remapped);
             if (downsample_factor != 1){
                 cv::resize(left_remapped,left_remapped,cv::Size(),downsample_factor,downsample_factor);
                 cv::resize(right_remapped,right_remapped,cv::Size(),downsample_factor,downsample_factor);
