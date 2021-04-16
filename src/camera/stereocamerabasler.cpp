@@ -32,7 +32,7 @@ void CStereoCameraBaslerImageEventHandler::OnImageGrabbed( Pylon::CInstantCamera
     }
     mtx.lock();
     int lr_diff = abs(timestamp_left - timestamp_right);
-    if (lr_diff <= 5){
+    if (lr_diff <= 10){
         newFrames = true;
         this->left_image = this->live_left_image.clone();
         this->right_image = this->live_right_image.clone();
@@ -56,8 +56,8 @@ bool CStereoCameraBaslerImageEventHandler::getImagePair(cv::Mat &left, cv::Mat &
             break;
         }
         mtx.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        time_count += 5;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        time_count += 1;
     }
     return !timed_out;
 }
@@ -730,7 +730,7 @@ bool StereoCameraBasler::enableAutoExposure(bool enable){
 
 bool StereoCameraBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_right_image){
     // set maximum timeout of capure to 2xfps
-    int max_timeout = 2*(1000*(1.0f/(float)frame_rate));
+    int max_timeout = 10*(1000*(1.0f/(float)frame_rate));
     if (max_timeout > 1000){
         max_timeout = 1000;
     }

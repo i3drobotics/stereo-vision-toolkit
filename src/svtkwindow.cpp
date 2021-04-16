@@ -2766,8 +2766,10 @@ void SVTKWindow::error(int error){
         msgBoxMsg = "Failed to apply calibration to images received. Calibration requires images of the same size as calibrated. Fix this an re-load calibration.";
         msg_box_required = true;
     } else if (error == AbstractStereoCamera::CAPTURE_ERROR){
+        qDebug() << "Failed to capture image from cameras.";
         ui->statusBar->showMessage("Failed to capture image from cameras.");
     } else if (error == AbstractStereoCamera::MATCH_ERROR){
+        qDebug() << "Failed to capture image from cameras.";
         ui->statusBar->showMessage("Failed to run stereo match on images.");
     } else if  (error == AbstractStereoCamera::CONNECT_ERROR){
         ui->statusBar->showMessage("Failed to connect to camera.");
