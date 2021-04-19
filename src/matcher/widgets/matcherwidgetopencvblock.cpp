@@ -53,6 +53,7 @@ MatcherWidgetOpenCVBlock::MatcherWidgetOpenCVBlock(QWidget* parent)
                 QString::number(matcher->getSpeckleFilterWindow()));
 
     enableExtendDisparity(ui->checkBoxExtendDisparity->isChecked());
+    enableWLSFilter(ui->checkBoxWLSFilter->isChecked());
 
     connect(ui->blockSizeSlider, SIGNAL(valueChanged(int)), this,
             SLOT(updateBlockSize(int)));
@@ -88,8 +89,19 @@ MatcherWidgetOpenCVBlock::MatcherWidgetOpenCVBlock(QWidget* parent)
     connect(ui->checkBoxExtendDisparity, SIGNAL(toggled(bool)), this,
             SLOT(enableExtendDisparity(bool)));
 
+    connect(ui->checkBoxWLSFilter, SIGNAL(toggled(bool)), this,
+            SLOT(enableWLSFilter(bool)));
+
     connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
             SLOT(onSaveClicked()));
+
+#ifdef WITH_OPENCV_CONTRIB
+    ui->checkBoxWLSFilter->setVisible(true);
+    ui->lblWLSFilter->setVisible(true);
+#else
+    ui->checkBoxWLSFilter->setVisible(false);
+    ui->lblWLSFilter->setVisible(false);
+#endif
 }
 
 AbstractStereoMatcher* MatcherWidgetOpenCVBlock::getMatcher() {
@@ -109,6 +121,13 @@ void MatcherWidgetOpenCVBlock::updateSpeckleRange(int range) {
 
 void MatcherWidgetOpenCVBlock::updateSpeckleWindow(int window) {
     matcher->setSpeckleFilterWindow(window);
+}
+
+void MatcherWidgetOpenCVBlock::enableWLSFilter(bool enable){
+    matcher->setWLSFilterEnabled(enable);
+    if (ui->speckleFilterCheck->isChecked()){
+        enableSpeckleFilter(true);
+    }
 }
 
 void MatcherWidgetOpenCVBlock::enableExtendDisparity(bool enable) {

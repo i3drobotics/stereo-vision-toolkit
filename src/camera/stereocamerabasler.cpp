@@ -5,6 +5,68 @@
 
 #include "stereocamerabasler.h"
 
+// Image event handler
+CStereoCameraBaslerImageEventHandler::CStereoCameraBaslerImageEventHandler(std::string left_serial, std::string right_serial, Pylon::CImageFormatConverter *formatConverter){
+    this->left_serial = left_serial;
+    this->right_serial = right_serial;
+    this->formatConverter = formatConverter;
+}
+
+void CStereoCameraBaslerImageEventHandler::OnImageGrabbed( Pylon::CInstantCamera& camera, const Pylon::CGrabResultPtr& ptrGrabResult)
+{
+    const auto now = std::chrono::system_clock::now();
+    int frame_timestamp_milli = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    // left camera
+    if (camera.GetDeviceInfo().GetSerialNumber() == this->left_serial.c_str()){
+        bool res = PylonSupport::grabImage2mat(ptrGrabResult,this->formatConverter,this->live_left_image);
+        if (res){
+            timestamp_left = frame_timestamp_milli;
+        }
+    }
+    // right camera
+    if (camera.GetDeviceInfo().GetSerialNumber() == this->right_serial.c_str()){
+        bool res = PylonSupport::grabImage2mat(ptrGrabResult,this->formatConverter,this->live_right_image);
+        if (res){
+            timestamp_right = frame_timestamp_milli;
+        }
+    }
+    mtx.lock();
+    int lr_diff = abs(timestamp_left - timestamp_right);
+    if (lr_diff <= 10){
+        newFrames = true;
+        this->left_image = this->live_left_image.clone();
+        this->right_image = this->live_right_image.clone();
+    } else {
+        newFrames = false;
+    }
+    mtx.unlock();
+}
+
+bool CStereoCameraBaslerImageEventHandler::getImagePair(cv::Mat &left, cv::Mat &right, int timeout=1000){
+    int time_count = 0;
+    bool timed_out = true;
+    while(time_count < timeout){
+        mtx.lock();
+        if (newFrames){
+            left = this->left_image.clone();
+            right = this->right_image.clone();
+            newFrames = false;
+            timed_out = false;
+            mtx.unlock();
+            break;
+        }
+        mtx.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        time_count += 1;
+    }
+    return !timed_out;
+}
+
+//!  Stereo balser cameras
+/*!
+  Control of stereo pair of basler cameras and generation of 3D
+*/
+
 //see: https://github.com/basler/pypylon/blob/master/samples/grabmultiplecameras.py
 
 bool StereoCameraBasler::openCamera(){
@@ -14,7 +76,7 @@ bool StereoCameraBasler::openCamera(){
         qDebug() << "Failed to find serial device for hardware control.";
         //return false;
     } else {
-        camControl->open(serial_device_list.at(0),115200);
+        has_trigger_fps_control = camControl->open(serial_device_list.at(0),115200);
     }
 
     int binning = stereoCameraSettings_.binning;
@@ -94,6 +156,10 @@ bool StereoCameraBasler::openCamera(){
             return false;
         }
 
+        // Set device link throughput to fix data collision
+        enableDeviceLinkThroughputLimit(true);
+        setDeviceLinkThroughput(100000000);
+
         //check open
         bool connected = true;
         try{
@@ -118,16 +184,21 @@ bool StereoCameraBasler::openCamera(){
         getImageSize(cameras->operator[](0),image_width,image_height,image_bitdepth);
         emit update_size(image_width, image_height, image_bitdepth);
 
-        for (size_t i = 0; i < cameras->GetSize(); ++i)
-        {
-            cameras->operator[](i).MaxNumBuffer = 1;
-            cameras->operator[](i).OutputQueueSize = cameras->operator[](i).MaxNumBuffer.GetValue();
-        }
-
         formatConverter = new Pylon::CImageFormatConverter();
 
-        formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
+        //formatConverter->OutputPixelFormat = Pylon::PixelType_Mono8;
+        formatConverter->OutputPixelFormat = Pylon::PixelType_BGR8packed;
         formatConverter->OutputBitAlignment = Pylon::OutputBitAlignment_MsbAligned;
+
+        imageEventHandler = new CStereoCameraBaslerImageEventHandler(camera_left_serial,camera_right_serial,formatConverter);
+
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            //cameras->operator[](i).MaxNumBuffer = 1;
+            //cameras->operator[](i).OutputQueueSize = 1;
+            //cameras->operator[](i).ClearBufferModeEnable();
+            cameras->operator[](i).RegisterImageEventHandler( imageEventHandler, Pylon::RegistrationMode_Append, Pylon::Cleanup_Delete);
+        }
     }
     catch (const Pylon::GenericException &e)
     {
@@ -138,6 +209,7 @@ bool StereoCameraBasler::openCamera(){
         return connected;
     }
 
+    // Set device parameters
     setBinning(binning);
     enableTrigger(trigger);
     setPacketSize(packet_size);
@@ -149,11 +221,13 @@ bool StereoCameraBasler::openCamera(){
     setGain(gain);
     setPacketDelay(packet_delay);
 
+    //lineStatusTimerId = startTimer(lineStatusTimerDelay);
+
     connected = true;
     return connected;
 }
 
-std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::listSystems(void){
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::listSystemsQuick(Pylon::CTlFactory* tlFactory){
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_gige = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_usb = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_USB);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos;
@@ -164,10 +238,14 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::li
     // find basler systems connected
     // Initialise Basler Pylon
     // Create an instant camera object with the camera device found first.
-    Pylon::CTlFactory& tlFactory = Pylon::CTlFactory::GetInstance();
+    QElapsedTimer task_timer;
+    task_timer.start();
+    //Pylon::CTlFactory& tlFactory = Pylon::CTlFactory::GetInstance();
 
     Pylon::DeviceInfoList_t devices;
-    tlFactory.EnumerateDevices(devices);
+    tlFactory->EnumerateDevices(devices);
+
+    qDebug() << "Time to initalise pylon: " << task_timer.elapsed();
 
     std::string DEVICE_CLASS_GIGE = "BaslerGigE";
     std::string DEVICE_CLASS_USB = "BaslerUsb";
@@ -223,6 +301,114 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::li
     return connected_serial_infos;
 }
 
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::listSystems(void){
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_gige = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_GIGE);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_usb = loadSerials(AbstractStereoCamera::CAMERA_TYPE_BASLER_USB);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos;
+    known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_gige.begin(), known_serial_infos_gige.end() );
+    known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_usb.begin(), known_serial_infos_usb.end() );
+
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
+    // find basler systems connected
+    // Initialise Basler Pylon
+    // Create an instant camera object with the camera device found first.
+    QElapsedTimer task_timer;
+    task_timer.start();
+    Pylon::CTlFactory& tlFactory = Pylon::CTlFactory::GetInstance();
+
+    Pylon::DeviceInfoList_t devices;
+    tlFactory.EnumerateDevices(devices);
+
+    qDebug() << "Time to initalise pylon: " << task_timer.elapsed();
+
+    std::string DEVICE_CLASS_GIGE = "BaslerGigE";
+    std::string DEVICE_CLASS_USB = "BaslerUsb";
+
+    std::vector<std::string> connected_camera_names;
+    std::vector<std::string> connected_serials;
+    //TODO add generic way to recognise i3dr cameras whilst still being
+    //able to make sure the correct right and left cameras are selected together
+    for (size_t i = 0; i < devices.size(); ++i)
+    {
+        std::string device_class = std::string(devices[i].GetDeviceClass());
+        std::string device_name = std::string(devices[i].GetUserDefinedName());
+        std::string device_serial = std::string(devices[i].GetSerialNumber());
+        if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
+            connected_serials.push_back(device_serial);
+            connected_camera_names.push_back(device_name);
+        } else {
+            qDebug() << "Unsupported basler class: " << device_class.c_str();
+        }
+    }
+
+    for (auto& known_serial_info : known_serial_infos) {
+        bool left_found = false;
+        bool right_found = false;
+        std::string left_serial;
+        std::string right_serial;
+        //find left
+        for (auto& connected_serial : connected_serials)
+        {
+            left_serial = connected_serial;
+            if (left_serial == known_serial_info.left_camera_serial){
+                left_found = true;
+                break;
+            }
+        }
+        if (left_found){
+            //find right
+            for (auto& connected_serial : connected_serials)
+            {
+                right_serial = connected_serial;
+                if (right_serial == known_serial_info.right_camera_serial){
+                    right_found = true;
+                    break;
+                }
+            }
+        }
+        if (left_found && right_found){ //only add if both cameras found
+            connected_serial_infos.push_back(known_serial_info);
+        }
+    }
+
+    //Pylon::PylonTerminate();
+    return connected_serial_infos;
+}
+
+void StereoCameraBasler::timerEvent(QTimerEvent *event)
+{
+    if(event->timerId() == lineStatusTimerId) {
+        bool status_l, status_r;
+        getLineStatus(2,status_l,status_r);
+        //TODO enable this
+        //qDebug() << "Line Status.. (" << status_l << ", " << status_r << ")";
+    }
+}
+
+void StereoCameraBasler::getLineStatus(int line, bool &status_l, bool &status_r){
+    try
+    {
+        std::string line_str = "Line" + std::to_string(line); //LineX
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            cameras->operator[](0).Open();
+            Pylon::CEnumParameter(cameras->operator[](0).GetNodeMap().GetNode("LineSelector")).FromString(line_str.c_str());
+            //get device line status
+            if (i == 0){
+                status_l = Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "LineStatus").GetValue();;
+            } else if (i == 1){
+                status_r = Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "LineStatus").GetValue();;
+            }
+        }
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred whilst getting device line status." << std::endl
+                    << e.GetDescription() << std::endl;
+    }
+}
+
 void StereoCameraBasler::getImageSize(Pylon::CInstantCamera &camera, int &width, int &height, int &bitdepth)
 {
     try
@@ -237,6 +423,46 @@ void StereoCameraBasler::getImageSize(Pylon::CInstantCamera &camera, int &width,
         // Error handling.
         std::cerr << "An exception occurred whilst getting camera image size." << std::endl
                   << e.GetDescription() << std::endl;
+    }
+}
+
+void StereoCameraBasler::enableDeviceLinkThroughputLimit(bool enable){
+    try
+    {
+        std::string mode = "Off";
+        if (enable){
+            mode = "On";
+        }
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            cameras->operator[](i).Open();
+            //Set device link throughput mode
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "DeviceLinkThroughputLimitMode").FromString(mode.c_str());
+        }
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred whilst setting device link throughput parameter." << std::endl
+                    << e.GetDescription() << std::endl;
+    }
+}
+
+void StereoCameraBasler::setDeviceLinkThroughput(int value){
+    try
+    {
+        for (size_t i = 0; i < cameras->GetSize(); ++i)
+        {
+            cameras->operator[](i).Open();
+            //Set device link throughput limit
+            Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "DeviceLinkThroughputLimit").SetValue(value);
+        } 
+    }
+    catch (const Pylon::GenericException &e)
+    {
+        // Error handling.
+        std::cerr << "An exception occurred whilst setting device link throughput parameter." << std::endl
+                    << e.GetDescription() << std::endl;
     }
 }
 
@@ -262,6 +488,7 @@ bool StereoCameraBasler::setPacketDelay(int interPacketDelay)
 {
     try
     {
+        //Apply only to left camera as this should be the delay betwen left and right
         if (interPacketDelay >= 0){
             cameras->operator[](0).Open();
             Pylon::CIntegerParameter(cameras->operator[](0).GetNodeMap(), "GevSCPD").SetValue(interPacketDelay);
@@ -292,10 +519,13 @@ bool StereoCameraBasler::setFPS(int val){
                 camControl->updateFPS(val);
             } else {
                 qDebug() << "Failed to open connection to camera control device";
+                // TODO remove this when camcontrol consistently working
+                frame_rate = val;
                 return false;
             }
         } else {
             camControl->updateFPS(val);
+            frame_rate = val;
             return true;
         }
     } else {
@@ -306,10 +536,9 @@ bool StereoCameraBasler::setFPS(int val){
             for (size_t i = 0; i < cameras->GetSize(); ++i)
             {
                 cameras->operator[](i).Open();
-                if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
+                if (stereoCameraSettings_.isGige){
                     Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateAbs").SetValue(fps_f);
-                }
-                if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
+                } else {
                     Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRate").SetValue(fps_f);
                 }
             }
@@ -324,6 +553,7 @@ bool StereoCameraBasler::setFPS(int val){
             return false;
         }
     }
+    return false;
 }
 
 bool StereoCameraBasler::enableFPS(bool enable){
@@ -331,6 +561,7 @@ bool StereoCameraBasler::enableFPS(bool enable){
     {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
+            qDebug() << "AcquisitionFrameRateEnable: " << enable;
             cameras->operator[](i).Open();
             Pylon::CBooleanParameter(cameras->operator[](i).GetNodeMap(), "AcquisitionFrameRateEnable").SetValue(enable);
         }
@@ -354,10 +585,9 @@ bool StereoCameraBasler::setExposure(double val) {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
+            if (stereoCameraSettings_.isGige){
                 Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "ExposureTimeRaw").SetValue(exposure_i);
-            }
-            if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
+            } else {
                 Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "ExposureTime").SetValue(exposure_i);
             }
         }
@@ -376,6 +606,7 @@ bool StereoCameraBasler::setBinning(int val){
     try
     {
         if (val >= 1){
+            qDebug() << "Setting binning... " << val;
             for (size_t i = 0; i < cameras->GetSize(); ++i)
             {
                 cameras->operator[](i).Open();
@@ -408,10 +639,13 @@ bool StereoCameraBasler::enableTrigger(bool enable){
         if (enable){
             enable_str = "On";
         }
+        qDebug() << "Enable hardware trigger: " << enable_str.c_str();
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").FromString(enable_str.c_str());
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSelector").SetValue("FrameStart");
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerSource").SetValue("Line1");
+            Pylon::CEnumParameter(cameras->operator[](i).GetNodeMap(), "TriggerMode").SetValue(enable_str.c_str());
         }
         return true;
     }
@@ -431,10 +665,9 @@ bool StereoCameraBasler::setGain(int val) {
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
             cameras->operator[](i).Open();
-            if (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_GIGE){
+            if (stereoCameraSettings_.isGige){
                 Pylon::CIntegerParameter(cameras->operator[](i).GetNodeMap(), "GainRaw").SetValue(gain_i);
-            }
-            if  (stereoCameraSerialInfo_.camera_type == CAMERA_TYPE_BASLER_USB){
+            } else {
                 Pylon::CFloatParameter(cameras->operator[](i).GetNodeMap(), "Gain").SetValue(gain_i);
             }
         }
@@ -495,7 +728,7 @@ bool StereoCameraBasler::enableAutoExposure(bool enable){
     }
 }
 
-bool StereoCameraBasler::captureSingle(){
+bool StereoCameraBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat &cam_right_image){
     // set maximum timeout of capure to 2xfps
     int max_timeout = 10*(1000*(1.0f/(float)frame_rate));
     if (max_timeout > 1000){
@@ -506,14 +739,16 @@ bool StereoCameraBasler::captureSingle(){
     {
         if (this->connected){
             if (capturing){
+                res = imageEventHandler->getImagePair(cam_left_image, cam_right_image, max_timeout);
+                /*
                 if (cameras->operator[](0).IsGrabbing() && cameras->operator[](1).IsGrabbing())
                 {
                     Pylon::CGrabResultPtr ptrGrabResult_left,ptrGrabResult_right;
                     cameras->operator[](0).RetrieveResult(max_timeout, ptrGrabResult_left, Pylon::TimeoutHandling_ThrowException);
                     cameras->operator[](1).RetrieveResult(max_timeout, ptrGrabResult_right, Pylon::TimeoutHandling_ThrowException);
 
-                    bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_raw);
-                    bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_raw);
+                    bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,cam_left_image);
+                    bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,cam_right_image);
 
                     ptrGrabResult_left.Release();
                     ptrGrabResult_right.Release();
@@ -524,21 +759,21 @@ bool StereoCameraBasler::captureSingle(){
                             qDebug() << "Failed to convert grab result to mat";
                         } else {
                             qDebug() << "Failed to convert grab result to mat but not grabbing so will just ignore this frame.";
-                            return false;
                         }
                     }
                 } else {
                     res = false;
                     qDebug() << "Camera is not grabbing. Should use cameras->StartGrabbing()";
                 }
+                */
             } else {
                 qDebug() << "Camera isn't grabbing images. Will grab one";
                 Pylon::CGrabResultPtr ptrGrabResult_left,ptrGrabResult_right;
                 cameras->operator[](0).GrabOne( max_timeout, ptrGrabResult_left);
                 cameras->operator[](1).GrabOne( max_timeout, ptrGrabResult_right);
 
-                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,left_raw);
-                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,right_raw);
+                bool res_l = PylonSupport::grabImage2mat(ptrGrabResult_left,formatConverter,cam_left_image);
+                bool res_r = PylonSupport::grabImage2mat(ptrGrabResult_right,formatConverter,cam_right_image);
 
                 ptrGrabResult_left.Release();
                 ptrGrabResult_right.Release();
@@ -563,10 +798,18 @@ bool StereoCameraBasler::captureSingle(){
                   << e.GetDescription() << std::endl;
         res = false;
     }
+    return res;
+}
+
+bool StereoCameraBasler::captureSingle(){
+    cv::Mat left_tmp, right_tmp;
+    bool res = getCameraFrame(left_tmp,right_tmp);
     if (!res){
         send_error(CAPTURE_ERROR);
         emit captured_fail();
     } else {
+        left_raw = left_tmp.clone();
+        right_raw = right_tmp.clone();
         emit captured_success();
     }
     emit captured();
@@ -582,7 +825,8 @@ bool StereoCameraBasler::enableCapture(bool enable){
         //Start capture thread
         for (size_t i = 0; i < cameras->GetSize(); ++i)
         {
-            cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImages);
+            cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_LatestImageOnly, Pylon::GrabLoop_ProvidedByInstantCamera);
+            //cameras->operator[](i).StartGrabbing(Pylon::EGrabStrategy::GrabStrategy_OneByOne);
         }
         //TODO replace this with pylon callback
         connect(this, SIGNAL(captured()), this, SLOT(captureThreaded()));
@@ -617,4 +861,5 @@ bool StereoCameraBasler::closeCamera() {
 }
 
 StereoCameraBasler::~StereoCameraBasler() {
+    killTimer(lineStatusTimerId);
 }

@@ -463,8 +463,8 @@ bool StereoCameraOpenCV::setExposure(double exposure_milliseconds) {
 bool StereoCameraOpenCV::setFPS(int fps){
     if (!isCapturing()){
         double fps_d = fps;
-        camera_l.set(CV_CAP_PROP_FPS, (double)fps_d);
-        camera_r.set(CV_CAP_PROP_FPS, (double)fps_d);
+        camera_l.set(cv::CAP_PROP_FPS, (double)fps_d);
+        camera_r.set(cv::CAP_PROP_FPS, (double)fps_d);
         frame_rate = fps;
         return true;
     } else {
@@ -483,7 +483,7 @@ bool StereoCameraOpenCV::send_hid(hid_device* cam_device, std::vector<unsigned c
     if (cam_device == NULL) return false;
 
     std::vector<unsigned char> commands;
-    for (int i = 0; i < command_len; i++) {
+    for (size_t i = 0; i < command_len; i++) {
         commands.push_back(buffer[i + 1]);
     }
 
@@ -500,7 +500,7 @@ bool StereoCameraOpenCV::send_hid(hid_device* cam_device, std::vector<unsigned c
         qDebug() << "Failed to read HID data";
         return false;
     } else {
-        for (int i = 0; i < command_len; i++) {
+        for (size_t i = 0; i < command_len; i++) {
             if (commands[i] != buffer[i]) return false;
         }
     }
@@ -511,10 +511,10 @@ bool StereoCameraOpenCV::send_hid(hid_device* cam_device, std::vector<unsigned c
 bool StereoCameraOpenCV::setFrameSize(int width, int height) {
     bool res = false;
 
-    res = camera_l.set(CV_CAP_PROP_FRAME_WIDTH, width);
-    res &= camera_l.set(CV_CAP_PROP_FRAME_HEIGHT, height);
-    res &= camera_r.set(CV_CAP_PROP_FRAME_WIDTH, width);
-    res &= camera_r.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+    res = camera_l.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    res &= camera_l.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    res &= camera_r.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    res &= camera_r.set(cv::CAP_PROP_FRAME_HEIGHT, height);
     image_width = width;
     image_height = height;
     image_bitdepth = 1; //TODO get bit depth
@@ -525,14 +525,14 @@ bool StereoCameraOpenCV::setFrameSize(int width, int height) {
 
 bool StereoCameraOpenCV::setFrame16(void) {
     bool res = false;
-    res = camera_l.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
-    res &= camera_r.set(CV_CAP_PROP_FOURCC, CV_FOURCC('Y', '1', '6', ' '));
+    res = camera_l.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
+    res &= camera_r.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('Y', '1', '6', ' '));
 
     return res;
 }
 
 void StereoCameraOpenCV::getFrameRate() {
-    frame_rate = (int)camera_l.get(CV_CAP_PROP_FPS);
+    frame_rate = (int)camera_l.get(cv::CAP_PROP_FPS);
     //TODO check frame rate is the same in both cameras
     qDebug() << "Frame rate: " << frame_rate;
 }

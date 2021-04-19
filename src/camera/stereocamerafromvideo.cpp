@@ -10,17 +10,17 @@ bool StereoCameraFromVideo::openCamera(){
         closeCamera();
     }
     int fps = stereoCameraSettings_.fps;
-    std::string fname = stereoCameraSerialInfo_.filename;
+    std::string fname = stereoCameraSerialInfo_.left_camera_serial;
 
     stream = cv::VideoCapture(fname);
 
     if (stream.isOpened()) {
-        image_height = stream.get(CV_CAP_PROP_FRAME_HEIGHT);
-        image_width = stream.get(CV_CAP_PROP_FRAME_WIDTH) / 2;
+        image_height = stream.get(cv::CAP_PROP_FRAME_HEIGHT);
+        image_width = stream.get(cv::CAP_PROP_FRAME_WIDTH) / 2;
         image_bitdepth = 1; //TODO get bit depth
         emit update_size(image_width, image_height, image_bitdepth);
 
-        number_frames = stream.get(CV_CAP_PROP_FRAME_COUNT);
+        number_frames = stream.get(cv::CAP_PROP_FRAME_COUNT);
 
         setFPS(fps);
 
@@ -32,7 +32,7 @@ bool StereoCameraFromVideo::openCamera(){
 }
 
 void StereoCameraFromVideo::setPosition(int position){
-    stream.set(CV_CAP_PROP_POS_FRAMES, (0.01*number_frames) * position);
+    stream.set(cv::CAP_PROP_POS_FRAMES, (0.01*number_frames) * position);
 }
 
 bool StereoCameraFromVideo::closeCamera(){
@@ -47,7 +47,7 @@ bool StereoCameraFromVideo::closeCamera(){
 }
 
 bool StereoCameraFromVideo::captureSingle(){
-    int current_frame = stream.get(CV_CAP_PROP_POS_FRAMES);
+    int current_frame = stream.get(cv::CAP_PROP_POS_FRAMES);
     if (current_frame >= number_frames ){
         setPosition(0);
     }
@@ -60,9 +60,9 @@ bool StereoCameraFromVideo::captureSingle(){
         if(delay_needed > 0){
             QThread::msleep(delay_needed);
         }
-        emit videoPosition(100*((float) stream.get(CV_CAP_PROP_POS_FRAMES))/number_frames);
-        if(image_buffer.channels() == 3)
-            cv::cvtColor(image_buffer, image_buffer, CV_RGB2GRAY);
+        emit videoPosition(100*((float) stream.get(cv::CAP_PROP_POS_FRAMES))/number_frames);
+        //if(image_buffer.channels() == 3)
+        //    cv::cvtColor(image_buffer, image_buffer, cv::COLOR_RGB2GRAY);
 
         cv::Mat(image_buffer,
                 cv::Rect(0, 0, image_buffer.cols / 2, image_buffer.rows))

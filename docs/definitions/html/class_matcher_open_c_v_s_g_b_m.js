@@ -1,8 +1,8 @@
 var class_matcher_open_c_v_s_g_b_m =
 [
     [ "MatcherOpenCVSGBM", "class_matcher_open_c_v_s_g_b_m.html#a13bbc096906b22720a18a5b2c31b9ed4", null ],
-    [ "backwardMatch", "class_matcher_open_c_v_s_g_b_m.html#a3cd2e33926c85e87df779badc5a86f51", null ],
-    [ "forwardMatch", "class_matcher_open_c_v_s_g_b_m.html#a10443707c8205bb90461fd6b4f8e79d8", null ],
+    [ "backwardMatch", "class_matcher_open_c_v_s_g_b_m.html#a3f20680b00dc5c4da92136fc47afb68c", null ],
+    [ "forwardMatch", "class_matcher_open_c_v_s_g_b_m.html#a59d7838fc00d64ef32c42c8b1d11bb72", null ],
     [ "getBlockSize", "class_matcher_open_c_v_s_g_b_m.html#a995f6a2e469eb9b3412b37c1da5ea16c", null ],
     [ "getDisp12MaxDiff", "class_matcher_open_c_v_s_g_b_m.html#a8fe62c6d80597541d02c18709d9516d2", null ],
     [ "getDisparityRange", "class_matcher_open_c_v_s_g_b_m.html#a30e6692b076c5adf8ef1e1584c03202a", null ],
@@ -14,6 +14,7 @@ var class_matcher_open_c_v_s_g_b_m =
     [ "getUniquenessRatio", "class_matcher_open_c_v_s_g_b_m.html#aef6c00036288432502b1280d642a4263", null ],
     [ "init", "class_matcher_open_c_v_s_g_b_m.html#aefee35a45c109a413b40da4b99b453fb", null ],
     [ "isLicenseValid", "class_matcher_open_c_v_s_g_b_m.html#a6c199904ec77b5c3cf1ea703af741632", null ],
+    [ "isWLSFilterEnabled", "class_matcher_open_c_v_s_g_b_m.html#a0ed2a341fce9566663dfca7139a57009", null ],
     [ "saveParams", "class_matcher_open_c_v_s_g_b_m.html#a45225a59cee1727abce90e6dea990418", null ],
     [ "setBlockSize", "class_matcher_open_c_v_s_g_b_m.html#afb8e186fd35dc7830afbea0f525025e7", null ],
     [ "setDisp12MaxDiff", "class_matcher_open_c_v_s_g_b_m.html#a27a251f5645a7ebc813290aec5b2fea6", null ],
@@ -23,6 +24,7 @@ var class_matcher_open_c_v_s_g_b_m =
     [ "setSpeckleFilterWindow", "class_matcher_open_c_v_s_g_b_m.html#a66e9c8a8087464e291a90c5b0dd9e795", null ],
     [ "setUniquenessRatio", "class_matcher_open_c_v_s_g_b_m.html#a9e7548ef4d0e13312aa2e0836e8714af", null ],
     [ "setupDefaultMatcher", "class_matcher_open_c_v_s_g_b_m.html#a60bb163b383cb432054193e05483bba1", null ],
+    [ "setWLSFilterEnabled", "class_matcher_open_c_v_s_g_b_m.html#a5b6714644c746409fb795b49124b3f13", null ],
     [ "matcher", "class_matcher_open_c_v_s_g_b_m.html#aa878ab5934a1b8820c50f121863869c2", null ],
     [ "wls_filter", "class_matcher_open_c_v_s_g_b_m.html#a6df2149f10933ec9a0206026c9ea9bfb", null ],
     [ "wls_lambda", "class_matcher_open_c_v_s_g_b_m.html#a4e8d870266215772331608727f0ca50d", null ],

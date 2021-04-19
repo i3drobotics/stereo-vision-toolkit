@@ -10,8 +10,7 @@ void MatcherOpenCVSGBM::init(void) {
   QString matcher_parameters = QStandardPaths::AppConfigLocation+"/stereo_bm_params.xml";
   if(QFile(matcher_parameters).exists()){
       try {
-        matcher =
-            cv::StereoSGBM::load<cv::StereoSGBM>(matcher_parameters.toStdString());
+          matcher = cv::StereoSGBM::load<cv::StereoSGBM>(matcher_parameters.toStdString());
       } catch (cv::Exception& e) {
           qDebug() << "Error loading SGBM matching parameters: " << e.msg.c_str();
           setupDefaultMatcher();
@@ -64,41 +63,55 @@ void MatcherOpenCVSGBM::setSpeckleFilterRange(int range) {
   matcher->setSpeckleRange(range);
 }
 
+void MatcherOpenCVSGBM::setWLSFilterEnabled(bool enable) {
+    wls_filter = enable;
+}
+
 int MatcherOpenCVSGBM::getErrorDisparity(void){
     return min_disparity - 1;
 }
 
-void MatcherOpenCVSGBM::forwardMatch() {
+bool MatcherOpenCVSGBM::forwardMatch(cv::Mat left_img, cv::Mat right_img) {
   matcher->setMinDisparity(min_disparity);
-
-
-
   try {
-    matcher->compute(*left, *right, disparity_lr);
+      if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
+        matcher->compute(left_img, right_img, disparity_lr);
+        if(wls_filter){
+#ifdef WITH_OPENCV_CONTRIB
+            backwardMatch(left_img,right_img);
+            cv::Mat disparity_filter;
+            auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
+            wls_filter->setLambda(wls_lambda);
+            wls_filter->setSigmaColor(wls_sigma);
+            wls_filter->filter(disparity_lr,left_img,disparity_filter,disparity_rl);
 
-    if(wls_filter){
-        backwardMatch();
-        cv::Mat disparity_filter;
-        auto wls_filter = cv::ximgproc::createDisparityWLSFilter(matcher);
-        wls_filter->setLambda(wls_lambda);
-        wls_filter->setSigmaColor(wls_sigma);
-        wls_filter->filter(disparity_lr,*left,disparity_filter,disparity_rl);
-
-        disparity_filter.convertTo(disparity_lr, CV_32F);
-    }else{
-
-        disparity_lr.convertTo(disparity_lr, CV_32F);
-    }
-
+            disparity_filter.convertTo(disparity_lr, CV_32F);
+#else
+            disparity_lr.convertTo(disparity_lr, CV_32F);
+#endif
+        }else{
+            disparity_lr.convertTo(disparity_lr, CV_32F);
+        }
+        return true;
+      } else {
+          qDebug() << "Invalid image type for stereo matcher. MUST be CV_8UC1.";
+          return false;
+      }
 
   } catch (...) {
     qDebug() << "Error in SGBM match parameters";
+    return false;
   }
 }
 
-void MatcherOpenCVSGBM::backwardMatch() {
-  auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
-  right_matcher->compute(*right, *left, disparity_rl);
+bool MatcherOpenCVSGBM::backwardMatch(cv::Mat left_img, cv::Mat right_img) {
+#ifdef WITH_OPENCV_CONTRIB
+    auto right_matcher = cv::ximgproc::createRightMatcher(matcher);
+    right_matcher->compute(right_img, left_img, disparity_rl);
+    return true;
+#else
+    return false;
+#endif
 }
 
 void MatcherOpenCVSGBM::saveParams() {

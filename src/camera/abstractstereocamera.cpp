@@ -5,21 +5,50 @@
 
 #include "abstractstereocamera.h"
 
+std::string AbstractStereoCamera::CAMERA_NAME_TARA = "tara";
+std::string AbstractStereoCamera::CAMERA_NAME_TIS = "tis";
+std::string AbstractStereoCamera::CAMERA_NAME_VIMBA = "vimba";
+std::string AbstractStereoCamera::CAMERA_NAME_USB = "usb";
+std::string AbstractStereoCamera::CAMERA_NAME_BASLER_GIGE = "baslergige";
+std::string AbstractStereoCamera::CAMERA_NAME_BASLER_USB = "baslerusb";
+std::string AbstractStereoCamera::CAMERA_NAME_DEIMOS = "deimos";
+std::string AbstractStereoCamera::CAMERA_NAME_PHOBOS_BASLER_GIGE = "phobosbaslergige";
+std::string AbstractStereoCamera::CAMERA_NAME_PHOBOS_BASLER_USB = "phobosbaslerusb";
+std::string AbstractStereoCamera::CAMERA_NAME_PHOBOS_TIS_USB = "phobostisusb";
+std::string AbstractStereoCamera::CAMERA_NAME_TITANIA_BASLER_GIGE = "titaniabaslergige";
+std::string AbstractStereoCamera::CAMERA_NAME_TITANIA_BASLER_USB = "titaniabaslerusb";
+std::string AbstractStereoCamera::CAMERA_NAME_TITANIA_VIMBA_USB = "titaniavimbausb";
+std::string AbstractStereoCamera::CAMERA_NAME_INVALID = "invalid";
+
 AbstractStereoCamera::AbstractStereoCamera(StereoCameraSerialInfo serial_info, StereoCameraSettings camera_settings, QObject *parent) :
     QObject(parent),
-    stereoCameraSerialInfo_(serial_info),
-    stereoCameraSettings_(camera_settings),
     ptCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>)),
-    cv_video_writer(new cv::VideoWriter())
+    cv_video_writer(new cv::VideoWriter()),
+    stereoCameraSettings_(camera_settings),
+    stereoCameraSerialInfo_(serial_info)
 {
 
 #ifdef WITH_CUDA
-    if (cv::cuda::getCudaEnabledDeviceCount() > 0) {
-        cuda_device_found = true;
+    
+    try
+    {
+        if (cv::cuda::getCudaEnabledDeviceCount() > 0) {
+            cuda_device_found = true;
+        }
+    }
+    catch( cv::Exception& e )
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+        std::cout << "Disabling GPU CUDA functions" << std::endl;
+        cuda_device_found = false;
     }
 #endif
     //startThread();
-    connect(this, SIGNAL(captured_success()), this, SLOT(processStereo()));
+    //connect(this, SIGNAL(captured_success()), this, SLOT(processStereo()));
+    connect(this, SIGNAL(captured_success()), this, SLOT(processNewCapture()));
+    connect(this, SIGNAL(stereopair_processed()), this, SLOT(processNewStereo()));
+    //connect(this, SIGNAL(matched()), this, SLOT(processNewMatch()));
     connect(this, SIGNAL(captured_success()), this, SLOT(resetFailFrameCount()));
 }
 
@@ -40,30 +69,53 @@ void AbstractStereoCamera::stopThread(){
 std::string AbstractStereoCamera::StereoCameraType2String(StereoCameraType camera_type){
     switch(camera_type)
     {
-        case CAMERA_TYPE_DEIMOS  : return "deimos"; break;
-        case CAMERA_TYPE_BASLER_GIGE  : return "baslergige"; break;
-        case CAMERA_TYPE_BASLER_USB  : return "baslerusb"; break;
-        case CAMERA_TYPE_TIS  : return "tis"; break;
-        case CAMERA_TYPE_VIMBA  : return "vimba"; break;
-        default  : return ""; break;
+        case CAMERA_TYPE_TARA : return CAMERA_NAME_TARA; break;
+        case CAMERA_TYPE_TIS : return CAMERA_NAME_TIS; break;
+        case CAMERA_TYPE_VIMBA : return CAMERA_NAME_VIMBA; break;
+        case CAMERA_TYPE_USB : return CAMERA_NAME_USB; break;
+        case CAMERA_TYPE_BASLER_GIGE : return CAMERA_NAME_BASLER_GIGE; break;
+        case CAMERA_TYPE_BASLER_USB : return CAMERA_NAME_BASLER_USB; break;
+        case CAMERA_TYPE_DEIMOS : return CAMERA_NAME_DEIMOS; break;
+        case CAMERA_TYPE_PHOBOS_BASLER_GIGE : return CAMERA_NAME_PHOBOS_BASLER_GIGE; break;
+        case CAMERA_TYPE_PHOBOS_BASLER_USB : return CAMERA_NAME_PHOBOS_BASLER_USB; break;
+        case CAMERA_TYPE_PHOBOS_TIS_USB : return CAMERA_NAME_PHOBOS_TIS_USB; break;
+        case CAMERA_TYPE_TITANIA_BASLER_GIGE : return CAMERA_NAME_TITANIA_BASLER_GIGE; break;
+        case CAMERA_TYPE_TITANIA_BASLER_USB : return CAMERA_NAME_TITANIA_BASLER_USB; break;
+        case CAMERA_TYPE_TITANIA_VIMBA_USB : return CAMERA_NAME_TITANIA_VIMBA_USB; break;
+        default  : return CAMERA_NAME_INVALID; break;
     }
 }
 
 AbstractStereoCamera::StereoCameraType AbstractStereoCamera::String2StereoCameraType(std::string camera_type){
-    if (camera_type.compare("deimos") == 0){
-        return CAMERA_TYPE_DEIMOS;
-    } else if (camera_type.compare("usb") == 0){
-        return CAMERA_TYPE_USB;
-    } else if (camera_type.compare("baslergige") == 0){
-        return CAMERA_TYPE_BASLER_GIGE;
-    } else if (camera_type.compare("baslerusb") == 0){
-        return CAMERA_TYPE_BASLER_USB;
-    } else if (camera_type.compare("tis") == 0){
+    if (camera_type.compare(CAMERA_NAME_TARA) == 0){
+        return CAMERA_TYPE_TARA;
+    } else if (camera_type.compare(CAMERA_NAME_TIS) == 0){
         return CAMERA_TYPE_TIS;
-    } else if (camera_type.compare("vimba") == 0){
+    } else if (camera_type.compare(CAMERA_NAME_VIMBA) == 0){
         return CAMERA_TYPE_VIMBA;
+    } else if (camera_type.compare(CAMERA_NAME_USB) == 0){
+        return CAMERA_TYPE_USB;
+    } else if (camera_type.compare(CAMERA_NAME_BASLER_GIGE) == 0){
+        return CAMERA_TYPE_BASLER_GIGE;
+    } else if (camera_type.compare(CAMERA_NAME_BASLER_USB) == 0){
+        return CAMERA_TYPE_BASLER_USB;
+    } else if (camera_type.compare(CAMERA_NAME_DEIMOS) == 0){
+        return CAMERA_TYPE_DEIMOS;
+    } else if (camera_type.compare(CAMERA_NAME_PHOBOS_BASLER_GIGE) == 0){
+        return CAMERA_TYPE_PHOBOS_BASLER_GIGE;
+    } else if (camera_type.compare(CAMERA_NAME_PHOBOS_BASLER_USB) == 0){
+        return CAMERA_TYPE_PHOBOS_BASLER_USB;
+    } else if (camera_type.compare(CAMERA_NAME_PHOBOS_TIS_USB) == 0){
+        return CAMERA_TYPE_PHOBOS_TIS_USB;
+    } else if (camera_type.compare(CAMERA_NAME_TITANIA_BASLER_GIGE) == 0){
+        return CAMERA_TYPE_TITANIA_BASLER_GIGE;
+    } else if (camera_type.compare(CAMERA_NAME_TITANIA_BASLER_USB) == 0){
+        return CAMERA_TYPE_TITANIA_BASLER_USB;
+    } else if (camera_type.compare(CAMERA_NAME_TITANIA_VIMBA_USB) == 0){
+        return CAMERA_TYPE_TITANIA_VIMBA_USB;
+    } else {
+        return CAMERA_TYPE_INVALID;
     }
-    return CAMERA_TYPE_INVALID;
 }
 
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> AbstractStereoCamera::loadSerials(AbstractStereoCamera::StereoCameraType camera_type, std::string filename){
@@ -110,25 +162,96 @@ void AbstractStereoCamera::saveImageTimestamped(void) {
 }
 
 void AbstractStereoCamera::imageSaved(bool success){
-    emit savedImage(file_save_directory);
+    emit savedImage(success);
 }
 
+void AbstractStereoCamera::saveDisparity(QString filename) {
+    cv::Mat disparity_output;
+
+    getDisparityFiltered(disparity_output);
+
+    cv::imwrite(filename.toStdString(), disparity_output);
+
+    return;
+}
+
+void AbstractStereoCamera::saveDisparityColormap(QString filename) {
+    cv::Mat disparity_main, disparity_output;
+
+    getDisparity(disparity_main);
+    //generate normalised colormap for saving
+    CVSupport::disparity2colormap(disparity_main,Q,disparity_output);
+
+    cv::imwrite(filename.toStdString(), disparity_output);
+
+    return;
+}
+
+void AbstractStereoCamera::saveRGBD(QString filename, bool enable_16bit, float scale_16bit){
+    cv::Mat rgbd, color, depth, Q, depth_z, depth_split[3];;
+    getLeftMatchImage(color);
+    getDepth(depth);
+    getQ(Q);
+
+    // extract Z only channel from depth (xyz) image
+    cv::split(depth, depth_split);
+    depth_z = depth_split[2];
+    // get horizontal fov from Q matrix
+    float hfov = CVSupport::getHFOVFromQ(Q);
+    // embed horizontal fov in top left pixel of z only depth image to simplify reconstruction
+    depth_z.at<float>(0,0) = (float)hfov;
+    if (!depth_z.empty() && !color.empty()){
+        // convert image to rgb
+        if (color.type() == CV_8UC1){
+            cvtColor(color,color,cv::COLOR_GRAY2RGB);
+        } else if (color.type() == CV_8UC3){
+            cvtColor(color,color,cv::COLOR_BGR2RGB);
+        } else {
+            std::cerr << "Invalid image type for saving RGBD" << std::endl;
+        }
+        // Create RGBD image from color image and z only depth image
+        if (enable_16bit){
+            rgbd = CVSupport::createRGBD16(color,depth_z,scale_16bit,false);
+        } else {
+            rgbd = CVSupport::createRGBD32(color,depth_z);
+        }
+        qDebug() << "Saving rgbd image...";
+        cv::imwrite(filename.toStdString(), rgbd);
+    } else {
+        std::cerr << "Depth image or camera image is empty." << std::endl;
+        return;
+    }
+}  
+
 void AbstractStereoCamera::saveImage(QString fname) {
-    file_save_directory = fname;
+    setFileSaveDirectory(fname);
 
     cv::Mat left, right;
+    std::string filename_r, filename_l;
     if (rectifying) {
-        left_remapped.copyTo(left);
-        right_remapped.copyTo(right);
+        filename_l = fname.toStdString() + "_l_rect.png";
+        filename_r = fname.toStdString() + "_r_rect.png";
     } else {
-        left_raw.copyTo(left);
-        right_raw.copyTo(right);
+        filename_l = fname.toStdString() + "_l.png";
+        filename_r = fname.toStdString() + "_r.png";
     }
 
+    left = left_output.clone();
+    right = right_output.clone();
+
+    std::vector<int> params(cv::IMWRITE_PNG_COMPRESSION,0);
+    qDebug() << "Saving left image...";
+    cv::imwrite(filename_l,left,params);
+    qDebug() << "Saving right image...";
+    cv::imwrite(filename_r,right,params);
+    qDebug() << "Image saving complete.";
+    imageSaved(true);
+
+    /*
     QFuture<bool> rect_l = QtConcurrent::run(
-                CVSupport::write_parallel, fname.toStdString() + "_l_rect.png", left_remapped);
+                CVSupport::write_parallel, filename_l, left);
     QFuture<bool> rect_r = QtConcurrent::run(
-                CVSupport::write_parallel, fname.toStdString() + "_r_rect.png", right_remapped);
+                CVSupport::write_parallel, filename_r, right);
 
     QFutureWatcher<bool> futureWatcher_l, futureWatcher_r;
     QObject::connect(&futureWatcher_l, SIGNAL(finished(bool)), this, SLOT(imageSaved(bool)));
@@ -136,10 +259,12 @@ void AbstractStereoCamera::saveImage(QString fname) {
 
     futureWatcher_l.setFuture(rect_l);
     futureWatcher_r.setFuture(rect_r);
+    */
 
     if(matching && savingDisparity){
-        matcher->saveDisparity(fname + "_disp_raw.png");
-        matcher->saveDisparityColormap(fname + "_disp_colormap.png");
+        saveDisparity(fname + "_disp_raw.tif");
+        saveDisparityColormap(fname + "_disp_colormap.png");
+        saveRGBD(fname + "_rgbd.png");
     }
 }
 
@@ -149,126 +274,10 @@ void AbstractStereoCamera::setVisualZmin(double zmin){
     qDebug() << "Set vmin: " << zmin;
 }
 
-
 void AbstractStereoCamera::setVisualZmax(double zmax){
     assert(zmax > 0);
     visualisation_max_z = zmax;
     qDebug() << "Set vmax: " << zmax;
-}
-
-void AbstractStereoCamera::reproject3D() {
-
-    cv::Mat disparity_downscale;
-    cv::Mat disparity;
-
-    matcher->getDisparity(disparity);
-    disparity.copyTo(disparity_downscale);
-
-    cv::Mat depth;
-    matcher->calcDepth(disparity,depth);
-
-    qDebug() << "disparity image size: " << disparity_downscale.size().width << "," << disparity_downscale.size().height;
-
-    //cv::abs(disparity_downscale);
-
-    // By default the disparity maps are scaled by a factor of 16.0
-    disparity_downscale /= 16.0;
-
-    int row = (disparity_downscale.rows-1)/2;
-    int column = (disparity_downscale.cols-1)/2;
-    float disp_val_f =  disparity_downscale.at<float>(row, column);
-    qDebug() << "IMAGE CENTER: " << column+1 << "," << row+1;
-    qDebug() << "DISPARITY AT CENTER: " << disp_val_f;
-
-    if (Q.empty() || disparity_downscale.empty()) {
-        qDebug() << "Q or disparity map is empty";
-        return;
-    }
-
-    //cv::reprojectImageTo3D(disparity_downscale, stereo_reprojected, Q, true);
-
-    //qDebug() << "reprojected image size: " << stereo_reprojected.size().width << "," << stereo_reprojected.size().height;
-
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp(
-                new pcl::PointCloud<pcl::PointXYZRGB>);
-
-    pcl::PointXYZRGB point;
-    uint32_t rgb = 0;
-
-    point.x = 0;
-    point.y = 0;
-    point.z = 0;
-
-    rgb = ((int)255) << 16 | ((int)255) << 8 | ((int)255);
-    point.rgb = *reinterpret_cast<float *>(&rgb);
-    ptCloudTemp->points.push_back(point);
-
-    cv::Matx44d _Q;
-    Q.convertTo(_Q, CV_64F);
-
-    for (int i = 0; i < disparity_downscale.rows; i++)
-    {
-        for (int j = 0; j < disparity_downscale.cols; j++)
-        {
-            float d = disparity_downscale.at<float>(i, j);
-
-            if (d < 10000 && d > 0){
-                float x_index = j;
-                float y_index = i;
-
-                //qDebug() << d;
-
-                cv::Vec4d homg_pt = _Q * cv::Vec4d((double)x_index, (double)y_index, (double)d, 1.0);
-
-                float x = (float)homg_pt[0] / (float)homg_pt[3];
-                float y = (float)homg_pt[1] / (float)homg_pt[3];
-                float z = (float)homg_pt[2] / (float)homg_pt[3];
-
-                uchar intensity = left_remapped.at<uchar>(i,j);
-
-                pcl::PointXYZRGB point;
-                point.x = x;
-                point.y = y;
-                point.z = z;
-                point.r = intensity;
-                point.g = intensity;
-                point.b = intensity;
-                ptCloudTemp->points.push_back(point);
-            }
-        }
-    }
-
-    if(ptCloudTemp->points.empty()){
-        qDebug() << "Failed to create Point cloud. Point cloud is empty";
-        return;
-    }
-
-    pcl::PassThrough<pcl::PointXYZRGB> pass;
-    pass.setInputCloud (ptCloudTemp);
-    pass.setFilterFieldName ("z");
-    pass.setFilterLimits(visualisation_min_z, visualisation_max_z);
-    pass.filter(*ptCloudTemp);
-
-    /*
-  pcl::RadiusOutlierRemoval<pcl::PointXYZRGB> outrem;
-  outrem.setInputCloud(ptCloudTemp);
-  outrem.setRadiusSearch(0.05);
-  outrem.setMinNeighborsInRadius (5);
-  outrem.filter (*ptCloudTemp);
-
-  pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
-  sor.setInputCloud (ptCloudTemp);
-  sor.setMeanK (5);
-  sor.setStddevMulThresh (4.0);
-  sor.filter(*ptCloudTemp);
-  */
-
-    ptCloud = ptCloudTemp;
-
-    qDebug() << "tmp point cloud size: " << ptCloudTemp->points.size();
-    qDebug() << "point cloud size: " << ptCloud->points.size();
-
-    emit reprojected();
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr AbstractStereoCamera::getPointCloud(){
@@ -298,7 +307,7 @@ void AbstractStereoCamera::savePointCloud(){
     ptCloud->sensor_origin_ = Eigen::Vector4f::Zero();
 
     //TODO Figure out how to disable outputting camera information in the PLY file
-    int exit_code = pcl::io::savePLYFile(fname.toStdString(), *ptCloud);
+    int exit_code = pcl::io::savePLYFileBinary(fname.toStdString(), *ptCloud);
 
     QString msgBoxMessage;
     if (exit_code == 0){ //Point cloud saved successfully
@@ -323,6 +332,33 @@ void AbstractStereoCamera::enableRectify(bool rectify) {
 
 void AbstractStereoCamera::enableCaptureRectifedVideo(bool rectify) {
     capturing_rectified_video = rectify;
+}
+
+void AbstractStereoCamera::getQ(cv::Mat &Q_){
+    Q.copyTo(Q_);
+}
+
+bool AbstractStereoCamera::setVideoSource(int source_index){
+    // 0: stereo, 1: left, 2:right, 3:disparity
+    switch(source_index) {
+    case 0: // stereo
+        video_src = VIDEO_SRC_STEREO;
+        break;
+    case 1: // left
+        video_src = VIDEO_SRC_LEFT;
+        break;
+    case 2: // right
+        video_src = VIDEO_SRC_RIGHT;
+        break;
+    case 3: // disparity
+        video_src = VIDEO_SRC_DISPARITY;
+        break;
+    default:
+        qDebug() << "Invalid video source index. MUST be 0: stereo, 1: left, 2:right, 3:disparity";
+        return false;
+        break;
+    }
+    return true;
 }
 
 void AbstractStereoCamera::enableSwapLeftRight(bool swap){
@@ -357,18 +393,124 @@ bool AbstractStereoCamera::isSavingDisparity() { return savingDisparity; }
 
 bool AbstractStereoCamera::isConnected() { return connected; }
 
-void AbstractStereoCamera::getLeftImage(cv::Mat &dst) { left_output.copyTo(dst); }
+void AbstractStereoCamera::getLeftImage(cv::Mat &dst) {
+    lr_image_mutex.lock();
+    left_output.copyTo(dst);
+    lr_image_mutex.unlock();
+}
 
-void AbstractStereoCamera::getRightImage(cv::Mat &dst) { right_output.copyTo(dst); }
+void AbstractStereoCamera::getRightImage(cv::Mat &dst) {
+    lr_image_mutex.lock();
+    right_output.copyTo(dst);
+    lr_image_mutex.unlock();
+}
 
-cv::Mat AbstractStereoCamera::getLeftImage(void) { return left_raw.clone(); }
+cv::Mat AbstractStereoCamera::getLeftImage(void) {
+    lr_image_mutex.lock();
+    return left_output.clone();
+    lr_image_mutex.unlock();
+}
 
-cv::Mat AbstractStereoCamera::getRightImage(void) { return right_raw.clone(); }
+cv::Mat AbstractStereoCamera::getRightImage(void) {
+    lr_image_mutex.lock();
+    return right_output.clone();
+    lr_image_mutex.unlock();
+}
+
+void AbstractStereoCamera::getLeftRawImage(cv::Mat &dst) {
+    lr_raw_image_mutex.lock();
+    left_unrectified.copyTo(dst);
+    lr_raw_image_mutex.unlock();
+}
+
+void AbstractStereoCamera::getRightRawImage(cv::Mat &dst) {
+    lr_raw_image_mutex.lock();
+    right_unrectified.copyTo(dst);
+    lr_raw_image_mutex.unlock();
+}
+
+cv::Mat AbstractStereoCamera::getLeftRawImage(void) {
+    lr_raw_image_mutex.lock();
+    return left_unrectified.clone();
+    lr_raw_image_mutex.unlock();
+}
+
+cv::Mat AbstractStereoCamera::getRightRawImage(void) {
+    lr_raw_image_mutex.lock();
+    return right_unrectified.clone();
+    lr_raw_image_mutex.unlock();
+}
+
+void AbstractStereoCamera::getRightMatchImage(cv::Mat &dst){
+    disparity_mutex.lock();
+    right_match.copyTo(dst);
+    disparity_mutex.unlock();
+}
+
+void AbstractStereoCamera::getLeftMatchImage(cv::Mat &dst){
+    disparity_mutex.lock();
+    left_match.copyTo(dst);
+    disparity_mutex.unlock();
+}
+
+void AbstractStereoCamera::getDisparity(cv::Mat &dst) {
+    disparity_mutex.lock();
+    disparity.copyTo(dst);
+    disparity_mutex.unlock();
+}
+
+cv::Mat AbstractStereoCamera::getDisparity(){
+    disparity_mutex.lock();
+    return disparity.clone();
+    disparity_mutex.unlock();
+}
+
+void AbstractStereoCamera::getDisparityFiltered(cv::Mat &dst) {
+    disparity_mutex.lock();
+    disparity_filtered.copyTo(dst);
+    disparity_mutex.unlock();
+}
+
+cv::Mat AbstractStereoCamera::getDisparityFiltered(){
+    disparity_mutex.lock();
+    return disparity_filtered.clone();
+    disparity_mutex.unlock();
+}
+
+void AbstractStereoCamera::getDepth(cv::Mat &dst) {
+    disparity_mutex.lock();
+    depth.copyTo(dst);
+    disparity_mutex.unlock();
+}
+
+cv::Mat AbstractStereoCamera::getDepth(){
+    disparity_mutex.lock();
+    return depth.clone();
+    disparity_mutex.unlock();
+}
 
 void AbstractStereoCamera::generateRectificationMaps(cv::Size image_size){
+    /*
+    cv::Mat dl_camera_matrix = l_camera_matrix.clone();
+    cv::Mat dr_camera_matrix = r_camera_matrix.clone();
+    cv::Mat dl_proj_mat = l_proj_mat.clone();
+    cv::Mat dr_proj_mat = r_proj_mat.clone();
+    dl_camera_matrix.at<double>(0,2) *= downsample_factor;
+    dl_camera_matrix.at<double>(1,2) *= downsample_factor;
+    dl_camera_matrix.at<double>(0,2) *= downsample_factor;
+    dl_camera_matrix.at<double>(1,2) *= downsample_factor;
+    dr_camera_matrix.at<double>(0,2) *= downsample_factor;
+    dr_camera_matrix.at<double>(1,2) *= downsample_factor;
+    dl_proj_mat.at<double>(0,2) *= downsample_factor;
+    dl_proj_mat.at<double>(1,2) *= downsample_factor;
+    dr_proj_mat.at<double>(0,2) *= downsample_factor;
+    dr_proj_mat.at<double>(1,2) *= downsample_factor;
+    */
+
     cv::initUndistortRectifyMap(l_camera_matrix,l_dist_coeffs,l_rect_mat,l_proj_mat,image_size,CV_32FC1,rectmapx_l,rectmapy_l);
     cv::initUndistortRectifyMap(r_camera_matrix,r_dist_coeffs,r_rect_mat,r_proj_mat,image_size,CV_32FC1,rectmapx_r,rectmapy_r);
     rectification_valid = true;
+    QCoreApplication::processEvents();
 }
 
 bool AbstractStereoCamera::loadXMLRectificationMaps(QString src_l, QString src_r) {
@@ -384,6 +526,7 @@ bool AbstractStereoCamera::loadXMLRectificationMaps(QString src_l, QString src_r
     } else {
         res = false;
     }
+    QCoreApplication::processEvents();
 
     if (fs_r.isOpened()) {
         fs_r["x"] >> rectmapx_r;
@@ -394,6 +537,7 @@ bool AbstractStereoCamera::loadXMLRectificationMaps(QString src_l, QString src_r
 
     fs_l.release();
     fs_r.release();
+    QCoreApplication::processEvents();
 
     return res;
 }
@@ -412,6 +556,16 @@ bool AbstractStereoCamera::loadCalibrationXML(QString directory) {
     directory = QDir::cleanPath(directory);
 
     bool load_rectification = true;
+
+    if (!loadCalibrationXMLFiles(directory + "/left_calibration.xml",
+                         directory + "/right_calibration.xml",
+                         directory + "/stereo_calibration.xml")) {
+        qDebug() << "Couldn't load camera calibration";
+        calibration_valid = false;
+        return false;
+    }
+    QCoreApplication::processEvents();
+
     if (load_rectification){
         if (!loadXMLRectificationMaps(directory + "/left_rectification.xml", directory + "/right_rectification.xml")){
             rectification_valid = false;
@@ -424,17 +578,14 @@ bool AbstractStereoCamera::loadCalibrationXML(QString directory) {
                 cal_image_height != image_height || rectmapy_r.rows != image_height) {
             rectification_valid = false;
             qDebug() << "Image size doesn't match rectification maps";
+            qDebug() << "Cal image size: " << cal_image_width << "," << cal_image_height;
+            qDebug() << "Rectmap size: " << rectmapx_r.cols << "," << rectmapy_r.rows;
+            qDebug() << "Camera image size: " << image_width << "," << image_height;
 
             return false;
         }
     }
-    if (!loadCalibrationXMLFiles(directory + "/left_calibration.xml",
-                         directory + "/right_calibration.xml",
-                         directory + "/stereo_calibration.xml")) {
-        qDebug() << "Couldn't load camera calibration";
-        calibration_valid = false;
-        return false;
-    }
+    QCoreApplication::processEvents();
 
     rectification_valid = true;
 
@@ -456,6 +607,7 @@ bool AbstractStereoCamera::loadCalibrationXMLFiles(QString left_cal, QString rig
     }
 
     fs_l.release();
+    QCoreApplication::processEvents();
 
     cv::FileStorage fs_r(right_cal.toStdString(), flags);
 
@@ -467,6 +619,7 @@ bool AbstractStereoCamera::loadCalibrationXMLFiles(QString left_cal, QString rig
     }
 
     fs_r.release();
+    QCoreApplication::processEvents();
 
     cv::FileStorage fs_s(stereo_cal.toStdString(), flags);
 
@@ -481,49 +634,271 @@ bool AbstractStereoCamera::loadCalibrationXMLFiles(QString left_cal, QString rig
     }
 
     fs_s.release();
+    QCoreApplication::processEvents();
 
     return true;
 }
 
 bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString right_cal) {
     // implimented from (https://github.com/i3drobotics/pyStereo3D/blob/master/Stereo3D/Stereo3D/StereoCalibration.py)
-    int flags = cv::FileStorage::READ;
-
-    cv::FileStorage fs_l(left_cal.toStdString(), flags);
-
-    if (fs_l.isOpened()) {
-        fs_l["image_width"] >> cal_image_width;
-        fs_l["image_height"] >> cal_image_height;
-        fs_l["camera_matrix"] >> l_camera_matrix;
-        fs_l["distortion_coefficients"] >> l_dist_coeffs;
-        fs_l["rectification_matrix"] >> l_rect_mat;
-        fs_l["projection_matrix"] >> l_proj_mat;
-    } else {
-        return false;
-    }
-
-    fs_l.release();
-
-    if (cal_image_width != image_width || cal_image_height != image_height){
-        qDebug() << "Image size does not match calibrated image size";
-        return false;
-    }
-
-    cv::FileStorage fs_r(right_cal.toStdString(), flags);
-
     int cal_r_image_width, cal_r_image_height;
-    if (fs_r.isOpened()) {
-        fs_r["image_width"] >> cal_r_image_width;
-        fs_r["image_height"] >> cal_r_image_height;
-        fs_r["camera_matrix"] >> r_camera_matrix;
-        fs_r["distortion_coefficients"] >> r_dist_coeffs;
-        fs_r["rectification_matrix"] >> r_rect_mat;
-        fs_r["projection_matrix"] >> r_proj_mat;
+
+    // Detect yaml format type (cv or ros)
+    // Read first line of file
+    QFile yamlFile(left_cal);
+    QString first_line = "";
+    if (yamlFile.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&yamlFile);
+       first_line = in.readLine();
+       yamlFile.close();
+    }
+    if (first_line.contains("%YAML:1.0")){
+        // CV Filestorage yaml
+        int flags = cv::FileStorage::READ;
+
+        cv::FileStorage fs_l(left_cal.toStdString(), flags);
+
+        if (fs_l.isOpened()) {
+            fs_l["image_width"] >> cal_image_width;
+            fs_l["image_height"] >> cal_image_height;
+            fs_l["camera_matrix"] >> l_camera_matrix;
+            fs_l["distortion_coefficients"] >> l_dist_coeffs;
+            fs_l["rectification_matrix"] >> l_rect_mat;
+            fs_l["projection_matrix"] >> l_proj_mat;
+        } else {
+            return false;
+        }
+
+        fs_l.release();
+        QCoreApplication::processEvents();
+
+        if (cal_image_width != image_width || cal_image_height != image_height){
+            qDebug() << "Image size does not match calibrated image size";
+            return false;
+        }
+
+        cv::FileStorage fs_r(right_cal.toStdString(), flags);
+
+        if (fs_r.isOpened()) {
+            fs_r["image_width"] >> cal_r_image_width;
+            fs_r["image_height"] >> cal_r_image_height;
+            fs_r["camera_matrix"] >> r_camera_matrix;
+            fs_r["distortion_coefficients"] >> r_dist_coeffs;
+            fs_r["rectification_matrix"] >> r_rect_mat;
+            fs_r["projection_matrix"] >> r_proj_mat;
+        } else {
+            return false;
+        }
+
+        fs_r.release();
+    } else if (first_line.contains("image_width")){
+        // ROS Perception yaml
+
+        //TODO support badly formatted yaml
+
+        // Read left yaml
+        QFile leftYamlFile(left_cal);
+        QList<QString> left_lines;
+        if (leftYamlFile.open(QIODevice::ReadOnly))
+        {
+           QTextStream in(&leftYamlFile);
+           while (!in.atEnd())
+           {
+              QString line = in.readLine();
+              left_lines.append(line);
+           }
+           leftYamlFile.close();
+        }
+        if (left_lines.length() == 20){
+
+            if (left_lines[0].contains("image_width:")){
+                QStringList split_line = left_lines[0].split(':');
+                cal_image_width = split_line[1].toInt();
+            } else {
+                return false;
+            }
+            if (left_lines[1].contains("image_height:")){
+                QStringList split_line = left_lines[1].split(':');
+                cal_image_height = split_line[1].toInt();
+            } else {
+                return false;
+            }
+            if (left_lines[6].contains("data:")){
+                QStringList camera_matrix_line = left_lines[6].split(':');
+                QStringList camera_matrix_data = camera_matrix_line[1].split(',');
+                l_camera_matrix = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                l_camera_matrix.at<double>(0,0) = camera_matrix_data[0].split('[')[1].toDouble();
+                l_camera_matrix.at<double>(0,1) = camera_matrix_data[1].toDouble();
+                l_camera_matrix.at<double>(0,2) = camera_matrix_data[2].toDouble();
+                l_camera_matrix.at<double>(1,0) = camera_matrix_data[3].toDouble();
+                l_camera_matrix.at<double>(1,1) = camera_matrix_data[4].toDouble();
+                l_camera_matrix.at<double>(1,2) = camera_matrix_data[5].toDouble();
+                l_camera_matrix.at<double>(2,0) = camera_matrix_data[6].toDouble();
+                l_camera_matrix.at<double>(2,1) = camera_matrix_data[7].toDouble();
+                l_camera_matrix.at<double>(2,2) = camera_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (left_lines[11].contains("data:")){
+                QStringList dist_matrix_line = left_lines[11].split(':');
+                QStringList dist_matrix_data = dist_matrix_line[1].split(',');
+                l_dist_coeffs = cv::Mat(1, 5, CV_64F, cv::Scalar(0));
+
+                l_dist_coeffs.at<double>(0,0) = dist_matrix_data[0].split('[')[1].toDouble();
+                l_dist_coeffs.at<double>(0,1) = dist_matrix_data[1].toDouble();
+                l_dist_coeffs.at<double>(0,2) = dist_matrix_data[2].toDouble();
+                l_dist_coeffs.at<double>(0,3) = dist_matrix_data[3].toDouble();
+                l_dist_coeffs.at<double>(0,4) = dist_matrix_data[4].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (left_lines[15].contains("data:")){
+                QStringList rect_matrix_line = left_lines[15].split(':');
+                QStringList rect_matrix_data = rect_matrix_line[1].split(',');
+                l_rect_mat = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                l_rect_mat.at<double>(0,0) = rect_matrix_data[0].split('[')[1].toDouble();
+                l_rect_mat.at<double>(0,1) = rect_matrix_data[1].toDouble();
+                l_rect_mat.at<double>(0,2) = rect_matrix_data[2].toDouble();
+                l_rect_mat.at<double>(1,0) = rect_matrix_data[3].toDouble();
+                l_rect_mat.at<double>(1,1) = rect_matrix_data[4].toDouble();
+                l_rect_mat.at<double>(1,2) = rect_matrix_data[5].toDouble();
+                l_rect_mat.at<double>(2,0) = rect_matrix_data[6].toDouble();
+                l_rect_mat.at<double>(2,1) = rect_matrix_data[7].toDouble();
+                l_rect_mat.at<double>(2,2) = rect_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (left_lines[19].contains("data:")){
+                QStringList proj_matrix_line = left_lines[19].split(':');
+                QStringList proj_matrix_data = proj_matrix_line[1].split(',');
+                l_proj_mat = cv::Mat(3, 4, CV_64F, cv::Scalar(0));
+
+                l_proj_mat.at<double>(0,0) = proj_matrix_data[0].split('[')[1].toDouble();
+                l_proj_mat.at<double>(0,1) = proj_matrix_data[1].toDouble();
+                l_proj_mat.at<double>(0,2) = proj_matrix_data[2].toDouble();
+                l_proj_mat.at<double>(0,3) = proj_matrix_data[3].toDouble();
+                l_proj_mat.at<double>(1,0) = proj_matrix_data[4].toDouble();
+                l_proj_mat.at<double>(1,1) = proj_matrix_data[5].toDouble();
+                l_proj_mat.at<double>(1,2) = proj_matrix_data[6].toDouble();
+                l_proj_mat.at<double>(1,3) = proj_matrix_data[7].toDouble();
+                l_proj_mat.at<double>(2,0) = proj_matrix_data[8].toDouble();
+                l_proj_mat.at<double>(2,1) = proj_matrix_data[9].toDouble();
+                l_proj_mat.at<double>(2,2) = proj_matrix_data[10].toDouble();
+                l_proj_mat.at<double>(2,3) = proj_matrix_data[11].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+
+        } else {
+            return false;
+        }
+
+        // Read right yaml
+        QFile rightYamlFile(right_cal);
+        QList<QString> right_lines;
+        if (rightYamlFile.open(QIODevice::ReadOnly))
+        {
+           QTextStream in(&rightYamlFile);
+           while (!in.atEnd())
+           {
+              QString line = in.readLine();
+              right_lines.append(line);
+           }
+           rightYamlFile.close();
+        }
+
+        if (right_lines.length() == 20){
+
+            if (right_lines[0].contains("image_width:")){
+                QStringList split_line = right_lines[0].split(':');
+                cal_r_image_width = split_line[1].toInt();
+            }
+            if (right_lines[1].contains("image_height:")){
+                QStringList split_line = right_lines[1].split(':');
+                cal_r_image_height = split_line[1].toInt();
+            }
+
+            if (right_lines[6].contains("data:")){
+                QStringList camera_matrix_line = right_lines[6].split(':');
+                QStringList camera_matrix_data = camera_matrix_line[1].split(',');
+                r_camera_matrix = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                r_camera_matrix.at<double>(0,0) = camera_matrix_data[0].split('[')[1].toDouble();
+                r_camera_matrix.at<double>(0,1) = camera_matrix_data[1].toDouble();
+                r_camera_matrix.at<double>(0,2) = camera_matrix_data[2].toDouble();
+                r_camera_matrix.at<double>(1,0) = camera_matrix_data[3].toDouble();
+                r_camera_matrix.at<double>(1,1) = camera_matrix_data[4].toDouble();
+                r_camera_matrix.at<double>(1,2) = camera_matrix_data[5].toDouble();
+                r_camera_matrix.at<double>(2,0) = camera_matrix_data[6].toDouble();
+                r_camera_matrix.at<double>(2,1) = camera_matrix_data[7].toDouble();
+                r_camera_matrix.at<double>(2,2) = camera_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (right_lines[11].contains("data:")){
+                QStringList dist_matrix_line = right_lines[11].split(':');
+                QStringList dist_matrix_data = dist_matrix_line[1].split(',');
+                r_dist_coeffs = cv::Mat(1, 5, CV_64F, cv::Scalar(0));
+
+                r_dist_coeffs.at<double>(0,0) = dist_matrix_data[0].split('[')[1].toDouble();
+                r_dist_coeffs.at<double>(0,1) = dist_matrix_data[1].toDouble();
+                r_dist_coeffs.at<double>(0,2) = dist_matrix_data[2].toDouble();
+                r_dist_coeffs.at<double>(0,3) = dist_matrix_data[3].toDouble();
+                r_dist_coeffs.at<double>(0,4) = dist_matrix_data[4].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (right_lines[15].contains("data:")){
+                QStringList rect_matrix_line = right_lines[15].split(':');
+                QStringList rect_matrix_data = rect_matrix_line[1].split(',');
+                r_rect_mat = cv::Mat(3, 3, CV_64F, cv::Scalar(0));
+
+                r_rect_mat.at<double>(0,0) = rect_matrix_data[0].split('[')[1].toDouble();
+                r_rect_mat.at<double>(0,1) = rect_matrix_data[1].toDouble();
+                r_rect_mat.at<double>(0,2) = rect_matrix_data[2].toDouble();
+                r_rect_mat.at<double>(1,0) = rect_matrix_data[3].toDouble();
+                r_rect_mat.at<double>(1,1) = rect_matrix_data[4].toDouble();
+                r_rect_mat.at<double>(1,2) = rect_matrix_data[5].toDouble();
+                r_rect_mat.at<double>(2,0) = rect_matrix_data[6].toDouble();
+                r_rect_mat.at<double>(2,1) = rect_matrix_data[7].toDouble();
+                r_rect_mat.at<double>(2,2) = rect_matrix_data[8].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+            if (right_lines[19].contains("data:")){
+                QStringList proj_matrix_line = right_lines[19].split(':');
+                QStringList proj_matrix_data = proj_matrix_line[1].split(',');
+                r_proj_mat = cv::Mat(3, 4, CV_64F, cv::Scalar(0));
+
+                r_proj_mat.at<double>(0,0) = proj_matrix_data[0].split('[')[1].toDouble();
+                r_proj_mat.at<double>(0,1) = proj_matrix_data[1].toDouble();
+                r_proj_mat.at<double>(0,2) = proj_matrix_data[2].toDouble();
+                r_proj_mat.at<double>(0,3) = proj_matrix_data[3].toDouble();
+                r_proj_mat.at<double>(1,0) = proj_matrix_data[4].toDouble();
+                r_proj_mat.at<double>(1,1) = proj_matrix_data[5].toDouble();
+                r_proj_mat.at<double>(1,2) = proj_matrix_data[6].toDouble();
+                r_proj_mat.at<double>(1,3) = proj_matrix_data[7].toDouble();
+                r_proj_mat.at<double>(2,0) = proj_matrix_data[8].toDouble();
+                r_proj_mat.at<double>(2,1) = proj_matrix_data[9].toDouble();
+                r_proj_mat.at<double>(2,2) = proj_matrix_data[10].toDouble();
+                r_proj_mat.at<double>(2,3) = proj_matrix_data[11].split(']')[0].toDouble();
+            } else {
+                return false;
+            }
+
+       } else {
+            return false;
+        }
+
     } else {
+        qDebug() << "Cannot detect yaml type in calibration file. Invalid first line.";
         return false;
     }
 
-    fs_r.release();
+    QCoreApplication::processEvents();
 
     if (cal_r_image_width != image_width || cal_r_image_height != image_height){
         qDebug() << "Image size does not match calibrated image size";
@@ -536,7 +911,7 @@ bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString ri
     double cxr = r_proj_mat.at<double>(0,2);
     double cy = l_proj_mat.at<double>(1,2);
     double fx = l_camera_matrix.at<double>(0,0);
-    double fy = l_camera_matrix.at<double>(1,1);
+    //double fy = l_camera_matrix.at<double>(1,1);
 
     double p14 = r_proj_mat.at<double>(0,3);
     baseline = -p14 / fx;
@@ -544,7 +919,7 @@ bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString ri
     double q33 = -(cx - cxr) / baseline;
 
     Q.at<double>(0,0) = 1.0;
-    Q.at<double>(0,3) = cx;
+    Q.at<double>(0,3) = -cx;
     Q.at<double>(1,1) = 1.0;
     Q.at<double>(1,3) = -cy;
     Q.at<double>(2,3) = fx;
@@ -553,23 +928,28 @@ bool AbstractStereoCamera::loadCalibrationYamlFiles(QString left_cal, QString ri
 
     Q.convertTo(Q, CV_32F);
 
+    QCoreApplication::processEvents();
+
     generateRectificationMaps(cv::Size(image_width,image_height));
 
     return true;
 }
 
 
-bool AbstractStereoCamera::rectifyImages(void) {
+bool AbstractStereoCamera::rectifyImages(cv::Mat left, cv::Mat right, cv::Mat& left_rect, cv::Mat& right_rect) {
     if (cal_image_width != image_width || cal_image_height != image_height){
         qDebug() << "Image size does not match calibrated image size";
+        left.copyTo(left_rect);
+        right.copyTo(right_rect);
         return false;
     }
-#ifdef WITH_CUDA
     if (cuda_device_found){
+#ifdef WITH_CUDA
+
         cv::cuda::GpuMat d_left, d_right, d_left_remap, d_right_remap;
 
-        d_left.upload(left_raw);
-        d_right.upload(right_raw);
+        d_left.upload(left);
+        d_right.upload(right);
 
         cv::cuda::GpuMat d_rectmapx_l, d_rectmapy_l, d_rectmapx_r, d_rectmapy_r;
 
@@ -583,23 +963,17 @@ bool AbstractStereoCamera::rectifyImages(void) {
         cv::cuda::remap(d_right, d_right_remap, d_rectmapx_r, d_rectmapy_r,
                         cv::INTER_CUBIC, cv::BORDER_CONSTANT);
 
-        d_left_remap.download(left_remapped);
-        d_right_remap.download(right_remapped);
+        d_left_remap.download(left_rect);
+        d_right_remap.download(right_rect);
+        return true;
+#else
+        return false;
+#endif
     } else {
-#endif
-        QFuture<void> res_l =
-                QtConcurrent::run(this, &AbstractStereoCamera::remap_parallel, left_raw,
-                                  std::ref(left_remapped), rectmapx_l, rectmapy_l);
-        QFuture<void> res_r = QtConcurrent::run(
-                    this, &AbstractStereoCamera::remap_parallel, right_raw,
-                    std::ref(right_remapped), rectmapx_r, rectmapy_r);
-
-        res_l.waitForFinished();
-        res_r.waitForFinished();
-#ifdef WITH_CUDA
+        remap_parallel(left,left_rect, rectmapx_l, rectmapy_l);
+        remap_parallel(right,right_rect, rectmapx_r, rectmapy_r);
+        return true;
     }
-#endif
-    return true;
 }
 
 void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
@@ -610,90 +984,250 @@ void AbstractStereoCamera::remap_parallel(cv::Mat src, cv::Mat &dst,
 
 void AbstractStereoCamera::setMatcher(AbstractStereoMatcher *matcher) {
 
+    new_matcher = matcher;
+    changed_matcher = true;
+    /*
     bool reenable_required = false;
     if (this->isMatching()){
         reenable_required = true;
         enableMatching(false);
     }
     this->matcher = matcher;
-    this->matcher->setImages(&left_remapped, &right_remapped);
     if (reenable_required){
         enableMatching(true);
     }
     qDebug() << "Changed matcher";
+    */
 }
+
+void AbstractStereoCamera::processNewCapture(void){
+    if (!processing_busy){
+        processing_busy = true;
+        //processStereo();
+        stereo_future = QtConcurrent::run(this, &AbstractStereoCamera::processStereo);
+    }
+}
+
+void AbstractStereoCamera::processNewStereo(void){
+    if (!match_busy && matching){
+        match_busy = true;
+        //processMatch();
+        match_future = QtConcurrent::run(this, &AbstractStereoCamera::processMatch);
+    }
+}
+
+/*
+void AbstractStereoCamera::processNewMatch(void){
+    if (!reproject_busy && reprojecting){
+        reproject_busy = true;
+        reproject_future = QtConcurrent::run(this, &AbstractStereoCamera::reproject3D);
+    }
+}
+*/
 
 void AbstractStereoCamera::processStereo(void) {
 
     frames++;
     emit framecount(frames);
 
-    if (isSwappingLeftRight()){
-        cv::Mat right_tmp;
-        right_raw.copyTo(right_tmp);
+    if (!right_raw.empty() && !left_raw.empty()){
 
-        left_raw.copyTo(right_raw);
-        right_tmp.copyTo(left_raw);
-    }
+        cv::Mat left_tmp, right_tmp;
 
-    if (downsample_factor != 1){
-        cv::resize(left_raw,left_raw,cv::Size(),downsample_factor,downsample_factor);
-        cv::resize(right_raw,right_raw,cv::Size(),downsample_factor,downsample_factor);
-    }
-
-    if (rectifying) {
-        bool res = rectifyImages();
-        if (!res){
-            send_error(RECTIFY_ERROR);
-            left_raw.copyTo(left_remapped);
-            right_raw.copyTo(right_remapped);
-        }
-    } else {
-        left_raw.copyTo(left_remapped);
-        right_raw.copyTo(right_remapped);
-    }
-
-    left_remapped.copyTo(left_output);
-    right_remapped.copyTo(right_output);
-
-    if (capturing_video){
-        if (capturing_rectified_video){
-            addVideoStreamFrame(left_remapped,right_remapped);
+        if (isSwappingLeftRight()){
+            right_raw.copyTo(left_tmp);
+            left_raw.copyTo(right_tmp);
         } else {
-            addVideoStreamFrame(left_raw,right_raw);
+            left_raw.copyTo(left_tmp);
+            right_raw.copyTo(right_tmp);
         }
-    }
 
-    if (matching) {
-        matcher->match();
-        if (reprojecting) {
-            reproject3D();
+        if (downsample_factor != 1){
+            cv::resize(left_tmp,left_tmp,cv::Size(),downsample_factor,downsample_factor);
+            cv::resize(right_tmp,right_tmp,cv::Size(),downsample_factor,downsample_factor);
+            /*
+            if (calibration_valid){
+                if (rectmapx_l.size() != left_tmp.size()){
+                    //adjust rectification maps to downsampled size
+                    generateRectificationMaps(left_tmp.size());
+                    emit update_size((float)right_tmp.size().width, (float)right_tmp.size().height, getBitDepth());
+                }
+            }
+            */
         }
-        emit matched();
-    }
 
-    emit stereopair_processed();
-    if (!first_image_received){
-        first_image_received = true;
-        emit first_image_ready(true);
-    }
+        lr_raw_image_mutex.lock();
+        left_tmp.copyTo(left_unrectified);
+        right_tmp.copyTo(right_unrectified);
+        lr_raw_image_mutex.unlock();
 
-    emit frametime(frametimer.elapsed());
-    frametimer.restart();
+        if (rectifying) {
+            lr_raw_image_mutex.lock();
+            //bool res = rectifyImages(left_unrectified,right_unrectified,left_remapped,right_remapped);
+            bool res = rectifyImages(left_tmp,right_tmp,left_remapped,right_remapped);
+            if (downsample_factor != 1){
+                cv::resize(left_remapped,left_remapped,cv::Size(),downsample_factor,downsample_factor);
+                cv::resize(right_remapped,right_remapped,cv::Size(),downsample_factor,downsample_factor);
+            }
+            lr_raw_image_mutex.unlock();
+            if (!res){
+                send_error(RECTIFY_ERROR);
+                lr_raw_image_mutex.lock();
+                left_unrectified.copyTo(left_remapped);
+                right_unrectified.copyTo(right_remapped);
+                lr_raw_image_mutex.unlock();
+            }
+        } else {
+            lr_raw_image_mutex.lock();
+            left_unrectified.copyTo(left_remapped);
+            right_unrectified.copyTo(right_remapped);
+            lr_raw_image_mutex.unlock();
+        }
+
+        lr_image_mutex.lock();
+        left_remapped.copyTo(left_output);
+        right_remapped.copyTo(right_output);
+        lr_image_mutex.unlock();
+
+        if (capturing_video){
+            if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT){
+                if (video_src == VIDEO_SRC_STEREO){
+                    if (capturing_rectified_video){
+                        cv::hconcat(left_output, right_output, video_frame);
+                    } else {
+                        cv::hconcat(left_unrectified, right_unrectified, video_frame);
+                    }
+                } else if (video_src == VIDEO_SRC_LEFT){
+                    if (capturing_rectified_video){
+                        left_output.copyTo(video_frame);
+                    } else {
+                        left_unrectified.copyTo(video_frame);
+                    }
+                } else if (video_src == VIDEO_SRC_RIGHT){
+                    if (capturing_rectified_video){
+                        right_output.copyTo(video_frame);
+                    } else {
+                        right_unrectified.copyTo(video_frame);
+                    }
+                }
+                addVideoStreamFrame(video_frame);
+            }
+        }
+
+        emit stereopair_processed();
+        if (!first_image_received){
+            first_image_received = true;
+            emit first_image_ready(true);
+        }
+        emit frametime(frametimer.elapsed());
+        frametimer.restart();
+    }
+    processing_busy = false;
 }
 
-bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat left, cv::Mat right){
-    cv::hconcat(left, right, video_frame);
-    cv_video_writer->write(video_frame);
+void AbstractStereoCamera::processMatch(){
+    //qDebug() << "Processing match...";
+    lr_image_mutex.lock();
+    if (left_output.empty() || right_output.empty()){
+        return;
+    }
+    cv::Mat left_img, right_img, disp, left_bgr, disp_filtered, depth_tmp;
+    left_img = left_output.clone();
+    right_img = right_output.clone();
+    lr_image_mutex.unlock();
+
+    if (changed_matcher){
+        changed_matcher = false;
+        this->matcher = new_matcher;
+    }
+
+    //qDebug() << "Stereo matching...";
+    matcher->match(left_img,right_img);
+    //qDebug() << "Getting disparity from stereo match...";
+    matcher->getDisparity(disp);
+    disparity_mutex.lock();
+    left_match = left_img.clone();
+    right_match = right_img.clone();
+    disparity = disp.clone();
+    CVSupport::removeInvalidDisparity(disparity/16,Q,disp_filtered);
+    disparity_filtered = disp_filtered.clone();
+    CVSupport::disparity2Depth(disp_filtered, Q, depth_tmp, 10000, downsample_factor);
+    depth = depth_tmp.clone();
+    disparity_mutex.unlock();
+    //qDebug() << "Getting left image from stereo match...";
+    left_bgr = matcher->getLeftBGRImage();
+    emit matched();
+
+    cv::Mat disp_colormap;
+    if (video_src == VIDEO_SRC_DISPARITY || (reprojecting && getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH)){
+        CVSupport::disparity2colormap(disp,Q,disp_colormap);
+
+        if (video_src == VIDEO_SRC_DISPARITY){
+            if (capturing_video)
+                addVideoStreamFrame(disp_colormap);
+        }
+        //TODO add RGBD support for with VIDEO_SRC_RGBD
+    }
+
+    if (reprojecting){
+        qDebug() << "Reprojecting 3D...";
+        cv::Mat texture_image;
+        if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_IMAGE){
+            left_bgr.copyTo(texture_image);
+        } else if (getPointCloudTexture() == POINT_CLOUD_TEXTURE_DEPTH){
+            disp_colormap.copyTo(texture_image);
+        }
+
+        if (depth_tmp.empty() || texture_image.empty()){
+            return;
+        }
+
+        //pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp = PCLSupport::disparity2PointCloud(disp,texture_image,Q, downsample_factor);
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr ptCloudTemp = PCLSupport::depth2PointCloud(depth_tmp,texture_image);
+
+        pcl::PassThrough<pcl::PointXYZRGB> pass;
+        pass.setInputCloud (ptCloudTemp);
+        pass.setFilterFieldName ("z");
+        pass.setFilterLimits(visualisation_min_z, visualisation_max_z);
+        pass.filter(*ptCloudTemp);
+
+        ptCloud = ptCloudTemp;
+
+        emit reprojected();
+    }
+
+    match_busy = false;
+
+    emit matchtime(matchtimer.elapsed());
+    matchtimer.restart();
+}
+
+bool AbstractStereoCamera::addVideoStreamFrame(cv::Mat frame){
+    video_mutex.lock();
+    if (capturing_video){
+        if (cv_video_writer != nullptr)
+            if (cv_video_writer->isOpened())
+                cv_video_writer->write(frame);
+    }
+    video_mutex.unlock();
     return true;
 }
 
 bool AbstractStereoCamera::enableVideoStream(bool enable){
+    video_mutex.lock();
     bool res;
     if (enable){
         //start video capture
         cv_video_writer = new cv::VideoWriter();
-        video_frame = cv::Mat (image_height, 2 * image_width, CV_8UC1);
+        int video_width = image_width;
+        if (video_src == VIDEO_SRC_STEREO){
+            video_width = 2 * image_width;
+        }
+        if (video_is_color){
+            video_frame = cv::Mat (image_height, video_width, CV_8UC3);
+        } else {
+            video_frame = cv::Mat (image_height, video_width, CV_8UC1);
+        }
         res = cv_video_writer->open(video_filename, video_codec, video_fps, video_frame.size(), video_is_color);
         if (res){
             capturing_video = true;
@@ -707,14 +1241,33 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
         }
         res = true;
     }
+    video_mutex.unlock();
     return res;
 }
 
-bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int codec, bool is_color){
+bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int codec, bool is_color, VideoSource vid_src){
     if (filename == "") {
         QDateTime dateTime = dateTime.currentDateTime();
         QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-        video_filename = QString("%1/stereo_video_%2.mp4").arg(save_directory, date_string).toStdString();
+        QString file_prefix;
+        switch(vid_src) {
+        case VIDEO_SRC_STEREO:
+            file_prefix = "stereo_video_";
+            break;
+        case VIDEO_SRC_LEFT:
+            file_prefix = "left_video_";
+            break;
+        case VIDEO_SRC_RIGHT:
+            file_prefix = "right_video_";
+            break;
+        case VIDEO_SRC_DISPARITY:
+            file_prefix = "disparity_video_";
+            break;
+        case VIDEO_SRC_RGBD:
+            file_prefix = "rgbd_video_";
+            break;
+        }
+        video_filename = QString("%1/%2%3.avi").arg(save_directory, file_prefix, date_string).toStdString();
     }
 
     if (fps == 0) fps = 30;
@@ -722,6 +1275,7 @@ bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int c
 
     video_codec = codec;
     video_is_color = is_color;
+    video_src = vid_src;
     return true;
 }
 

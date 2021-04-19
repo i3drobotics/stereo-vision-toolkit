@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['settings_494',['settings',['../class_calibrate_from_images_dialog.html#a19edd5ac29a4d5a20c6beaa0275be925',1,'CalibrateFromImagesDialog::settings()'],['../class_calibration_dialog.html#a488457d2d4ebe4fcf6efdfaa77275708',1,'CalibrationDialog::settings()']]],
-  ['size_5fmin_5fchange_495',['size_min_change',['../class_calibration_dialog.html#ae513b4a4655f86a8bbf6b49b49edb563',1,'CalibrationDialog']]],
-  ['skew_5fmin_5fchange_496',['skew_min_change',['../class_calibration_dialog.html#a53ff64a7dcc76720d40c8c30cb34ed43',1,'CalibrationDialog']]],
-  ['stereo_5fcam_497',['stereo_cam',['../class_calibration_dialog.html#a49c1d63dba527ed9c7f2b4f0a70e1183',1,'CalibrationDialog']]]
+  ['ui_463',['ui',['../class_about_dialog.html#a36203efe478483744d1f3c53a0f69256',1,'AboutDialog::ui()'],['../class_calibrate_confirm_dialog.html#ad97976740de1126a474ca44187634e2e',1,'CalibrateConfirmDialog::ui()'],['../class_calibrate_from_images_dialog.html#ac3198e751dad3897244cee671eae0fdc',1,'CalibrateFromImagesDialog::ui()'],['../class_calibration_dialog.html#a2e0aaab49968d5d75f554d7dc2d530b5',1,'CalibrationDialog::ui()']]]
 ];

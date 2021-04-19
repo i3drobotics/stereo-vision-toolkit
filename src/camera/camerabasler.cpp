@@ -324,11 +324,10 @@ bool CameraBasler::setExposure(double exposure)
 {
     try
     {
-        // convert from seconds to milliseconds
-        int exposure_i = exposure * 10000;
-        qDebug() << "Setting exposure..." << exposure_i;
+        float exposure_f = (float)exposure * 1000;
+        qDebug() << "Setting exposure..." << exposure_f;
         camera->Open();
-        Pylon::CIntegerParameter(camera->GetNodeMap(), "ExposureTimeRaw").SetValue(exposure_i);
+        Pylon::CFloatParameter(camera->GetNodeMap(), "ExposureTimeAbs").SetValue(exposure_f);
         return true;
     }
     catch (const Pylon::GenericException &e)

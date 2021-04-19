@@ -35,6 +35,7 @@ MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent)
     updateMinDisparity(ui->minDisparitySlider->value());
     updateDisparityRange(ui->disparityRangeSlider->value());
     enableInterpolatation(ui->interpolateCheck->isChecked());
+    enableExtendDisparity(ui->checkBoxExtendDisparity->isChecked());
     negative_disparity = ui->minDisparitySlider->value() <= 0;
     ui->checkBoxNegativeDisparity->setChecked(negative_disparity);
 
@@ -64,7 +65,7 @@ void MatcherWidgetI3DRSGM::updatePyramidLevel(int level) {
 
 void MatcherWidgetI3DRSGM::enableExtendDisparity(bool enable) {
     if (enable){
-        ui->disparityRangeSlider->setMaximum(128);
+        ui->disparityRangeSlider->setMaximum(300);
         ui->minDisparitySlider->setMaximum(2048);
     } else {
         ui->disparityRangeSlider->setMaximum(32);
@@ -82,7 +83,7 @@ void MatcherWidgetI3DRSGM::updateMinDisparity(int min_disparity) {
     this->min_disparity = min_disparity;
     if (negative_disparity){
         ui->minDisparityLabel->setNum(-min_disparity);
-        double shift_p = (double)min_disparity / 20;
+        double shift_p = (double)-min_disparity / 20;
         matcher->setDisparityShift(shift_p);
     } else {
         ui->minDisparityLabel->setNum(min_disparity);

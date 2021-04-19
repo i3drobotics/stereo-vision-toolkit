@@ -7,6 +7,12 @@
 #define MATCHEROPENCVBLOCK_H
 
 #include <abstractstereomatcher.h>
+#ifdef WITH_OPENCV_CONTRIB
+    #include <opencv2/ximgproc.hpp>
+#endif
+#ifdef WITH_CUDA
+    #include <opencv2/cudastereo.hpp>
+#endif
 #include <QFile>
 
 //!  Matcher OpenCV Block
@@ -36,6 +42,10 @@ public slots:
     void setUniquenessRatio(int ratio);
     void setSpeckleFilterWindow(int window);
     void setSpeckleFilterRange(int range);
+    void setWLSFilterEnabled(bool enable);
+#ifdef WITH_CUDA
+    void setGPUEnabled(bool enable);
+#endif
     int getErrorDisparity(void);
 
     int getMinDisparity(){return matcher->getMinDisparity();}
@@ -49,20 +59,32 @@ public slots:
     int getUniquenessRatio(){return matcher->getUniquenessRatio();}
     int getSpeckleFilterWindow(){return matcher->getSpeckleWindowSize();}
     int getSpeckleFilterRange(){return matcher->getSpeckleRange();}
+    bool isWLSFilterEnabled(){return wls_filter;}
+#ifdef WITH_CUDA
+    bool isGPUEnabled(){return useGPU;}
+#endif
 
     void saveParams();
 
-    void forwardMatch(void);
-    void backwardMatch(void);
+    bool forwardMatch(cv::Mat left_img, cv::Mat right_img);
+    bool backwardMatch(cv::Mat left_img, cv::Mat right_img);
 
 private:
+#ifdef WITH_CUDA
+    cv::Ptr<cv::cuda::StereoBM> gpu_matcher;
     cv::Ptr<cv::StereoBM> matcher;
+#else
+    cv::Ptr<cv::StereoBM> matcher;
+#endif
+
     void init(void);
     void setupDefaultMatcher(void);
 
     bool wls_filter = false;
     double wls_lambda = 8000;
     double wls_sigma = 1.5;
+
+    bool useGPU = false;
 };
 
 #endif  // MATCHEROPENCVBLOCK_H

@@ -39,12 +39,18 @@ signals:
 public:
     explicit CalibrateFromImagesDialog(QWidget *parent = 0);
     ~CalibrateFromImagesDialog();
-    //! Get left images
+//    //! Get left images
+//    /*! \return list of images */
+//    QList<cv::Mat> getLeftImages(){return left_image_list;}
+//    //! Get right images
+//    /*! \return list of images */
+//    QList<cv::Mat> getRightImages(){return right_image_list;}
+    //! Get left image paths
     /*! \return list of images */
-    QList<cv::Mat> getLeftImages(){return left_image_list;}
-    //! Get right images
+    QList<std::string> getLeftImagePaths(){return left_image_path_list;}
+    //! Get right image paths
     /*! \return list of images */
-    QList<cv::Mat> getRightImages(){return right_image_list;}
+    QList<std::string> getRightImagePaths(){return right_image_path_list;}
     //! Get number of columns in pattern
     /*! \return number of columns */
     int getPatternCols();
@@ -81,10 +87,15 @@ private:
     //! Search model for finding right images
     QFileSystemModel *right_file_model;
 
-    //! List of left images found
-    QList<cv::Mat> left_image_list;
-    //! List of right images found
-    QList<cv::Mat> right_image_list;
+//    //! List of left images found
+//    QList<cv::Mat> left_image_list;
+//    //! List of right images found
+//    QList<cv::Mat> right_image_list;
+
+    //! List of left images filepath found
+    QList<std::string> left_image_path_list;
+    //! List of right images filepath found
+    QList<std::string> right_image_path_list;
 
     //! App settings used to retreive 'calLeftDir', 'calRightDir' and 'calDir'
     QSettings *settings;

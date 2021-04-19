@@ -92,7 +92,7 @@ bool Chessboard::checkMargins(void) {
   bottom_out_of_bounds = false;
 
   if (left_margin > 0) {
-    for (cv::Point2f point : left_points) {
+    for (const cv::Point2f &point : left_points) {
       if (point.x > left_margin) {
         left_out_of_bounds = true;
         return false;
@@ -101,7 +101,7 @@ bool Chessboard::checkMargins(void) {
   }
 
   if (top_margin > 0) {
-    for (cv::Point2f point : top_points) {
+    for (const cv::Point2f &point : top_points) {
       if (point.y > top_margin) {
         top_out_of_bounds = true;
         return false;
@@ -110,7 +110,7 @@ bool Chessboard::checkMargins(void) {
   }
 
   if (bottom_margin > 0) {
-    for (cv::Point2f point : bottom_points) {
+    for (const cv::Point2f &point : bottom_points) {
       if (point.y < (this->image_size.height - bottom_margin)) {
         bottom_out_of_bounds = true;
         return false;
@@ -119,7 +119,7 @@ bool Chessboard::checkMargins(void) {
   }
 
   if (right_margin > 0) {
-    for (cv::Point2f point : right_points) {
+    for (const cv::Point2f &point : right_points) {
       if (point.x < (this->image_size.width - right_margin)) {
         right_out_of_bounds = true;
         return false;

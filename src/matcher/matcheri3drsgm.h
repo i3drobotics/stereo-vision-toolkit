@@ -7,7 +7,7 @@
 #define MATCHERI3DRSGM_H
 
 #include <abstractstereomatcher.h>
-#include <i3drsgm.h>
+#include <I3DRSGM/i3drsgm.h>
 #include <QDir>
 #include <QDebug>
 #include <QStandardPaths>
@@ -33,6 +33,13 @@ public:
     void parseConfig(std::string input_file);
     int getErrorDisparity();
     bool isLicenseValid();
+
+    //! Get hostid and hostname (useful for displaying to user)
+    /*! \param hostname string variable to place hostname */
+    /*! \param hostid string varaible to place hostid */
+    static void getHostInfo(std::string & hostname, std::string & hostid){
+        I3DRSGM::getHostInfo(hostname,hostid);
+    }
 
     void setDisparityShift(int shift);
     void setDisparityRange(int n);
@@ -62,15 +69,32 @@ public:
     void setDisparityError(int val);
     void enableCPU(bool enable);
 
-    void forwardMatch();
-    void backwardMatch();
+    bool forwardMatch(cv::Mat left_img, cv::Mat right_img);
+    bool backwardMatch(cv::Mat left_img, cv::Mat right_img);
 
     int getStatus();
 
 private:
+    bool CPU = false;
+    int disparityError = -10000;
+    int disparityShift = 0;
+    int disparityRange = 105;
+    bool subpixel = false;
+    float p1 = 100;
+    float p2 = 800;
+    int windowSize = 7;
+    int speckleDifference = 5;
+    int speckleSize = 1000;
+    bool interpolation = false;
+    bool occlusionDetection;
+    bool occlusionInterpolation;
+    bool textureDSI;
+    int maxPyramidLevel = 6;
+
     int min_disparity, disparity_range;
 
     void init();
+    void initMatcherParams();
 
     I3DRSGM * i3drsgm;
 };

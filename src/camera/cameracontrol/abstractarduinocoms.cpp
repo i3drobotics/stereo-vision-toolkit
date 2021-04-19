@@ -55,8 +55,8 @@ void AbstractArduinoComs::handleBytesWritten(qint64 bytes)
 void AbstractArduinoComs::handleTimeout()
 {
     m_standardOutput << QObject::tr("Operation timed out for port %1, error: %2")
-                        .arg(m_serialPort->portName())
-                        .arg(m_serialPort->errorString())
+                        .arg(m_serialPort->portName(),
+                             m_serialPort->errorString())
                      << "\n";
 }
 
@@ -65,8 +65,8 @@ void AbstractArduinoComs::handleError(QSerialPort::SerialPortError serialPortErr
     if (serialPortError == QSerialPort::WriteError) {
         m_standardOutput << QObject::tr("An I/O error occurred while writing"
                                         " the data to port %1, error: %2")
-                            .arg(m_serialPort->portName())
-                            .arg(m_serialPort->errorString())
+                            .arg(m_serialPort->portName(),
+                                 m_serialPort->errorString())
                          << "\n";
     }
 }
@@ -79,13 +79,13 @@ void AbstractArduinoComs::write(const QString &writeData)
 
     if (bytesWritten == -1) {
         m_standardOutput << QObject::tr("Failed to write the data to port %1, error: %2")
-                            .arg(m_serialPort->portName())
-                            .arg(m_serialPort->errorString())
+                            .arg(m_serialPort->portName(),
+                                 m_serialPort->errorString())
                          << "\n";
     } else if (bytesWritten != m_writeData.size()) {
         m_standardOutput << QObject::tr("Failed to write all the data to port %1, error: %2")
-                            .arg(m_serialPort->portName())
-                            .arg(m_serialPort->errorString())
+                            .arg(m_serialPort->portName(),
+                                 m_serialPort->errorString())
                          << "\n";
     }
 

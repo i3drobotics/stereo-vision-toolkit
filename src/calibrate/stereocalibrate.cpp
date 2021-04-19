@@ -42,12 +42,12 @@ void StereoCalibrate::abortCalibration() {
     emit doneCalibration(false);
 }
 
-void StereoCalibrate::finishedCalibration() {
+void StereoCalibrate::finishedCalibration(bool success) {
     if (stereo_camera) {
         disconnect(stereo_camera, SIGNAL(acquired()), this, SLOT(checkImages()));
         disconnect(this, SIGNAL(requestImage()), stereo_camera, SLOT(singleShot()));
     }
-    emit doneCalibration(true);
+    emit doneCalibration(success);
 }
 
 void StereoCalibrate::setDisplays(QLabel* left, QLabel* right) {
@@ -61,6 +61,7 @@ void StereoCalibrate::setBoardOrientations(
 }
 
 void StereoCalibrate::startCalibration(void) {
+    success = false;
     imageProgress(0, total_poses);
 
     total_images = 0;
@@ -118,6 +119,7 @@ void StereoCalibrate::checkImages(void) {
 }
 
 bool StereoCalibrate::jointCalibration(void) {
+    success = false;
     assert(left_images.size() != 0);
     assert(right_images.size() != 0);
     assert(left_image_points.size() == right_image_points.size());
@@ -143,9 +145,10 @@ bool StereoCalibrate::jointCalibration(void) {
         cal_dialog->updateLeft(left_camera_matrix, left_distortion, left_rms_error);
         qDebug() << "Left RMS reprojection error: " << left_rms_error;
     }else{
-        alert.setText("Right camera calibration failed.");
+        alert.setText("Left camera calibration failed.");
         alert.exec();
         qDebug() << "Left camera calibration failed.";
+        finishedCalibration(false);
         return false;
     }
 
@@ -169,6 +172,7 @@ bool StereoCalibrate::jointCalibration(void) {
             alert.setText("Right camera calibration failed.");
             alert.exec();
             qDebug() << "Right camera calibration failed.";
+            finishedCalibration(false);
             return false;
         }
 
@@ -224,6 +228,9 @@ bool StereoCalibrate::jointCalibration(void) {
 
         cal_dialog->updateStereo(stereo_q, stereo_rms_error);
 
+        qDebug() << "Saving calibration files... ";
+
+        qDebug() << "Saving camera calibration files... ";
         cv::FileStorage leftIntrinsicFS(output_folder.absoluteFilePath("left_calibration.xml").toStdString(),
                                         cv::FileStorage::WRITE);
         leftIntrinsicFS << "cameraMatrix" << left_camera_matrix;
@@ -238,6 +245,7 @@ bool StereoCalibrate::jointCalibration(void) {
         rightIntrinsicFS << "rms_error" << right_rms_error;
         rightIntrinsicFS.release();
 
+        qDebug() << "Saving stereo calibration files... ";
         cv::FileStorage stereoFS(output_folder.absoluteFilePath("stereo_calibration.xml").toStdString(), cv::FileStorage::WRITE);
         stereoFS << "R" << stereo_r;
         stereoFS << "T" << stereo_t;
@@ -247,6 +255,7 @@ bool StereoCalibrate::jointCalibration(void) {
         stereoFS << "rms_error" << stereo_rms_error;
         stereoFS.release();
 
+        qDebug() << "Saving rectification files... ";
         cv::FileStorage leftRectFs(output_folder.absoluteFilePath("left_rectification.xml").toStdString(), cv::FileStorage::WRITE);
         leftRectFs << "x" << left_rectification_x;
         leftRectFs << "y" << left_rectification_y;
@@ -258,21 +267,23 @@ bool StereoCalibrate::jointCalibration(void) {
         rightRectFS << "y" << right_rectification_y;
         rightRectFS.release();
 
-        alert.setText(QString("Written calibration files to: %1").arg(output_folder.absolutePath()));
-        alert.exec();
-
         if(save_ros){
-            outputRosYaml(output_folder.absoluteFilePath("left.yaml"), "leftCamera", left_images.front().size(), left_camera_matrix, left_distortion, P1, R1);
-            outputRosYaml(output_folder.absoluteFilePath("right.yaml"), "rightCamera", right_images.front().size(), right_camera_matrix, right_distortion, P2, R2);
+            qDebug() << "Saving yaml files... ";
+            outputYaml(YamlFileFormat::ROS_PERCEPTION_YAML,output_folder.absoluteFilePath("left.yaml"), "leftCamera", left_images.front().size(), left_camera_matrix, left_distortion, P1, R1);
+            outputYaml(YamlFileFormat::ROS_PERCEPTION_YAML,output_folder.absoluteFilePath("right.yaml"), "rightCamera", right_images.front().size(), right_camera_matrix, right_distortion, P2, R2);
         }
-        finishedCalibration();
+
+        //alert.setText(QString("Written calibration files to: %1").arg(output_folder.absolutePath()));
+        //alert.exec();
+        success = true;
+        finishedCalibration(true);
 
         return true;
     }else{
-        alert.setText("Stereo camera calibration failed.");
-        alert.exec();
+        //alert.setText("Stereo camera calibration failed.");
+        //alert.exec();
         qDebug() << "Stereo camera calibration failed.";
-        finishedCalibration();
+        finishedCalibration(false);
         cal_dialog->close();
 
         return false;
@@ -396,7 +407,8 @@ bool StereoCalibrate::findCorners(cv::Mat image,
 
     //if image is high resolution, find checkerboard on downscaled image
     bool found = false;
-    int max_size = 1100;
+    int max_size = 1024;
+
     if (image.size().width > max_size || image.size().height > max_size){
         qDebug() << "Finding chessboard corners in downscaled image...";
         float scale_amount = (float)max_size/(float)image.size().width;
@@ -410,9 +422,14 @@ bool StereoCalibrate::findCorners(cv::Mat image,
         found = cv::findChessboardCorners(image_downscaled, pattern_size, corners, flags);
         if (found){
             qDebug() << "Found corners in downscaled image.";
-            //upscale corners back to correct size
-            for (std::vector<cv::Point2f>::iterator it = corners.begin() ; it != corners.end(); ++it){
-                *it = *it * (1/scale_amount);
+            // upscale corners back to correct size
+//            for (std::vector<cv::Point2f>::iterator it = corners.begin() ; it != corners.end(); ++it){
+//                *it = *it * (1/scale_amount);
+//            }
+            // Re-run corner detection on larger image
+            found = cv::findChessboardCorners(image, pattern_size, corners, flags);
+            if (found){
+                qDebug() << "Found corners in image.";
             }
         }
     } else {
@@ -423,27 +440,21 @@ bool StereoCalibrate::findCorners(cv::Mat image,
         }
     }
 
-    if (found) {
-        qDebug() << "Chessboard corners found";
-        qDebug() << "Finding subpix corners...";
-        cv::cornerSubPix(
-                    image, corners, cv::Size(11, 11), cv::Size(-1, -1),
-                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.001));
-        qDebug() << "Subpix corners complete.";
-        return true;
-    } else {
-        qDebug() << "Failed to find chessboard corners.";
+    //subpixel refinement
+    if (found){
+        cv::cornerSubPix(image, corners, pattern_size, cv::Size(-1, -1),
+                         cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.001));
     }
 
-    return false;
+    return found;
 }
 
 void StereoCalibrate::overlayImage(cv::Mat& image, Chessboard* board,
                                    bool found, bool valid) {
-    CvScalar red(255, 0, 0, 255);
-    CvScalar green(0, 255, 0, 255);
-    CvScalar blue(0, 0, 255, 255);
-    CvScalar overlayColour = red;
+    cv::Scalar red(255, 0, 0, 255);
+    cv::Scalar green(0, 255, 0, 255);
+    cv::Scalar blue(0, 0, 255, 255);
+    cv::Scalar overlayColour = red;
 
     // cv::drawChessboardCorners(image, pattern_size, board->board_points, found);
 
@@ -493,10 +504,10 @@ void StereoCalibrate::overlayImage(cv::Mat& image, Chessboard* board,
 
 void StereoCalibrate::overlayArrow(cv::Mat& image,
                                    std::vector<cv::Point2f>& points,
-                                   cv::Point2f offset, CvScalar colour,
+                                   cv::Point2f offset, cv::Scalar colour,
                                    int thickness) {
     cv::Mat mean_;
-    cv::reduce(points, mean_, 1, CV_REDUCE_AVG);
+    cv::reduce(points, mean_, 1, cv::REDUCE_AVG);
     cv::Point2f centrepoint(mean_.at<float>(0, 0), mean_.at<float>(0, 1));
 
     auto end = centrepoint + offset;
@@ -615,22 +626,63 @@ void StereoCalibrate::updateViews(void) {
                 pmap_right.scaled(this->right_view->size(), Qt::KeepAspectRatio));
 }
 
-bool StereoCalibrate::outputRosYaml(QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R){
-    cv::FileStorage fs(filename.toStdString(), cv::FileStorage::WRITE);
+bool StereoCalibrate::outputYaml(YamlFileFormat yaml_file_format, QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R){
 
-    fs << "image_width" << image_size.width;
-    fs << "image_height" << image_size.height;
-    fs << "camera_name" << camera_name.toStdString();
+    if (yaml_file_format == YamlFileFormat::CV_FILESTORAGE_YAML){
+        cv::FileStorage fs(filename.toStdString(), cv::FileStorage::WRITE);
 
-    fs << "camera_matrix" << camera_matrix;
-    fs << "distortion_model" << "plumb_bob";
+        fs << "image_width" << image_size.width;
+        fs << "image_height" << image_size.height;
+        fs << "camera_name" << camera_name.toStdString();
 
-    fs << "distortion_coefficients" << dist_coeffs;
-    fs << "rectification_matrix" << R;
-    fs << "projection_matrix" << P;
+        fs << "camera_matrix" << camera_matrix;
+        fs << "distortion_model" << "plumb_bob";
 
-    fs.release();
+        fs << "distortion_coefficients" << dist_coeffs;
+        fs << "rectification_matrix" << R;
+        fs << "projection_matrix" << P;
 
-    return true;
+        fs.release();
+        return true;
+    } else if (yaml_file_format == YamlFileFormat::ROS_PERCEPTION_YAML){
+        QFile file(filename);
+        if(file.open(QIODevice::WriteOnly | QIODevice::Text)){
+            QTextStream stream(&file);
+
+            stream << "image_width: " << image_size.width << "\n";
+            stream << "image_height: " << image_size.height << "\n";
+            stream << "camera_name: " << camera_name << "\n";
+            stream << "camera_matrix:\n";
+            stream << "  rows: 3\n";
+            stream << "  cols: 3\n";
+            stream << "  data: [" << camera_matrix.at<double>(0,0) << ", " << camera_matrix.at<double>(0,1) << ", " << camera_matrix.at<double>(0,2) << ", ";
+            stream << camera_matrix.at<double>(1,0) << ", " << camera_matrix.at<double>(1,1) << ", " << camera_matrix.at<double>(1,2) << ", ";
+            stream << camera_matrix.at<double>(2,0) << ", " << camera_matrix.at<double>(2,1) << ", " << camera_matrix.at<double>(2,2) << "]\n";
+            stream << "distortion_model: plumb_bob\n";
+            stream << "distortion_coefficients:\n";
+            stream << "  rows: 1\n";
+            stream << "  cols: 5\n";
+            stream << "  data: [" << dist_coeffs.at<double>(0,0) << ", " << dist_coeffs.at<double>(0,1) << ", " << dist_coeffs.at<double>(0,2) << ", ";
+            stream << dist_coeffs.at<double>(0,3) << ", " << dist_coeffs.at<double>(0,4) << "]\n";
+            stream << "rectification_matrix:\n";
+            stream << "  rows: 3\n";
+            stream << "  cols: 3\n";
+            stream << "  data: [" << R.at<double>(0,0) << ", " << R.at<double>(0,1) << ", " << R.at<double>(0,2) << ", ";
+            stream << R.at<double>(1,0) << ", " << R.at<double>(1,1) << ", " << R.at<double>(1,2) << ", ";
+            stream << R.at<double>(2,0) << ", " << R.at<double>(2,1) << ", " << R.at<double>(2,2) << "]\n";
+            stream << "projection_matrix:\n";
+            stream << "  rows: 3\n";
+            stream << "  cols: 4\n";
+            stream << "  data: [" << P.at<double>(0,0) << ", " << P.at<double>(0,1) << ", " << P.at<double>(0,2) << ", " << P.at<double>(0,3) << ", ";
+            stream << P.at<double>(1,0) << ", " << P.at<double>(1,1) << ", " << P.at<double>(1,2) << ", " << P.at<double>(1,3) << ", ";
+            stream << P.at<double>(2,0) << ", " << P.at<double>(2,1) << ", " << P.at<double>(2,2) << ", " << P.at<double>(2,3) << "]\n";
+
+            file.close();
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
-

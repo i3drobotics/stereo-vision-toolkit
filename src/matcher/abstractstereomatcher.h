@@ -12,7 +12,6 @@
 #include <QThread>
 #include <QDebug>
 #include <opencv2/opencv.hpp>
-#include <opencv2/ximgproc.hpp>
 #include <QStandardPaths>
 
 // Point Cloud Library
@@ -21,6 +20,8 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/visualization/pcl_visualizer.h>
+
+#include "cvsupport.hpp"
 
 //!  Stereo matcher base class
 /*!
@@ -45,18 +46,6 @@ class AbstractStereoMatcher : public QObject {
    void finished();
 
  public slots:
-   //!  Set images for matching
-   /*!
-   * \param left Left image
-   * \param right Right image
-   */
-  void setImages(cv::Mat* left, cv::Mat* right);
-
-  //! Perform a match with the left image as the reference. This is normally what you want.
-  virtual void forwardMatch() = 0;
-
-  //! Perform a match with the right image as the reference.
-  virtual void backwardMatch() = 0;
 
   //! Setup the matcher.
   virtual void init(void) = 0;
@@ -88,18 +77,6 @@ class AbstractStereoMatcher : public QObject {
   //!  Get the min disparity value
   void getDisparityRange(int &val);
 
-  //!  Save the disparity map
-  /*!
-  * @param[in] filename Output filename
-  */
-  void saveDisparity(QString filename);
-
-  //!  Save the disparity map as normalised colormap
-  /*!
-  * @param[in] filename Output filename
-  */
-  void saveDisparityColormap(QString filename);
-
   //!  Perform a full left-right consistency check (experimental)
   /*!
    * \brief checkLRConsistencyFull
@@ -107,29 +84,40 @@ class AbstractStereoMatcher : public QObject {
    */
   void checkLRConsistencyFull(double threshold);
 
-  //!  Get a pointer to the left image
-  cv::Mat *getLeftImage(void){return left;}
+  //!  Get left image used in stereo match
+  cv::Mat getLeftImage(void){return left;}
 
-  //!  Get a pointer to the right image
-  cv::Mat *getRighttImage(void){return right;}
+  //! Get left image in colour
+  //! Actual matching is done is grayscale but can be useful for
+  //! future processing such as point clouds to store original colour image
+  cv::Mat getLeftBGRImage(void){return left_bgr;}
+
+  //!  Get right image used in stereo match
+  cv::Mat getRightImage(void){return right;}
 
   void setDownsampleFactor(int factor){ downsample_factor=factor; };
 
-  virtual void match();
+  bool match(cv::Mat left_img, cv::Mat right_img);
 
-  void normaliseDisparity(cv::Mat inDisparity, cv::Mat &outNormalisedDisparity);
-
-  void getMinMaxDisparity(cv::Mat inDisparity, double &min_disp, double &max_disp);
-
-  void disparity2colormap(cv::Mat inDisparity, cv::Mat &outColormap);
-
-  void calcDepth(cv::Mat inDisparity, cv::Mat &outDepth);
-
-  void calcPointCloud(cv::Mat inDepth, pcl::PointCloud<pcl::PointXYZRGB>::Ptr outPoints);
+private:
+  //!  Set images for matching
+  /*!
+  * \param left Left image
+  * \param right Right image
+  */
+ void convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_bgr_conv_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img);
 
  protected:
-  cv::Mat *left;
-  cv::Mat *right;
+
+    //! Perform a match with the left image as the reference. This is normally what you want.
+    virtual bool forwardMatch(cv::Mat left_img, cv::Mat right_img) = 0;
+
+    //! Perform a match with the right image as the reference.
+    virtual bool backwardMatch(cv::Mat left_img, cv::Mat right_img) = 0;
+
+  cv::Mat left;
+  cv::Mat right;
+  cv::Mat left_bgr;
 
   cv::Mat disparity_buffer;
   cv::Mat disparity_rl;
@@ -137,6 +125,8 @@ class AbstractStereoMatcher : public QObject {
   cv::Mat disparity16;
 
   cv::Size image_size;
+
+  bool sizeChangedThisFrame = false;
 
   int min_disparity = 0;
   int disparity_range = 64;

@@ -7,6 +7,9 @@
 #define MATCHEROPENCVSGBM_H
 
 #include <abstractstereomatcher.h>
+#ifdef WITH_OPENCV_CONTRIB
+    #include <opencv2/ximgproc.hpp>
+#endif
 #include <QFile>
 
 //!  Matcher OpenCV SGBM
@@ -33,12 +36,13 @@ public slots:
     void setUniquenessRatio(int ratio);
     void setSpeckleFilterWindow(int window);
     void setSpeckleFilterRange(int range);
+    void setWLSFilterEnabled(bool enable);
     int getErrorDisparity(void);
 
     void saveParams();
 
-    void forwardMatch(void);
-    void backwardMatch(void);
+    bool forwardMatch(cv::Mat left_img, cv::Mat right_img);
+    bool backwardMatch(cv::Mat left_img, cv::Mat right_img);
 
 
     int getMinDisparity(){return matcher->getMinDisparity();}
@@ -49,9 +53,11 @@ public slots:
     int getUniquenessRatio(){return matcher->getUniquenessRatio();}
     int getSpeckleFilterWindow(){return matcher->getSpeckleWindowSize();}
     int getSpeckleFilterRange(){return matcher->getSpeckleRange();}
+    bool isWLSFilterEnabled(){return wls_filter;}
 
 private:
     cv::Ptr<cv::StereoSGBM> matcher;
+
     void init(void);
     void setupDefaultMatcher(void);
 

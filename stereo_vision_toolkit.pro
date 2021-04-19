@@ -7,25 +7,19 @@
 #
 #-------------------------------------------------
 
-VERSION = 1.3.1
+# Read version from version.txt
+VERSION = $$cat($$_PRO_FILE_PWD_/version.txt)
 DEFINES += FV_APP_VERSION
 FV_APP_VERSION = $$VERSION
 
+# Define QT modules
 QT += core gui concurrent widgets xml network quick serialport
 
-#QT version > 5.6 required for using openssl 1.0.2j
-#QT version > 5.12.4 uses newer openssl 1.1.1g
-!versionAtLeast(QT_VERSION, 5.6.0):
-versionAtLeast(QT_VERSION, 5.6.0){
-    versionAtLeast(QT_VERSION, 5.12.4){
-        CONFIG += WITH_OPENSSL_111g
-        message("Building with OpenSSL 1.1.1g")
-    } else {
-        CONFIG += WITH_OPENSSL_102j
-        message("Building with OpenSSL 1.0.2j")
-    }
+# QT version > 5.12.4 uses openssl 1.1.1
+versionAtLeast(QT_VERSION, 5.12.4){
+    message("Building with OpenSSL 1.1.1")
 } else {
-    error("Use at least Qt version 5.6.0")
+    error("Use at least Qt version 5.12.4")
 }
 
 # Application name
@@ -35,11 +29,30 @@ TEMPLATE = app vcapp
 
 CONFIG += warn_on
 CONFIG += doc
+CONFIG -= debug_and_release
+CONFIG -= debug_and_release_target
 
-# Setup FEVOR defines
+# Define if doing development build
+# !! ONLY USE WHEN ON DEVELOPMENT BRANCH !!
+# !! MAKE SURE TO REMOVE THIS BUILD OPTION WHEN DOING RELEASE !!
+DEV_BRANCH {
+    message("Development build")
+    message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING MASTER RELEASE !!")
+    DEFINES += DEV_BRANCH
+
+    CONFIG(debug, debug|release) { #debug
+    }else { # release
+        CONFIG += console
+    }
+}
+
+# Setup FERVOR defines
 DEFINES += WITH_FERVOR
 DEFINES += FV_APP_NAME
 FV_APP_NAME = $$TARGET
+
+DEFINES += WITH_CUDA
+DEFINES += WITH_OPENCV_CONTRIB
 
 # To use I3DRSGM
 # add 'CONFIG+=WITH_I3DRSGM' to build arguments
@@ -48,28 +61,32 @@ WITH_I3DRSGM {
     DEFINES += WITH_I3DRSGM
 }
 
-# To use CUDA
-# add 'CONFIG+=WITH_CUDA' to build arguments
-WITH_CUDA {
-    message("CUDA enabled")
-    DEFINES += WITH_CUDA
-}
-
 # To use Vimbda camera API (currently optional while being implimented)
 # add 'CONFIG+=WITH_VIMBA' to build arguments
+# Vimba remains optional as there is an issue with debugging when enabled
+# so it is useful to be able to turn it off for debug build
 WITH_VIMBA {
     message("VIMBA enabled")
     DEFINES += WITH_VIMBA
 }
 
 # Define resources
-RC_FILE = icon.rc
-
+RC_FILE = $$_PRO_FILE_PWD_/resources/icon.rc
 RESOURCES += \
     $$_PRO_FILE_PWD_/resources/qdarkstyle/style.qrc \
     $$_PRO_FILE_PWD_/resources/window/window.qrc
 
-include($$_PRO_FILE_PWD_/resources/QtAwesome/QtAwesome.pri)
+# ---Include modules---
+# QtAwesome
+!include(modules/QtAwesome/QtAwesome.pri) {
+    error("Unable to include QtAwesome.")
+}
+
+# Fervor autoupdater
+!include("modules/fervor/Fervor.pri") {
+        error("Unable to include Fervor autoupdater.")
+}
+# ---------------------
 
 # Define search paths for files
 VPATH += $$_PRO_FILE_PWD_/src
@@ -80,6 +97,7 @@ VPATH += $$_PRO_FILE_PWD_/src/camera/widgets
 VPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 VPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 VPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
+VPATH += $$_PRO_FILE_PWD_/src/detection
 INCLUDEPATH += $$_PRO_FILE_PWD_/src
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher
@@ -88,24 +106,24 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/matcher/widgets
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/virtualcam
 INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/cameracontrol
+INCLUDEPATH += $$_PRO_FILE_PWD_/src/detection
 
 WITH_VIMBA {
     VPATH += $$_PRO_FILE_PWD_/src/camera/vimba
     INCLUDEPATH += $$_PRO_FILE_PWD_/src/camera/vimba
 }
 
-WITH_I3DRSGM {
-    VPATH += $$_PRO_FILE_PWD_/i3drsgm/src
-    INCLUDEPATH += $$_PRO_FILE_PWD_/i3drsgm/src
-}
-
 # Define source files
 SOURCES += \
+    src/camera/widgets/loadstereoimagepairdialog.cpp \
+    svtkmain.cpp \
+    svtkwindow.cpp \
     arduinocommscameracontrol.cpp \
-    main.cpp\
-    mainwindow.cpp \
+    aboutdialog.cpp \
     calibrationdialog.cpp \
     abstractarduinocoms.cpp \
+    detectoropencv.cpp \
+    detectorsetupdialog.cpp \
     stereocalibrate.cpp \
     chessboard.cpp \
     calibrateconfirmdialog.cpp \
@@ -118,6 +136,7 @@ SOURCES += \
     stereocameraopencv.cpp \
     stereocameratis.cpp \
     stereocamerafromvideo.cpp \
+    stereocamerafromimage.cpp \
     matcheropencvblock.cpp \
     matcherwidgetopencvblock.cpp \
     matcheropencvsgbm.cpp \
@@ -127,34 +146,43 @@ SOURCES += \
     paramfile.cpp \
     cameradisplaywidget.cpp \
     cameraimagingsource.cpp \
-    virtualcam.cpp
-# Deimos source file is windows only for directshow
+    virtualcam.cpp \
+    stereocameraphobos.cpp \
+    stereocameratitania.cpp
+# Tara and Deimos source file is windows only for directshow
 win32 {
+    SOURCES += stereocameratara.cpp
     SOURCES += stereocameradeimos.cpp
 }
-# Optional vimba source files (as currently in development)
+# Optional vimba source files
 WITH_VIMBA {
     SOURCES += \
-        stereocameravimba.cpp \
-        ApiController.cpp
+        camera/cameravimba.cpp \
+        stereocameravimba.cpp
 }
 # Optional I3RSGM matcher source files
 WITH_I3DRSGM {
     SOURCES += \
         matcherwidgeti3drsgm.cpp \
-        matcheri3drsgm.cpp \
-        i3drsgm.cpp
+        matcheri3drsgm.cpp
 }
 
 # Define header files
 HEADERS += \
+    src/camera/widgets/loadstereoimagepairdialog.h \
+    svtkwindow.h \
     arduinocommscameracontrol.h \
-    mainwindow.h \
+    aboutdialog.h \
     calibrationdialog.h \
     asmopencv.h \
     abstractarduinocoms.h \
-    cvsupport.h \
+    cvsupport.hpp \
+    pclsupport.hpp \
+    cvsharedmemory.hpp \
     pylonsupport.h \
+    boundingbox.h \
+    detectoropencv.h \
+    detectorsetupdialog.h \
     stereocalibrate.h \
     chessboard.h \
     calibrateconfirmdialog.h \
@@ -167,6 +195,7 @@ HEADERS += \
     stereocameraopencv.h \
     stereocameratis.h \
     stereocamerafromvideo.h \
+    stereocamerafromimage.h \
     stereocamerasupport.h \
     matcheropencvblock.h \
     matcherwidgetopencvblock.h \
@@ -177,48 +206,58 @@ HEADERS += \
     paramfile.h \
     cameradisplaywidget.h \
     cameraimagingsource.h \
-    virtualcam.h
-# Deimos header file is windows only for directshow
+    virtualcam.h \
+    stereocameraphobos.h \
+    stereocameratitania.h
+# Tara and Deimos header file is windows only for directshow
 win32 {
+    HEADERS += stereocameratara.h
     HEADERS += stereocameradeimos.h
 }
-# Optional vimba header files (as currently in development)
+# Optional vimba header files
 WITH_VIMBA {
     HEADERS += \
-        stereocameravimba.h \
-        ApiController.h
+        camera/cameravimba.h \
+        stereocameravimba.h
 }
 # Optional I3DRSGM matcher header files
 WITH_I3DRSGM {
     HEADERS += \
         matcherwidgeti3drsgm.h \
-        matcheri3drsgm.h \
-        i3drsgm.h
+        matcheri3drsgm.h
 }
 # Define application window forms
 FORMS += \
-    mainwindow.ui \
+    src/camera/widgets/loadstereoimagepairdialog.ui \
+    svtkwindow.ui \
+    aboutdialog.ui \
     calibrationdialog.ui \
     calibrateconfirmdialog.ui \
     calibratefromimagesdialog.ui \
     matcherwidgetopencvblock.ui \
     matcherwidgetopencvsgbm.ui \
     disparityviewer.ui \
-    cameradisplaywidget.ui
+    cameradisplaywidget.ui \
+    aboutdialog.ui \
+    detectorsetupdialog.ui
 # Optional I3DRSGM window form
 WITH_I3DRSGM {
     FORMS += matcherwidgeti3drsgm.ui
 }
 
 # For building in a release and debug in seperate folders
-CONFIG(debug, debug|release) {
-    DESTDIR = debug
-    OBJECTS_DIR = .obj_debug
-    MOC_DIR     = .moc_debug
+CONFIG(debug, debug|release) { #debug
+    DESTDIR = $$TARGET/debug
+    OBJECTS_DIR = $$TARGET/.obj_debug
+    MOC_DIR     = $$TARGET/.moc_debug
+    RCC_DIR = $$TARGET/.qrc_debug
+    UI_DIR = $$TARGET/.ui_debug
 }else {
-    DESTDIR = release
-    OBJECTS_DIR = .obj
-    MOC_DIR     = .moc
+    DESTDIR = $$TARGET/release
+    OBJECTS_DIR = $$TARGET/.obj
+    MOC_DIR     = $$TARGET/.moc
+    RCC_DIR = $$TARGET/.qrc
+    UI_DIR = $$TARGET/.ui
 }
 
 # Error if running 32-bit system
@@ -242,73 +281,64 @@ macx {
 }
 
 # Define include folders for libraries
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/opencv/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/boost/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/VTK/include/vtk-7.0"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/PCL/include/pcl-1.8"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/eigen"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/hidapi/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/tis/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/yaml-cpp/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/pylon/include"
-INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/dshow/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/VTK/include/vtk-7.0"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/PCL/include/pcl-1.8"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/eigen"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/hidapi/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/tis/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/yaml-cpp/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/pylon/include"
+INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/dshow/include"
 
 # Define libaries
 CONFIG(debug, debug|release) {
     # Define debug only libraries
     message("Debug mode")
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/debug" -lhidapi
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/debug" -lTIS_UDSHL11d_x64
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pcl/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vtk/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/debug" -lhidapi
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/debug" -lTIS_UDSHL11d_x64
     LIBS += -lpcl_visualization_debug -lpcl_io_debug -lpcl_common_debug -lpcl_filters_debug
-    LIBS += -lopencv_ximgproc341d -lopencv_core341d -lopencv_highgui341d -lopencv_calib3d341d -lopencv_videoio341d -lopencv_imgproc341d -lopencv_imgcodecs341d
-    # Optional CUDA libraries
-    WITH_CUDA {
-        LIBS += -lopencv_cudastereo341d -lopencv_cudawarping341d
-    }
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450d
+
 }else {
     # Define release only libraries
     message("Release mode")
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pcl/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vtk/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/opencv/lib"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/hidapi/lib/release" -lhidapi
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/tis/lib/release" -lTIS_UDSHL11_x64
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pcl/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vtk/lib"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/hidapi/lib/release" -lhidapi
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/tis/lib/release" -lTIS_UDSHL11_x64
     LIBS += -lpcl_visualization_release -lpcl_io_release -lpcl_common_release -lpcl_filters_release
-    LIBS += -lopencv_ximgproc341 -lopencv_core341 -lopencv_highgui341 -lopencv_calib3d341 -lopencv_videoio341 -lopencv_imgproc341 -lopencv_imgcodecs341
-    # Optional CUDA libraries
-    WITH_CUDA {
-        LIBS += -lopencv_cudastereo341 -lopencv_cudawarping341
-    }
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/lib" -lopencv_world450
 }
 
 # Define libraries
 LIBS += -lvtkCommonCore-7.0 -lvtkCommonDataModel-7.0 -lvtkGUISupportQt-7.0 -lvtkViewsQt-7.0 -lvtkViewsCore-7.0 -lvtkRenderingQt-7.0  -lvtkCommonMath-7.0 -lvtkRenderingCore-7.0 -lvtkIOCore-7.0
-LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/boost/lib"
+LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/boost-1.66.0/boost_1_66_0/stage/lib"
 
 WITH_VIMBA {
     # Vimba library and include files
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rd_party/vimba/"
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaC/Lib/Win64/" -lVimbaC
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Lib/Win64/" -lVimbaImageTransform
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/vimba/"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Lib/Win64/" -lVimbaCPP
 }
 
 WITH_I3DRSGM {
     # I3DRSGM library and include files
-    LIBS += -L"$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/lib/PhobosIntegration" -lPhobosIntegration
-    INCLUDEPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/include"
-    DEPENDPATH += "$$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep"
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.11/lib/" -lI3DRSGM
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.11/include"
+    # PhobosIntegration library and include files (required for I3DRSGM)
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/phobosIntegration-1.0.54/lib/PhobosIntegration" -lPhobosIntegration
+    INCLUDEPATH += "$$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/phobosIntegration-1.0.54/include"
 }
 
 # Basler library files
-LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/pylon/lib/x64"
+LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pylon/lib/x64"
 
 win32 {
     # Directshow libraries
-    LIBS += -L"$$_PRO_FILE_PWD_/3rd_party/dshow/lib/x64" -lstrmbasd -lstrmbase
+    LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/dshow/lib/x64" -lstrmbasd -lstrmbase
     # Directshow class IDs
     LIBS += -lstrmiids
 }
@@ -331,68 +361,77 @@ isEmpty(TARGET_EXT) {
 win32 {
     # Define dlls to copy to build folder (windows only)
     EXTRA_FILES += \
-        $$files($$_PRO_FILE_PWD_/3rd_party/opengl/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/opencv/dep/310/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/cuda/bin/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/pylon/bin/x64/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rd_party/pylon/dep/x64/*.dll, true) \
-        $$_PRO_FILE_PWD_/3rd_party/hidapi/bin/Release/hidapi.dll \
-        $$_PRO_FILE_PWD_/3rd_party/tbb/tbb.dll
+        $$files($$_PRO_FILE_PWD_/3rdparty/opengl/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rdparty/cuda/bin/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rdparty/pylon/bin/x64/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rdparty/pylon/dep/x64/*.dll, true) \
+        $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
+        $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
+        $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
+        
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_videoio_ffmpeg450_64.dll
 
-    # Copy openssl dlls depending on version using
-    WITH_OPENSSL_102j {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.0.2j/Win64/bin/*.dll, true)
-    }
-    WITH_OPENSSL_111g {
-        EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/openssl-1.1.1g/Win64/bin/*.dll, true)
-    }
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cuda/*.dll)
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn64_8.dll
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_cnn_infer64_8.dll
+    EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/cudnn/cudnn_ops_infer64_8.dll
 
     CONFIG( debug, debug|release ) {
         # Debug only dlls
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/debug/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/debug/*.dll, true) \
-            $$_PRO_FILE_PWD_/3rd_party/png/libpng16d.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tbb/tbb_debug.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11d_x64.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/debug/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/debug/*.dll, true)
+            $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/debug/*.dll, true) \
+            $$_PRO_FILE_PWD_/3rdparty/png/libpng16d.dll \
+            $$_PRO_FILE_PWD_/3rdparty/tbb/tbb_debug.dll \
+            $$_PRO_FILE_PWD_/3rdparty/tis/bin/TIS_UDSHL11d_x64.dll \
+            $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/debug/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/debug/*.dll, true)
+
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450d.dll
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450.dll
     } else {
         # Release only dlls
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/3rd_party/opencv/bin/release/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/pcl/bin/release/*.dll, true) \
-            $$_PRO_FILE_PWD_/3rd_party/png/libpng16.dll \
-            $$_PRO_FILE_PWD_/3rd_party/tis/bin/TIS_UDSHL11_x64.dll \
-            $$files($$_PRO_FILE_PWD_/3rd_party/vtk/bin/release/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/3rd_party/zlib/bin/release/*.dll, true)
+            $$files($$_PRO_FILE_PWD_/3rdparty/pcl/bin/release/*.dll, true) \
+            $$_PRO_FILE_PWD_/3rdparty/png/libpng16.dll \
+            $$_PRO_FILE_PWD_/3rdparty/tis/bin/TIS_UDSHL11_x64.dll \
+            $$files($$_PRO_FILE_PWD_/3rdparty/vtk/bin/release/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/zlib/bin/release/*.dll, true)
+
+        EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/opencv-contrib-cuda/opencv/build/x64/vc15/bin/opencv_world450.dll
     }
 
     # Define drivers to copy to build folder
-    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.msi, true)
-    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rd_party/pylon/drivers/*.bat, true)
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/drivers/*.msi, true)
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/drivers/*.bat, true)
 
     # I3DRSGM dlls
     WITH_I3DRSGM {
         EXTRA_FILES += \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/bin/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/dep/*.dll, true) \
-            $$files($$_PRO_FILE_PWD_/i3drsgm/3rd_party/i3dr/param/*.param, true)
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.11/lib/*.dll, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/i3drsgm-1.0.11/lib/*.param, true) \
+            $$files($$_PRO_FILE_PWD_/3rdparty/i3drsgm/i3drsgm/phobosIntegration-1.0.54/bin/*.dll, true)
     }
 
     # Vimba dlls
     WITH_VIMBA {
         EXTRA_FILES += \
-            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaC.dll \
-            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaImageTransform/Bin/Win64/VimbaImageTransform.dll \
-            $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaC/Bin/Win64/VimbaC.dll \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/clallserial.dll \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/VimbaCLConfigTL.cti \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCLConfigTL/Bin/Win64/VimbaCLConfigTL.xml \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaUSBTL/Bin/Win64/VimbaUSBTL.cti \
+            $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaUSBTL/Bin/Win64/VimbaUSBTL.xml \
 
         CONFIG( debug, debug|release ) {
             # Debug only dlls
-            EXTRA_FILES += $$_PRO_FILE_PWD_/3rd_party/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
+            # TODO find out why CPP is needed with CPPd (causing debug issues)
+            EXTRA_FILES += \
+                $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll \
+                $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPPd.dll
+        } else {
+            EXTRA_FILES += $$_PRO_FILE_PWD_/3rdparty/vimba/VimbaCPP/Bin/Win64/VimbaCPP.dll
         }
     }
-
 }
 
 # Define additional files to copy to build folder
@@ -420,6 +459,12 @@ win32 {
 }
 extraFiles.path = $${DEPLOY_FOLDER}
 
+## Replace qmake vcredist with internal vcredist to avoid 'VCRUNTIME_140_1.dll was not found' error
+## this is thought to be due to some 3rdparty packages using vs2015 and some using vs2017
+VCREDIST_DEPLOY_FOLDER = $$shell_quote($$shell_path($${DEPLOY_FOLDER}))
+VCREDIST_EXE = $$shell_quote($$shell_path($$_PRO_FILE_PWD_/3rdparty/vcredist/VC_redist.x64.exe))
+QMAKE_POST_LINK += && $(COPY_DIR) $${VCREDIST_EXE} $${VCREDIST_DEPLOY_FOLDER}
+
 # Install drivers
 win32 {
     QMAKE_POST_LINK += && cd /d $${DEPLOY_FOLDER}
@@ -431,15 +476,10 @@ COPIES += helpDocs
 helpDocs.files = $$files($$_PRO_FILE_PWD_/docs/app/*.pdf, true)
 helpDocs.path = $${DEPLOY_FOLDER}/docs/help
 
-# Fervor autoupdater
-!include("fervor/Fervor.pri") {
-        error("Unable to include Fervor autoupdater.")
-}
-
-# Auto generate code documenation using doxygen
-CONFIG( doc ){
-    QMAKE_POST_LINK += && cd /d $${_PRO_FILE_PWD_} && doxygen -u
-}
+# Copy example ml to build folder
+COPIES += mlExamples
+mlExamples.files = $$files($$_PRO_FILE_PWD_/resources/ml/coco/*, true)
+mlExamples.path = $${DEPLOY_FOLDER}/ml/coco
 
 # Add clean command to remove all files from build directory
 # use 'extraclean' in clean arguments to trigger this clean step

@@ -1,5 +1,9 @@
 var class_stereo_calibrate =
 [
+    [ "YamlFileFormat", "class_stereo_calibrate.html#a4b7b628d89a5a82164e4b5affb209d95", [
+      [ "CV_FILESTORAGE_YAML", "class_stereo_calibrate.html#a4b7b628d89a5a82164e4b5affb209d95a84d87d51ec3e89258204f011bba26e19", null ],
+      [ "ROS_PERCEPTION_YAML", "class_stereo_calibrate.html#a4b7b628d89a5a82164e4b5affb209d95a69ca442ff484c775095c278dd4082c00", null ]
+    ] ],
     [ "StereoCalibrate", "class_stereo_calibrate.html#a0ba54ebc21eea32ab13ced8731dd4423", null ],
     [ "abortCalibration", "class_stereo_calibrate.html#a6e4b4838382adcf8a2cb27b9f37eb110", null ],
     [ "checkImages", "class_stereo_calibrate.html#a69e4719c556f500027651b6fc9648f3a", null ],
@@ -7,13 +11,13 @@ var class_stereo_calibrate =
     [ "done_image", "class_stereo_calibrate.html#a29a79921e046abe6d70012c93a18533c", null ],
     [ "doneCalibration", "class_stereo_calibrate.html#ac3d8097c8d6a5c9fe8c97439716f13e7", null ],
     [ "findCorners", "class_stereo_calibrate.html#a77c9fc2b18ab6faa22ead85459ab6abd", null ],
-    [ "finishedCalibration", "class_stereo_calibrate.html#a47e314b74a36d8b226e3e5514287a65d", null ],
+    [ "finishedCalibration", "class_stereo_calibrate.html#adb81a7993a608ed39074cee72e5c05c1", null ],
     [ "imageProgress", "class_stereo_calibrate.html#a41525653d38ca4e2a45a6daf5dc45f08", null ],
     [ "imageValid", "class_stereo_calibrate.html#a315e6d7c92a006003242ae548f56ca29", null ],
     [ "jointCalibration", "class_stereo_calibrate.html#aac7cce8c777aff0eb5773804718c7f89", null ],
     [ "loadBoardPoses", "class_stereo_calibrate.html#a579036077efc510864e55ead9e479376", null ],
-    [ "outputRosYaml", "class_stereo_calibrate.html#afc010677c0a3bf02e164b61fd21c8f9c", null ],
-    [ "overlayArrow", "class_stereo_calibrate.html#a96b0cb2c8b225d1c7373f235d614f4a9", null ],
+    [ "outputYaml", "class_stereo_calibrate.html#aead28b43ec7e9723c8a7256902af1e35", null ],
+    [ "overlayArrow", "class_stereo_calibrate.html#aa7a3693370a5465c31684aa63a52da5e", null ],
     [ "overlayImage", "class_stereo_calibrate.html#acd9488fed7fbb75f1b74f3d5757bbef7", null ],
     [ "requestImage", "class_stereo_calibrate.html#ab1db6cd7acd48f9c7a34a76ce6aca340", null ],
     [ "setBoardOrientations", "class_stereo_calibrate.html#ac474055fd6fe2e6072ea0f064e2e42ac", null ],
@@ -72,6 +76,7 @@ var class_stereo_calibrate =
     [ "stereo_r", "class_stereo_calibrate.html#aeb574c601840e023ac3bcada4c43d71b", null ],
     [ "stereo_rms_error", "class_stereo_calibrate.html#a9904403fff5a29e885b8cb7df65e8df4", null ],
     [ "stereo_t", "class_stereo_calibrate.html#aa4d8872e0c9d353d3d85dbd679e1153b", null ],
+    [ "success", "class_stereo_calibrate.html#acacc9fdc4219cf09ff3e5d0c919d257d", null ],
     [ "total_images", "class_stereo_calibrate.html#ac61a7f72185f45b0644ff94643d059fc", null ],
     [ "total_poses", "class_stereo_calibrate.html#a9074fc4b2fc57f5ad6298c7052fafad6", null ]
 ];

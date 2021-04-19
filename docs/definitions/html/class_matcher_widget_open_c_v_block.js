@@ -7,6 +7,7 @@ var class_matcher_widget_open_c_v_block =
     [ "enableExtendDisparity", "class_matcher_widget_open_c_v_block.html#afbf7e3832b83929ad7ceb0b7006a8bf7", null ],
     [ "enableNegativeDisparity", "class_matcher_widget_open_c_v_block.html#a2c39283a8d23b7c20050a4cc7e90f9e4", null ],
     [ "enableSpeckleFilter", "class_matcher_widget_open_c_v_block.html#a5139f63b5c756006b10bb29b6748a7a7", null ],
+    [ "enableWLSFilter", "class_matcher_widget_open_c_v_block.html#af94ed7842759dd2b5053b6268a772b7a", null ],
     [ "getMatcher", "class_matcher_widget_open_c_v_block.html#af7c6bef8f8db89d6accdbf3ce551b7a4", null ],
     [ "minDisparity", "class_matcher_widget_open_c_v_block.html#afff4da21bf63fbc4999002a068908f3d", null ],
     [ "onSaveClicked", "class_matcher_widget_open_c_v_block.html#a106a9d2af50ffe2d07399a89fc9df1c1", null ],

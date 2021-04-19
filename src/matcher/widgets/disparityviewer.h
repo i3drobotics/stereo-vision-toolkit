@@ -12,7 +12,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <abstractstereomatcher.h>
-#include <cvsupport.h>
+#include <cvsupport.hpp>
 
 namespace Ui {
 class DisparityViewer;
@@ -58,6 +58,7 @@ public slots:
     void setColourmap(int);
     void setCalibration(cv::Mat &Q, double baseline = 1.0, double focal = 1.0);
     void saveDisparityChanged(bool enable);
+    void setDownsampleFactor(int factor);
 
 private:
     Ui::DisparityViewer *ui;
@@ -69,17 +70,14 @@ private:
     double focal = 4e-3;
     double pixel_size = 6e-6;
     QLabel *viewer;
-    cv::Mat colour_disparity;
     AbstractStereoMatcher *matcher;
     bool processing_disparity;
     QString save_directory = ".";
 
-    double min_disp_ = 10000;
-    double max_disp_ = 0;
+    int downsample_factor = 1;
+
     double min_depth_ = -1;
     double max_depth_ = -1;
-
-    float genZ(cv::Matx44d Q_, int x_index, int y_index, float d);
 
 public slots:
     //void updateDisparityRange_slide(int val);

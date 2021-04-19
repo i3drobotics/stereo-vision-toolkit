@@ -18,7 +18,8 @@
 #include <opencv2/cudawarping.hpp>
 #endif
 
-#include "cvsupport.h"
+#include "cvsupport.hpp"
+#include "pclsupport.hpp"
 
 // Point Cloud Library
 #include <pcl/point_cloud.h>
@@ -36,6 +37,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QProgressDialog>
+#include <QMutex>
 
 //!  Stereo camera base class
 /*!
@@ -69,12 +71,26 @@ class AbstractStereoCamera : public QObject {
 public:
 
     //! Enum defined errors. This defines the type of error that occured.
-    enum StereoCameraError { CONNECT_ERROR, CAPTURE_ERROR, TIMEOUT_ERROR, RECTIFY_ERROR, MATCH_ERROR };
+    enum StereoCameraError { CONNECT_ERROR, CAPTURE_ERROR, LOST_FRAMES_ERROR, RECTIFY_ERROR, MATCH_ERROR };
     //! Enum defined camera type. This defines the type of camera being used.
-    enum StereoCameraType { CAMERA_TYPE_DEIMOS, CAMERA_TYPE_USB, CAMERA_TYPE_BASLER_GIGE,
-                            CAMERA_TYPE_BASLER_USB, CAMERA_TYPE_TIS, CAMERA_TYPE_VIMBA, CAMERA_TYPE_INVALID };
+    enum StereoCameraType { CAMERA_TYPE_TARA, CAMERA_TYPE_TIS, CAMERA_TYPE_VIMBA, CAMERA_TYPE_USB,
+                            CAMERA_TYPE_BASLER_GIGE, CAMERA_TYPE_BASLER_USB,
+                            CAMERA_TYPE_PHOBOS_BASLER_GIGE, CAMERA_TYPE_PHOBOS_BASLER_USB, CAMERA_TYPE_PHOBOS_TIS_USB,
+                            CAMERA_TYPE_DEIMOS,
+                            CAMERA_TYPE_TITANIA_VIMBA_USB, CAMERA_TYPE_TITANIA_BASLER_GIGE, CAMERA_TYPE_TITANIA_BASLER_USB,
+                            CAMERA_TYPE_INVALID };
+
+    static std::string CAMERA_NAME_TARA,CAMERA_NAME_TIS,CAMERA_NAME_VIMBA;
+    static std::string CAMERA_NAME_USB,CAMERA_NAME_BASLER_GIGE,CAMERA_NAME_BASLER_USB;
+    static std::string CAMERA_NAME_DEIMOS,CAMERA_NAME_PHOBOS_BASLER_GIGE,CAMERA_NAME_PHOBOS_BASLER_USB,CAMERA_NAME_PHOBOS_TIS_USB;
+    static std::string CAMERA_NAME_TITANIA_BASLER_GIGE, CAMERA_NAME_TITANIA_BASLER_USB, CAMERA_NAME_TITANIA_VIMBA_USB;
+    static std::string CAMERA_NAME_INVALID;
 
     enum StereoCalibrationType { CALIBRATION_TYPE_YAML, CALIBRATION_TYPE_XML };
+
+    enum PointCloudTexture { POINT_CLOUD_TEXTURE_IMAGE, POINT_CLOUD_TEXTURE_DEPTH };
+
+    enum VideoSource { VIDEO_SRC_STEREO, VIDEO_SRC_LEFT, VIDEO_SRC_RIGHT, VIDEO_SRC_DISPARITY, VIDEO_SRC_RGBD };
 
     //! Structure to hold camera settings
     struct StereoCameraSettings {
@@ -97,7 +113,6 @@ public:
         std::string right_camera_serial;
         StereoCameraType camera_type; // type of camera
         std::string i3dr_serial; // defined i3dr serial for camera pair
-        std::string filename; // filename for video [only used for stereoCameraFromVideo]
     };
 
     explicit AbstractStereoCamera(StereoCameraSerialInfo serial_info,
@@ -107,6 +122,7 @@ public:
     ~AbstractStereoCamera(void);
 
     AbstractStereoMatcher *matcher = nullptr;
+    AbstractStereoMatcher *new_matcher = nullptr;
 
     //! Convert between stereo camera type enum and string
     static std::string StereoCameraType2String(StereoCameraType camera_type);
@@ -163,6 +179,32 @@ public:
     //! Returns wheather the camera is connected
     bool isConnected();
 
+    void getQ(cv::Mat &Q);
+
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getLeftRawImage(cv::Mat &dst);
+
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getRightRawImage(cv::Mat &dst);
+
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @return OpenCV matrix containing left image
+  */
+    cv::Mat getLeftRawImage();
+
+    //! Get the left stereo image (un-rectified)
+    /*!
+  * @return OpenCV matrix containing left image
+  */
+    cv::Mat getRightRawImage();
+
     //! Get the left stereo image
     /*!
   * @param[out] dst OpenCV matrix to store image into
@@ -186,6 +228,55 @@ public:
   * @return OpenCV matrix containing right image
   */
     cv::Mat getRightImage();
+
+    //! Get the left stereo image used in latest stereo match
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getLeftMatchImage(cv::Mat &dst);
+
+    //! Get the right stereo image used in latest stereo match
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getRightMatchImage(cv::Mat &dst);
+
+    //! Get the disparity image
+    /*!
+  * @return OpenCV matrix containing disparity image
+  */
+    cv::Mat getDisparity();
+
+    //! Get the disparity image
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getDisparity(cv::Mat &dst);
+
+    //! Get the disparity image
+    /*!
+  * @return OpenCV matrix containing disparity image
+  */
+    cv::Mat getDisparityFiltered();
+
+    //! Get the disparity image
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getDisparityFiltered(cv::Mat &dst);
+
+    //! Get the depth image
+    /*!
+  * @return OpenCV matrix containing depth image
+  */
+    cv::Mat getDepth();
+
+    //! Get the depth image
+    /*!
+  * @param[out] dst OpenCV matrix to store image into
+  */
+    void getDepth(cv::Mat &dst);
+
 
     //! Get a pointer to the current point cloud
     /*!
@@ -217,6 +308,14 @@ public:
   */
     cv::Size getSize(void){ return cv::Size(getWidth(),getHeight()); }
 
+    void setPointCloudTexture(PointCloudTexture pct){
+        this->pct = pct;
+    }
+
+    PointCloudTexture getPointCloudTexture(void){
+        return this->pct;
+    }
+
     //! Initalise video stream for writing a video stream to a file
     /*!
    * If no filename is supplied, a timestamped video will be stored in the current selected save folder.
@@ -225,14 +324,18 @@ public:
    * @sa setSavelocation(), videoStreamStop()
    * @param[out] fps The frame rate of the video recording
   */
-    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = CV_FOURCC('H', '2', '6', '4'), bool is_color = false);
-    bool addVideoStreamFrame(cv::Mat left, cv::Mat right);
+    bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = cv::VideoWriter::fourcc('H', '2', '6', '4'), bool is_color = false, VideoSource vid_src = VIDEO_SRC_STEREO);
+    bool addVideoStreamFrame(cv::Mat frame);
 
     bool connected = false;
     float downsample_factor = 1;
 
     cv::Mat left_remapped;
     cv::Mat right_remapped;
+    cv::Mat left_unrectified;
+    cv::Mat right_unrectified;
+    cv::Mat left_match;
+    cv::Mat right_match;
     cv::Mat left_raw;
     cv::Mat right_raw;
     cv::Mat Q;
@@ -272,6 +375,12 @@ signals:
     //! Emitted after a frame has been processed to indicate the process time (fps = 1000/frametime)
     void frametime(qint64 time);
 
+    //! Emitted after a match has been processed to indicate the process time (fps = 1000/matchtime)
+    void matchtime(qint64 time);
+
+    //! Emitted after a reproject has been processed to indicate the process time (fps = 1000/reprojecttime)
+    void reprojecttime(qint64 time);
+
     //! Emitted after a frame has been processed to indicates the current frame count
     void framecount(qint64 count);
 
@@ -282,7 +391,7 @@ signals:
     void savedImage();
 
     //! Emitted when an image has been saved, including the filename
-    void savedImage(QString filename);
+    void savedImage(bool success);
 
     //! Emmitted when point cloud is saved
     void pointCloudSaveStatus(QString);
@@ -366,10 +475,16 @@ public slots:
      * This is a virtual function which should be implmented by a particular camera driver */
     virtual bool setPacketSize(int) = 0;
 
+    void setFileSaveDirectory(QString path){file_save_directory = path;};
+    QString getFileSaveDirectory(){return file_save_directory;};
+
+    bool hasTriggerFPSControl(){return has_trigger_fps_control;};
+
     bool startCapture(){return enableCapture(true);};
     bool stopCapture(){return enableCapture(false);};
 
     bool enableVideoStream(bool enable);
+    bool setVideoSource(int source_index); // 0: stereo, 1: left, 2:right, 3:disparity
     bool startVideoStream(){return enableVideoStream(false);}
     bool stopVideoStream(){return enableVideoStream(false);}
 
@@ -484,14 +599,34 @@ private slots:
         failed_frames = 0;
     }
 
+    void processNewCapture(void);
+
+    void processNewStereo(void);
+
+    //void processNewMatch(void);
+
+    void processMatch();
+
 private:
     qint64 frames = 0;
+
+    PointCloudTexture pct = POINT_CLOUD_TEXTURE_IMAGE;
+
+    bool match_busy = false;
+    bool processing_busy = false;
+    bool reproject_busy = false;
+    bool changed_matcher = false;
 
     bool includeDateInFilename = false;
     bool matching = false;
     bool rectifying = false;
     bool capturing_video = false;
     bool capturing_rectified_video = true;
+    VideoSource video_src = VIDEO_SRC_STEREO;
+    QMutex video_mutex;
+    QMutex disparity_mutex;
+    QMutex lr_image_mutex;
+    QMutex lr_raw_image_mutex;
     bool swappingLeftRight = false;
     bool reprojecting = false;
     bool cuda_device_found = false;
@@ -502,7 +637,13 @@ private:
 
     QString file_save_directory = "";
 
-    cv::VideoWriter *cv_video_writer;
+    QFuture<void> match_future;
+    QFuture<void> stereo_future;
+    QFuture<void> reproject_future;
+
+    QFutureWatcher<void> match_futureWatcher;
+
+    cv::VideoWriter *cv_video_writer = nullptr;
 
     //! Block until a steroe processing has finished
     void stereo_process_finished(void);
@@ -512,6 +653,26 @@ private:
   * @param[in] fname Output filename
   */
     void saveImage(QString fname);
+
+    //!  Save the disparity map
+    /*!
+    * @param[in] filename Output filename
+    */
+    void saveDisparity(QString filename);
+
+    //!  Save the disparity map as normalised colormap
+    /*!
+    * @param[in] filename Output filename
+    */
+    void saveDisparityColormap(QString filename);
+
+    //!  Save the disparity map as normalised colormap
+    /*!
+    * @param[in] filename Output filename
+    * @param[in] enable_16bit Save with 16 bit depth
+    * @param[in] scale_16bit Scaling factor to apply to depth before converting to 16-bit to increase precision
+    */
+    void saveRGBD(QString fname, bool enable_16bit=true, float scale_16bit=6553.0);
 
     //! Load rectification maps from calibration files
     /*!
@@ -539,7 +700,7 @@ private:
     /*!
   * Note this will update the image matrices: #left_remapped and #right_remapped
   */
-    bool rectifyImages(void);
+    bool rectifyImages(cv::Mat left, cv::Mat right, cv::Mat& left_rect, cv::Mat& right_rect);
 
     //! Wrapper around OpenCV rectify function for paralell calls.
     /*!
@@ -564,7 +725,6 @@ private:
   *
   * @sa setVisualZmin(), setVisualZmax(), getPointCloud()
   */
-    void reproject3D();
 
     cv::Mat rectmapx_l;
     cv::Mat rectmapy_l;
@@ -583,13 +743,23 @@ private:
     int cal_image_height;
 
     int video_fps = 0;
-    int video_codec = CV_FOURCC('H', '2', '6', '4');
-    bool video_is_color = false;
+    //int video_codec = cv::VideoWriter::fourcc('H', '2', '6', '4');
+    //int video_codec = cv::VideoWriter::fourcc('H', 'E', 'V', 'C');
+    int video_codec = cv::VideoWriter::fourcc('M','J','P','G');
+    //int video_codec = cv::VideoWriter::fourcc('a','v','c','1');
+    bool video_is_color = true;
     std::string video_filename = "";
     cv::Mat video_frame;
 
     cv::Mat left_output;
     cv::Mat right_output;
+
+    cv::Mat left_match_input;
+    cv::Mat right_match_input;
+
+    cv::Mat disparity;
+    cv::Mat disparity_filtered;
+    cv::Mat depth;
 
     double visualisation_min_z = 0.2;
     double visualisation_max_z = 5;
@@ -609,12 +779,15 @@ protected:
     StereoCameraSerialInfo stereoCameraSerialInfo_;
 
     QElapsedTimer frametimer;
+    QElapsedTimer matchtimer;
+    //QElapsedTimer reprojecttimer;
 
     bool rectification_valid = false;
     bool calibration_valid = false;
     bool captured_stereo = false;
     bool first_image_received = false;
     bool capturing = false;
+    bool has_trigger_fps_control = false;
 
     QThread *thread_;
 
@@ -623,7 +796,7 @@ protected:
         if (stereo_error == CAPTURE_ERROR){
             failed_frames += 1;
             if (failed_frames > max_failed_frames){
-                send_error(TIMEOUT_ERROR);
+                send_error(LOST_FRAMES_ERROR);
             }
         }
         int error_index = stereo_error;

@@ -90,4 +90,4 @@ private:
     QFuture<void> future;
 };
 
-#endif // STEREOCAMERAOPENCV_H
+#endif // STEREOCAMERATIS_H

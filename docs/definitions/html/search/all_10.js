@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['write_5fparallel_244',['write_parallel',['../class_c_v_support.html#abc1c6aa3035dc31fa00499a0aa0c7633',1,'CVSupport']]],
-  ['writeinifileraw_245',['WriteIniFileRaw',['../class_i3_d_r_s_g_m.html#afdaf2746702f981918ca4add533bdafb',1,'I3DRSGM']]]
+  ['x_5fhighest_229',['x_highest',['../class_calibration_dialog.html#a9a90c8508d0fbda09dcf2029767a66aa',1,'CalibrationDialog']]],
+  ['x_5flowest_230',['x_lowest',['../class_calibration_dialog.html#a570ad8881953edbd62a8d7a6b62cd719',1,'CalibrationDialog']]]
 ];

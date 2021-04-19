@@ -50,6 +50,7 @@ public slots:
    void enableExtendDisparity(bool enable);
    void enableNegativeDisparity(bool enable);
    void enableSpeckleFilter(bool enable);
+   void enableWLSFilter(bool enable);
 
    AbstractStereoMatcher* getMatcher(void);
 

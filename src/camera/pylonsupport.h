@@ -35,7 +35,7 @@ public:
                 } else {
                     Pylon::CPylonImage pylonImage;
                     formatConverter->Convert(pylonImage, ptrGrabResult);
-                    cv::Mat image_temp = cv::Mat(frameRows, frameCols, CV_8UC1, static_cast<uchar *>(pylonImage.GetBuffer()));
+                    cv::Mat image_temp = cv::Mat(frameRows, frameCols, CV_8UC3, (uint8_t *)pylonImage.GetBuffer());
 
                     if (image_temp.cols == 0 || image_temp.rows == 0){
                         //qDebug() << "Image result buffer size is incorrect";
