@@ -8,8 +8,8 @@ cd %scriptpath:~0,-1%
 cd ..
 
 :: define which appcast will be changed
-set InputFile=AppcastDev.xml
-set TmpFile=AppcastDev_tmp.xml
+set InputFile=Appcast.xml
+set TmpFile=Appcast_tmp.xml
 
 :: read i3drsgm version from file
 set /p version=< version.txt

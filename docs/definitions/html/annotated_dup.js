@@ -1,17 +1,11 @@
 var annotated_dup =
 [
-    [ "AVT", null, [
-      [ "VmbAPI", null, [
-        [ "Examples", null, [
-          [ "ApiController", "class_a_v_t_1_1_vmb_a_p_i_1_1_examples_1_1_api_controller.html", "class_a_v_t_1_1_vmb_a_p_i_1_1_examples_1_1_api_controller" ]
-        ] ]
-      ] ]
-    ] ],
     [ "AboutDialog", "class_about_dialog.html", "class_about_dialog" ],
     [ "AbstractArduinoComs", "class_abstract_arduino_coms.html", "class_abstract_arduino_coms" ],
     [ "AbstractStereoCamera", "class_abstract_stereo_camera.html", "class_abstract_stereo_camera" ],
     [ "AbstractStereoMatcher", "class_abstract_stereo_matcher.html", "class_abstract_stereo_matcher" ],
     [ "ArduinoCommsCameraControl", "class_arduino_comms_camera_control.html", "class_arduino_comms_camera_control" ],
+    [ "BoundingBox", "struct_bounding_box.html", "struct_bounding_box" ],
     [ "CalibrateConfirmDialog", "class_calibrate_confirm_dialog.html", "class_calibrate_confirm_dialog" ],
     [ "CalibrateFromImagesDialog", "class_calibrate_from_images_dialog.html", "class_calibrate_from_images_dialog" ],
     [ "CalibrationDialog", "class_calibration_dialog.html", "class_calibration_dialog" ],
@@ -22,10 +16,15 @@ var annotated_dup =
     [ "CameraVimba", "class_camera_vimba.html", "class_camera_vimba" ],
     [ "Chessboard", "class_chessboard.html", "class_chessboard" ],
     [ "CPylonImageEventHandler", "class_c_pylon_image_event_handler.html", "class_c_pylon_image_event_handler" ],
+    [ "CStereoCameraBaslerImageEventHandler", "class_c_stereo_camera_basler_image_event_handler.html", "class_c_stereo_camera_basler_image_event_handler" ],
+    [ "cvSharedMemory", "classcv_shared_memory.html", "classcv_shared_memory" ],
     [ "CVSupport", "class_c_v_support.html", null ],
+    [ "DetectorOpenCV", "class_detector_open_c_v.html", "class_detector_open_c_v" ],
+    [ "DetectorSetupDialog", "class_detector_setup_dialog.html", "class_detector_setup_dialog" ],
     [ "DisparityViewer", "class_disparity_viewer.html", "class_disparity_viewer" ],
+    [ "FrameObserver", "class_frame_observer.html", "class_frame_observer" ],
     [ "Listener", "class_listener.html", "class_listener" ],
-    [ "MainWindow", "class_main_window.html", "class_main_window" ],
+    [ "LoadStereoImagePairDialog", "class_load_stereo_image_pair_dialog.html", "class_load_stereo_image_pair_dialog" ],
     [ "MatcherI3DRSGM", "class_matcher_i3_d_r_s_g_m.html", "class_matcher_i3_d_r_s_g_m" ],
     [ "MatcherOpenCVBlock", "class_matcher_open_c_v_block.html", "class_matcher_open_c_v_block" ],
     [ "MatcherOpenCVSGBM", "class_matcher_open_c_v_s_g_b_m.html", "class_matcher_open_c_v_s_g_b_m" ],
@@ -34,13 +33,20 @@ var annotated_dup =
     [ "MatcherWidgetOpenCVBlock", "class_matcher_widget_open_c_v_block.html", "class_matcher_widget_open_c_v_block" ],
     [ "MatcherWidgetOpenCVSGBM", "class_matcher_widget_open_c_v_s_g_b_m.html", "class_matcher_widget_open_c_v_s_g_b_m" ],
     [ "ParamFile", "class_param_file.html", "class_param_file" ],
+    [ "PCLSupport", "class_p_c_l_support.html", null ],
     [ "PylonSupport", "class_pylon_support.html", "class_pylon_support" ],
     [ "StereoCalibrate", "class_stereo_calibrate.html", "class_stereo_calibrate" ],
     [ "StereoCameraBasler", "class_stereo_camera_basler.html", "class_stereo_camera_basler" ],
     [ "StereoCameraDeimos", "class_stereo_camera_deimos.html", "class_stereo_camera_deimos" ],
+    [ "StereoCameraFromImage", "class_stereo_camera_from_image.html", "class_stereo_camera_from_image" ],
     [ "StereoCameraFromVideo", "class_stereo_camera_from_video.html", "class_stereo_camera_from_video" ],
     [ "StereoCameraOpenCV", "class_stereo_camera_open_c_v.html", "class_stereo_camera_open_c_v" ],
+    [ "StereoCameraPhobosBasler", "class_stereo_camera_phobos_basler.html", "class_stereo_camera_phobos_basler" ],
+    [ "StereoCameraPhobosTIS", "class_stereo_camera_phobos_t_i_s.html", "class_stereo_camera_phobos_t_i_s" ],
     [ "StereoCameraSupport", "class_stereo_camera_support.html", null ],
+    [ "StereoCameraTara", "class_stereo_camera_tara.html", "class_stereo_camera_tara" ],
     [ "StereoCameraTIS", "class_stereo_camera_t_i_s.html", "class_stereo_camera_t_i_s" ],
-    [ "StereoCameraVimba", "class_stereo_camera_vimba.html", "class_stereo_camera_vimba" ]
+    [ "StereoCameraTitaniaBasler", "class_stereo_camera_titania_basler.html", "class_stereo_camera_titania_basler" ],
+    [ "StereoCameraVimba", "class_stereo_camera_vimba.html", "class_stereo_camera_vimba" ],
+    [ "SVTKWindow", "class_s_v_t_k_window.html", "class_s_v_t_k_window" ]
 ];

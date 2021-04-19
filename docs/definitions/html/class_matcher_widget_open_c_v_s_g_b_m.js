@@ -7,6 +7,7 @@ var class_matcher_widget_open_c_v_s_g_b_m =
     [ "enableExtendDisparity", "class_matcher_widget_open_c_v_s_g_b_m.html#a2046f8696c7bfa8b353a63979691fede", null ],
     [ "enableNegativeDisparity", "class_matcher_widget_open_c_v_s_g_b_m.html#a85917ef039f3c3f6bdfb0bc2f6ac5e74", null ],
     [ "enableSpeckleFilter", "class_matcher_widget_open_c_v_s_g_b_m.html#a3b0438995da832995ee30fc44c0ca45f", null ],
+    [ "enableWLSFilter", "class_matcher_widget_open_c_v_s_g_b_m.html#a2ca11907f865bbcb34a933277978466a", null ],
     [ "getMatcher", "class_matcher_widget_open_c_v_s_g_b_m.html#a2e792ea7fb0f07b482ba7dabeade4a4f", null ],
     [ "minDisparity", "class_matcher_widget_open_c_v_s_g_b_m.html#a894a5cbe9aa8f8e076a02c4a25f4ddc5", null ],
     [ "onSaveClicked", "class_matcher_widget_open_c_v_s_g_b_m.html#a4baa468def1b004f9e783694901bb5de", null ],

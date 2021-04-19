@@ -3,7 +3,7 @@
 [Software Website](https://i3drobotics.github.io/stereo-vision-toolkit/)
 
 ## Latest Release
-Download the latest release v1.3 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.0/StereoVisionToolkit-1.3.0-Win64.exe)
+Download the latest release v1.3.1 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1/StereoVisionToolkit-1.3.1-Win64.exe)
 
 For detailed instructions see the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf)
 
@@ -11,7 +11,6 @@ For detailed instructions see the [User Guide](https://i3drobotics.github.io/ste
 ![Build](https://github.com/i3drobotics/stereo-vision-toolkit/workflows/QT%20Build/badge.svg?branch=dev&event=push)
 
 ## About
-
 I3DR's stereo vision toolkit is an application provided for testing of stereo cameras and gathering of 3D data.
 
 You can calibrate stereo cameras, acquire images and perform matching and 3D reconstruction. You can save raw stereo video to capture a scene and then replay it in the software to fine tune matching parameters.
@@ -19,7 +18,6 @@ You can calibrate stereo cameras, acquire images and perform matching and 3D rec
 SVTK is under active development. At the moment the software only officially supports the i3DR Deimos and Phobos cameras, but in principle any usb camera pair or pre-rectified stereo video of the correct format (side-by-side) will work.
 
 ## Roadmap
-
 Currently SVTK is a useful and functional tool for exploring stereo imaging, and allows you to get going with your I3DR stereo camera quickly. There are a number of features/improvements in development including:
 
 - Live camera calibration (currently in beta)
@@ -31,29 +29,24 @@ Currently SVTK is a useful and functional tool for exploring stereo imaging, and
 See [issues](https://github.com/i3drobotics/stereo-vision-toolkit/issues) for details on known bugs and future enhancements
 
 ## Stereo matching support
-
 We have included support for two of OpenCV's matchers: the basic block matcher and semi-global block matching. The block matcher will run at over 60fps on a fast CPU (e.g. i5.) SGBM should provide better results, but will run around a factor of five slower.
 
 I3DR's own 3D matching algorithm (I3DRSGM) is also built into this application by default however a license is required to be able to run it. Please contact info@i3drobotics.com for requesting a license. 
 
 ## Installation
-
-Download and install the windows installer for the latest release [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.0/StereoVisionToolkit-1.3.0-Win64.exe).
+Download and install the windows installer for the latest release [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1/StereoVisionToolkit-1.3.1-Win64.exe).
 
 See the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on using the software as well as building from source. 
 
 ## Development
-
 This application is under active development and it is likely that in the short term there may be breaking changes to classes, or significant changes to the GUI. Have a look at the [project milestones](https://github.com/i3drobotics/stereo-vision-toolkit/milestones) for information on future improvements.
 
 Feel free to send us pull requests!
 
 ## License
-
 This code is provided under the MIT license, which essentially means it's open source, but we require you to add our copyright if you distribute it elsewhere.
 
 ## Previous Releases
-
 See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
 
 ## Developer zone

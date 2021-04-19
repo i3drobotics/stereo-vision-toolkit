@@ -1,8 +1,8 @@
 var class_matcher_open_c_v_block =
 [
     [ "MatcherOpenCVBlock", "class_matcher_open_c_v_block.html#a0cb50cffd34ad0fe344217d9fe55a968", null ],
-    [ "backwardMatch", "class_matcher_open_c_v_block.html#a7c31fc9dbe970b3cf7e01a0f1c5baf60", null ],
-    [ "forwardMatch", "class_matcher_open_c_v_block.html#a2abcf69b70bed18c59609b1a432a3fbd", null ],
+    [ "backwardMatch", "class_matcher_open_c_v_block.html#a5f8e445fe97b0a65b89fa036ea75b625", null ],
+    [ "forwardMatch", "class_matcher_open_c_v_block.html#ad2cac8c28a5251bd1022fb4807d39e73", null ],
     [ "getBlockSize", "class_matcher_open_c_v_block.html#a48761cf09adce564a9fdaa91d25c037e", null ],
     [ "getDisp12MaxDiff", "class_matcher_open_c_v_block.html#afbff703a45d2a1a80c73682a60c6239b", null ],
     [ "getDisparityRange", "class_matcher_open_c_v_block.html#aa6cb3a70729a5602f688608324a19655", null ],
@@ -17,6 +17,7 @@ var class_matcher_open_c_v_block =
     [ "getUniquenessRatio", "class_matcher_open_c_v_block.html#a9c9ed77a220f19e79b35ac6b0e6d1fc4", null ],
     [ "init", "class_matcher_open_c_v_block.html#a06b1d7f9007834ca1dd1e285341e1e13", null ],
     [ "isLicenseValid", "class_matcher_open_c_v_block.html#a9a3326a138a0eb9f3379ec881142b2ff", null ],
+    [ "isWLSFilterEnabled", "class_matcher_open_c_v_block.html#af4728d2094d45893ae171b26936cc432", null ],
     [ "saveParams", "class_matcher_open_c_v_block.html#ae5ec6be50177c4540668ee1508c84de0", null ],
     [ "setBlockSize", "class_matcher_open_c_v_block.html#a4a34614f23f03c4505f6dcde975ca3cc", null ],
     [ "setDisp12MaxDiff", "class_matcher_open_c_v_block.html#a929bdcd0ddc2d0e64a83d9b467226a45", null ],
@@ -30,7 +31,10 @@ var class_matcher_open_c_v_block =
     [ "setTextureThreshold", "class_matcher_open_c_v_block.html#a668eaeb56744a3982d90a1e7b1c5ead7", null ],
     [ "setUniquenessRatio", "class_matcher_open_c_v_block.html#ae6d8ad706c2743abc1998a7e7deae899", null ],
     [ "setupDefaultMatcher", "class_matcher_open_c_v_block.html#ab417e1cbbc83d266a0653b324e67a627", null ],
+    [ "setWLSFilterEnabled", "class_matcher_open_c_v_block.html#ad9d9481492925f5796cb5b42b979d01c", null ],
     [ "matcher", "class_matcher_open_c_v_block.html#ae6369136aff57fd96ec79983b34d06bb", null ],
+    [ "useGPU", "class_matcher_open_c_v_block.html#aa0f776349aaacbdb731de2697b576080", null ],
+    [ "wls_filter", "class_matcher_open_c_v_block.html#acc9e8518006e8d85880cd60ba69dfafa", null ],
     [ "wls_lambda", "class_matcher_open_c_v_block.html#a6645a323bdfd35f951b8d3397f5bc79b", null ],
     [ "wls_sigma", "class_matcher_open_c_v_block.html#a9aef4427fbd84d520d10ac9195227181", null ]
 ];

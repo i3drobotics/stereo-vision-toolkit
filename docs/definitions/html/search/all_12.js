@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['y_5fhighest_209',['y_highest',['../class_calibration_dialog.html#ab801731639c2927faff9638a63fa02cd',1,'CalibrationDialog']]],
-  ['y_5flowest_210',['y_lowest',['../class_calibration_dialog.html#a1679af00a9810492a7af172f70afb98d',1,'CalibrationDialog']]]
+  ['_7esvtkwindow_233',['~SVTKWindow',['../class_s_v_t_k_window.html#a176814ee420f7d799f6e4a7004655803',1,'SVTKWindow']]]
 ];
