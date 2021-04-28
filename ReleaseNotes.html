@@ -1,35 +1,7 @@
-Stereo Vision Toolkit v1.3.1
+Stereo Vision Toolkit v1.3.1.1
 
 Changes:
-- Add ML detector using YOLO or Tensorflow
-- Add loading of stereo image pair from image files (.png, .jpg, .jpeg)
-- Add toggle to show epipolar lines for checking calibration
-- Add RGBD streaming using shared memory (for use with I3DRStereo3D Unity package)
-- Add I3DR Titania stereo camera support
-- Add Vimba camera integration
-- Add colour image capture to Basler cameras
-- Add point cloud texture options (depth colourmap or image)
-- Add colour to loading/saving stereo videos
-- Add about dialogue to show software version
-- Add separate camera capture and processing threads
-- Add video saving of individual camera images or disparity
-- Add WLS filter to OpenCV BM and SGBM matchers
-- Add hostname and hostID to license message if I3DRSGM license is not found
-- Add new camera serials
-- Change load/save YAML calibration to use ROS perception supported YAML (changed from OpenCV FileStorage yaml)
-- Upgrade to OpenCV v4.5.0
-- Upgrade to CUDA 11.1
-- Upgrade to I3DRSGM v1.0.11
-- Upgrade to using Pylon v6.1.1.18345 library for Basler cameras
-
-Bug fixes:
-- Fix YAML file generates invalid Q matrix
-- Fix missing link to online documentation
-- Fix overwriting image during save
-- Fix non rectified images saved with '_rect' suffix
-- Fix maximum point cloud z value being set incorrectly
-- Fix camera capture delay when processing load is high
-- Fix I3DRSGM failed to initalise when switching to camera with different resolution
+- Update documentation
 
 Known issues:
 - ROS perception YAML's data arrays must be on single line in YAML file.
