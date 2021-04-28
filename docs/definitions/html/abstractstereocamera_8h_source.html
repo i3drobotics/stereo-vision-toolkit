@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('abstractstereocamera_8h_source.html','
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="cvsupport_8hpp.html">cvsupport.hpp</a>&quot;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;pclsupport.hpp&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="pclsupport_8hpp.html">pclsupport.hpp</a>&quot;</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">// Point Cloud Library</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;pcl/point_cloud.h&gt;</span></div>
@@ -296,353 +296,352 @@ $(document).ready(function(){initNavTree('abstractstereocamera_8h_source.html','
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    }</div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160; </div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160; </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aaec60ad16288d9c3eb937391ab2351b6">setVideoStreamParams</a>(QString filename = <span class="stringliteral">&quot;&quot;</span>, <span class="keywordtype">int</span> fps = 0, <span class="keywordtype">int</span> codec = cv::VideoWriter::fourcc(<span class="charliteral">&#39;H&#39;</span>, <span class="charliteral">&#39;2&#39;</span>, <span class="charliteral">&#39;6&#39;</span>, <span class="charliteral">&#39;4&#39;</span>), <span class="keywordtype">bool</span> is_color = <span class="keyword">false</span>, VideoSource vid_src = VIDEO_SRC_STEREO);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordtype">bool</span> addVideoStreamFrame(cv::Mat frame);</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordtype">bool</span> connected = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordtype">float</span> downsample_factor = 1;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aaec60ad16288d9c3eb937391ab2351b6">setVideoStreamParams</a>(QString filename = <span class="stringliteral">&quot;&quot;</span>, <span class="keywordtype">int</span> fps = 0, <span class="keywordtype">int</span> codec = cv::VideoWriter::fourcc(<span class="charliteral">&#39;H&#39;</span>, <span class="charliteral">&#39;2&#39;</span>, <span class="charliteral">&#39;6&#39;</span>, <span class="charliteral">&#39;4&#39;</span>), <span class="keywordtype">bool</span> is_color = <span class="keyword">false</span>, VideoSource vid_src = VIDEO_SRC_STEREO);</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordtype">bool</span> addVideoStreamFrame(cv::Mat frame);</div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    cv::Mat left_remapped;</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    cv::Mat right_remapped;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    cv::Mat left_unrectified;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    cv::Mat right_unrectified;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    cv::Mat left_match;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    cv::Mat right_match;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    cv::Mat left_raw;</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    cv::Mat right_raw;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    cv::Mat Q;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="keywordtype">double</span> fx;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keywordtype">double</span> baseline;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160; </div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    cv::Mat stereo_reprojected;</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160; </div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;signals:</div>
-<div class="line"><a name="l00349"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375">  349</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375">captured</a>();</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
-<div class="line"><a name="l00352"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a266a79e8d669f521489e09e4ce8f893d">  352</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a266a79e8d669f521489e09e4ce8f893d">captured_success</a>();</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="keywordtype">bool</span> connected = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordtype">float</span> downsample_factor = 1;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160; </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    cv::Mat left_remapped;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    cv::Mat right_remapped;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    cv::Mat left_unrectified;</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    cv::Mat right_unrectified;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    cv::Mat left_match;</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    cv::Mat right_match;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    cv::Mat left_raw;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    cv::Mat right_raw;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    cv::Mat Q;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordtype">double</span> fx;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordtype">double</span> baseline;</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160; </div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    cv::Mat stereo_reprojected;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160; </div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;signals:</div>
+<div class="line"><a name="l00352"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375">  352</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a28c67fb287ceef7cac927595959f5375">captured</a>();</div>
 <div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160; </div>
-<div class="line"><a name="l00355"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aebcdc59dc862a630b7c9a596b0752133">  355</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#aebcdc59dc862a630b7c9a596b0752133">captured_fail</a>();</div>
+<div class="line"><a name="l00355"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a266a79e8d669f521489e09e4ce8f893d">  355</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a266a79e8d669f521489e09e4ce8f893d">captured_success</a>();</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160; </div>
-<div class="line"><a name="l00358"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a5181f8bbd0358c5340654c1009aa23ff">  358</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a5181f8bbd0358c5340654c1009aa23ff">first_image_ready</a>(<span class="keywordtype">bool</span> ready);</div>
+<div class="line"><a name="l00358"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aebcdc59dc862a630b7c9a596b0752133">  358</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#aebcdc59dc862a630b7c9a596b0752133">captured_fail</a>();</div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
-<div class="line"><a name="l00361"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a2b2df7aa4bbf0ee936310e7f47783ba6">  361</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a2b2df7aa4bbf0ee936310e7f47783ba6">error</a>(<span class="keywordtype">int</span> error_index);</div>
+<div class="line"><a name="l00361"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a5181f8bbd0358c5340654c1009aa23ff">  361</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a5181f8bbd0358c5340654c1009aa23ff">first_image_ready</a>(<span class="keywordtype">bool</span> ready);</div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160; </div>
-<div class="line"><a name="l00364"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ac86037594fcc19b765cefce6f240e2c2">  364</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ac86037594fcc19b765cefce6f240e2c2">rectified</a>();</div>
+<div class="line"><a name="l00364"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a2b2df7aa4bbf0ee936310e7f47783ba6">  364</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a2b2df7aa4bbf0ee936310e7f47783ba6">error</a>(<span class="keywordtype">int</span> error_index);</div>
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160; </div>
-<div class="line"><a name="l00367"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ac24eaa1c0c62dae96a176f0eac053414">  367</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ac24eaa1c0c62dae96a176f0eac053414">matched</a>();</div>
+<div class="line"><a name="l00367"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ac86037594fcc19b765cefce6f240e2c2">  367</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ac86037594fcc19b765cefce6f240e2c2">rectified</a>();</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160; </div>
-<div class="line"><a name="l00370"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a955561b40fdaeaf218e32fb117b6aa9b">  370</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a955561b40fdaeaf218e32fb117b6aa9b">reprojected</a>();</div>
+<div class="line"><a name="l00370"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ac24eaa1c0c62dae96a176f0eac053414">  370</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ac24eaa1c0c62dae96a176f0eac053414">matched</a>();</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160; </div>
-<div class="line"><a name="l00373"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#acfe99ec51c2feee3df7a160f36ea090c">  373</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#acfe99ec51c2feee3df7a160f36ea090c">stereopair_processed</a>();</div>
+<div class="line"><a name="l00373"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a955561b40fdaeaf218e32fb117b6aa9b">  373</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a955561b40fdaeaf218e32fb117b6aa9b">reprojected</a>();</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160; </div>
-<div class="line"><a name="l00376"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a95d213e81c973da9799972a15c418bf6">  376</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a95d213e81c973da9799972a15c418bf6">frametime</a>(qint64 time);</div>
+<div class="line"><a name="l00376"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#acfe99ec51c2feee3df7a160f36ea090c">  376</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#acfe99ec51c2feee3df7a160f36ea090c">stereopair_processed</a>();</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a6f9fae3e3f951318a79e1f29605ddc48">  379</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a6f9fae3e3f951318a79e1f29605ddc48">matchtime</a>(qint64 time);</div>
+<div class="line"><a name="l00379"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a95d213e81c973da9799972a15c418bf6">  379</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a95d213e81c973da9799972a15c418bf6">frametime</a>(qint64 time);</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160; </div>
-<div class="line"><a name="l00382"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#abecef33309b92df075e2b5e9c72cf9d3">  382</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#abecef33309b92df075e2b5e9c72cf9d3">reprojecttime</a>(qint64 time);</div>
+<div class="line"><a name="l00382"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a6f9fae3e3f951318a79e1f29605ddc48">  382</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a6f9fae3e3f951318a79e1f29605ddc48">matchtime</a>(qint64 time);</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aacc05ac65e043fc984662ce083d491ca">  385</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#aacc05ac65e043fc984662ce083d491ca">framecount</a>(qint64 count);</div>
+<div class="line"><a name="l00385"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#abecef33309b92df075e2b5e9c72cf9d3">  385</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#abecef33309b92df075e2b5e9c72cf9d3">reprojecttime</a>(qint64 time);</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160; </div>
-<div class="line"><a name="l00388"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a739c0a904e281dd6ad522a8a0642c4e2">  388</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a739c0a904e281dd6ad522a8a0642c4e2">update_size</a>(<span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height, <span class="keywordtype">int</span> bitdepth);</div>
+<div class="line"><a name="l00388"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aacc05ac65e043fc984662ce083d491ca">  388</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#aacc05ac65e043fc984662ce083d491ca">framecount</a>(qint64 count);</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
-<div class="line"><a name="l00391"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a6eb388b6b235a928d5792d01db3e0654">  391</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a6eb388b6b235a928d5792d01db3e0654">savedImage</a>();</div>
+<div class="line"><a name="l00391"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a739c0a904e281dd6ad522a8a0642c4e2">  391</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a739c0a904e281dd6ad522a8a0642c4e2">update_size</a>(<span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height, <span class="keywordtype">int</span> bitdepth);</div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160; </div>
-<div class="line"><a name="l00394"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a53a4fa60101e40778119b570a7da1f59">  394</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a53a4fa60101e40778119b570a7da1f59">savedImage</a>(<span class="keywordtype">bool</span> success);</div>
+<div class="line"><a name="l00394"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a6eb388b6b235a928d5792d01db3e0654">  394</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a6eb388b6b235a928d5792d01db3e0654">savedImage</a>();</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160; </div>
-<div class="line"><a name="l00397"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a3e464cbf65365aaa18b13d2070e1cf5f">  397</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a3e464cbf65365aaa18b13d2070e1cf5f">pointCloudSaveStatus</a>(QString);</div>
+<div class="line"><a name="l00397"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a53a4fa60101e40778119b570a7da1f59">  397</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a53a4fa60101e40778119b570a7da1f59">savedImage</a>(<span class="keywordtype">bool</span> success);</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160; </div>
-<div class="line"><a name="l00400"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a3d09b66be2f4c53280d4328ff5409881">  400</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a3d09b66be2f4c53280d4328ff5409881">disconnected</a>();</div>
+<div class="line"><a name="l00400"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a3e464cbf65365aaa18b13d2070e1cf5f">  400</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a3e464cbf65365aaa18b13d2070e1cf5f">pointCloudSaveStatus</a>(QString);</div>
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
-<div class="line"><a name="l00403"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ae7cf0a8b94f4ee9bba33d8f6fc1d2be0">  403</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ae7cf0a8b94f4ee9bba33d8f6fc1d2be0">finished</a>();</div>
+<div class="line"><a name="l00403"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a3d09b66be2f4c53280d4328ff5409881">  403</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a3d09b66be2f4c53280d4328ff5409881">disconnected</a>();</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160; </div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;<span class="keyword">public</span> slots:</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
-<div class="line"><a name="l00411"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a5bf9d7efd2bf4f5eee6003d107600d47">  411</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a5bf9d7efd2bf4f5eee6003d107600d47">captureSingle</a>() = 0;</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160; </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160; </div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    <span class="comment">//virtual bool captureContinuous() = 0;</span></div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160; </div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160; </div>
-<div class="line"><a name="l00423"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">  423</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">enableCapture</a>(<span class="keywordtype">bool</span> enable) = 0;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160; </div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160; </div>
-<div class="line"><a name="l00430"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aaecdd422fccc375de7c076175196d3fa">  430</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aaecdd422fccc375de7c076175196d3fa">openCamera</a>(<span class="keywordtype">void</span>) = 0;</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160; </div>
-<div class="line"><a name="l00436"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a3602516e045385a56e60631d8d96457b">  436</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a3602516e045385a56e60631d8d96457b">closeCamera</a>(<span class="keywordtype">void</span>) = 0;</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160; </div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
-<div class="line"><a name="l00441"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aa604d5b7b4cc064dce3ae6d3b9f5dbb8">  441</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aa604d5b7b4cc064dce3ae6d3b9f5dbb8">enableAutoExposure</a>(<span class="keywordtype">bool</span>) = 0;</div>
+<div class="line"><a name="l00406"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ae7cf0a8b94f4ee9bba33d8f6fc1d2be0">  406</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ae7cf0a8b94f4ee9bba33d8f6fc1d2be0">finished</a>();</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160; </div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="keyword">public</span> slots:</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160; </div>
+<div class="line"><a name="l00414"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a5bf9d7efd2bf4f5eee6003d107600d47">  414</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a5bf9d7efd2bf4f5eee6003d107600d47">captureSingle</a>() = 0;</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160; </div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160; </div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="comment">//virtual bool captureContinuous() = 0;</span></div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160; </div>
+<div class="line"><a name="l00426"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">  426</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">enableCapture</a>(<span class="keywordtype">bool</span> enable) = 0;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160; </div>
+<div class="line"><a name="l00433"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aaecdd422fccc375de7c076175196d3fa">  433</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aaecdd422fccc375de7c076175196d3fa">openCamera</a>(<span class="keywordtype">void</span>) = 0;</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160; </div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160; </div>
+<div class="line"><a name="l00439"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a3602516e045385a56e60631d8d96457b">  439</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a3602516e045385a56e60631d8d96457b">closeCamera</a>(<span class="keywordtype">void</span>) = 0;</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160; </div>
 <div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160; </div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160; </div>
-<div class="line"><a name="l00446"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#abbf8b44c4b27f65dfcb814ccb7e644b8">  446</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#abbf8b44c4b27f65dfcb814ccb7e644b8">setExposure</a>(<span class="keywordtype">double</span>) = 0;</div>
+<div class="line"><a name="l00444"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aa604d5b7b4cc064dce3ae6d3b9f5dbb8">  444</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aa604d5b7b4cc064dce3ae6d3b9f5dbb8">enableAutoExposure</a>(<span class="keywordtype">bool</span>) = 0;</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160; </div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160; </div>
-<div class="line"><a name="l00451"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ae34107496350624b82d0d3d0150402ac">  451</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#ae34107496350624b82d0d3d0150402ac">enableAutoGain</a>(<span class="keywordtype">bool</span>) = 0;</div>
+<div class="line"><a name="l00449"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#abbf8b44c4b27f65dfcb814ccb7e644b8">  449</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#abbf8b44c4b27f65dfcb814ccb7e644b8">setExposure</a>(<span class="keywordtype">double</span>) = 0;</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
 <div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160; </div>
-<div class="line"><a name="l00456"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aee2dbdbc334d898e4cae8930ab2f60a5">  456</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aee2dbdbc334d898e4cae8930ab2f60a5">setGain</a>(<span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00454"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ae34107496350624b82d0d3d0150402ac">  454</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#ae34107496350624b82d0d3d0150402ac">enableAutoGain</a>(<span class="keywordtype">bool</span>) = 0;</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160; </div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160; </div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160; </div>
-<div class="line"><a name="l00461"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a73a5b0e52d9369239f7b2b4e3a3360cd">  461</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a73a5b0e52d9369239f7b2b4e3a3360cd">setBinning</a>(<span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00459"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aee2dbdbc334d898e4cae8930ab2f60a5">  459</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aee2dbdbc334d898e4cae8930ab2f60a5">setGain</a>(<span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160; </div>
 <div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160; </div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160; </div>
-<div class="line"><a name="l00466"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a89a50bfafc00ad09a769c96d1b8c9919">  466</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a89a50bfafc00ad09a769c96d1b8c9919">enableTrigger</a>(<span class="keywordtype">bool</span>) = 0;</div>
+<div class="line"><a name="l00464"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a73a5b0e52d9369239f7b2b4e3a3360cd">  464</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a73a5b0e52d9369239f7b2b4e3a3360cd">setBinning</a>(<span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160; </div>
 <div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160; </div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160; </div>
-<div class="line"><a name="l00471"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ad46c734161ab703dc3819c0bb3b7ae90">  471</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#ad46c734161ab703dc3819c0bb3b7ae90">setFPS</a>(<span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00469"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a89a50bfafc00ad09a769c96d1b8c9919">  469</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a89a50bfafc00ad09a769c96d1b8c9919">enableTrigger</a>(<span class="keywordtype">bool</span>) = 0;</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160; </div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160; </div>
-<div class="line"><a name="l00476"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aad356af22f5ec7412c68c3ba6db9a625">  476</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aad356af22f5ec7412c68c3ba6db9a625">setPacketSize</a>(<span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00474"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#ad46c734161ab703dc3819c0bb3b7ae90">  474</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#ad46c734161ab703dc3819c0bb3b7ae90">setFPS</a>(<span class="keywordtype">int</span>) = 0;</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160; </div>
 <div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160; </div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    <span class="keywordtype">void</span> setFileSaveDirectory(QString path){file_save_directory = path;};</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    QString getFileSaveDirectory(){<span class="keywordflow">return</span> file_save_directory;};</div>
+<div class="line"><a name="l00479"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aad356af22f5ec7412c68c3ba6db9a625">  479</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#aad356af22f5ec7412c68c3ba6db9a625">setPacketSize</a>(<span class="keywordtype">int</span>) = 0;</div>
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160; </div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;    <span class="keywordtype">bool</span> hasTriggerFPSControl(){<span class="keywordflow">return</span> has_trigger_fps_control;};</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160; </div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    <span class="keywordtype">bool</span> startCapture(){<span class="keywordflow">return</span> <a class="code" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">enableCapture</a>(<span class="keyword">true</span>);};</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    <span class="keywordtype">bool</span> stopCapture(){<span class="keywordflow">return</span> <a class="code" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">enableCapture</a>(<span class="keyword">false</span>);};</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;    <span class="keywordtype">void</span> setFileSaveDirectory(QString path){file_save_directory = path;};</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    QString getFileSaveDirectory(){<span class="keywordflow">return</span> file_save_directory;};</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160; </div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    <span class="keywordtype">bool</span> hasTriggerFPSControl(){<span class="keywordflow">return</span> has_trigger_fps_control;};</div>
 <div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160; </div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    <span class="keywordtype">bool</span> enableVideoStream(<span class="keywordtype">bool</span> enable);</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <span class="keywordtype">bool</span> setVideoSource(<span class="keywordtype">int</span> source_index); <span class="comment">// 0: stereo, 1: left, 2:right, 3:disparity</span></div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    <span class="keywordtype">bool</span> startVideoStream(){<span class="keywordflow">return</span> enableVideoStream(<span class="keyword">false</span>);}</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="keywordtype">bool</span> stopVideoStream(){<span class="keywordflow">return</span> enableVideoStream(<span class="keyword">false</span>);}</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160; </div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordtype">void</span> setMatcher(<a class="code" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a> *matcher);</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160; </div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160; </div>
-<div class="line"><a name="l00498"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a5099bd75a017fbfb066b37f3988fa9de">  498</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a5099bd75a017fbfb066b37f3988fa9de">loadCalibration</a>(QString directory, StereoCalibrationType cal_type){</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;        <span class="keywordflow">if</span> (directory == <span class="stringliteral">&quot;&quot;</span>) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;        <span class="keywordtype">bool</span> res;</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;        <span class="keywordflow">if</span> (cal_type == CALIBRATION_TYPE_XML){</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;            res = loadCalibrationXML(directory);</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (cal_type == CALIBRATION_TYPE_YAML){</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;            res = loadCalibrationYaml(directory);</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;        }</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160; </div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;        <span class="comment">//TODO: scale calibration by downsample factor</span></div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160; </div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;        <a class="code" href="class_abstract_stereo_camera.html#a16cb90b828f6f4d4e32a8df9d8b8be0f">enableRectify</a>(res);</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;        calibration_valid = res;</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160; </div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;        <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    }</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160; </div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    <span class="keywordtype">bool</span> loadCalibrationYaml(QString directory);</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160; </div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    <span class="keywordtype">bool</span> loadCalibrationXML(QString directory);</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    <span class="keywordtype">bool</span> startCapture(){<span class="keywordflow">return</span> <a class="code" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">enableCapture</a>(<span class="keyword">true</span>);};</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <span class="keywordtype">bool</span> stopCapture(){<span class="keywordflow">return</span> <a class="code" href="class_abstract_stereo_camera.html#ae497c9a3e27a6c992eddd8d8d62b260d">enableCapture</a>(<span class="keyword">false</span>);};</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160; </div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="keywordtype">bool</span> enableVideoStream(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    <span class="keywordtype">bool</span> setVideoSource(<span class="keywordtype">int</span> source_index); <span class="comment">// 0: stereo, 1: left, 2:right, 3:disparity</span></div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordtype">bool</span> startVideoStream(){<span class="keywordflow">return</span> enableVideoStream(<span class="keyword">false</span>);}</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    <span class="keywordtype">bool</span> stopVideoStream(){<span class="keywordflow">return</span> enableVideoStream(<span class="keyword">false</span>);}</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160; </div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    <span class="keywordtype">void</span> setMatcher(<a class="code" href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a> *matcher);</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160; </div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160; </div>
+<div class="line"><a name="l00502"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a5099bd75a017fbfb066b37f3988fa9de">  502</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a5099bd75a017fbfb066b37f3988fa9de">loadCalibration</a>(QString directory, StereoCalibrationType cal_type){</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;        <span class="keywordflow">if</span> (directory == <span class="stringliteral">&quot;&quot;</span>) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;        <span class="keywordtype">bool</span> res;</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;        <span class="keywordflow">if</span> (cal_type == CALIBRATION_TYPE_XML){</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;            res = loadCalibrationXML(directory);</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (cal_type == CALIBRATION_TYPE_YAML){</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;            res = loadCalibrationYaml(directory);</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;        }</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160; </div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;        <span class="comment">//TODO: scale calibration by downsample factor</span></div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160; </div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;        <a class="code" href="class_abstract_stereo_camera.html#a16cb90b828f6f4d4e32a8df9d8b8be0f">enableRectify</a>(res);</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;        calibration_valid = res;</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160; </div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;        <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    }</div>
 <div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160; </div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;    <span class="keywordtype">bool</span> loadCalibrationYaml(QString directory);</div>
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160; </div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ac299030bbbc8a7445140ca419c94a558">saveImageTimestamped</a>();</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160; </div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a0d63f01457d134b1f83d7c6c11e42010">enableMatching</a>(<span class="keywordtype">bool</span> match);</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160; </div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a16cb90b828f6f4d4e32a8df9d8b8be0f">enableRectify</a>(<span class="keywordtype">bool</span> rectify);</div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160; </div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ab8475532e8bac3904fce8c30c77e87b8">enableCaptureRectifedVideo</a>(<span class="keywordtype">bool</span> rectify);</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160; </div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ae3dec6f756ff3b6d3702ff3d85e95272">enableReproject</a>(<span class="keywordtype">bool</span> reproject);</div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160; </div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#af1427d89c573859167ff5ee216e041ed">enableSwapLeftRight</a>(<span class="keywordtype">bool</span> swap);</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160; </div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ae3ea2cd84d22229b82973674a71e2a56">enableDownsampleCalibration</a>(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    <span class="keywordtype">bool</span> loadCalibrationXML(QString directory);</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160; </div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160; </div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ac299030bbbc8a7445140ca419c94a558">saveImageTimestamped</a>();</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160; </div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a0d63f01457d134b1f83d7c6c11e42010">enableMatching</a>(<span class="keywordtype">bool</span> match);</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160; </div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a16cb90b828f6f4d4e32a8df9d8b8be0f">enableRectify</a>(<span class="keywordtype">bool</span> rectify);</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160; </div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ab8475532e8bac3904fce8c30c77e87b8">enableCaptureRectifedVideo</a>(<span class="keywordtype">bool</span> rectify);</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160; </div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ae3dec6f756ff3b6d3702ff3d85e95272">enableReproject</a>(<span class="keywordtype">bool</span> reproject);</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160; </div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#af1427d89c573859167ff5ee216e041ed">enableSwapLeftRight</a>(<span class="keywordtype">bool</span> swap);</div>
 <div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160; </div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ace9f42cf9437737f7de4b40af014d3dd">enableSaveDisparity</a>(<span class="keywordtype">bool</span> enable);</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160; </div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a850e0dc1d6859b97262232989c98a6a4">setDownsampleFactor</a>(<span class="keywordtype">int</span> factor);</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160; </div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160; </div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a176f96b1e0cadc210b4a4b73bd51069e">setVisualZmin</a>(<span class="keywordtype">double</span> zmin);</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ae3ea2cd84d22229b82973674a71e2a56">enableDownsampleCalibration</a>(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160; </div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#ace9f42cf9437737f7de4b40af014d3dd">enableSaveDisparity</a>(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160; </div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a850e0dc1d6859b97262232989c98a6a4">setDownsampleFactor</a>(<span class="keywordtype">int</span> factor);</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160; </div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160; </div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160; </div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a5da7d8b7074a30583f22d0efd0af5f28">setVisualZmax</a>(<span class="keywordtype">double</span> zmax);</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a176f96b1e0cadc210b4a4b73bd51069e">setVisualZmin</a>(<span class="keywordtype">double</span> zmin);</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160; </div>
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160; </div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a41ffbf9a98378b4c600a64b4a7e293f5">enableDateInFilename</a>(<span class="keywordtype">bool</span> enable);</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160; </div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a895b0205fd95e9cd59598d95da7e4b8a">savePointCloud</a>();</div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160; </div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160; </div>
-<div class="line"><a name="l00576"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991">  576</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991">setSavelocation</a>(QString dir){</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a5da7d8b7074a30583f22d0efd0af5f28">setVisualZmax</a>(<span class="keywordtype">double</span> zmax);</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160; </div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a41ffbf9a98378b4c600a64b4a7e293f5">enableDateInFilename</a>(<span class="keywordtype">bool</span> enable);</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160; </div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a895b0205fd95e9cd59598d95da7e4b8a">savePointCloud</a>();</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160; </div>
 <div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160; </div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;        <span class="keywordflow">if</span>(!QDir(dir).exists()){</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;            <span class="keyword">auto</span> saved = QDir(dir);</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;            saved.mkpath(<span class="stringliteral">&quot;.&quot;</span>);</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;        }</div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160; </div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        save_directory = dir;</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    }</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160; </div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;<span class="keyword">private</span> slots:</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160; </div>
+<div class="line"><a name="l00580"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991">  580</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991">setSavelocation</a>(QString dir){</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160; </div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        <span class="keywordflow">if</span>(!QDir(dir).exists()){</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;            <span class="keyword">auto</span> saved = QDir(dir);</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;            saved.mkpath(<span class="stringliteral">&quot;.&quot;</span>);</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        }</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160; </div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;        save_directory = dir;</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    }</div>
 <div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160; </div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a68a1342fcdcf7815ab001ba86fc72296">processStereo</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160; </div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;    <span class="keywordtype">void</span> imageSaved(<span class="keywordtype">bool</span>);</div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160; </div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    <span class="keywordtype">void</span> resetFailFrameCount(<span class="keywordtype">void</span>){</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;        failed_frames = 0;</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    }</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="keyword">private</span> slots:</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160; </div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160; </div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a68a1342fcdcf7815ab001ba86fc72296">processStereo</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160; </div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    <span class="keywordtype">void</span> imageSaved(<span class="keywordtype">bool</span>);</div>
 <div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160; </div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    <span class="keywordtype">void</span> processNewCapture(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160; </div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    <span class="keywordtype">void</span> processNewStereo(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    <span class="keywordtype">void</span> resetFailFrameCount(<span class="keywordtype">void</span>){</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        failed_frames = 0;</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;    }</div>
 <div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160; </div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    <span class="comment">//void processNewMatch(void);</span></div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    <span class="keywordtype">void</span> processNewCapture(<span class="keywordtype">void</span>);</div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160; </div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="keywordtype">void</span> processMatch();</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="keywordtype">void</span> processNewStereo(<span class="keywordtype">void</span>);</div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160; </div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    qint64 frames = 0;</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160; </div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    PointCloudTexture pct = POINT_CLOUD_TEXTURE_IMAGE;</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160; </div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;    <span class="keywordtype">bool</span> match_busy = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    <span class="keywordtype">bool</span> processing_busy = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keywordtype">bool</span> reproject_busy = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    <span class="keywordtype">bool</span> changed_matcher = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160; </div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;    <span class="keywordtype">bool</span> includeDateInFilename = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    <span class="keywordtype">bool</span> matching = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <span class="keywordtype">bool</span> rectifying = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    <span class="keywordtype">bool</span> capturing_video = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;    <span class="keywordtype">bool</span> capturing_rectified_video = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    VideoSource video_src = VIDEO_SRC_STEREO;</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;    QMutex video_mutex;</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;    QMutex disparity_mutex;</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    QMutex lr_image_mutex;</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    QMutex lr_raw_image_mutex;</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;    <span class="keywordtype">bool</span> swappingLeftRight = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;    <span class="keywordtype">bool</span> reprojecting = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;    <span class="keywordtype">bool</span> cuda_device_found = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;    <span class="keywordtype">bool</span> downsamplingCalibration = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    <span class="keywordtype">bool</span> savingDisparity = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    pcl::PointCloud&lt;pcl::PointXYZRGB&gt;::Ptr ptCloud;</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    QString save_directory = <span class="stringliteral">&quot;.&quot;</span>;</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160; </div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    QString file_save_directory = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160; </div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    QFuture&lt;void&gt; match_future;</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    QFuture&lt;void&gt; stereo_future;</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    QFuture&lt;void&gt; reproject_future;</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    <span class="comment">//void processNewMatch(void);</span></div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160; </div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    <span class="keywordtype">void</span> processMatch();</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160; </div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;    qint64 frames = 0;</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160; </div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    PointCloudTexture pct = POINT_CLOUD_TEXTURE_IMAGE;</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160; </div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    <span class="keywordtype">bool</span> match_busy = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;    <span class="keywordtype">bool</span> processing_busy = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    <span class="keywordtype">bool</span> reproject_busy = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <span class="keywordtype">bool</span> changed_matcher = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160; </div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;    <span class="keywordtype">bool</span> includeDateInFilename = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    <span class="keywordtype">bool</span> matching = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;    <span class="keywordtype">bool</span> rectifying = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;    <span class="keywordtype">bool</span> capturing_video = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    <span class="keywordtype">bool</span> capturing_rectified_video = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    VideoSource video_src = VIDEO_SRC_STEREO;</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;    QMutex video_mutex;</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;    QMutex disparity_mutex;</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;    QMutex lr_image_mutex;</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;    QMutex lr_raw_image_mutex;</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    <span class="keywordtype">bool</span> swappingLeftRight = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    <span class="keywordtype">bool</span> reprojecting = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    <span class="keywordtype">bool</span> cuda_device_found = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;    <span class="keywordtype">bool</span> downsamplingCalibration = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;    <span class="keywordtype">bool</span> savingDisparity = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    pcl::PointCloud&lt;pcl::PointXYZRGB&gt;::Ptr ptCloud;</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    QString save_directory = <span class="stringliteral">&quot;.&quot;</span>;</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160; </div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    QString file_save_directory = <span class="stringliteral">&quot;&quot;</span>;</div>
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160; </div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    QFutureWatcher&lt;void&gt; match_futureWatcher;</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160; </div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    cv::VideoWriter *cv_video_writer = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    QFuture&lt;void&gt; match_future;</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    QFuture&lt;void&gt; stereo_future;</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    QFuture&lt;void&gt; reproject_future;</div>
 <div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160; </div>
-<div class="line"><a name="l00649"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a1c43b1a923597f795563bf0dcfc172b6">  649</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a1c43b1a923597f795563bf0dcfc172b6">stereo_process_finished</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160; </div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160; </div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a9e253b816609cd06147e6703791f21c0">saveImage</a>(QString fname);</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    QFutureWatcher&lt;void&gt; match_futureWatcher;</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160; </div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    cv::VideoWriter *cv_video_writer = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160; </div>
+<div class="line"><a name="l00653"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a1c43b1a923597f795563bf0dcfc172b6">  653</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a1c43b1a923597f795563bf0dcfc172b6">stereo_process_finished</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160; </div>
 <div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160; </div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160; </div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#abc255107aaecb6d84e6c6dea3f4cee16">saveDisparity</a>(QString filename);</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a9e253b816609cd06147e6703791f21c0">saveImage</a>(QString fname);</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160; </div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160; </div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160; </div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#af56112b887e5e7e16176f3c3c8255c9f">saveDisparityColormap</a>(QString filename);</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#abc255107aaecb6d84e6c6dea3f4cee16">saveDisparity</a>(QString filename);</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160; </div>
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160; </div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160; </div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a0aeebf68bdc98804d4b5c00fcf1ad1aa">saveRGBD</a>(QString fname, <span class="keywordtype">bool</span> enable_16bit=<span class="keyword">true</span>, <span class="keywordtype">float</span> scale_16bit=6553.0);</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160; </div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160; </div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a8c8cd4829401f67888358932f66af9e9">loadXMLRectificationMaps</a>(QString src_l, QString src_r);</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160; </div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="keywordtype">void</span> generateRectificationMaps(cv::Size image_size);</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160; </div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#af56112b887e5e7e16176f3c3c8255c9f">saveDisparityColormap</a>(QString filename);</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160; </div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160; </div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a0aeebf68bdc98804d4b5c00fcf1ad1aa">saveRGBD</a>(QString fname, <span class="keywordtype">bool</span> enable_16bit=<span class="keyword">true</span>, <span class="keywordtype">float</span> scale_16bit=6553.0);</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160; </div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160; </div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a8c8cd4829401f67888358932f66af9e9">loadXMLRectificationMaps</a>(QString src_l, QString src_r);</div>
 <div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160; </div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a311dd4fbe681ee592a546fc17aba755d">loadCalibrationXMLFiles</a>(QString left_cal, QString right_cal,</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;                         QString stereo_cal);</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160; </div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    <span class="keywordtype">bool</span> loadCalibrationYamlFiles(QString left_cal, QString right_cal);</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160; </div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;    <span class="keywordtype">void</span> generateRectificationMaps(cv::Size image_size);</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160; </div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160; </div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#a311dd4fbe681ee592a546fc17aba755d">loadCalibrationXMLFiles</a>(QString left_cal, QString right_cal,</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;                         QString stereo_cal);</div>
 <div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160; </div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#adac63111c84ab37f80ad760a375c13c5">rectifyImages</a>(cv::Mat left, cv::Mat right, cv::Mat&amp; left_rect, cv::Mat&amp; right_rect);</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <span class="keywordtype">bool</span> loadCalibrationYamlFiles(QString left_cal, QString right_cal);</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160; </div>
 <div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160; </div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160; </div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a6c0c5ae0ed8fad72e65b4132f2b40f29">remap_parallel</a>(cv::Mat src, cv::Mat &amp;dst, cv::Mat rmapx,</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;                        cv::Mat rmapy);</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_camera.html#adac63111c84ab37f80ad760a375c13c5">rectifyImages</a>(cv::Mat left, cv::Mat right, cv::Mat&amp; left_rect, cv::Mat&amp; right_rect);</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160; </div>
 <div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160; </div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160; </div>
-<div class="line"><a name="l00729"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#adff53cfe93efffa4a37cc5d878fb33e9">  729</a></span>&#160;    cv::Mat <a class="code" href="class_abstract_stereo_camera.html#adff53cfe93efffa4a37cc5d878fb33e9">rectmapx_l</a>;</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    cv::Mat rectmapy_l;</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    cv::Mat rectmapx_r;</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    cv::Mat rectmapy_r;</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    cv::Mat r_camera_matrix;</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    cv::Mat l_camera_matrix;</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    cv::Mat l_dist_coeffs;</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    cv::Mat r_dist_coeffs;</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    cv::Mat r_rect_mat;</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    cv::Mat l_rect_mat;</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    cv::Mat r_proj_mat;</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    cv::Mat l_proj_mat;</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160; </div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;    <span class="keywordtype">int</span> cal_image_width;</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    <span class="keywordtype">int</span> cal_image_height;</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160; </div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    <span class="keywordtype">int</span> video_fps = 0;</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;    <span class="comment">//int video_codec = cv::VideoWriter::fourcc(&#39;H&#39;, &#39;2&#39;, &#39;6&#39;, &#39;4&#39;);</span></div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;    <span class="comment">//int video_codec = cv::VideoWriter::fourcc(&#39;H&#39;, &#39;E&#39;, &#39;V&#39;, &#39;C&#39;);</span></div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    <span class="keywordtype">int</span> video_codec = cv::VideoWriter::fourcc(<span class="charliteral">&#39;M&#39;</span>,<span class="charliteral">&#39;J&#39;</span>,<span class="charliteral">&#39;P&#39;</span>,<span class="charliteral">&#39;G&#39;</span>);</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    <span class="comment">//int video_codec = cv::VideoWriter::fourcc(&#39;a&#39;,&#39;v&#39;,&#39;c&#39;,&#39;1&#39;);</span></div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    <span class="keywordtype">bool</span> video_is_color = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    std::string video_filename = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    cv::Mat video_frame;</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a6c0c5ae0ed8fad72e65b4132f2b40f29">remap_parallel</a>(cv::Mat src, cv::Mat &amp;dst, cv::Mat rmapx,</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;                        cv::Mat rmapy);</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160; </div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    cv::Mat rectmapx_l;</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    cv::Mat rectmapy_l;</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    cv::Mat rectmapx_r;</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    cv::Mat rectmapy_r;</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    cv::Mat r_camera_matrix;</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    cv::Mat l_camera_matrix;</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    cv::Mat l_dist_coeffs;</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    cv::Mat r_dist_coeffs;</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    cv::Mat r_rect_mat;</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    cv::Mat l_rect_mat;</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    cv::Mat r_proj_mat;</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    cv::Mat l_proj_mat;</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160; </div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    <span class="keywordtype">int</span> cal_image_width;</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="keywordtype">int</span> cal_image_height;</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160; </div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    <span class="keywordtype">int</span> video_fps = 0;</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    <span class="comment">//int video_codec = cv::VideoWriter::fourcc(&#39;H&#39;, &#39;2&#39;, &#39;6&#39;, &#39;4&#39;);</span></div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    <span class="comment">//int video_codec = cv::VideoWriter::fourcc(&#39;H&#39;, &#39;E&#39;, &#39;V&#39;, &#39;C&#39;);</span></div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;    <span class="keywordtype">int</span> video_codec = cv::VideoWriter::fourcc(<span class="charliteral">&#39;M&#39;</span>,<span class="charliteral">&#39;J&#39;</span>,<span class="charliteral">&#39;P&#39;</span>,<span class="charliteral">&#39;G&#39;</span>);</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    <span class="comment">//int video_codec = cv::VideoWriter::fourcc(&#39;a&#39;,&#39;v&#39;,&#39;c&#39;,&#39;1&#39;);</span></div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    <span class="keywordtype">bool</span> video_is_color = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    std::string video_filename = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;    cv::Mat video_frame;</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160; </div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    cv::Mat left_output;</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    cv::Mat right_output;</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160; </div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    cv::Mat left_match_input;</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    cv::Mat right_match_input;</div>
 <div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160; </div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    cv::Mat left_output;</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    cv::Mat right_output;</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160; </div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;    cv::Mat left_match_input;</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    cv::Mat right_match_input;</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160; </div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    cv::Mat disparity;</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    cv::Mat disparity_filtered;</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;    cv::Mat depth;</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160; </div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;    <span class="keywordtype">double</span> visualisation_min_z = 0.2;</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;    <span class="keywordtype">double</span> visualisation_max_z = 5;</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    cv::Mat disparity;</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    cv::Mat disparity_filtered;</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;    cv::Mat depth;</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160; </div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    <span class="keywordtype">double</span> visualisation_min_z = 0.2;</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    <span class="keywordtype">double</span> visualisation_max_z = 5;</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160; </div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    <span class="comment">//TODO replace with frame timeout timer</span></div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;    <span class="keywordtype">int</span> max_failed_frames = 5;</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    <span class="keywordtype">int</span> failed_frames = 0;</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160; </div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;<span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160; </div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    <span class="comment">//TODO replace with frame timeout timer</span></div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="keywordtype">int</span> max_failed_frames = 5;</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;    <span class="keywordtype">int</span> failed_frames = 0;</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160; </div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160; </div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;    <span class="keywordtype">int</span> frame_rate = 30;</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;    <span class="keywordtype">int</span> image_width = 0;</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    <span class="keywordtype">int</span> image_height = 0;</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    <span class="keywordtype">int</span> image_bitdepth = 1;</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160; </div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    <a class="code" href="struct_abstract_stereo_camera_1_1_stereo_camera_settings.html">StereoCameraSettings</a> stereoCameraSettings_;</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    <a class="code" href="struct_abstract_stereo_camera_1_1_stereo_camera_serial_info.html">StereoCameraSerialInfo</a> stereoCameraSerialInfo_;</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160; </div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    QElapsedTimer frametimer;</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;    QElapsedTimer matchtimer;</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    <span class="comment">//QElapsedTimer reprojecttimer;</span></div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160; </div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;    <span class="keywordtype">bool</span> rectification_valid = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;    <span class="keywordtype">bool</span> calibration_valid = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;    <span class="keywordtype">bool</span> captured_stereo = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <span class="keywordtype">bool</span> first_image_received = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    <span class="keywordtype">bool</span> capturing = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="keywordtype">bool</span> has_trigger_fps_control = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160; </div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;    QThread *thread_;</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160; </div>
-<div class="line"><a name="l00795"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">  795</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">send_error</a>(<a class="code" href="class_abstract_stereo_camera.html#a6def7904b42c543e8a5978fa2c7bee8e">StereoCameraError</a> stereo_error){</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;        <span class="keywordflow">if</span> (stereo_error == CAPTURE_ERROR){</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;            failed_frames += 1;</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;            <span class="keywordflow">if</span> (failed_frames &gt; max_failed_frames){</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;                <a class="code" href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">send_error</a>(LOST_FRAMES_ERROR);</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;            }</div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;        }</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        <span class="keywordtype">int</span> error_index = stereo_error;</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        emit <a class="code" href="class_abstract_stereo_camera.html#a2b2df7aa4bbf0ee936310e7f47783ba6">error</a>(error_index);</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    }</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;};</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160; </div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// ABSTRACTSTEREOCAMERA_H</span></div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    <span class="keywordtype">int</span> frame_rate = 30;</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="keywordtype">int</span> image_width = 0;</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;    <span class="keywordtype">int</span> image_height = 0;</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;    <span class="keywordtype">int</span> image_bitdepth = 1;</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160; </div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <a class="code" href="struct_abstract_stereo_camera_1_1_stereo_camera_settings.html">StereoCameraSettings</a> stereoCameraSettings_;</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;    <a class="code" href="struct_abstract_stereo_camera_1_1_stereo_camera_serial_info.html">StereoCameraSerialInfo</a> stereoCameraSerialInfo_;</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160; </div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    QElapsedTimer frametimer;</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    QElapsedTimer matchtimer;</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;    <span class="comment">//QElapsedTimer reprojecttimer;</span></div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160; </div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    <span class="keywordtype">bool</span> rectification_valid = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;    <span class="keywordtype">bool</span> calibration_valid = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    <span class="keywordtype">bool</span> captured_stereo = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;    <span class="keywordtype">bool</span> first_image_received = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    <span class="keywordtype">bool</span> capturing = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;    <span class="keywordtype">bool</span> has_trigger_fps_control = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160; </div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;    QThread *thread_;</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160; </div>
+<div class="line"><a name="l00789"></a><span class="lineno"><a class="line" href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">  789</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">send_error</a>(<a class="code" href="class_abstract_stereo_camera.html#a6def7904b42c543e8a5978fa2c7bee8e">StereoCameraError</a> stereo_error){</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;        <span class="keywordflow">if</span> (stereo_error == CAPTURE_ERROR){</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;            failed_frames += 1;</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;            <span class="keywordflow">if</span> (failed_frames &gt; max_failed_frames){</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;                <a class="code" href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">send_error</a>(LOST_FRAMES_ERROR);</div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;            }</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        }</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;        <span class="keywordtype">int</span> error_index = stereo_error;</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;        emit <a class="code" href="class_abstract_stereo_camera.html#a2b2df7aa4bbf0ee936310e7f47783ba6">error</a>(error_index);</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    }</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;};</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160; </div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// ABSTRACTSTEREOCAMERA_H</span></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html"><div class="ttname"><a href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></div><div class="ttdoc">Stereo camera base class.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00068">abstractstereocamera.h:68</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a0096fcc42b50aa7fa4236f6bddcd81f7"><div class="ttname"><a href="class_abstract_stereo_camera.html#a0096fcc42b50aa7fa4236f6bddcd81f7">AbstractStereoCamera::isMatching</a></div><div class="ttdeci">bool isMatching()</div><div class="ttdoc">Returns whether matching is enabled.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00384">abstractstereocamera.cpp:384</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a01c48565e18ae2ac7ea4f3322c2e5059"><div class="ttname"><a href="class_abstract_stereo_camera.html#a01c48565e18ae2ac7ea4f3322c2e5059">AbstractStereoCamera::isCapturing</a></div><div class="ttdeci">bool isCapturing()</div><div class="ttdoc">Returns weather camera image capture is enabled.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00382">abstractstereocamera.cpp:382</a></div></div>
@@ -664,8 +663,8 @@ $(document).ready(function(){initNavTree('abstractstereocamera_8h_source.html','
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a3e464cbf65365aaa18b13d2070e1cf5f"><div class="ttname"><a href="class_abstract_stereo_camera.html#a3e464cbf65365aaa18b13d2070e1cf5f">AbstractStereoCamera::pointCloudSaveStatus</a></div><div class="ttdeci">void pointCloudSaveStatus(QString)</div><div class="ttdoc">Emmitted when point cloud is saved.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a41ffbf9a98378b4c600a64b4a7e293f5"><div class="ttname"><a href="class_abstract_stereo_camera.html#a41ffbf9a98378b4c600a64b4a7e293f5">AbstractStereoCamera::enableDateInFilename</a></div><div class="ttdeci">void enableDateInFilename(bool enable)</div><div class="ttdoc">Toggle saving date in filename.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00287">abstractstereocamera.cpp:287</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a4a1e8d3823219d718f43d5859bfc5096"><div class="ttname"><a href="class_abstract_stereo_camera.html#a4a1e8d3823219d718f43d5859bfc5096">AbstractStereoCamera::getWidth</a></div><div class="ttdeci">int getWidth(void)</div><div class="ttdoc">Get the image width.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00291">abstractstereocamera.h:291</a></div></div>
-<div class="ttc" id="aclass_abstract_stereo_camera_html_a4b0a607fb257abfc84d7326219bc8e26"><div class="ttname"><a href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">AbstractStereoCamera::send_error</a></div><div class="ttdeci">void send_error(StereoCameraError stereo_error)</div><div class="ttdoc">Convert from enum to int for sending error signal.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00795">abstractstereocamera.h:795</a></div></div>
-<div class="ttc" id="aclass_abstract_stereo_camera_html_a5099bd75a017fbfb066b37f3988fa9de"><div class="ttname"><a href="class_abstract_stereo_camera.html#a5099bd75a017fbfb066b37f3988fa9de">AbstractStereoCamera::loadCalibration</a></div><div class="ttdeci">bool loadCalibration(QString directory, StereoCalibrationType cal_type)</div><div class="ttdoc">Load calibration files from a directory and check them for validity.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00498">abstractstereocamera.h:498</a></div></div>
+<div class="ttc" id="aclass_abstract_stereo_camera_html_a4b0a607fb257abfc84d7326219bc8e26"><div class="ttname"><a href="class_abstract_stereo_camera.html#a4b0a607fb257abfc84d7326219bc8e26">AbstractStereoCamera::send_error</a></div><div class="ttdeci">void send_error(StereoCameraError stereo_error)</div><div class="ttdoc">Convert from enum to int for sending error signal.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00789">abstractstereocamera.h:789</a></div></div>
+<div class="ttc" id="aclass_abstract_stereo_camera_html_a5099bd75a017fbfb066b37f3988fa9de"><div class="ttname"><a href="class_abstract_stereo_camera.html#a5099bd75a017fbfb066b37f3988fa9de">AbstractStereoCamera::loadCalibration</a></div><div class="ttdeci">bool loadCalibration(QString directory, StereoCalibrationType cal_type)</div><div class="ttdoc">Load calibration files from a directory and check them for validity.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00502">abstractstereocamera.h:502</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a5181f8bbd0358c5340654c1009aa23ff"><div class="ttname"><a href="class_abstract_stereo_camera.html#a5181f8bbd0358c5340654c1009aa23ff">AbstractStereoCamera::first_image_ready</a></div><div class="ttdeci">void first_image_ready(bool ready)</div><div class="ttdoc">Emmited when first image stereo pair received.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a5376ae9c07bdc8e048cbb83a3f11d520"><div class="ttname"><a href="class_abstract_stereo_camera.html#a5376ae9c07bdc8e048cbb83a3f11d520">AbstractStereoCamera::isRectifying</a></div><div class="ttdeci">bool isRectifying()</div><div class="ttdoc">Returns whether rectification is being performed.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00386">abstractstereocamera.cpp:386</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_a53a4fa60101e40778119b570a7da1f59"><div class="ttname"><a href="class_abstract_stereo_camera.html#a53a4fa60101e40778119b570a7da1f59">AbstractStereoCamera::savedImage</a></div><div class="ttdeci">void savedImage(bool success)</div><div class="ttdoc">Emitted when an image has been saved, including the filename.</div></div>
@@ -698,7 +697,7 @@ $(document).ready(function(){initNavTree('abstractstereocamera_8h_source.html','
 <div class="ttc" id="aclass_abstract_stereo_camera_html_aacc05ac65e043fc984662ce083d491ca"><div class="ttname"><a href="class_abstract_stereo_camera.html#aacc05ac65e043fc984662ce083d491ca">AbstractStereoCamera::framecount</a></div><div class="ttdeci">void framecount(qint64 count)</div><div class="ttdoc">Emitted after a frame has been processed to indicates the current frame count.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_aacdd3bb48879447203ecfb880d32e011"><div class="ttname"><a href="class_abstract_stereo_camera.html#aacdd3bb48879447203ecfb880d32e011">AbstractStereoCamera::getDisparity</a></div><div class="ttdeci">cv::Mat getDisparity()</div><div class="ttdoc">Get the disparity image.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00462">abstractstereocamera.cpp:462</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_aad356af22f5ec7412c68c3ba6db9a625"><div class="ttname"><a href="class_abstract_stereo_camera.html#aad356af22f5ec7412c68c3ba6db9a625">AbstractStereoCamera::setPacketSize</a></div><div class="ttdeci">virtual bool setPacketSize(int)=0</div><div class="ttdoc">Adjust camera packet size (GigE cameras only but defined here for access)</div></div>
-<div class="ttc" id="aclass_abstract_stereo_camera_html_aad94fb2509d7c36d33eb176c28963991"><div class="ttname"><a href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991">AbstractStereoCamera::setSavelocation</a></div><div class="ttdeci">void setSavelocation(QString dir)</div><div class="ttdoc">Set the save directory.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00576">abstractstereocamera.h:576</a></div></div>
+<div class="ttc" id="aclass_abstract_stereo_camera_html_aad94fb2509d7c36d33eb176c28963991"><div class="ttname"><a href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991">AbstractStereoCamera::setSavelocation</a></div><div class="ttdeci">void setSavelocation(QString dir)</div><div class="ttdoc">Set the save directory.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00580">abstractstereocamera.h:580</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_aaec60ad16288d9c3eb937391ab2351b6"><div class="ttname"><a href="class_abstract_stereo_camera.html#aaec60ad16288d9c3eb937391ab2351b6">AbstractStereoCamera::setVideoStreamParams</a></div><div class="ttdeci">bool setVideoStreamParams(QString filename=&quot;&quot;, int fps=0, int codec=cv::VideoWriter::fourcc('H', '2', '6', '4'), bool is_color=false, VideoSource vid_src=VIDEO_SRC_STEREO)</div><div class="ttdoc">Initalise video stream for writing a video stream to a file.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l01248">abstractstereocamera.cpp:1248</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_aaecdd422fccc375de7c076175196d3fa"><div class="ttname"><a href="class_abstract_stereo_camera.html#aaecdd422fccc375de7c076175196d3fa">AbstractStereoCamera::openCamera</a></div><div class="ttdeci">virtual bool openCamera(void)=0</div><div class="ttdoc">Open camera.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_ab10271479da237768911e3bf6cd60373"><div class="ttname"><a href="class_abstract_stereo_camera.html#ab10271479da237768911e3bf6cd60373">AbstractStereoCamera::isCapturingRectifiedVideo</a></div><div class="ttdeci">bool isCapturingRectifiedVideo()</div><div class="ttdoc">Returns wheather video saving rectified or non recitifed images.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00168">abstractstereocamera.h:168</a></div></div>
@@ -719,7 +718,6 @@ $(document).ready(function(){initNavTree('abstractstereocamera_8h_source.html','
 <div class="ttc" id="aclass_abstract_stereo_camera_html_ad46c734161ab703dc3819c0bb3b7ae90"><div class="ttname"><a href="class_abstract_stereo_camera.html#ad46c734161ab703dc3819c0bb3b7ae90">AbstractStereoCamera::setFPS</a></div><div class="ttdeci">virtual bool setFPS(int)=0</div><div class="ttdoc">Adjust camera FPS.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_ad8f91d2d5e03a466c1066ab27ec3116f"><div class="ttname"><a href="class_abstract_stereo_camera.html#ad8f91d2d5e03a466c1066ab27ec3116f">AbstractStereoCamera::getPointCloud</a></div><div class="ttdeci">pcl::PointCloud&lt; pcl::PointXYZRGB &gt;::Ptr getPointCloud()</div><div class="ttdoc">Get a pointer to the current point cloud.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00283">abstractstereocamera.cpp:283</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_adac63111c84ab37f80ad760a375c13c5"><div class="ttname"><a href="class_abstract_stereo_camera.html#adac63111c84ab37f80ad760a375c13c5">AbstractStereoCamera::rectifyImages</a></div><div class="ttdeci">bool rectifyImages(cv::Mat left, cv::Mat right, cv::Mat &amp;left_rect, cv::Mat &amp;right_rect)</div><div class="ttdoc">Rectify the current stereo image pair.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00939">abstractstereocamera.cpp:939</a></div></div>
-<div class="ttc" id="aclass_abstract_stereo_camera_html_adff53cfe93efffa4a37cc5d878fb33e9"><div class="ttname"><a href="class_abstract_stereo_camera.html#adff53cfe93efffa4a37cc5d878fb33e9">AbstractStereoCamera::rectmapx_l</a></div><div class="ttdeci">cv::Mat rectmapx_l</div><div class="ttdoc">Project the disparity map to 3D.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00729">abstractstereocamera.h:729</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_ae34107496350624b82d0d3d0150402ac"><div class="ttname"><a href="class_abstract_stereo_camera.html#ae34107496350624b82d0d3d0150402ac">AbstractStereoCamera::enableAutoGain</a></div><div class="ttdeci">virtual bool enableAutoGain(bool)=0</div><div class="ttdoc">Enable/disable camera auto gain.</div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_ae3dec6f756ff3b6d3702ff3d85e95272"><div class="ttname"><a href="class_abstract_stereo_camera.html#ae3dec6f756ff3b6d3702ff3d85e95272">AbstractStereoCamera::enableReproject</a></div><div class="ttdeci">void enableReproject(bool reproject)</div><div class="ttdoc">Emable or disable disparity map reprojection to 3D.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00323">abstractstereocamera.cpp:323</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html_ae3ea2cd84d22229b82973674a71e2a56"><div class="ttname"><a href="class_abstract_stereo_camera.html#ae3ea2cd84d22229b82973674a71e2a56">AbstractStereoCamera::enableDownsampleCalibration</a></div><div class="ttdeci">void enableDownsampleCalibration(bool enable)</div><div class="ttdoc">Enable applying downsampling to calibration as well as image this is done to avoid needed to re-calib...</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00372">abstractstereocamera.cpp:372</a></div></div>
@@ -735,6 +733,7 @@ $(document).ready(function(){initNavTree('abstractstereocamera_8h_source.html','
 <div class="ttc" id="aclass_abstract_stereo_camera_html_afb39bfa4946d05dc60346f165b12ecc9"><div class="ttname"><a href="class_abstract_stereo_camera.html#afb39bfa4946d05dc60346f165b12ecc9">AbstractStereoCamera::isDownsamplingCalibration</a></div><div class="ttdeci">bool isDownsamplingCalibration()</div><div class="ttdoc">Returns whether downsampling is also being applied to calibration.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8cpp_source.html#l00390">abstractstereocamera.cpp:390</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdoc">Stereo matcher base class.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00032">abstractstereomatcher.h:32</a></div></div>
 <div class="ttc" id="acvsupport_8hpp_html"><div class="ttname"><a href="cvsupport_8hpp.html">cvsupport.hpp</a></div><div class="ttdoc">Support class for using openCV.</div></div>
+<div class="ttc" id="apclsupport_8hpp_html"><div class="ttname"><a href="pclsupport_8hpp.html">pclsupport.hpp</a></div><div class="ttdoc">Support class for using PCL.</div></div>
 <div class="ttc" id="astruct_abstract_stereo_camera_1_1_stereo_camera_serial_info_html"><div class="ttname"><a href="struct_abstract_stereo_camera_1_1_stereo_camera_serial_info.html">AbstractStereoCamera::StereoCameraSerialInfo</a></div><div class="ttdoc">Structure to hold stereo camera information.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00111">abstractstereocamera.h:111</a></div></div>
 <div class="ttc" id="astruct_abstract_stereo_camera_1_1_stereo_camera_settings_html"><div class="ttname"><a href="struct_abstract_stereo_camera_1_1_stereo_camera_settings.html">AbstractStereoCamera::StereoCameraSettings</a></div><div class="ttdoc">Structure to hold camera settings.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00096">abstractstereocamera.h:96</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
@@ -743,7 +742,7 @@ $(document).ready(function(){initNavTree('abstractstereocamera_8h_source.html','
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_34519bff5ae72130fe71a8620cbf1fc0.html">camera</a></li><li class="navelem"><b>abstractstereocamera.h</b></li>
-    <li class="footer">Generated on Mon Apr 19 2021 11:50:23 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Wed Apr 28 2021 10:56:46 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

@@ -320,9 +320,12 @@ public:
     /*!
    * If no filename is supplied, a timestamped video will be stored in the current selected save folder.
    *
-   * @param[out] filename The output filename
-   * @sa setSavelocation(), videoStreamStop()
-   * @param[out] fps The frame rate of the video recording
+   * @param[in] filename The output filename
+   * @param[in] fps frames per second
+   * @param[in] codec video codec
+   * @param[in] is_color is color video otherwise grayscale
+   * @param[in] vid_src video source type (enum)
+   * @return success
   */
     bool setVideoStreamParams(QString filename = "", int fps = 0, int codec = cv::VideoWriter::fourcc('H', '2', '6', '4'), bool is_color = false, VideoSource vid_src = VIDEO_SRC_STEREO);
     bool addVideoStreamFrame(cv::Mat frame);
@@ -493,6 +496,7 @@ public slots:
     //! Load calibration files from a directory and check them for validity
     /*!
     @param[in] directory The folder too check.
+    @param[in] cal_type Calibration type (enum XML or YAML)
     @return True or false, depending on whether the parameters are valid.
     */
     bool loadCalibration(QString directory, StereoCalibrationType cal_type){
@@ -668,7 +672,7 @@ private:
 
     //!  Save the disparity map as normalised colormap
     /*!
-    * @param[in] filename Output filename
+    * @param[in] fname Output filename
     * @param[in] enable_16bit Save with 16 bit depth
     * @param[in] scale_16bit Scaling factor to apply to depth before converting to 16-bit to increase precision
     */
@@ -686,11 +690,11 @@ private:
 
     //! Load camera intrinsic/extinrisc calibration files
     /*!
-  * @param[in] left_cal Left camera calibration parameter file
-  * @param[in] right_cal Right camera calibration parameter file
-  * @param[in] stereo_cal Stereo camera calibration parameter file
-  * @return true/false whether the filse were loaded successfully
-  */
+    * @param[in] left_cal Left camera calibration parameter file
+    * @param[in] right_cal Right camera calibration parameter file
+    * @param[in] stereo_cal Stereo camera calibration parameter file
+    * @return true/false whether the filse were loaded successfully
+    */
     bool loadCalibrationXMLFiles(QString left_cal, QString right_cal,
                          QString stereo_cal);
 
@@ -698,8 +702,12 @@ private:
 
     //! Rectify the current stereo image pair
     /*!
-  * Note this will update the image matrices: #left_remapped and #right_remapped
-  */
+    * @param[in] left left image
+    * @param[in] right right image
+    * @param[out] left_rect rectified left image
+    * @param[out] right_rect rectified right image
+    * @return true/false whether the rectification was successful
+    */
     bool rectifyImages(cv::Mat left, cv::Mat right, cv::Mat& left_rect, cv::Mat& right_rect);
 
     //! Wrapper around OpenCV rectify function for paralell calls.
@@ -711,20 +719,6 @@ private:
   */
     void remap_parallel(cv::Mat src, cv::Mat &dst, cv::Mat rmapx,
                         cv::Mat rmapy);
-
-    //! Project the disparity map to 3D
-    /*!
-  * Call prior to getPointCloud()
-  * Internally this:
-  *
-  * 1. Downscales the disparity map by a factor of 16 (to convert the OpenCV representation into actual disparities)
-  * 2. Use the calibration Q matrix to reproject the image to 3D
-  * 3. Creates a PCL point cloud and textures it using image intensity data
-  * 4. Filters the cloud based on the #zmin, #zmax parameters. Any points farther than 10m are discarded as they're likely to be
-  *    wrong anyway.
-  *
-  * @sa setVisualZmin(), setVisualZmax(), getPointCloud()
-  */
 
     cv::Mat rectmapx_l;
     cv::Mat rectmapy_l;
