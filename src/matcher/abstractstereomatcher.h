@@ -102,8 +102,11 @@ class AbstractStereoMatcher : public QObject {
 private:
   //!  Set images for matching
   /*!
-  * \param left Left image
-  * \param right Right image
+  * @param[in] left_img left image
+  * @param[in] right_img right image
+  * @param[out] left_bgr_conv_img left image converted to bgr
+  * @param[out] left_conv_img left image converted
+  * @param[out] right_conv_img right image converted
   */
  void convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_bgr_conv_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img);
 

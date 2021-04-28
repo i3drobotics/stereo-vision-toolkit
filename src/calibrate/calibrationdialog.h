@@ -30,6 +30,7 @@ class CalibrationDialog : public QDialog
 public:
     //! Constructor
     /*! \param stereo_cam stereo camera to grab image feed from */
+    /*! \param parent QWidget parent */
     explicit CalibrationDialog(AbstractStereoCamera* stereo_cam, QWidget *parent = 0);
     //! Get number of columns in pattern
     /*! \return number of columns */

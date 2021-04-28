@@ -160,34 +160,34 @@ $(document).ready(function(){initNavTree('abstractstereomatcher_8h_source.html',
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a0fa44f4254c7dea4629805b7f4e505fc">convertImages</a>(cv::Mat left_img, cv::Mat right_img, cv::Mat&amp; left_bgr_conv_img, cv::Mat&amp; left_conv_img, cv::Mat&amp; right_conv_img);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html#a65b0490ffbabdf04ee60bf4f8c34c589">  113</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_matcher.html#a65b0490ffbabdf04ee60bf4f8c34c589">forwardMatch</a>(cv::Mat left_img, cv::Mat right_img) = 0;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; <span class="keywordtype">void</span> <a class="code" href="class_abstract_stereo_matcher.html#a0fa44f4254c7dea4629805b7f4e505fc">convertImages</a>(cv::Mat left_img, cv::Mat right_img, cv::Mat&amp; left_bgr_conv_img, cv::Mat&amp; left_conv_img, cv::Mat&amp; right_conv_img);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; <span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html#af58843f730a7cb2911e7b1c16f342a43">  116</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_matcher.html#af58843f730a7cb2911e7b1c16f342a43">backwardMatch</a>(cv::Mat left_img, cv::Mat right_img) = 0;</div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html#a65b0490ffbabdf04ee60bf4f8c34c589">  116</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_matcher.html#a65b0490ffbabdf04ee60bf4f8c34c589">forwardMatch</a>(cv::Mat left_img, cv::Mat right_img) = 0;</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  cv::Mat left;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  cv::Mat right;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  cv::Mat left_bgr;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  cv::Mat disparity_buffer;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  cv::Mat disparity_rl;</div>
+<div class="line"><a name="l00119"></a><span class="lineno"><a class="line" href="class_abstract_stereo_matcher.html#af58843f730a7cb2911e7b1c16f342a43">  119</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_abstract_stereo_matcher.html#af58843f730a7cb2911e7b1c16f342a43">backwardMatch</a>(cv::Mat left_img, cv::Mat right_img) = 0;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  cv::Mat left;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  cv::Mat right;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  cv::Mat left_bgr;</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  cv::Mat disparity16;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  cv::Size image_size;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keywordtype">bool</span> sizeChangedThisFrame = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  <span class="keywordtype">int</span> min_disparity = 0;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordtype">int</span> disparity_range = 64;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="keywordtype">int</span> block_size = 9;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="keywordtype">int</span> downsample_factor = 1;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;};</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// ABSTRACTSTEREOMATCHER_H</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  cv::Mat disparity_buffer;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  cv::Mat disparity_rl;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  cv::Mat disparity16;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  cv::Size image_size;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  <span class="keywordtype">bool</span> sizeChangedThisFrame = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="keywordtype">int</span> min_disparity = 0;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="keywordtype">int</span> disparity_range = 64;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keywordtype">int</span> block_size = 9;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <span class="keywordtype">int</span> downsample_factor = 1;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;};</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// ABSTRACTSTEREOMATCHER_H</span></div>
 <div class="ttc" id="aclass_abstract_stereo_matcher_html"><div class="ttname"><a href="class_abstract_stereo_matcher.html">AbstractStereoMatcher</a></div><div class="ttdoc">Stereo matcher base class.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00032">abstractstereomatcher.h:32</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_matcher_html_a059137e4215011a3beebf83767b606d2"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a059137e4215011a3beebf83767b606d2">AbstractStereoMatcher::getRightImage</a></div><div class="ttdeci">cv::Mat getRightImage(void)</div><div class="ttdoc">Get right image used in stereo match.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8h_source.html#l00096">abstractstereomatcher.h:96</a></div></div>
 <div class="ttc" id="aclass_abstract_stereo_matcher_html_a0fa44f4254c7dea4629805b7f4e505fc"><div class="ttname"><a href="class_abstract_stereo_matcher.html#a0fa44f4254c7dea4629805b7f4e505fc">AbstractStereoMatcher::convertImages</a></div><div class="ttdeci">void convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat &amp;left_bgr_conv_img, cv::Mat &amp;left_conv_img, cv::Mat &amp;right_conv_img)</div><div class="ttdoc">Set images for matching.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereomatcher_8cpp_source.html#l00020">abstractstereomatcher.cpp:20</a></div></div>
@@ -212,7 +212,7 @@ $(document).ready(function(){initNavTree('abstractstereomatcher_8h_source.html',
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_c5758bf4325b56ad294e80c02eb3ad04.html">matcher</a></li><li class="navelem"><b>abstractstereomatcher.h</b></li>
-    <li class="footer">Generated on Mon Apr 19 2021 11:50:23 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Wed Apr 28 2021 10:56:46 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

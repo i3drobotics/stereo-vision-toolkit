@@ -843,8 +843,8 @@ QFutureWatcher&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="memitem:a24b46e0e254420c7b35bccc370d47f10"><td class="memItemLeft" align="right" valign="top"><a id="a24b46e0e254420c7b35bccc370d47f10"></a>
 cv::VideoWriter *&#160;</td><td class="memItemRight" valign="bottom"><b>cv_video_writer</b> = nullptr</td></tr>
 <tr class="separator:a24b46e0e254420c7b35bccc370d47f10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adff53cfe93efffa4a37cc5d878fb33e9"><td class="memItemLeft" align="right" valign="top">cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_abstract_stereo_camera.html#adff53cfe93efffa4a37cc5d878fb33e9">rectmapx_l</a></td></tr>
-<tr class="memdesc:adff53cfe93efffa4a37cc5d878fb33e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project the disparity map to 3D.  <a href="class_abstract_stereo_camera.html#adff53cfe93efffa4a37cc5d878fb33e9">More...</a><br /></td></tr>
+<tr class="memitem:adff53cfe93efffa4a37cc5d878fb33e9"><td class="memItemLeft" align="right" valign="top"><a id="adff53cfe93efffa4a37cc5d878fb33e9"></a>
+cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><b>rectmapx_l</b></td></tr>
 <tr class="separator:adff53cfe93efffa4a37cc5d878fb33e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a404b230392e755929452cf5ec5f50051"><td class="memItemLeft" align="right" valign="top"><a id="a404b230392e755929452cf5ec5f50051"></a>
 cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><b>rectmapy_l</b></td></tr>
@@ -1755,12 +1755,13 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>failed_frames</b> = 0<
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">directory</td><td>The folder too check. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cal_type</td><td>Calibration type (enum XML or YAML) </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True or false, depending on whether the parameters are valid. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00498">498</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00502">502</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
 
 </div>
 </div>
@@ -2021,7 +2022,16 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>failed_frames</b> = 0<
 </div><div class="memdoc">
 
 <p>Rectify the current stereo image pair. </p>
-<p>Note this will update the image matrices: #left_remapped and #right_remapped </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">left</td><td>left image </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">right</td><td>right image </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">left_rect</td><td>rectified left image </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">right_rect</td><td>rectified right image </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true/false whether the rectification was successful </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l00939">939</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
@@ -2263,7 +2273,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>failed_frames</b> = 0<
 <p>Save the disparity map as normalised colormap. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">filename</td><td>Output filename </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fname</td><td>Output filename </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">enable_16bit</td><td>Save with 16 bit depth </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">scale_16bit</td><td>Scaling factor to apply to depth before converting to 16-bit to increase precision </td></tr>
   </table>
@@ -2451,7 +2461,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>failed_frames</b> = 0<
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00576">576</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00580">580</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
 
 </div>
 </div>
@@ -2503,17 +2513,15 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>failed_frames</b> = 0<
 <p>If no filename is supplied, a timestamped video will be stored in the current selected save folder.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">filename</td><td>The output filename </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filename</td><td>The output filename </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fps</td><td>frames per second </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">codec</td><td>video codec </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">is_color</td><td>is color video otherwise grayscale </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vid_src</td><td>video source type (enum) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991" title="Set the save directory.">setSavelocation()</a>, videoStreamStop() </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">fps</td><td>The frame rate of the video recording </td></tr>
-  </table>
-  </dd>
-</dl>
+<dl class="section return"><dt>Returns</dt><dd>success </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="abstractstereocamera_8cpp_source.html#l01248">1248</a> of file <a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a>.</p>
 
@@ -2575,41 +2583,6 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>failed_frames</b> = 0<
 
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a id="adff53cfe93efffa4a37cc5d878fb33e9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adff53cfe93efffa4a37cc5d878fb33e9">&#9670;&nbsp;</a></span>rectmapx_l</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">cv::Mat AbstractStereoCamera::rectmapx_l</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Project the disparity map to 3D. </p>
-<p>Call prior to <a class="el" href="class_abstract_stereo_camera.html#ad8f91d2d5e03a466c1066ab27ec3116f" title="Get a pointer to the current point cloud.">getPointCloud()</a> Internally this:</p>
-<ol type="1">
-<li>Downscales the disparity map by a factor of 16 (to convert the OpenCV representation into actual disparities)</li>
-<li>Use the calibration Q matrix to reproject the image to 3D</li>
-<li>Creates a PCL point cloud and textures it using image intensity data</li>
-<li>Filters the cloud based on the #zmin, #zmax parameters. Any points farther than 10m are discarded as they're likely to be wrong anyway.</li>
-</ol>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_abstract_stereo_camera.html#a176f96b1e0cadc210b4a4b73bd51069e" title="Set the point cloud clipping distance closest to the camera (i.e. specify the closest distance to dis...">setVisualZmin()</a>, <a class="el" href="class_abstract_stereo_camera.html#a5da7d8b7074a30583f22d0efd0af5f28" title="Set the point cloud clipping distance furthest from the camera (i.e. specify the farthest distance to...">setVisualZmax()</a>, <a class="el" href="class_abstract_stereo_camera.html#ad8f91d2d5e03a466c1066ab27ec3116f" title="Get a pointer to the current point cloud.">getPointCloud()</a> </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="abstractstereocamera_8h_source.html#l00729">729</a> of file <a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a>.</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/camera/<a class="el" href="abstractstereocamera_8h_source.html">abstractstereocamera.h</a></li>
 <li>src/camera/<a class="el" href="abstractstereocamera_8cpp_source.html">abstractstereocamera.cpp</a></li>
@@ -2620,7 +2593,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>failed_frames</b> = 0<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></li>
-    <li class="footer">Generated on Mon Apr 19 2021 11:50:24 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Wed Apr 28 2021 10:56:46 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

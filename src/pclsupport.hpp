@@ -1,5 +1,5 @@
 /*!
- * @file cvsupport.h
+ * @file pclsupport.hpp
  * @authors Ben Knight (bknight@i3drobotics.com)
  * @brief Support class for using PCL
  * @version 1.3

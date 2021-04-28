@@ -13,8 +13,10 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     ] ],
     [ "paramfile.cpp", "paramfile_8cpp_source.html", null ],
     [ "paramfile.h", "paramfile_8h_source.html", null ],
-    [ "pclsupport.hpp", "pclsupport_8hpp_source.html", null ],
-    [ "svtkmain.cpp", "svtkmain_8cpp_source.html", null ],
+    [ "pclsupport.hpp", "pclsupport_8hpp.html", [
+      [ "PCLSupport", "class_p_c_l_support.html", null ]
+    ] ],
+    [ "svtkmain.cpp", "svtkmain_8cpp.html", "svtkmain_8cpp" ],
     [ "svtkwindow.cpp", "svtkwindow_8cpp_source.html", null ],
     [ "svtkwindow.h", "svtkwindow_8h_source.html", null ]
 ];

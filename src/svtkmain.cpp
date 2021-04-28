@@ -1,5 +1,5 @@
 /**
- * @file main.cpp
+ * @file svtkmain.cpp
  * @authors Josh Veitch-Michaelis, Ben Knight (bknight@i3drobotics.com)
  * @brief 
  * @version 1.3
