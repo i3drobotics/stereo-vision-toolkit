@@ -83,8 +83,10 @@ MatcherWidgetOpenCVSGBM::MatcherWidgetOpenCVSGBM(QWidget* parent)
   connect(ui->checkBoxWLSFilter, SIGNAL(toggled(bool)), this,
           SLOT(enableWLSFilter(bool)));
 
-  connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
-          SLOT(onSaveClicked()));
+//  connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
+//          SLOT(onSaveClicked()));
+
+  ui->saveParametersButton->setVisible(false);
 
 #ifdef WITH_OPENCV_CONTRIB
     ui->checkBoxWLSFilter->setVisible(true);
