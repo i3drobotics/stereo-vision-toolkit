@@ -109,7 +109,7 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     default_deimos_init_settings.packetDelay = -1;
     default_deimos_init_settings.packetSize = -1;
 
-    default_phobos_basler_usb_init_settings.exposure = 5;
+    default_phobos_basler_usb_init_settings.exposure = 2.5;
     default_phobos_basler_usb_init_settings.gain = 0;
     default_phobos_basler_usb_init_settings.fps = 10;
     default_phobos_basler_usb_init_settings.binning = 1;

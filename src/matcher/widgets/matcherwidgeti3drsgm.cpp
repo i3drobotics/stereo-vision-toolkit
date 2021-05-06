@@ -28,14 +28,15 @@ MatcherWidgetI3DRSGM::MatcherWidgetI3DRSGM(QWidget* parent)
     connect(ui->checkBoxExtendDisparity, SIGNAL(toggled(bool)), this,
             SLOT(enableExtendDisparity(bool)));
 
-    connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
-            SLOT(onSaveClicked()));
+    // connect(ui->saveParametersButton, SIGNAL(clicked(bool)), this,
+    //         SLOT(onSaveClicked()));
+    ui->saveParametersButton->setVisible(false);
 
+    enableInterpolatation(ui->interpolateCheck->isChecked());
+    enableExtendDisparity(ui->checkBoxExtendDisparity->isChecked());
     updateBlockSize(ui->blockSizeSlider->value());
     updateMinDisparity(ui->minDisparitySlider->value());
     updateDisparityRange(ui->disparityRangeSlider->value());
-    enableInterpolatation(ui->interpolateCheck->isChecked());
-    enableExtendDisparity(ui->checkBoxExtendDisparity->isChecked());
     negative_disparity = ui->minDisparitySlider->value() <= 0;
     ui->checkBoxNegativeDisparity->setChecked(negative_disparity);
 
