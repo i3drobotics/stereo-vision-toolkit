@@ -38,14 +38,3 @@ jobs:
               cd build
               qmake.exe "CONFIG+=qtquickcompiler CONFIG+=DEV_BRANCH CONFIG+=WITH_VIMBA CONFIG+=WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
               jom.exe
-          - name: Build Installer
-            working-directory: installer
-            shell: cmd
-            run: |
-              iscc installer.iss
-          - name: Upload installer artifact
-            uses: actions/upload-artifact@v2
-            with:
-              name: Installer artifact
-              path: |
-                installer/Output
