@@ -7,7 +7,7 @@ SET scriptpath=%~dp0
 cd %scriptpath:~0,-1%
 
 :: set i3drsgm version
-set version=1.0.11
+set version=1.0.13
 
 :: url for downloading opencv
 SET url="https://github.com/i3drobotics/i3drsgm/releases/download/v%version%/i3drsgm-%version%.exe"

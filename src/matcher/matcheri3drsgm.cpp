@@ -100,13 +100,13 @@ void MatcherI3DRSGM::setDisparityError(int val)
 void MatcherI3DRSGM::setSpeckleDifference(float diff)
 {
     this->speckleDifference = diff;
-  this->i3drsgm->setSpeckleDifference(diff);
+    this->i3drsgm->setSpeckleDifference(diff);
 }
 
 void MatcherI3DRSGM::setSpeckleSize(int size)
 {
     this->speckleSize = size;
-   this->i3drsgm->setSpeckleSize(size);
+    this->i3drsgm->setSpeckleSize(size);
 }
 
 void MatcherI3DRSGM::setMatchCosts(float P1, float P2){
@@ -117,19 +117,19 @@ void MatcherI3DRSGM::setMatchCosts(float P1, float P2){
 void MatcherI3DRSGM::setP1(float P1)
 {
     this->p1 = P1;
-   this->i3drsgm->setP1(P1);
+    this->i3drsgm->setP1(P1);
 }
 
 void MatcherI3DRSGM::setP2(float P2)
 {
     this->p2 = P2;
-   this->i3drsgm->setP2(P2);
+    this->i3drsgm->setP2(P2);
 }
 
 void MatcherI3DRSGM::setWindowSize(int census_size)
 {
     this->windowSize = census_size;
-   this->i3drsgm->setWindowSize(census_size);
+    this->i3drsgm->setWindowSize(census_size);
 }
 
 void MatcherI3DRSGM::setDisparityShift(int shift)
@@ -141,7 +141,7 @@ void MatcherI3DRSGM::setDisparityShift(int shift)
 void MatcherI3DRSGM::maxPyramid(int pyramid_num)
 {
     this->maxPyramidLevel = pyramid_num;
-   this->i3drsgm->maxPyramid(pyramid_num);
+    this->i3drsgm->maxPyramid(pyramid_num);
 }
 
 void MatcherI3DRSGM::enablePyramid(bool enable, int pyramid_num)
@@ -164,7 +164,7 @@ void MatcherI3DRSGM::setDisparityRange(int n)
 void MatcherI3DRSGM::enableTextureDSI(bool enable)
 {
     this->textureDSI = enable;
-  this->i3drsgm->enableTextureDSI(enable);
+    this->i3drsgm->enableTextureDSI(enable);
 }
 
 void MatcherI3DRSGM::enableInterpolation(bool enable)
