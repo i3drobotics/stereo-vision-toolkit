@@ -3,7 +3,7 @@
 [Software Website](https://i3drobotics.github.io/stereo-vision-toolkit/)
 
 ## Latest Release
-Download the latest release v1.3.1 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.2/StereoVisionToolkit-1.3.1.2-Win64.exe)
+Download the latest release v1.3.1.3 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.3/StereoVisionToolkit-1.3.1.3-Win64.exe)
 
 For detailed instructions see the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf)
 
@@ -34,7 +34,7 @@ We have included support for two of OpenCV's matchers: the basic block matcher a
 I3DR's own 3D matching algorithm (I3DRSGM) is also built into this application by default however a license is required to be able to run it. Please contact info@i3drobotics.com for requesting a license. 
 
 ## Installation
-Download and install the windows installer for the latest release [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.2/StereoVisionToolkit-1.3.1.2-Win64.exe).
+Download and install the windows installer for the latest release [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.2/StereoVisionToolkit-1.3.1.3-Win64.exe).
 
 See the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on using the software as well as building from source. 
 
@@ -50,7 +50,7 @@ This code is provided under the MIT license, which essentially means it's open s
 See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
 
 ## Developer zone
-Download the latest development release v1.3.1a.24 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.24/StereoVisionToolkit-1.3.1a.24-Win64.exe)   
+Download the latest development release v1.3.1.3 ~~[here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.24/StereoVisionToolkit-1.3.1a.24-Win64.exe)~~ (**developer release is currently the main release**)  
 *WARNING: Development release may contain broken code and untested features. Use at your own risk!*
 
 See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on building from source.
