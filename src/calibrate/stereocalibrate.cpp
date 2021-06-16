@@ -39,10 +39,10 @@ void StereoCalibrate::abortCalibration() {
         disconnect(stereo_camera, SIGNAL(acquired()), this, SLOT(checkImages()));
         disconnect(this, SIGNAL(requestImage()), stereo_camera, SLOT(singleShot()));
     }
-    emit doneCalibration(false);
+    emit doneCalibration(CalibrationStatus::ABORTED);
 }
 
-void StereoCalibrate::finishedCalibration(bool success) {
+void StereoCalibrate::finishedCalibration(CalibrationStatus success) {
     if (stereo_camera) {
         disconnect(stereo_camera, SIGNAL(acquired()), this, SLOT(checkImages()));
         disconnect(this, SIGNAL(requestImage()), stereo_camera, SLOT(singleShot()));
@@ -118,8 +118,7 @@ void StereoCalibrate::checkImages(void) {
     return;
 }
 
-bool StereoCalibrate::jointCalibration(void) {
-    success = false;
+StereoCalibrate::CalibrationStatus StereoCalibrate::jointCalibration(void) {
     assert(left_images.size() != 0);
     assert(right_images.size() != 0);
     assert(left_image_points.size() == right_image_points.size());
@@ -148,8 +147,9 @@ bool StereoCalibrate::jointCalibration(void) {
         alert.setText("Left camera calibration failed.");
         alert.exec();
         qDebug() << "Left camera calibration failed.";
-        finishedCalibration(false);
-        return false;
+        cal_dialog->close();
+        finishedCalibration(CalibrationStatus::FAILED);
+        return CalibrationStatus::FAILED;
     }
 
     if (left_valid.size() >= 5){
@@ -172,15 +172,18 @@ bool StereoCalibrate::jointCalibration(void) {
             alert.setText("Right camera calibration failed.");
             alert.exec();
             qDebug() << "Right camera calibration failed.";
-            finishedCalibration(false);
-            return false;
+            cal_dialog->close();
+            finishedCalibration(CalibrationStatus::FAILED);
+            return CalibrationStatus::FAILED;
         }
 
         disconnect(this, SIGNAL(done_image(int)), cal_dialog, SLOT(updateRightProgress(int)));
         qApp->processEvents(); // Otherwise we seem to go too fast for the GUI to keep up
     } else {
         qDebug() << "Need at least 5 valid left image for calibration. Found: " << left_valid.size();
-        qApp->processEvents(); // Otherwise we seem to go too fast for the GUI to keep up
+        cal_dialog->close();
+        finishedCalibration(CalibrationStatus::INVALID_NUM_VALID_IMAGES);
+        return CalibrationStatus::INVALID_NUM_VALID_IMAGES;
     }
 
     if (left_valid.size() >= 5 && left_valid.size() >= 5){
@@ -213,14 +216,23 @@ bool StereoCalibrate::jointCalibration(void) {
                 const char* err_msg = e.what();
                 std::cout << "exception caught: " << err_msg << std::endl;
                 stereo_rms_error = 0;
+                cal_dialog->close();
+                finishedCalibration(CalibrationStatus::FAILED);
+                return CalibrationStatus::FAILED;
             }
         } else {
             stereo_rms_error = 0;
             qDebug() << "Need at least 5 valid image pairs for calibration. Found: " << valid_count;
+            cal_dialog->close();
+            finishedCalibration(CalibrationStatus::INVALID_NUM_VALID_IMAGES);
+            return CalibrationStatus::INVALID_NUM_VALID_IMAGES;
         }
     } else {
         stereo_rms_error = 0;
         qDebug() << "Need at least 5 valid images for calibration. Found: l - " << left_valid.size() << " r - " << right_valid.size();
+        cal_dialog->close();
+        finishedCalibration(CalibrationStatus::INVALID_NUM_VALID_IMAGES);
+        return CalibrationStatus::INVALID_NUM_VALID_IMAGES;
     }
 
     if(stereo_rms_error > 0){
@@ -275,18 +287,17 @@ bool StereoCalibrate::jointCalibration(void) {
 
         //alert.setText(QString("Written calibration files to: %1").arg(output_folder.absolutePath()));
         //alert.exec();
-        success = true;
-        finishedCalibration(true);
+        finishedCalibration(CalibrationStatus::SUCCESS);
 
-        return true;
+        return CalibrationStatus::SUCCESS;
     }else{
         //alert.setText("Stereo camera calibration failed.");
         //alert.exec();
         qDebug() << "Stereo camera calibration failed.";
-        finishedCalibration(false);
+        finishedCalibration(CalibrationStatus::FAILED);
         cal_dialog->close();
 
-        return false;
+        return CalibrationStatus::FAILED;
     }
 }
 
@@ -305,8 +316,8 @@ double StereoCalibrate::stereoCameraCalibration(int stereoFlags) {
         }
     }
 
-    assert(leftImagePointsMask.size() > 6);
-    assert(rightImagePointsMask.size() > 6);
+    assert(leftImagePointsMask.size() >= 5);
+    assert(rightImagePointsMask.size() >= 5);
 
     double stereoRes = cv::stereoCalibrate(
                 objectPointsMask, leftImagePointsMask, rightImagePointsMask,

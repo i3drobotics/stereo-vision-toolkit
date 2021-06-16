@@ -267,7 +267,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QPushButton" name="okPushButton">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="maximumSize">
         <size>

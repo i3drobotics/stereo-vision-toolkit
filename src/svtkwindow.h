@@ -289,7 +289,7 @@ public slots:
     void startCalibrationFromImages(void);
     void runCalibrationFromImages(void);
 
-    void doneCalibration(bool);
+    void doneCalibration(StereoCalibrate::CalibrationStatus);
 
     void enableVideoCapture(bool enable);
     void startVideoCapture(void){ enableVideoCapture(true); }

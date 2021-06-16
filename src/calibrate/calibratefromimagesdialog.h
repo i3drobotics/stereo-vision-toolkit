@@ -105,6 +105,9 @@ private:
      * and at least one of each where found */
     void checkImageCount(void);
 
+    bool left_paths_checked = false;
+    bool right_paths_checked = false;
+
 private slots:
     //! Select left image root (open file dialog)
     void selectLeftImageRoot(void);

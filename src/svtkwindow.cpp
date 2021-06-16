@@ -2187,14 +2187,15 @@ void SVTKWindow::runCalibrationFromImages(void){
 
     stopDeviceListTimer();
 
-    connect(calibrator, SIGNAL(doneCalibration(bool)), this,
-               SLOT(doneCalibration(bool)));
+    connect(calibrator, &StereoCalibrate::doneCalibration, this, &SVTKWindow::doneCalibration);
 
     calibrator->setOutputPath(calibration_images_dialog->getOutputPath());
     calibrator->setPattern(pattern, square_size_mm);
     calibrator->setImages(left_images, right_images);
     calibrator->setSaveROS(save_ros);
     calibrator->jointCalibration();
+    //StereoCalibrate::CalibrationStatus stat = calibrator->jointCalibration();
+    //doneCalibration(stat);
 }
 
 void SVTKWindow::startAutoCalibration(void) {
@@ -2238,9 +2239,11 @@ void SVTKWindow::runAutoCalibration(void){
     calibrator->setImages(left_images, right_images);
     calibrator->setSaveROS(save_ros);
     calibrator->jointCalibration();
+    //StereoCalibrate::CalibrationStatus stat = calibrator->jointCalibration();
+    //doneCalibration(stat);
 }
 
-void SVTKWindow::doneCalibration(bool success) {
+void SVTKWindow::doneCalibration(StereoCalibrate::CalibrationStatus success) {
     //connect(stereo_cam, SIGNAL(acquired()), this, SLOT(updateDisplay())); TODO check this
 
        //TODO fix this for auto calibration
@@ -2248,15 +2251,23 @@ void SVTKWindow::doneCalibration(bool success) {
 //        disconnect(calibration_dialog, SIGNAL(stopCalibration()), calibrator,
 //                   SLOT(abortCalibration()));
 //    }
-    disconnect(calibrator, SIGNAL(doneCalibration(bool)), this,
-               SLOT(doneCalibration(bool)));
+    disconnect(calibrator, SIGNAL(doneCalibration(StereoCalibrate::CalibrationStatus)), this,
+               SLOT(doneCalibration(StereoCalibrate::CalibrationStatus)));
     startDeviceListTimer();
 
     QMessageBox alert;
-    if (success) {
+    if (success == StereoCalibrate::CalibrationStatus::SUCCESS) {
         alert.setText(QString("Written calibration files to: %1").arg(calibrator->output_folder.absolutePath()));
-    } else {
+    } else if (success == StereoCalibrate::CalibrationStatus::FAILED) {
         alert.setText("Stereo camera calibration failed.");
+    } else if (success == StereoCalibrate::CalibrationStatus::ABORTED) {
+        alert.setText("Stereo camera calibration aborted.");
+    } else if (success == StereoCalibrate::CalibrationStatus::INVALID_NUM_OF_IMAGES) {
+        alert.setText("Invalid number of images provided for calibration. Minimum 5.");
+    } else if (success == StereoCalibrate::CalibrationStatus::INVALID_NUM_VALID_IMAGES) {
+        alert.setText("Stereo camera calibration failed due to invalid number of image detected with valid checkerboard.");
+    } else {
+        alert.setText("Stereo camera calibration failed due to unknown error.");
     }
     alert.exec();
     //stereo_cam->enableCapture(true);

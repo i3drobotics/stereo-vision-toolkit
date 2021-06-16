@@ -28,11 +28,15 @@
 
 class StereoCalibrate : public QObject {
   Q_OBJECT
+  Q_PROPERTY(CalibrationStatus status NOTIFY doneCalibration)
+
  public:
   explicit StereoCalibrate(QObject* parent = 0,
                             AbstractStereoCamera* stereo_camera = 0);
 
   enum YamlFileFormat { CV_FILESTORAGE_YAML, ROS_PERCEPTION_YAML };
+  enum class CalibrationStatus { SUCCESS, FAILED, ABORTED, INVALID_NUM_OF_IMAGES, INVALID_NUM_VALID_IMAGES };
+  Q_ENUM(CalibrationStatus)
 
   cv::Mat left_camera_matrix;
   cv::Mat left_distortion;
@@ -98,7 +102,7 @@ class StereoCalibrate : public QObject {
   bool calibrating_left = true;
   bool calibrating_right = false;
 
-  void finishedCalibration(bool success);
+  void finishedCalibration(CalibrationStatus success);
   bool findCorners(cv::Mat image, std::vector<cv::Point2f>& corners, int flags);
 
   cv::Mat left_image_overlay;
@@ -123,11 +127,11 @@ class StereoCalibrate : public QObject {
   void setOutputPath(QString path);
   void overlayArrow(cv::Mat& image, std::vector<cv::Point2f>& points,
                     cv::Point2f offset, cv::Scalar colour, int thickness = 3);
-  bool jointCalibration(void);
+  CalibrationStatus jointCalibration(void);
   bool outputYaml(YamlFileFormat yaml_file_format, QString filename, QString camera_name, cv::Size image_size, cv::Mat camera_matrix, cv::Mat dist_coeffs, cv::Mat P, cv::Mat R);
 
  signals:
-  void doneCalibration(bool);
+  void doneCalibration(CalibrationStatus);
   void imageProgress(int, int);
   void requestImage(void);
   void chessboardFound(Chessboard* board);
