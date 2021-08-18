@@ -1944,14 +1944,14 @@ void SVTKWindow::stereoCameraInit() {
 }
 
 void SVTKWindow::startDeviceListTimer() {
-    // refresh device list every 5 seconds
+    // refresh device list every 30 seconds
     //TODO replace this with event driven system
     qDebug() << "Starting device list timer";
     if (!device_list_timer->isActive()){
         device_list_timer->stop();
         device_list_timer = new QTimer(this);
         refreshCameraListThreaded();
-        device_list_timer->start(5000);
+        device_list_timer->start(30000);
         QObject::connect(device_list_timer, SIGNAL(timeout()), this, SLOT(refreshCameraListThreaded()));
         qDebug() << "Device list timer started";
     } else {

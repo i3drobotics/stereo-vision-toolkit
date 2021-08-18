@@ -181,6 +181,12 @@ bool StereoCameraBasler::openCamera(){
             return connected;
         }
 
+        // Flip camera image if required (due to mounting orientation)
+        Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "ReverseX").SetValue(stereoCameraSettings_.flip_left_x);
+        Pylon::CBooleanParameter(cameras->operator[](0).GetNodeMap(), "ReverseY").SetValue(stereoCameraSettings_.flip_left_y);
+        Pylon::CBooleanParameter(cameras->operator[](1).GetNodeMap(), "ReverseX").SetValue(stereoCameraSettings_.flip_right_x);
+        Pylon::CBooleanParameter(cameras->operator[](1).GetNodeMap(), "ReverseY").SetValue(stereoCameraSettings_.flip_right_y);
+
         getImageSize(cameras->operator[](0),image_width,image_height,image_bitdepth);
         emit update_size(image_width, image_height, image_bitdepth);
 

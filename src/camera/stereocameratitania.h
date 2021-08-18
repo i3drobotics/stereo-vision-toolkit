@@ -29,8 +29,14 @@ public:
                                 AbstractStereoCamera::StereoCameraSettings camera_settings,
                                 QObject *parent = 0) :
                 StereoCameraBasler(serial_info, camera_settings, parent){
+        // flip left camera in x and y as mounted upside down
+        stereoCameraSettings_.flip_left_x = true;
+        stereoCameraSettings_.flip_left_y = true;
+        stereoCameraSettings_.flip_right_x = false;
+        stereoCameraSettings_.flip_right_y = false;
     }
 
+    static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> autoDetectTitanias(Pylon::CTlFactory* tlFactory);
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystemsQuick(Pylon::CTlFactory* tlFactory);
 

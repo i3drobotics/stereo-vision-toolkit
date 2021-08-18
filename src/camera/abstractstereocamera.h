@@ -105,6 +105,10 @@ public:
         int isGige;
         int packetDelay;
         int packetSize;
+        bool flip_left_x;
+        bool flip_left_y;
+        bool flip_right_x;
+        bool flip_right_y;
     };
 
     //! Structure to hold stereo camera information

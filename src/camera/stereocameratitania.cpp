@@ -5,6 +5,60 @@
 
 #include "stereocameratitania.h"
 
+std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBasler::autoDetectTitanias(Pylon::CTlFactory* tlFactory){
+    Pylon::DeviceInfoList_t devices;
+    tlFactory->EnumerateDevices(devices);
+
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> foundTitanias;
+
+    // find valid labels titania devices
+    Pylon::DeviceInfoList_t valid_titania_devices_left;
+    Pylon::DeviceInfoList_t valid_titania_devices_right;
+    for (size_t i = 0; i < devices.size(); ++i)
+    {
+        std::string device_class = std::string(devices[i].GetDeviceClass());
+        std::string device_name = std::string(devices[i].GetUserDefinedName());
+        std::string device_serial = std::string(devices[i].GetSerialNumber());
+
+        QString device_name_qstr = QString::fromStdString(device_name);
+        if (device_name_qstr.contains("I3DRTitania")){
+            QStringList device_name_qstrlist = device_name_qstr.split('_');
+            if (device_name_qstrlist.size() == 3){
+                if (device_name_qstrlist.at(2) == "l"){
+                    valid_titania_devices_left.push_back(devices[i]);
+                }
+                else if (device_name_qstrlist.at(2) == "r"){
+                    valid_titania_devices_right.push_back(devices[i]);
+                }
+                else {
+                    qDebug() << "Detected I3DR Titania with malformed device name: " << device_name.c_str();
+                }
+            } else {
+                qDebug() << "Detected I3DR Titania with malformed device name: " << device_name.c_str();
+            }
+        }
+    }
+
+    // list auto detected titanias found using UserDefinedName
+    // for (size_t i = 0; i < connected_serials.size(); ++i){
+    //     std::string connected_serial = connected_serials[i];
+    //     std::string connected_camera_name = connected_camera_names[i];
+
+    //     connected_camera_name_qstr = QString::fromStdString(connected_camera_name);
+    //     if (connected_camera_name_qstr.contains("I3DRTitania")){
+    //         QStringList connected_camera_name_qstrlist = connected_camera_name_qstr.split('_');
+    //         if (connected_camera_name_qstrlist.size() == 3){
+    //             std::string connected_camera_titania_serial = connected_camera_name_qstrlist[1];
+                
+    //         } else {
+    //             qDebug() << "Detected I3DR Titania with malformed device name: " << connected_camera_name.c_str();
+    //         }
+    //     }
+    // }
+
+    return foundTitanias;
+}
+
 std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBasler::listSystemsQuick(Pylon::CTlFactory* tlFactory){
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_gige = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_GIGE);
     std::vector<AbstractStereoCamera::StereoCameraSerialInfo> known_serial_infos_usb = loadSerials(AbstractStereoCamera::CAMERA_TYPE_TITANIA_BASLER_USB);
@@ -30,8 +84,6 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
 
     std::vector<std::string> connected_camera_names;
     std::vector<std::string> connected_serials;
-    //TODO add generic way to recognise i3dr cameras whilst still being
-    //able to make sure the correct right and left cameras are selected together
     for (size_t i = 0; i < devices.size(); ++i)
     {
         std::string device_class = std::string(devices[i].GetDeviceClass());
@@ -74,6 +126,11 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
             connected_serial_infos.push_back(known_serial_info);
         }
     }
+
+    //TODO add generic way to recognise i3dr cameras whilst still being
+    //able to make sure the correct right and left cameras are selected together
+    
+    
 
     //Pylon::PylonTerminate();
     return connected_serial_infos;
@@ -158,8 +215,8 @@ bool StereoCameraTitaniaBasler::getCameraFrame(cv::Mat &cam_left_image, cv::Mat 
     bool res = StereoCameraBasler::getCameraFrame(left_tmp,right_tmp);
     if (res){
         // Rotate right camera as it is mounted upside down
-        cv::flip(left_tmp,left_tmp,0);
-        cv::flip(left_tmp,left_tmp,1);
+        //cv::flip(left_tmp,left_tmp,0);
+        //cv::flip(left_tmp,left_tmp,1);
         //cv::flip(right_tmp,right_tmp,0);
         //cv::flip(right_tmp,right_tmp,1);
         cam_left_image = left_tmp.clone();
