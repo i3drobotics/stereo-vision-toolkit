@@ -6,7 +6,6 @@
 #define PHOBOS_USB_TRIGGER_1 5
 #define PHOBOS_USB_TRIGGER_2 6
 
-
 #define PHOBOS_GIGE_TRIGGER_1 3
 #define PHOBOS_GIGE_TRIGGER_2 2
 
@@ -39,6 +38,7 @@
   #define LASER_PIN 1
 #endif
 
+String device_serial = "746974616e24319"; // CHANGE THIS FOR YOUR CAMERA
 double frame_delay;      // amount of time between triggered (1/fps)
 int trigger_time = 10;   // time for trigger to be registered by camera
 double fps = 10;          // inital fps
@@ -88,20 +88,20 @@ void loop() {
 
   // Wait for time to trigger the camera (without stopping the program)
   if (timeSinceTrigger > frame_delay){
-    // Triggger camera (pulse high and then low
+    // Triggger camera (pulse high and then low)
     digitalWrite(LED_BUILTIN, HIGH);
     #ifdef USE_LASER
-      digitalWrite(LASER_PIN, LOW);
+      digitalWrite(LASER_PIN, HIGH);
     #endif
     digitalWrite(CAMERA_TRIGGER_1, HIGH);
     digitalWrite(CAMERA_TRIGGER_2, HIGH);
     lastTriggerTime = millis();
-    delay(trigger_time*8.0); // Wait small time for high to be registered by camera
+    delay(trigger_time); // Wait small time for high to be registered by camera
     digitalWrite(LED_BUILTIN, LOW);
     #ifdef USE_LASER
-      digitalWrite(LASER_PIN, HIGH);
+      digitalWrite(LASER_PIN, LOW);
     #endif
-    delay(trigger_time*0.2);
+    delay(trigger_time);
     digitalWrite(CAMERA_TRIGGER_1, LOW);
     digitalWrite(CAMERA_TRIGGER_2, LOW);
   }
@@ -127,6 +127,8 @@ void loop() {
       bno.getEvent(&event);
       
       // Display the floating point data
+      Serial.print(device_serial);
+      Serial.print(",");
       Serial.print(event.orientation.x, 4);
       Serial.print(",");
       Serial.print(event.orientation.y, 4);
@@ -135,7 +137,8 @@ void loop() {
       Serial.println();
     } else {
       // IMU failed to initalise return -1000 in all axis
-      Serial.println("-1000,-1000,-1000");
+      Serial.print(device_serial);
+      Serial.println(",-1000,-1000,-1000");
     }
   }
   #else
