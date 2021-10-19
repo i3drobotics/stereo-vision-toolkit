@@ -3,7 +3,7 @@
 [Software Website](https://i3drobotics.github.io/stereo-vision-toolkit/)
 
 ## Latest Release
-Download the latest release v1.3.1.3 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.3/StereoVisionToolkit-1.3.1.3-Win64.exe)
+Download the latest release v1.3.1.5 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.5/StereoVisionToolkit-1.3.1.5-Win64.exe)
 
 For detailed instructions see the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf)
 
