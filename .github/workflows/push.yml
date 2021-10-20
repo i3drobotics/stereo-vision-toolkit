@@ -25,14 +25,14 @@ jobs:
               modules: 'qtwebengine'
               tools-only: 'false'
           - name: Install jom, inno setup, doxygen
-            shell: cmd
+            shell: powershell
             run: | 
               choco install jom
               choco install innosetup
               choco install doxygen.install
           # Install 3rd party dependencies
           - name: Install 3rdparty
-            shell: powershell
+            shell: cmd
             run: |
               call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
               .\scripts\3rdparty.bat
