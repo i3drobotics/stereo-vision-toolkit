@@ -31,7 +31,6 @@ SolidCompression=yes
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 UninstallDisplayIcon="{#IconPath}/{#IconName}"
-AlwaysRestart = yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
