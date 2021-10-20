@@ -7,12 +7,16 @@ SET scriptpath=%~dp0
 cd %scriptpath:~0,-1%
 cd ..
 
-:: define which appcast will be changed
-set InputFile=Appcast.xml
-set TmpFile=Appcast_tmp.xml
+:: define appcast file to update
+set appcast_file=Appcast.xml
+set index_file=index.html
+set tmp_appcast_file=Appcast_tmp.xml
+set tmp_index_file=tmp_index.html
 
 :: read i3drsgm version from file
 set /p version=< version.txt
+
+:: update version in appcast file (and update timestamp)
 
 :: get date in correct format
 for /f %%i in ('powershell ^(get-date^).DayOfWeek') do set dow=%%i
@@ -32,7 +36,7 @@ set "appcast_item_title=			^<title^>Version %version%^</title^>"
 set appcast_item_pubDate_line=18
 set "appcast_item_pubDate=			^<pubDate^>%pubDate%^</pubDate^>"
 set appcast_fevor_url_line=31
-set "appcast_fevor_url=				url=^"https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v%version%/StereoVisionToolkit-%version%-Win64.exe^""
+set "appcast_fevor_url=				url=^"https://github.com/i3drobotics/stereo-vision-toolkit/releases/latest/download/StereoVisionToolkit-%version%-Win64.exe^""
 set appcast_fervor_version_line=32
 set "appcast_fervor_version=				fervor:version=^"%version%^""
 
@@ -41,7 +45,7 @@ echo %appcast_item_title%
 echo %appcast_item_pubDate%
 echo %appcast_fervor_version%
 
-(for /f "tokens=1* delims=[]" %%a in ('find /n /v "##" ^< "%InputFile%"') do (
+(for /f "tokens=1* delims=[]" %%a in ('find /n /v "##" ^< "%appcast_file%"') do (
     if "%%~a"=="%appcast_version_line%" (
         echo %appcast_version%
     ) else if "%%~a"=="%appcast_item_title_line%" (
@@ -55,10 +59,34 @@ echo %appcast_fervor_version%
     ) ELSE (
         echo.%%b
     )
-)) > %TmpFile%
+)) > %tmp_appcast_file%
 
-copy %TmpFile% %InputFile%
-del %TmpFile%
+copy %tmp_appcast_file% %appcast_file%
+del %tmp_appcast_file%
+
+:: update version in index file
+set index_version_line=10
+set "index_version=  ^<h3^>Latest release: %version%^</h3^>"
+set index_version_link_line=11
+set "index_version_link=  ^<button onclick=^"location.href='https://github.com/i3drobotics/stereo-vision-toolkit/releases/latest/download/StereoVisionToolkit-%version%-Win64.exe'^" type=^"button^"^>"
+
+echo %index_version%
+echo %index_version_link%
+
+cd docs
+
+(for /f "tokens=1* delims=[]" %%a in ('find /n /v "##" ^< "%index_file%"') do (
+    if "%%~a"=="%index_version_line%" (
+        echo %index_version%
+    ) else if "%%~a"=="%index_version_link_line%" (
+        echo %index_version_link%
+    ) ELSE (
+        echo.%%b
+    )
+)) > %tmp_index_file%
+
+copy %tmp_index_file% %index_file%
+del %tmp_index_file%
 
 :: reset working directory
 cd %initcwd%
