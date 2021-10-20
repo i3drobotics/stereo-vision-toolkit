@@ -294,7 +294,7 @@ void SVTKWindow::checkUpdates(){
 #ifdef DEV_BRANCH
     FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/dev/AppcastDev.xml");
 #else
-    FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/master/Appcast.xml");
+    FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/main/Appcast.xml");
 #endif
 
     // Print current version to debug

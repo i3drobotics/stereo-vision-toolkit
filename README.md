@@ -105,14 +105,14 @@ a. Tag should match version number of toolkit (e.g. v1.3.1a.23) and target 'dev'
   f. Tick 'This is a pre-release'
 6. Once installer is uploaded to release, push the repository file changes, check the changes have been pushed to the GitHub repository and then publish the release. It is important to do this quickly and in the correct order to make sure the updater remains valid. 
 
-### Procedure for new master release
+### Procedure for new main release
 1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.19).
 2. Update ReleaseNotes.html with improvements, bug fixes, and known issues. 
 3. Build new version (Make sure to use the build arguments: 'CONFIG+=WITH_I3DRSGM')
 4. Create installer using inno setup (right click 'installer.iss' and click 'compile')
 6. Update Appcast.xml enclosure length with the file size of the installer
 5. On [GitHub](https://github.com/i3drobotics/stereo-vision-toolkit/releases) create new release   
-a. Tag should match version number of toolkit (e.g. v1.3.1) and target 'master' branch.    
+a. Tag should match version number of toolkit (e.g. v1.3.1) and target 'main' branch.    
   b. Title should have the program name and version (e.g. 'Stereo Vision Toolkit v1.3.1')  
   d. Description should list improvements, bug fixes, and known issues (which should match release notes).  
   e. Upload stereo toolkit installer  

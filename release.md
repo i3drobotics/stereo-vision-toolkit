@@ -1,4 +1,4 @@
-Stereo Vision Toolkit v1.3.2 [Development release]
+# Stereo Vision Toolkit v1.3.2
 
 Changes:
 - Remove computer restart from installer (still requires manual restart)

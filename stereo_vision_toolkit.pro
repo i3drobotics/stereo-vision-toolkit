@@ -37,7 +37,7 @@ CONFIG -= debug_and_release_target
 # !! MAKE SURE TO REMOVE THIS BUILD OPTION WHEN DOING RELEASE !!
 DEV_BRANCH {
     message("Development build")
-    message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING MASTER RELEASE !!")
+    message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING MAIN RELEASE !!")
     DEFINES += DEV_BRANCH
 
     CONFIG(debug, debug|release) { #debug
