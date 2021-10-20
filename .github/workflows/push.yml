@@ -46,6 +46,7 @@ jobs:
               jom.exe
           # Update appcasts version for release
           - name: Update appcasts
+            shell: cmd
             run: |
               scripts\update_appcasts.bat
           # Create installer
