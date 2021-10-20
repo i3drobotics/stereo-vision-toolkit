@@ -2,7 +2,7 @@
 
 ## Discontinued branch
 
-[Go to new branch](https://github.com/i3drobotics/stereo-vision-toolkit/main)
+[Go to new branch](https://github.com/i3drobotics/stereo-vision-toolkit/tree/main)
 
 This branch is retained to point old software to the new url. The source has been moved to the 'main' branch and the appcast url now points to:
 
