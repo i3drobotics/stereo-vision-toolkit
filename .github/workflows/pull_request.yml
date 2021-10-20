@@ -1,9 +1,6 @@
-name: QT Build
+name: Pull Request
 
 on:
-  push:
-    branches: [ main ]
-
   pull_request:
     branches: [ main ]
 
@@ -45,30 +42,4 @@ jobs:
               call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
               mkdir build
               cd build
-              qmake.exe "CONFIG+=qtquickcompiler CONFIG+=DEV_BRANCH CONFIG+=WITH_VIMBA CONFIG+=WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
-              jom.exe
-          # Update appcasts version for release
-          - name: Update appcasts
-            run: |
-              .\scripts\update_appcasts.bat
-              .\scripts\update_appcastsdev.bat
-          # Create installer
-          - name: Create installer
-            shell: cmd
-            run: |
-              iscc installer\installer.iss
-          # Get project version
-          - name: Get project version
-            shell: bash
-            run: |
-              PROJ_VER=$(cat version.txt)
-              echo "SVT_VERSION=$PROJ_VER" >> $GITHUB_ENV
-          # Create GitHub release
-          - name: Release
-            uses: softprops/action-gh-release@v1
-            with:
-              draft: false
-              body_path: release.md
-              tag_name: v${{ env.SVT_VERSION }}
-              files: |
-                installer/Output/*.exe
+              qmake.exe "CONFIG+=qtquickcompiler CONFIG+=WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
