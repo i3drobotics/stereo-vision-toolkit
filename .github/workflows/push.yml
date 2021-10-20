@@ -24,14 +24,15 @@ jobs:
               install-deps: 'true'
               modules: 'qtwebengine'
               tools-only: 'false'
-          - name: Install jom and inno setup
+          - name: Install jom, inno setup, doxygen
             shell: cmd
             run: | 
               choco install jom
               choco install innosetup
+              choco install doxygen.install
           # Install 3rd party dependencies
           - name: Install 3rdparty
-            shell: cmd
+            shell: powershell
             run: |
               call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
               .\scripts\3rdparty.bat
@@ -44,11 +45,16 @@ jobs:
               cd build
               qmake.exe "CONFIG+=qtquickcompiler CONFIG+=WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
               jom.exe
-          # Update appcasts version for release
-          - name: Update appcasts
+          # Update version in files
+          - name: Update version
             shell: cmd
             run: |
-              scripts\update_appcasts.bat
+              scripts\update_version.bat
+          # Update documentation
+          - name: Update docs
+            shell: bash
+            run: |
+              ./scripts/docs.sh
           # Create installer
           - name: Create installer
             shell: cmd

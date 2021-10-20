@@ -25,6 +25,9 @@ qmake.exe "CONFIG+=debug CONFIG+=qml_debug CONFIG+=qtquickcompiler CONFIG+=DEV_B
 :: reset working directory
 cd %initcwd%
 
+:: update version in docs & appcast
+call "scripts\update_version.bat"
+
 :: complete message
 echo build complete.
 
