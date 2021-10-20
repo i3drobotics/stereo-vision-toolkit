@@ -8,7 +8,7 @@ Download the latest release v1.3.1.5 [here](https://github.com/i3drobotics/stere
 For detailed instructions see the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf)
 
 ## Status
-![Build](https://github.com/i3drobotics/stereo-vision-toolkit/workflows/QT%20Build/badge.svg?branch=dev&event=push)
+[![Release](https://github.com/i3drobotics/stereo-vision-toolkit/actions/workflows/release.yml/badge.svg)](https://github.com/i3drobotics/stereo-vision-toolkit/actions/workflows/release.yml)
 
 ## About
 I3DR's stereo vision toolkit is an application provided for testing of stereo cameras and gathering of 3D data.
