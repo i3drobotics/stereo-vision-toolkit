@@ -9,24 +9,11 @@ on:
 
 
 jobs:
-  merge_job:
-    # this job will only run if the PR has been merged
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo PR #${{ github.event.number }} has been merged
-
-  feature_branch:
-    # this job will only run if the source branch is feature branch
-    if: contains( github.head_ref, 'feature')
-    runs-on: ubuntu-latest
-    steps:
-    - run: |
-        echo PR #${{ github.event.number }} is feature branch
-
+  # build and deploy new release
   deploy:
-    needs: [merge_job, feature_branch]
+    # this job will only run if the PR has been merged
+    # and the source branch is feature branch (feature/*)
+    if: github.event.pull_request.merged == true && startsWith( github.head_ref, 'feature')
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
