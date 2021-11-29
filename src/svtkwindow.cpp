@@ -292,7 +292,7 @@ void SVTKWindow::checkUpdates(){
 
     // Set the Fervor appcast url
     //TODO fix developer version update system
-    FvUpdater::sharedUpdater()->SetFeedURL("https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/main/Appcast.xml");
+    FvUpdater::sharedUpdater()->SetFeedURL("https://github.com/i3drobotics/stereo-vision-toolkit/releases/latest/download/Appcast.xml");
 
     // Print current version to debug
     qDebug() << FV_APP_NAME << FV_APP_VERSION;
