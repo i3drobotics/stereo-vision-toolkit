@@ -32,9 +32,7 @@ CONFIG += doc
 CONFIG -= debug_and_release
 CONFIG -= debug_and_release_target
 
-# Define if doing development build
-# !! ONLY USE WHEN ON DEVELOPMENT BRANCH !!
-# !! MAKE SURE TO REMOVE THIS BUILD OPTION WHEN DOING RELEASE !!
+# Option to build with console window
 SHOW_CONSOLE {
     CONFIG += console
 }
