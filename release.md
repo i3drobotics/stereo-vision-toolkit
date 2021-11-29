@@ -1,7 +1,7 @@
 # Stereo Vision Toolkit
 
 Changes:
-- Upgrade update system
+- Deployment process improvements
 
 Known issues:
 - Requires manual restart after installation.
