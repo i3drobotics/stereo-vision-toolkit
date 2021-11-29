@@ -1,5 +1,6 @@
-name: Pull Request
-
+name: Pull Request Review
+    
+# only trigger on main branch pull request closed events
 on:
   pull_request:
     branches: [ main ]
