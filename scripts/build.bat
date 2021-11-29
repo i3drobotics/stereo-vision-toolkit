@@ -19,7 +19,7 @@ cd build
 qmake.exe "CONFIG+=qtquickcompiler CONFIG+=WITH_I3DRSGM" ..\stereo_vision_toolkit.pro -spec win32-msvc
 %qt_creator_path%\jom.exe
 :: debug build
-qmake.exe "CONFIG+=debug CONFIG+=qml_debug CONFIG+=qtquickcompiler CONFIG+=WITH_I3DRSGM" ..\stereo_vision_toolkit.pro -spec win32-msvc
+qmake.exe "CONFIG+=debug CONFIG+=qml_debug CONFIG+=qtquickcompiler" ..\stereo_vision_toolkit.pro -spec win32-msvc
 %qt_creator_path%\jom.exe
 
 :: reset working directory
