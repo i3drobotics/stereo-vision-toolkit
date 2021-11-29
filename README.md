@@ -3,7 +3,7 @@
 [Software Website](https://i3drobotics.github.io/stereo-vision-toolkit/)
 
 ## Latest Release
-Download the latest release v1.3.1.5 [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.5/StereoVisionToolkit-1.3.1.5-Win64.exe)
+Download the latest release [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.3/StereoVisionToolkit-1.3.3-Win64.exe)
 
 For detailed instructions see the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf)
 
@@ -34,7 +34,7 @@ We have included support for two of OpenCV's matchers: the basic block matcher a
 I3DR's own 3D matching algorithm (I3DRSGM) is also built into this application by default however a license is required to be able to run it. Please contact info@i3drobotics.com for requesting a license. 
 
 ## Installation
-Download and install the windows installer for the latest release [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1.2/StereoVisionToolkit-1.3.1.3-Win64.exe).
+Download and install the windows installer for the latest release [here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.3/StereoVisionToolkit-1.3.3-Win64.exe).
 
 See the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on using the software as well as building from source. 
 
@@ -50,9 +50,6 @@ This code is provided under the MIT license, which essentially means it's open s
 See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for previous builds. 
 
 ## Developer zone
-Download the latest development release v1.3.1.3 ~~[here](https://github.com/i3drobotics/stereo-vision-toolkit/releases/download/v1.3.1a.24/StereoVisionToolkit-1.3.1a.24-Win64.exe)~~ (**developer release is currently the main release**)  
-*WARNING: Development release may contain broken code and untested features. Use at your own risk!*
-
 See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on building from source.
 
 Documentation can be found [here](https://i3drobotics.github.io/stereo-vision-toolkit/definitions/html/index.html). 
@@ -87,23 +84,6 @@ There is an issue where QT doesn't use the generic vc redist package and instead
 ### Phobos control
 Arduino code for controlling Phobos cameras is provided in src/camera/camera_control.
 This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.
-
-### Procedure for new development release
-1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.23).
-2. Update ReleaseNotesDev.html with improvements, bug fixes, and known issues. 
-3. Build new version (Make sure to use the build arguments: 'CONFIG+=DEV_BRANCH CONFIG+=WITH_I3DRSGM')
-4. Create installer using inno setup (right click 'installer.iss' and click 'compile')
-6. Update AppcastDev.xml enclosure length with the file size of the installer
-5. On [GitHub](https://github.com/i3drobotics/stereo-vision-toolkit/releases) create new release   
-a. Tag should match version number of toolkit (e.g. v1.3.1a.23) and target 'dev' branch.    
-  b. Title should have the program name and version (e.g. 'Stereo Vision Toolkit v1.3.1a.23')  
-  c. Description should have the following header:  
-  **WARNING: DO NOT USE THIS UNLESS YOU ARE PART OF THE I3DR DEVELOPMENT TEAM**  
-  This release is meant for development use only while some new fixes and features are tested.  
-  d. Description should then list improvements, bug fixes, and known issues (which should match release notes).  
-  e. Upload stereo toolkit installer  
-  f. Tick 'This is a pre-release'
-6. Once installer is uploaded to release, push the repository file changes, check the changes have been pushed to the GitHub repository and then publish the release. It is important to do this quickly and in the correct order to make sure the updater remains valid. 
 
 ### Procedure for new main release
 1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.19).
