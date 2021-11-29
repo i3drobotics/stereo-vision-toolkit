@@ -1,11 +1,11 @@
-name: Pull Request Review
+name: Pull Request
 
 # only trigger on main branch pull request open / edit events
 # used to test code before merging
 on:
   pull_request:
     branches: [ main ]
-    types: [ opened, edited, synchronize, reopened ]
+    types: [ opened, synchronize, reopened ]
 
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - run: |
-          echo Pull Request Review disabled until faster build process is implemented.
+          echo Pull Request build disabled until faster build process is implemented.
 
     build:
       # [DISABLED] until faster build process is implemented
