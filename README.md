@@ -85,15 +85,11 @@ There is an issue where QT doesn't use the generic vc redist package and instead
 Arduino code for controlling Phobos cameras is provided in src/camera/camera_control.
 This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.
 
-### Procedure for new main release
-1. Update version number manually in version.txt and in ReleaseNotesDev.html. Then run update_appcast.bat to update the appcast (**DO NOT PUSH THESE CHANGES YET**). Use a or b in version number to denote alpha and beta releases. (e.g. v1.3.1a.19).
-2. Update ReleaseNotes.html with improvements, bug fixes, and known issues. 
-3. Build new version (Make sure to use the build arguments: 'CONFIG+=WITH_I3DRSGM')
-4. Create installer using inno setup (right click 'installer.iss' and click 'compile')
-6. Update Appcast.xml enclosure length with the file size of the installer
-5. On [GitHub](https://github.com/i3drobotics/stereo-vision-toolkit/releases) create new release   
-a. Tag should match version number of toolkit (e.g. v1.3.1) and target 'main' branch.    
-  b. Title should have the program name and version (e.g. 'Stereo Vision Toolkit v1.3.1')  
-  d. Description should list improvements, bug fixes, and known issues (which should match release notes).  
-  e. Upload stereo toolkit installer  
-6. Once installer is uploaded to release, push the repository file changes, check the changes have been pushed to the GitHub repository and then publish the release. It is important to do this quickly and in the correct order to make sure the updater remains valid. 
+### Procedure for new release
+1. To make changes create a branch of the main repository with the name SVTK-XXX where XXX is the issue number of the task you are working on. If you are working on a code changing task (e.g. a task that will need building / testing of code) then you should create a feature branch e.g. feature/SVTK-XXX so that it is picked up by the automatic build process. 
+2. Make your changes to the new branch.
+2. Update version number in version.txt. Then run update_version.bat to update the version number across repo.
+3. Update ReleaseNotes.html with improvements, bug fixes, and known issues.
+4. Update the changelog.txt file with the changes the changes you have made and the associated GitHub issue number.
+6. Create a pull request on GitHub for merging your branch to the main branch. 
+7. Once the code has been tested and approved, merge the branch to the main branch. This will automatically create a new release.
