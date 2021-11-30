@@ -4,6 +4,7 @@ Each change is tied to a GitHub issue see [issues](https://github.com/i3drobotic
 # v1.3.5
 ## New Features
 - Add SHOW_CONSOLE build option for debugging release build [#107](https://github.com/i3drobotics/stereo-vision-toolkit/issues/107)
+- Add version check to workflows [#111](https://github.com/i3drobotics/stereo-vision-toolkit/issues/111)
 ## Update
 - Remove DEV_BRANCH from build options due to no longer being used [#107](https://github.com/i3drobotics/stereo-vision-toolkit/issues/107)
 
