@@ -20,6 +20,30 @@ jobs:
       # Checkout submodules (required for fever module used in app update system)
       - name: Checkout submodules
         run: git submodule update --init --recursive
+
+      # Get project version
+      - name: Get project version
+        shell: bash
+        run: |
+          PROJ_VER=$(cat version.txt)
+          echo "SVTK_VERSION=$PROJ_VER" >> $GITHUB_ENV
+      # Get latest released version
+      - uses: oprypin/find-latest-tag@v1
+        with:
+          repository: i3drobotics/stereo-vision-toolkit  # The repository to scan.
+          releases-only: true  # All relevant tags have a GitHub release for them.
+        id: latest-svtk  # The step ID to refer to later.
+      - name: Get latest released version
+        shell: bash
+        run: | 
+            LATEST_SVTK_VERSION=${{steps.latest-svtk.outputs.tag}}
+            LATEST_SVTK_VERSION=${LATEST_SVTK_VERSION:1}
+            echo "LATEST_SVTK_VERSION=$LATEST_SVTK_VERSION" >> $GITHUB_ENV
+      # Check build version is greater than latest released version
+      - name: Version check
+        shell: bash
+        run: ./scripts/version-check.sh $SVTK_VERSION $LATEST_SVTK_VERSION
+
       # Setup build environment
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
