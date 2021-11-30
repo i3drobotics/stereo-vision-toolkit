@@ -1,7 +1,7 @@
 # Stereo Vision Toolkit
 
 Changes:
-- Deployment process improvements
+- Removed development releases. Single main release is now sole release version to reduce complexity.
 
 Known issues:
 - Requires manual restart after installation.

@@ -32,18 +32,9 @@ CONFIG += doc
 CONFIG -= debug_and_release
 CONFIG -= debug_and_release_target
 
-# Define if doing development build
-# !! ONLY USE WHEN ON DEVELOPMENT BRANCH !!
-# !! MAKE SURE TO REMOVE THIS BUILD OPTION WHEN DOING RELEASE !!
-DEV_BRANCH {
-    message("Development build")
-    message("!! MAKE SURE TO REMOVE [CONFIG+=DEV_BRANCH] BUILD OPTION WHEN DOING MAIN RELEASE !!")
-    DEFINES += DEV_BRANCH
-
-    CONFIG(debug, debug|release) { #debug
-    }else { # release
-        CONFIG += console
-    }
+# Option to build with console window
+SHOW_CONSOLE {
+    CONFIG += console
 }
 
 # Setup FERVOR defines
