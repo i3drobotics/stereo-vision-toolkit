@@ -49,8 +49,10 @@ vergt () {
     if [[ $res != 1 ]]
     then
         echo "ERROR: Build Version must be greater than currently released version."
+        exit 1
     else
         echo "Build version is valid."
+        exit 0
     fi
 }
 
