@@ -43,8 +43,7 @@ jobs:
           name: version-file-${{ github.sha }}
           path: version.txt
 
-  # build and deploy new release
-  deploy:
+  build:
     needs: [versioning]
     runs-on: windows-latest
     steps:
@@ -104,27 +103,57 @@ jobs:
         shell: cmd
         run: |
           scripts\update_version.bat
-      # Update documentation
-      - name: Update docs
-        shell: bash
-        run: |
-          ./scripts/docs.sh
       # Create installer
       - name: Create installer
         shell: cmd
         run: |
           iscc installer\installer.iss
+      # Update documentation
+      - name: Update docs
+        shell: bash
+        run: |
+          ./scripts/docs.sh
+      # Upload docs to artifact for use in release
+      - name: Upload docs
+        uses: actions/upload-artifact@v2
+        with:
+          path: docs
+          name: docs-${{ github.sha }}
+      # Upload release data to artifact for use in release
+      - name: Upload release data
+        uses: actions/upload-artifact@v2
+        with:
+          path: |
+            release.md
+            Appcast.xml
+            installer/Output/*.exe
+          name: release-${{ github.sha }}
+
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      # Download installer from build artifacts
+      - name: Download installer artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: release-${{ github.sha }}
+          path: release
+      # Download docs from build artifacts
+      - name: Download docs artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: docs-${{ github.sha }}
+          path: docs
       # Create GitHub release
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           draft: false
-          body_path: release.md
+          body_path: release/release.md
           tag_name: v${{ env.PROJ_VER }}
           files: |
-            installer/Output/*.exe
-            ReleaseNotes.html
-            Appcast.xml
+            release/*
       # Deploy documentation
       - name: Deploy docs
         uses: JamesIves/github-pages-deploy-action@v4.2.3
@@ -155,3 +184,10 @@ jobs:
           target_branch: main
           github_token: ${{ github.token }}
           message: Release v${{ env.PROJ_VER }} ${{ steps.commit-vars.outputs.sha_short }}
+      # Cleanup artifacts used for job sharing
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: docs-${{ github.sha }}
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: release-${{ github.sha }}
