@@ -39,7 +39,6 @@ jobs:
           name: version-file-${{ github.sha }}
           path: version.txt
 
-  # build and deploy new release
   build:
     needs: [versioning]
     runs-on: windows-latest
@@ -103,7 +102,7 @@ jobs:
           jom.exe
 
   cleanup:
-    needs: [deploy]
+    needs: [build]
     runs-on: ubuntu-latest
 
     steps:
