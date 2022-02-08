@@ -136,3 +136,27 @@ jobs:
             installer/Output/*.exe
             ReleaseNotes.html
             Appcast.xml
+      # Get git variables
+      - name: Get commit variables
+        id: commit-vars
+        shell: bash
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      # Merge branch into production
+      - name: Merge main -> prod
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: prod
+          github_token: ${{ github.token }}
+          message: merged ${{ steps.commit-vars.outputs.sha_short }}
+      # Merge main back to production
+      - name: Merge prod -> main
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: prod
+          target_branch: main
+          github_token: ${{ github.token }}
+          message: merged ${{ steps.commit-vars.outputs.sha_short }}
