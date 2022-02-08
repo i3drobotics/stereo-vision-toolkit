@@ -1,7 +1,7 @@
 # Stereo Vision Toolkit
 
 Changes:
-- Upgrade to release strategy.
+- Upgrade release strategy.
 
 Known issues:
 - I3DRSGM not availiable due to issue in automatic builds.
