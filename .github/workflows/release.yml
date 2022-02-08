@@ -53,7 +53,6 @@ jobs:
         run: git submodule update --init --recursive
 
       # Get project version
-      # Get project version
       - name: Download version file artifact
         uses: actions/download-artifact@v2
         with:
@@ -133,6 +132,19 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      # Get project version
+      - name: Download version file artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: version-file-${{ github.sha }}
+          path: versioning
+      - name: Get project version
+        shell: bash
+        run: |
+          PROJ_VER=$(cat versioning/version.txt)
+          echo "$PROJ_VER" > version.txt
+          echo "PROJ_VER=$PROJ_VER" >> $GITHUB_ENV
       # Download installer from build artifacts
       - name: Download installer artifact
         uses: actions/download-artifact@v2
@@ -144,7 +156,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docs-${{ github.sha }}
-          path: docs
+          path: docs_new
       # Create GitHub release
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -159,7 +171,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4.2.3
         with:
           branch: docs # The branch the action should deploy to.
-          folder: docs # The folder the action should deploy.
+          folder: docs_new # The folder the action should deploy.
       # Get git variables
       - name: Get commit variables
         id: commit-vars
