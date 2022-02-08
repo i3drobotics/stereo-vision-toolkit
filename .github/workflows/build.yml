@@ -98,7 +98,7 @@ jobs:
           call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           mkdir build
           cd build
-          qmake.exe "CONFIG+=qtquickcompiler CONFIG+=WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
+          qmake.exe "CONFIG+=qtquickcompiler WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
           jom.exe
 
   cleanup:
