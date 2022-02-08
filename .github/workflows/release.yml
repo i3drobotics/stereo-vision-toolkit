@@ -166,6 +166,7 @@ jobs:
           tag_name: v${{ env.PROJ_VER }}
           files: |
             release/*
+            release/installer/Output/*
       # Deploy documentation
       - name: Deploy docs
         uses: JamesIves/github-pages-deploy-action@v4.2.3
