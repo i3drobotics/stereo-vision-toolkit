@@ -1,10 +1,9 @@
 # Stereo Vision Toolkit
 
 Changes:
-- Upgrade release strategy.
+- Fix missing I3DRSGM in installer.
 
 Known issues:
-- I3DRSGM not availiable due to issue in automatic builds.
 - Requires manual restart after installation.
 - ROS perception YAML's data arrays must be on single line in YAML file.
 - WLS filter causes speckle filter to sometimes be disabled.
