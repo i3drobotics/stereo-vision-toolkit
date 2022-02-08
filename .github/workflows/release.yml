@@ -1,0 +1,133 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+        level:
+          type: choice
+          description: Release type
+          options: 
+          - patch
+          - minor
+          - major
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+    steps:
+      # Get latest released version
+      - uses: oprypin/find-latest-tag@v1
+        with:
+          repository: i3drobotics/stereo-vision-toolkit  # The repository to scan.
+          releases-only: true  # All relevant tags have a GitHub release for them.
+        id: latest-tag  # The step ID to refer to later.
+      # Generate new release version
+      - name: Generate new version
+        uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-version
+        with:
+          current_version: ${{ steps.latest-tag.outputs.tag }}
+          level: patch
+      # Add generated version to VERSION file
+      # remove 'v' character from version string
+      - name: Add to Version file
+        shell: bash
+        run: |
+          PROJ_VERSION=${{ steps.bump-version.outputs.new_version }}
+          PROJ_VERSION=${PROJ_VERSION:1}
+          echo "$PROJ_VERSION" > version.txt
+      # Upload version file for use in other jobs
+      - name: Archive version file
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-file-${{ github.sha }}
+          path: version.txt
+
+  # build and deploy new release
+  deploy:
+    needs: [versioning]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Checkout submodules (required for fever module used in app update system)
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
+
+      # Get project version
+      # Get project version
+      - name: Download version file artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: version-file-${{ github.sha }}
+          path: versioning
+      - name: Get project version
+        shell: bash
+        run: |
+          PROJ_VER=$(cat versioning/version.txt)
+          echo "$PROJ_VER" > version.txt
+          echo "PROJ_VER=$PROJ_VER" >> $GITHUB_ENV
+      - name: Get latest released version
+        shell: bash
+        run: | 
+            LATEST_SVTK_VERSION=${{steps.latest-svtk.outputs.tag}}
+            LATEST_SVTK_VERSION=${LATEST_SVTK_VERSION:1}
+            echo "LATEST_SVTK_VERSION=$LATEST_SVTK_VERSION" >> $GITHUB_ENV
+      # Setup build environment
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '5.14.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2017_64'
+          dir: '${{ github.workspace }}/qt-install/'
+          install-deps: 'true'
+          modules: 'qtwebengine'
+          tools-only: 'false'
+      - name: Install jom, inno setup, doxygen
+        shell: powershell
+        run: | 
+          choco install jom
+          choco install innosetup
+          choco install doxygen.install
+      # Install 3rd party dependencies
+      - name: Install 3rdparty
+        shell: cmd
+        run: |
+          call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          .\scripts\3rdparty.bat
+      # Build application
+      - name: Build
+        shell: cmd
+        run: |
+          call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          mkdir build
+          cd build
+          qmake.exe "CONFIG+=qtquickcompiler CONFIG+=WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
+          jom.exe
+      # Update version in files
+      - name: Update version
+        shell: cmd
+        run: |
+          scripts\update_version.bat
+      # Update documentation
+      - name: Update docs
+        shell: bash
+        run: |
+          ./scripts/docs.sh
+      # Create installer
+      - name: Create installer
+        shell: cmd
+        run: |
+          iscc installer\installer.iss
+      # Create GitHub release
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          body_path: release.md
+          tag_name: v${{ env.PROJ_VER }}
+          files: |
+            installer/Output/*.exe
+            ReleaseNotes.html
+            Appcast.xml
