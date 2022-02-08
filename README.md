@@ -38,11 +38,6 @@ Download and install the windows installer for the latest release [here](https:/
 
 See the [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on using the software as well as building from source. 
 
-## Development
-This application is under active development and it is likely that in the short term there may be breaking changes to classes, or significant changes to the GUI. Have a look at the [project milestones](https://github.com/i3drobotics/stereo-vision-toolkit/milestones) for information on future improvements.
-
-Feel free to send us pull requests!
-
 ## License
 This code is provided under the MIT license, which essentially means it's open source, but we require you to add our copyright if you distribute it elsewhere.
 
@@ -52,7 +47,13 @@ See [release](https://github.com/i3drobotics/stereo-vision-toolkit/releases) for
 ## Developer zone
 See [User Guide](https://i3drobotics.github.io/stereo-vision-toolkit/app/UserGuide.pdf) for details on building from source.
 
-Documentation can be found [here](https://i3drobotics.github.io/stereo-vision-toolkit/definitions/html/index.html). 
+Documentation can be found [here](https://i3drobotics.github.io/stereo-vision-toolkit/definitions/html/index.html).
+
+This application is under active development and it is likely that in the short term there may be breaking changes to classes, or significant changes to the GUI.
+
+Please read the guides for [contributors](.github/CONTRIBUTOR.md) and [maintainers](.github/MAINTAINER.md) using this repository.
+
+Please read the guide for [branches](.github/BRANCHES.md) and how they are used in this repository.
 
 ### 3rd Party Content
 This repository is used for internal development and so we include both debug and release libraries and DLLs. This makes for quite a large repository for a rather small codebase (around 500MB), so be warned. 
@@ -84,12 +85,3 @@ There is an issue where QT doesn't use the generic vc redist package and instead
 ### Phobos control
 Arduino code for controlling Phobos cameras is provided in src/camera/camera_control.
 This is for the serial communication between the arduino and this toolkit. See [issue](https://github.com/i3drobotics/stereo-vision-toolkit/issues/54) for more information.
-
-### Procedure for new release
-1. To make changes create a branch of the main repository with the name SVTK-XXX where XXX is the issue number of the task you are working on. If you are working on a code changing task (e.g. a task that will need building / testing of code) then you should create a feature branch e.g. feature/SVTK-XXX so that it is picked up by the automatic build process. 
-2. Make your changes to the new branch.
-2. Update version number in version.txt. Then run update_version.bat to update the version number across repo.
-3. Update ReleaseNotes.html with improvements, bug fixes, and known issues.
-4. Update the changelog.txt file with the changes the changes you have made and the associated GitHub issue number.
-6. Create a pull request on GitHub for merging your branch to the main branch. 
-7. Once the code has been tested and approved, merge the branch to the main branch. This will automatically create a new release.
