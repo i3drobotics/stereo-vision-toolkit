@@ -66,12 +66,6 @@ jobs:
           PROJ_VER=$(cat versioning/version.txt)
           echo "$PROJ_VER" > version.txt
           echo "PROJ_VER=$PROJ_VER" >> $GITHUB_ENV
-      - name: Get latest released version
-        shell: bash
-        run: | 
-            LATEST_SVTK_VERSION=${{steps.latest-svtk.outputs.tag}}
-            LATEST_SVTK_VERSION=${LATEST_SVTK_VERSION:1}
-            echo "LATEST_SVTK_VERSION=$LATEST_SVTK_VERSION" >> $GITHUB_ENV
       # Setup build environment
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
@@ -150,7 +144,7 @@ jobs:
           type: now
           target_branch: prod
           github_token: ${{ github.token }}
-          message: merged ${{ steps.commit-vars.outputs.sha_short }}
+          message: Release v${{ env.PROJ_VER }} ${{ steps.commit-vars.outputs.sha_short }}
       # Merge main back to production
       - name: Merge prod -> main
         uses: devmasx/merge-branch@master
@@ -159,4 +153,4 @@ jobs:
           from_branch: prod
           target_branch: main
           github_token: ${{ github.token }}
-          message: merged ${{ steps.commit-vars.outputs.sha_short }}
+          message: Release v${{ env.PROJ_VER }} ${{ steps.commit-vars.outputs.sha_short }}
