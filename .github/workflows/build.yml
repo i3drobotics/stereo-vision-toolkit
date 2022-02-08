@@ -39,7 +39,6 @@ jobs:
           name: version-file-${{ github.sha }}
           path: version.txt
 
-  # build and deploy new release
   build:
     needs: [versioning]
     runs-on: windows-latest
@@ -99,5 +98,15 @@ jobs:
           call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           mkdir build
           cd build
-          qmake.exe "CONFIG+=qtquickcompiler CONFIG+=WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
+          qmake.exe "CONFIG+=qtquickcompiler WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
           jom.exe
+
+  cleanup:
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    steps:
+      # Cleanup artifacts used for job sharing
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: version-file-${{ github.sha }}

@@ -26,6 +26,11 @@ public:
                                 AbstractStereoCamera::StereoCameraSettings camera_settings,
                                 QObject *parent = 0) :
                 StereoCameraBasler(serial_info, camera_settings, parent){
+        // flip cameras in x and y as mounted upside down
+        stereoCameraSettings_.flip_left_x = true;
+        stereoCameraSettings_.flip_left_y = true;
+        stereoCameraSettings_.flip_right_x = true;
+        stereoCameraSettings_.flip_right_y = true;
     }
 
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> listSystems();
