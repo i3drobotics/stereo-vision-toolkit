@@ -115,6 +115,11 @@ jobs:
         shell: bash
         run: |
           ./scripts/docs.sh
+      - name: Deploy docs
+        uses: JamesIves/github-pages-deploy-action@v4.2.3
+        with:
+          branch: docs # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
       # Create installer
       - name: Create installer
         shell: cmd
