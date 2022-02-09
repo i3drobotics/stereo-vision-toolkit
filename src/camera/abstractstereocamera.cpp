@@ -1142,9 +1142,13 @@ void AbstractStereoCamera::processMatch(){
     }
 
     //qDebug() << "Stereo matching...";
-    matcher->match(left_img,right_img);
-    //qDebug() << "Getting disparity from stereo match...";
-    matcher->getDisparity(disp);
+    bool match_success = matcher->match(left_img,right_img);
+    if (match_success){
+        //qDebug() << "Getting disparity from stereo match...";
+        matcher->getDisparity(disp);
+    } else {
+        disp = cv::Mat::zeros(cv::Size(left_img.rows, left_img.cols), CV_64FC1);
+    }
     disparity_mutex.lock();
     left_match = left_img.clone();
     right_match = right_img.clone();
