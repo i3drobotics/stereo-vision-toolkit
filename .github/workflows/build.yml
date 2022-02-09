@@ -100,6 +100,18 @@ jobs:
           cd build
           qmake.exe "CONFIG+=qtquickcompiler WITH_I3DRSGM" ../stereo_vision_toolkit.pro -spec win32-msvc
           jom.exe
+      # Create installer
+      - name: Create installer
+        shell: cmd
+        run: |
+          iscc installer\installer.iss
+      # Upload installer as artifact for testing
+      - name: Upload installer
+        uses: actions/upload-artifact@v2
+        with:
+          path: installer/Output/*.exe
+          name: build-installer-${{ github.sha }}
+          retention-days: 1
 
   cleanup:
     needs: [build]
