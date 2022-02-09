@@ -1,7 +1,7 @@
 # Stereo Vision Toolkit
 
 Changes:
-- Fix missing I3DRSGM in installer.
+- Show console when running application for better debugging.
 
 Known issues:
 - Requires manual restart after installation.
