@@ -2084,16 +2084,16 @@ void SVTKWindow::enableVideoCapture(bool enable){
             vid_fps = measured_fps;
         }
         AbstractStereoCamera::VideoSource vid_src = (AbstractStereoCamera::VideoSource)ui->comboBoxVideoSource->currentIndex();
-        int vid_codec = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
-        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO){ // requires lossless for re-loading of stereo videos without loss
-            //TODO replace this with lossless compression codec as currently creates very large files (raw uncompressed)
-            vid_codec = cv::VideoWriter::fourcc('R', 'G', 'B', 'A');
+        bool vid_color = true;
+        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO_MONO){
+            vid_color = false;
         }
-        stereo_cam->setVideoStreamParams("",vid_fps,vid_codec,true,vid_src);
+        stereo_cam->setVideoStreamParams(vid_fps,vid_color,vid_src);
 
         if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO ||
                 vid_src == AbstractStereoCamera::VIDEO_SRC_LEFT ||
-                vid_src == AbstractStereoCamera::VIDEO_SRC_RIGHT){
+                vid_src == AbstractStereoCamera::VIDEO_SRC_RIGHT ||
+                vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO_MONO){
 
             // Ask user if to record rectified frames
             QMessageBox msgBox;

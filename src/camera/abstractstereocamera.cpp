@@ -339,22 +339,25 @@ void AbstractStereoCamera::getQ(cv::Mat &Q_){
 }
 
 bool AbstractStereoCamera::setVideoSource(int source_index){
-    // 0: stereo, 1: left, 2:right, 3:disparity
+    // 0: stereo-mono, 1: stereo, 2: left, 3:right, 4:disparity
     switch(source_index) {
-    case 0: // stereo
+    case 0: // stereo-mono
+        video_src = VIDEO_SRC_STEREO_MONO;
+        break;
+    case 1: // stereo
         video_src = VIDEO_SRC_STEREO;
         break;
-    case 1: // left
+    case 2: // left
         video_src = VIDEO_SRC_LEFT;
         break;
-    case 2: // right
+    case 3: // right
         video_src = VIDEO_SRC_RIGHT;
         break;
-    case 3: // disparity
+    case 4: // disparity
         video_src = VIDEO_SRC_DISPARITY;
         break;
     default:
-        qDebug() << "Invalid video source index. MUST be 0: stereo, 1: left, 2:right, 3:disparity";
+        qDebug() << "Invalid video source index. MUST be 0: stereo-mono, 1: stereo, 2: left, 3:right, 4:disparity";
         return false;
         break;
     }
@@ -1090,13 +1093,38 @@ void AbstractStereoCamera::processStereo(void) {
         lr_image_mutex.unlock();
 
         if (capturing_video){
-            if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT){
+            if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT || video_src == VIDEO_SRC_STEREO_MONO){
                 if (video_src == VIDEO_SRC_STEREO){
                     if (capturing_rectified_video){
                         cv::hconcat(left_output, right_output, video_frame);
                     } else {
                         cv::hconcat(left_unrectified, right_unrectified, video_frame);
                     }
+                } else if (video_src == VIDEO_SRC_STEREO_MONO){
+                    cv::Mat left_tmp_st_mono, right_tmp_st_mono;
+                    if (capturing_rectified_video){
+                        left_output.copyTo(left_tmp_st_mono);
+                        right_output.copyTo(right_tmp_st_mono);
+                    } else {
+                        left_unrectified.copyTo(left_tmp_st_mono);
+                        right_unrectified.copyTo(right_tmp_st_mono);
+                    }
+                    // convert color frames into mono
+                    cv::Mat left_st_mono, right_st_mono;
+                    if (left_tmp_st_mono.type() == CV_8UC3){
+                        cvtColor(left_tmp_st_mono, left_st_mono, cv::COLOR_BGR2GRAY);
+                        cvtColor(right_tmp_st_mono, right_st_mono, cv::COLOR_BGR2GRAY);
+                    } else {
+                        std::cerr << "Invalid image type for saving stereo mono" << std::endl;
+                    }
+                    cv::Mat b = cv::Mat::zeros(cv::Size(left_st_mono.cols, left_st_mono.rows), CV_8UC1);
+                    cv::Mat g = left_st_mono;
+                    cv::Mat r = right_st_mono;
+                    std::vector<cv::Mat> channels;
+                    channels.push_back(b);
+                    channels.push_back(g);
+                    channels.push_back(r);
+                    cv::merge(channels, video_frame);
                 } else if (video_src == VIDEO_SRC_LEFT){
                     if (capturing_rectified_video){
                         left_output.copyTo(video_frame);
@@ -1227,6 +1255,9 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
         if (video_src == VIDEO_SRC_STEREO){
             video_width = 2 * image_width;
         }
+        if (video_src == VIDEO_SRC_STEREO_MONO){
+            video_is_color = true;
+        }
         if (video_is_color){
             video_frame = cv::Mat (image_height, video_width, CV_8UC3);
         } else {
@@ -1249,30 +1280,42 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
     return res;
 }
 
-bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int codec, bool is_color, VideoSource vid_src){
-    if (filename == "") {
-        QDateTime dateTime = dateTime.currentDateTime();
-        QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-        QString file_prefix;
-        switch(vid_src) {
-        case VIDEO_SRC_STEREO:
-            file_prefix = "stereo_video_";
-            break;
-        case VIDEO_SRC_LEFT:
-            file_prefix = "left_video_";
-            break;
-        case VIDEO_SRC_RIGHT:
-            file_prefix = "right_video_";
-            break;
-        case VIDEO_SRC_DISPARITY:
-            file_prefix = "disparity_video_";
-            break;
-        case VIDEO_SRC_RGBD:
-            file_prefix = "rgbd_video_";
-            break;
+bool AbstractStereoCamera::setVideoStreamParams(int fps, bool is_color, VideoSource vid_src){
+    int codec = cv::VideoWriter::fourcc('M','P','4','V');
+    QDateTime dateTime = dateTime.currentDateTime();
+    QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
+    QString file_prefix;
+    //int vid_codec = cv::VideoWriter::fourcc(*'MJPG');
+    QString extension = "mp4";
+    switch(vid_src) {
+    case VIDEO_SRC_STEREO_MONO:
+        file_prefix = "stereo_mono_video_";
+        if (is_color){
+            qDebug() << "is_color is true but video source is stereo mono so color will be ignored.";
+            is_color = false;
         }
-        video_filename = QString("%1/%2%3.avi").arg(save_directory, file_prefix, date_string).toStdString();
+        break;
+    case VIDEO_SRC_STEREO:
+        file_prefix = "stereo_video_";
+        extension = "avi";
+        break;
+    case VIDEO_SRC_LEFT:
+        file_prefix = "left_video_";
+        break;
+    case VIDEO_SRC_RIGHT:
+        file_prefix = "right_video_";
+        break;
+    case VIDEO_SRC_DISPARITY:
+        file_prefix = "disparity_video_";
+        break;
+    case VIDEO_SRC_RGBD:
+        file_prefix = "rgbd_video_";
+        extension = "avi";
+        //TODO replace this with lossless compression codec as currently creates very large files (raw uncompressed)
+        codec = cv::VideoWriter::fourcc('R','G','B','A');
+        break;
     }
+    video_filename = QString("%1/%2%3.%4").arg(save_directory, file_prefix, date_string, extension).toStdString();
 
     if (fps == 0) fps = 30;
     video_fps = fps;
