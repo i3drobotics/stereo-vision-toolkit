@@ -4,7 +4,7 @@ SETLOCAL
 :: set working directory to script directory
 SET initcwd=%cd%
 SET scriptpath=%~dp0
-cd %scriptpath:~0,-1%
+cd "%scriptpath:~0,-1%"
 cd ..
 
 :: define appcast file to update
@@ -35,6 +35,12 @@ set appcast_item_title_line=17
 set "appcast_item_title=			^<title^>Version %version%^</title^>"
 set appcast_item_pubDate_line=18
 set "appcast_item_pubDate=			^<pubDate^>%pubDate%^</pubDate^>"
+set appcast_guid_link_line=19
+set "appcast_guid_link=			^<guid isPermaLink=^"true^"^>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/v%version%/release.md^</guid^>"
+set appcast_link_line=22
+set "appcast_link=			^<link^>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/v%version%/release.md^</link^>"
+set appcast_sparkle_link_line=23
+set "appcast_sparkle_link=			^<sparkle:releaseNotesLink^>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/v%version%/release.md^</sparkle:releaseNotesLink^>"
 set appcast_fevor_url_line=31
 set "appcast_fevor_url=				url=^"https://github.com/i3drobotics/stereo-vision-toolkit/releases/latest/download/StereoVisionToolkit-%version%-Win64.exe^""
 set appcast_fervor_version_line=32
@@ -52,6 +58,12 @@ echo %appcast_fervor_version%
         echo %appcast_item_title%
     ) else if "%%~a"=="%appcast_item_pubDate_line%" (
         echo %appcast_item_pubDate%
+    ) else if "%%~a"=="%appcast_guid_link_line%" (
+        echo %appcast_guid_link%
+    ) else if "%%~a"=="%appcast_link_line%" (
+        echo %appcast_link%
+    ) else if "%%~a"=="%appcast_sparkle_link_line%" (
+        echo %appcast_sparkle_link%
     ) else if "%%~a"=="%appcast_fevor_url_line%" (
         echo %appcast_fevor_url%
     ) else if "%%~a"=="%appcast_fervor_version_line%" (
