@@ -53,12 +53,22 @@ signals:
     void videoPosition(int);
 
 private:
+    enum StereoVideoType {
+        RG_VIDEO = 0,
+        CONCAT_VIDEO = 1,
+        UNKNOWN_VIDEO = -1
+    };
+
+    cv::Mat extractFirstFrame();
+    StereoVideoType detectVideoType();
+
     QFuture<void> future;
     cv::VideoCapture stream;
     cv::Mat image_buffer;
     double number_frames;
     QElapsedTimer frame_timer;
     double video_fps;
+    StereoVideoType video_type;
 };
 
 #endif // STEREOCAMERAFROMVIDEO_H

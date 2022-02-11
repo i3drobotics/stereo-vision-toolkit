@@ -90,7 +90,7 @@ public:
 
     enum PointCloudTexture { POINT_CLOUD_TEXTURE_IMAGE, POINT_CLOUD_TEXTURE_DEPTH };
 
-    enum VideoSource { VIDEO_SRC_STEREO_MONO, VIDEO_SRC_STEREO, VIDEO_SRC_LEFT, VIDEO_SRC_RIGHT, VIDEO_SRC_DISPARITY, VIDEO_SRC_RGBD };
+    enum VideoSource { VIDEO_SRC_STEREO_RG, VIDEO_SRC_STEREO_CONCAT, VIDEO_SRC_LEFT, VIDEO_SRC_RIGHT, VIDEO_SRC_DISPARITY, VIDEO_SRC_RGBD };
 
     //! Structure to hold camera settings
     struct StereoCameraSettings {
@@ -331,7 +331,7 @@ public:
    * @param[in] vid_src video source type (enum)
    * @return success
   */
-    bool setVideoStreamParams(int fps = 0, bool is_color = false, VideoSource vid_src = VIDEO_SRC_STEREO_MONO);
+    bool setVideoStreamParams(int fps = 0, bool is_color = false, VideoSource vid_src = VIDEO_SRC_STEREO_RG);
     bool addVideoStreamFrame(cv::Mat frame);
 
     bool connected = false;
@@ -630,7 +630,7 @@ private:
     bool rectifying = false;
     bool capturing_video = false;
     bool capturing_rectified_video = true;
-    VideoSource video_src = VIDEO_SRC_STEREO_MONO;
+    VideoSource video_src = VIDEO_SRC_STEREO_RG;
     QMutex video_mutex;
     QMutex disparity_mutex;
     QMutex lr_image_mutex;

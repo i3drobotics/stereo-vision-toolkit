@@ -967,12 +967,12 @@
                 <widget class="QComboBox" name="comboBoxVideoSource">
                  <item>
                   <property name="text">
-                   <string>Stereo Mono</string>
+                   <string>Stereo RG</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>Stereo</string>
+                   <string>Stereo Concat</string>
                   </property>
                  </item>
                  <item>
@@ -2459,6 +2459,11 @@
   <action name="actionLoad_Calibration">
    <property name="text">
     <string>Load Calibration</string>
+   </property>
+  </action>
+  <action name="actionLoad_Stereo_Concat_Video">
+   <property name="text">
+    <string>Load Stereo Concat Video</string>
    </property>
   </action>
  </widget>
