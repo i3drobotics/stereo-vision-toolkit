@@ -56,7 +56,7 @@ void AbstractStereoCamera::assignThread(QThread *thread){
     thread_ = thread;
     this->moveToThread(thread_);
     connect(this, SIGNAL(finished()), thread_, SLOT(quit()));
-    //connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(thread_, SIGNAL(finished()), thread_, SLOT(deleteLater()));
     thread_->start();
     //thread_->setPriority(QThread::LowestPriority);
@@ -1288,7 +1288,7 @@ bool AbstractStereoCamera::setVideoStreamParams(int fps, bool is_color, VideoSou
     QDateTime dateTime = dateTime.currentDateTime();
     QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
     QString filename_prefix = "";
-    QString extension = "avi";
+    QString extension = "mp4";
     QString filename_suffix = "";
     switch(vid_src) {
     case VIDEO_SRC_STEREO_RG:
