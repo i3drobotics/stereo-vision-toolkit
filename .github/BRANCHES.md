@@ -19,3 +19,6 @@ This is the latest production code (stable).
 
 ## Issue tracking
 All other branches in the repository should be associated with a GitHub issue and deleted once the issue is resolved.
+
+## Master
+The 'master' branch is an old branch that is no longer used. It must be retained due to the Appcasts file used for updating old versions of the software.

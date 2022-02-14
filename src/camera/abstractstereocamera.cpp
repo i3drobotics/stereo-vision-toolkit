@@ -56,7 +56,7 @@ void AbstractStereoCamera::assignThread(QThread *thread){
     thread_ = thread;
     this->moveToThread(thread_);
     connect(this, SIGNAL(finished()), thread_, SLOT(quit()));
-    //connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(thread_, SIGNAL(finished()), thread_, SLOT(deleteLater()));
     thread_->start();
     //thread_->setPriority(QThread::LowestPriority);
@@ -339,22 +339,25 @@ void AbstractStereoCamera::getQ(cv::Mat &Q_){
 }
 
 bool AbstractStereoCamera::setVideoSource(int source_index){
-    // 0: stereo, 1: left, 2:right, 3:disparity
+    // 0: stereo RG, 1: stereo concat, 2: left, 3:right, 4:disparity
     switch(source_index) {
-    case 0: // stereo
-        video_src = VIDEO_SRC_STEREO;
+    case 0: // stereo RG
+        video_src = VIDEO_SRC_STEREO_RG;
         break;
-    case 1: // left
+    case 1: // stereo concat
+        video_src = VIDEO_SRC_STEREO_CONCAT;
+        break;
+    case 2: // left
         video_src = VIDEO_SRC_LEFT;
         break;
-    case 2: // right
+    case 3: // right
         video_src = VIDEO_SRC_RIGHT;
         break;
-    case 3: // disparity
+    case 4: // disparity
         video_src = VIDEO_SRC_DISPARITY;
         break;
     default:
-        qDebug() << "Invalid video source index. MUST be 0: stereo, 1: left, 2:right, 3:disparity";
+        qDebug() << "Invalid video source index. MUST be 0: stereo RG, 1: stereo concat, 2: left, 3:right, 4:disparity";
         return false;
         break;
     }
@@ -1090,25 +1093,47 @@ void AbstractStereoCamera::processStereo(void) {
         lr_image_mutex.unlock();
 
         if (capturing_video){
-            if (video_src == VIDEO_SRC_STEREO || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT){
-                if (video_src == VIDEO_SRC_STEREO){
-                    if (capturing_rectified_video){
-                        cv::hconcat(left_output, right_output, video_frame);
-                    } else {
-                        cv::hconcat(left_unrectified, right_unrectified, video_frame);
-                    }
+            if (video_src == VIDEO_SRC_STEREO_CONCAT || video_src == VIDEO_SRC_LEFT || video_src == VIDEO_SRC_RIGHT || video_src == VIDEO_SRC_STEREO_RG){
+                // get stereo images in both mono and color format for use in video recording
+                cv::Mat left_st_tmp, right_st_tmp;
+                if (capturing_rectified_video){
+                    left_output.copyTo(left_st_tmp);
+                    right_output.copyTo(right_st_tmp);
+                } else {
+                    left_unrectified.copyTo(left_st_tmp);
+                    right_unrectified.copyTo(right_st_tmp);
+                }
+                cv::Mat left_st_mono, right_st_mono;
+                cv::Mat left_st_color, right_st_color;
+                if (left_st_tmp.type() == CV_8UC3){
+                    cvtColor(left_st_tmp, left_st_mono, cv::COLOR_BGR2GRAY);
+                    cvtColor(right_st_tmp, right_st_mono, cv::COLOR_BGR2GRAY);
+                    left_st_tmp.copyTo(left_st_color);
+                    right_st_tmp.copyTo(right_st_color);
+                } else if (left_st_tmp.type() == CV_8UC1){
+                    cvtColor(left_st_tmp, left_st_color, cv::COLOR_GRAY2BGR);
+                    cvtColor(right_st_tmp, right_st_color, cv::COLOR_GRAY2BGR);
+                    left_st_tmp.copyTo(left_st_mono);
+                    right_st_tmp.copyTo(right_st_mono);
+                } else {
+                    std::cerr << "Invalid image type for saving video" << std::endl;
+                }
+
+                if (video_src == VIDEO_SRC_STEREO_CONCAT){
+                    cv::hconcat(left_st_color, right_st_color, video_frame);
+                } else if (video_src == VIDEO_SRC_STEREO_RG){
+                    cv::Mat b = cv::Mat::zeros(cv::Size(left_st_mono.cols, left_st_mono.rows), CV_8UC1);
+                    cv::Mat g = left_st_mono;
+                    cv::Mat r = right_st_mono;
+                    std::vector<cv::Mat> channels;
+                    channels.push_back(b);
+                    channels.push_back(g);
+                    channels.push_back(r);
+                    cv::merge(channels, video_frame);
                 } else if (video_src == VIDEO_SRC_LEFT){
-                    if (capturing_rectified_video){
-                        left_output.copyTo(video_frame);
-                    } else {
-                        left_unrectified.copyTo(video_frame);
-                    }
+                    left_st_color.copyTo(video_frame);
                 } else if (video_src == VIDEO_SRC_RIGHT){
-                    if (capturing_rectified_video){
-                        right_output.copyTo(video_frame);
-                    } else {
-                        right_unrectified.copyTo(video_frame);
-                    }
+                    right_st_color.copyTo(video_frame);
                 }
                 addVideoStreamFrame(video_frame);
             }
@@ -1142,9 +1167,13 @@ void AbstractStereoCamera::processMatch(){
     }
 
     //qDebug() << "Stereo matching...";
-    matcher->match(left_img,right_img);
-    //qDebug() << "Getting disparity from stereo match...";
-    matcher->getDisparity(disp);
+    bool match_success = matcher->match(left_img,right_img);
+    if (match_success){
+        //qDebug() << "Getting disparity from stereo match...";
+        matcher->getDisparity(disp);
+    } else {
+        disp = cv::Mat::zeros(cv::Size(left_img.rows, left_img.cols), CV_64FC1);
+    }
     disparity_mutex.lock();
     left_match = left_img.clone();
     right_match = right_img.clone();
@@ -1220,7 +1249,8 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
         //start video capture
         cv_video_writer = new cv::VideoWriter();
         int video_width = image_width;
-        if (video_src == VIDEO_SRC_STEREO){
+        bool video_is_color = true;
+        if (video_src == VIDEO_SRC_STEREO_CONCAT){
             video_width = 2 * image_width;
         }
         if (video_is_color){
@@ -1245,37 +1275,54 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
     return res;
 }
 
-bool AbstractStereoCamera::setVideoStreamParams(QString filename, int fps, int codec, bool is_color, VideoSource vid_src){
-    if (filename == "") {
-        QDateTime dateTime = dateTime.currentDateTime();
-        QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
-        QString file_prefix;
-        switch(vid_src) {
-        case VIDEO_SRC_STEREO:
-            file_prefix = "stereo_video_";
+bool AbstractStereoCamera::setVideoStreamParams(int fps, VideoSource vid_src){
+    int codec = cv::VideoWriter::fourcc('m','p','4','v');
+    QDateTime dateTime = dateTime.currentDateTime();
+    QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
+    QString filename_prefix = "";
+    QString extension = "mp4";
+    QString filename_suffix = "";
+    switch(vid_src) {
+        case VIDEO_SRC_STEREO_RG:
+            filename_prefix = "stereo_rg_video_";
+            filename_suffix = "_srgvid";
+            break;
+        case VIDEO_SRC_STEREO_CONCAT:
+            //TODO replace this codec as currently creates very large files (raw uncompressed)
+            // RGBA used due to very wide video not compatible with standard codecs
+            codec = cv::VideoWriter::fourcc('R', 'G', 'B', 'A');
+            filename_prefix = "stereo_concat_video_";
+            filename_suffix = "_sctvid";
+            extension = "avi";
             break;
         case VIDEO_SRC_LEFT:
-            file_prefix = "left_video_";
+            filename_prefix = "left_video_";
+            filename_suffix = "_lvid";
             break;
         case VIDEO_SRC_RIGHT:
-            file_prefix = "right_video_";
+            filename_prefix = "right_video_";
+            filename_suffix = "_rvid";
             break;
         case VIDEO_SRC_DISPARITY:
-            file_prefix = "disparity_video_";
+            filename_prefix = "disparity_video_";
+            filename_suffix = "_dvid";
             break;
         case VIDEO_SRC_RGBD:
-            file_prefix = "rgbd_video_";
+            //TODO replace this codec as currently creates very large files (raw uncompressed)
+            // RGBA used due to 4 channel video not compatible with standard codecs
+            codec = cv::VideoWriter::fourcc('R','G','B','A');
+            filename_prefix = "rgbd_video_";
+            filename_suffix = "_rgbdvid";
+            extension = "avi";
             break;
-        }
-        video_filename = QString("%1/%2%3.avi").arg(save_directory, file_prefix, date_string).toStdString();
     }
+    video_filename = QString("%1/%2%3%4.%5").arg(save_directory, filename_prefix, date_string, filename_suffix, extension).toStdString();
 
     if (fps == 0) fps = 30;
     video_fps = fps;
-
     video_codec = codec;
-    video_is_color = is_color;
     video_src = vid_src;
+
     return true;
 }
 

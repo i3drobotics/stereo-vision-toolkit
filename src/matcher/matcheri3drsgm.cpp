@@ -63,6 +63,10 @@ bool MatcherI3DRSGM::forwardMatch(cv::Mat left_img, cv::Mat right_img)
     if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
         cv::Mat oDisparity;
         oDisparity = this->i3drsgm->forwardMatch(left_img,right_img);
+        if (oDisparity.empty()){
+            qDebug() << "Forward match returned empty disparity";
+            return false;
+        }
         oDisparity.convertTo(disparity_lr, CV_32F, -16);
         return true;
     } else {
@@ -77,6 +81,10 @@ bool MatcherI3DRSGM::backwardMatch(cv::Mat left_img, cv::Mat right_img)
     if (left_img.type() == CV_8UC1 && right_img.type() == CV_8UC1){
         cv::Mat oDisparity;
         oDisparity = this->i3drsgm->backwardMatch(left_img,right_img);
+        if (oDisparity.empty()){
+            qDebug() << "Backward match returned empty disparity";
+            return false;
+        }
         oDisparity.convertTo(disparity_rl, CV_32F, -16);
         return true;
     } else {

@@ -100,6 +100,7 @@ public:
 private:
     Ui::SVTKWindow* ui;
     QThread* cam_thread;
+    QThread* detector_thread;
 
     int fps_measure_count = 0;
     float fps_measure_total = 0;

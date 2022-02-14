@@ -22,6 +22,6 @@ SET downloadpath=%downloadfolder%\%downloadfile%
 curl -o "%downloadpath%" -L %url%
 
 :: reset working directory
-cd %initcwd%
+cd "%initcwd%"
 
 ENDLOCAL

@@ -1,10 +1,8 @@
-name: Build
+name: Build Installer
+# Used to manually build an installer for developmental testing.
 
-# Triggers on main branch pushes
 on:
-  push:
-    branches: [ main ]
-  # Allow manual triggering
+  # Manual triggering
   workflow_dispatch:
 
 jobs:
@@ -100,6 +98,18 @@ jobs:
           cd build
           qmake.exe "CONFIG+=qtquickcompiler WITH_I3DRSGM SHOW_CONSOLE" ../stereo_vision_toolkit.pro -spec win32-msvc
           jom.exe
+      # Create installer
+      - name: Create installer
+        shell: cmd
+        run: |
+          iscc installer\installer.iss
+      # Upload installer as artifact for testing
+      - name: Upload installer
+        uses: actions/upload-artifact@v2
+        with:
+          path: installer/Output/*.exe
+          name: build-installer-${{ github.sha }}
+          retention-days: 7
 
   cleanup:
     needs: [build]

@@ -15,7 +15,7 @@ void DetectorOpenCV::assignThread(QThread *thread){
     thread_ = thread;
     this->moveToThread(thread_);
     connect(this, SIGNAL(finished()), thread_, SLOT(quit()));
-    //connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(thread_, SIGNAL(finished()), thread_, SLOT(deleteLater()));
     thread_->start();
     thread_->setPriority(QThread::LowestPriority);
