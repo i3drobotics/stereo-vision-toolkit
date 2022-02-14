@@ -22,7 +22,7 @@ qmake.exe "CONFIG+=debug qml_debug qtquickcompiler" ..\stereo_vision_toolkit.pro
 jom.exe
 
 :: reset working directory
-cd %initcwd%
+cd "%initcwd%"
 
 :: update version in docs & appcast
 call "scripts\update_version.bat"

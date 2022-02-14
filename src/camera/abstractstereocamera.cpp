@@ -357,7 +357,7 @@ bool AbstractStereoCamera::setVideoSource(int source_index){
         video_src = VIDEO_SRC_DISPARITY;
         break;
     default:
-        qDebug() << "Invalid video source index. MUST be 0: stereo-mono, 1: stereo, 2: left, 3:right, 4:disparity";
+        qDebug() << "Invalid video source index. MUST be 0: stereo RG, 1: stereo concat, 2: left, 3:right, 4:disparity";
         return false;
         break;
     }
@@ -1303,7 +1303,7 @@ bool AbstractStereoCamera::setVideoStreamParams(int fps, bool is_color, VideoSou
     case VIDEO_SRC_STEREO_CONCAT:
         filename_prefix = "stereo_concat_video_";
         filename_suffix = "_sctvid";
-        extension = "mp4";
+        extension = "avi";
         //TODO replace this codec as currently creates very large files (raw uncompressed)
         // RGBA used due to very wide video not compatible with standard codecs
         codec = cv::VideoWriter::fourcc('R', 'G', 'B', 'A');
@@ -1323,6 +1323,7 @@ bool AbstractStereoCamera::setVideoStreamParams(int fps, bool is_color, VideoSou
     case VIDEO_SRC_RGBD:
         filename_prefix = "rgbd_video_";
         filename_suffix = "_rgbdvid";
+        extension = "avi";
         //TODO replace this codec as currently creates very large files (raw uncompressed)
         // RGBA used due to 4 channel video not compatible with standard codecs
         codec = cv::VideoWriter::fourcc('R','G','B','A');

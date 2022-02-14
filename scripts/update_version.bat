@@ -10,8 +10,10 @@ cd ..
 :: define appcast file to update
 set appcast_file=Appcast.xml
 set index_file=index.html
+set doxy_file=Doxyfile
 set tmp_appcast_file=Appcast_tmp.xml
 set tmp_index_file=tmp_index.html
+set tmp_doxy_file=Doxyfile_tmp
 
 :: read i3drsgm version from file
 set /p version=< version.txt
@@ -76,6 +78,9 @@ echo %appcast_fervor_version%
 copy %tmp_appcast_file% %appcast_file%
 del %tmp_appcast_file%
 
+cd "%initcwd%"
+cd ..\\docs
+
 :: update version in index file
 set index_version_line=10
 set "index_version=  ^<h3^>Latest release: %version%^</h3^>"
@@ -84,8 +89,6 @@ set "index_version_link=  ^<button onclick=^"location.href='https://github.com/i
 
 echo %index_version%
 echo %index_version_link%
-
-cd docs
 
 (for /f "tokens=1* delims=[]" %%a in ('find /n /v "##" ^< "%index_file%"') do (
     if "%%~a"=="%index_version_line%" (
@@ -100,8 +103,28 @@ cd docs
 copy %tmp_index_file% %index_file%
 del %tmp_index_file%
 
+cd "%initcwd%"
+cd ..
+
+:: update version in doxyfile
+set doxy_version_line=40
+set "doxy_version=PROJECT_NUMBER         = %version%"
+
+echo %doxy_version%
+
+(for /f "tokens=1* delims=[]" %%a in ('find /n /v "##" ^< "%doxy_file%"') do (
+    if "%%~a"=="%doxy_version_line%" (
+        echo %doxy_version%
+    ) ELSE (
+        echo.%%b
+    )
+)) > %tmp_doxy_file%
+
+copy %tmp_doxy_file% %doxy_file%
+del %tmp_doxy_file%
+
 :: reset working directory
-cd %initcwd%
+cd "%initcwd%"
 
 :: complete message
 echo update complete.
