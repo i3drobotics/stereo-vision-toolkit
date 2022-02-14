@@ -108,7 +108,7 @@ var class_abstract_stereo_camera =
     [ "setGain", "class_abstract_stereo_camera.html#aee2dbdbc334d898e4cae8930ab2f60a5", null ],
     [ "setPacketSize", "class_abstract_stereo_camera.html#aad356af22f5ec7412c68c3ba6db9a625", null ],
     [ "setSavelocation", "class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991", null ],
-    [ "setVideoStreamParams", "class_abstract_stereo_camera.html#aaec60ad16288d9c3eb937391ab2351b6", null ],
+    [ "setVideoStreamParams", "class_abstract_stereo_camera.html#a97c998d7bf5db4d0ff4846ce0fb98909", null ],
     [ "setVisualZmax", "class_abstract_stereo_camera.html#a5da7d8b7074a30583f22d0efd0af5f28", null ],
     [ "setVisualZmin", "class_abstract_stereo_camera.html#a176f96b1e0cadc210b4a4b73bd51069e", null ],
     [ "stereo_process_finished", "class_abstract_stereo_camera.html#a1c43b1a923597f795563bf0dcfc172b6", null ],

@@ -23,7 +23,7 @@ var searchData=
   ['setrightimages_20',['setRightImages',['../class_calibrate_from_images_dialog.html#a36775d29f4725885b11f2138824f4102',1,'CalibrateFromImagesDialog']]],
   ['setsavelocation_21',['setSavelocation',['../class_abstract_stereo_camera.html#aad94fb2509d7c36d33eb176c28963991',1,'AbstractStereoCamera']]],
   ['settings_22',['settings',['../class_calibration_dialog.html#a488457d2d4ebe4fcf6efdfaa77275708',1,'CalibrationDialog::settings()'],['../class_calibrate_from_images_dialog.html#a19edd5ac29a4d5a20c6beaa0275be925',1,'CalibrateFromImagesDialog::settings()']]],
-  ['setvideostreamparams_23',['setVideoStreamParams',['../class_abstract_stereo_camera.html#aaec60ad16288d9c3eb937391ab2351b6',1,'AbstractStereoCamera']]],
+  ['setvideostreamparams_23',['setVideoStreamParams',['../class_abstract_stereo_camera.html#a97c998d7bf5db4d0ff4846ce0fb98909',1,'AbstractStereoCamera']]],
   ['setvisualzmax_24',['setVisualZmax',['../class_abstract_stereo_camera.html#a5da7d8b7074a30583f22d0efd0af5f28',1,'AbstractStereoCamera']]],
   ['setvisualzmin_25',['setVisualZmin',['../class_abstract_stereo_camera.html#a176f96b1e0cadc210b4a4b73bd51069e',1,'AbstractStereoCamera']]],
   ['size_5fmin_5fchange_26',['size_min_change',['../class_calibration_dialog.html#ae513b4a4655f86a8bbf6b49b49edb563',1,'CalibrationDialog']]],

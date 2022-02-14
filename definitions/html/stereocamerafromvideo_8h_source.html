@@ -25,7 +25,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Stereo Vision Toolkit<span id="projectnumber">&#160;1.3.1</span>
+   <div id="projectname">Stereo Vision Toolkit<span id="projectnumber">&#160;0.0.0</span>
    </div>
   </td>
  </tr>
@@ -136,15 +136,25 @@ $(document).ready(function(){initNavTree('stereocamerafromvideo_8h_source.html',
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <span class="keywordtype">void</span> videoPosition(<span class="keywordtype">int</span>);</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    QFuture&lt;void&gt; future;</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    cv::VideoCapture stream;</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    cv::Mat image_buffer;</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <span class="keywordtype">double</span> number_frames;</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    QElapsedTimer frame_timer;</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="keywordtype">double</span> video_fps;</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>};</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#endif </span><span class="comment">// STEREOCAMERAFROMVIDEO_H</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keyword">enum</span> StereoVideoType {</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        RG_VIDEO = 0,</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        CONCAT_VIDEO = 1,</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        UNKNOWN_VIDEO = -1</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    };</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    cv::Mat extractFirstFrame();</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    StereoVideoType detectVideoType();</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    QFuture&lt;void&gt; future;</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    cv::VideoCapture stream;</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    cv::Mat image_buffer;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordtype">double</span> number_frames;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    QElapsedTimer frame_timer;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">double</span> video_fps;</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    StereoVideoType video_type;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>};</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#endif </span><span class="comment">// STEREOCAMERAFROMVIDEO_H</span></div>
 <div class="ttc" id="aclass_abstract_stereo_camera_html"><div class="ttname"><a href="class_abstract_stereo_camera.html">AbstractStereoCamera</a></div><div class="ttdoc">Stereo camera base class.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00068">abstractstereocamera.h:68</a></div></div>
 <div class="ttc" id="aclass_stereo_camera_from_video_html"><div class="ttname"><a href="class_stereo_camera_from_video.html">StereoCameraFromVideo</a></div><div class="ttdoc">Stereo video feed.</div><div class="ttdef"><b>Definition:</b> <a href="stereocamerafromvideo_8h_source.html#l00017">stereocamerafromvideo.h:18</a></div></div>
 <div class="ttc" id="astruct_abstract_stereo_camera_1_1_stereo_camera_serial_info_html"><div class="ttname"><a href="struct_abstract_stereo_camera_1_1_stereo_camera_serial_info.html">AbstractStereoCamera::StereoCameraSerialInfo</a></div><div class="ttdoc">Structure to hold stereo camera information.</div><div class="ttdef"><b>Definition:</b> <a href="abstractstereocamera_8h_source.html#l00115">abstractstereocamera.h:115</a></div></div>
@@ -155,7 +165,7 @@ $(document).ready(function(){initNavTree('stereocamerafromvideo_8h_source.html',
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_34519bff5ae72130fe71a8620cbf1fc0.html">camera</a></li><li class="navelem"><b>stereocamerafromvideo.h</b></li>
-    <li class="footer">Generated on Wed Feb 9 2022 12:04:32 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
+    <li class="footer">Generated on Mon Feb 14 2022 16:08:17 for Stereo Vision Toolkit by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.3 </li>
   </ul>
 </div>
 </body>
