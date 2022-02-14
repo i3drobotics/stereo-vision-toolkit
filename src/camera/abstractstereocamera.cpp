@@ -1276,7 +1276,7 @@ bool AbstractStereoCamera::enableVideoStream(bool enable){
 }
 
 bool AbstractStereoCamera::setVideoStreamParams(int fps, VideoSource vid_src){
-    int codec = cv::VideoWriter::fourcc('M','P','4','V');
+    int codec = cv::VideoWriter::fourcc('m','p','4','v');
     QDateTime dateTime = dateTime.currentDateTime();
     QString date_string = dateTime.toString("yyyyMMdd_hhmmss_zzz");
     QString filename_prefix = "";
