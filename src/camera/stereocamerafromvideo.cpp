@@ -47,6 +47,7 @@ StereoCameraFromVideo::StereoVideoType StereoCameraFromVideo::detectVideoType(){
         return StereoVideoType::UNKNOWN_VIDEO;
     }
     filename = fname.substr(0, lastdot);
+    std::string extension = fname.substr(lastdot, fname.size() - lastdot);
     std::string last_6 = filename.substr(filename.size() - 6);
     qDebug() << last_6.c_str();
     // rg stereo video must have 'srgvid' before extension in filename
@@ -57,9 +58,14 @@ StereoCameraFromVideo::StereoVideoType StereoCameraFromVideo::detectVideoType(){
     if (last_6 == "sctvid"){
         return StereoVideoType::CONCAT_VIDEO;
     }
-    // if it doesn't assume it's rg stereo video as this is the default
-    qDebug() << "srgvid or sctvid missing from filename. Assuming Stereo RG video.";
-    return StereoVideoType::RG_VIDEO;
+    // if it doesn't assume 'mp4' is stereo RG video and 'avi' is stereo concat video
+    if (extension == ".mp4"){
+        return StereoVideoType::RG_VIDEO;
+    } else if (extension == ".avi"){
+        return StereoVideoType::CONCAT_VIDEO;
+    }
+    qDebug() << "Unknown or invalid file extension in stereo video";
+    return StereoVideoType::UNKNOWN_VIDEO;
 }
 
 bool StereoCameraFromVideo::openCamera(){

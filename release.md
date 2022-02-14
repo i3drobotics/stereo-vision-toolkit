@@ -3,6 +3,7 @@
 Changes:
 - Show console when running application.
 - Add stereo RG video saving/loading for lower sized videos (mono stereo only, previous stereo video type is now called stereo concat).
+- Will attempt to detect stereo video type from filename when loading from File->Load Stereo video by looking for 'srgvid' or 'sctvid'. If this is missing then 'mp4' files are assumed to be stereo RG videos and 'avi' files stereo concat videos.
 - Remove doxyfile generated files from repository.
 - Fix appcast release info not loading. Release file (release.md) is now referenced as github raw link on prod branch.
 
