@@ -15,14 +15,14 @@ call "%visual_studio_path%\VC\Auxiliary\Build\vcvars64.bat"
 mkdir build
 cd build
 :: release build
-qmake.exe "CONFIG+=qtquickcompiler WITH_I3DRSGM" ..\stereo_vision_toolkit.pro -spec win32-msvc
+qmake.exe "CONFIG+=qtquickcompiler WITH_I3DRSGM SHOW_CONSOLE" ..\stereo_vision_toolkit.pro -spec win32-msvc
 jom.exe
 :: debug build
 qmake.exe "CONFIG+=debug qml_debug qtquickcompiler" ..\stereo_vision_toolkit.pro -spec win32-msvc
 jom.exe
 
 :: reset working directory
-cd %initcwd%
+cd "%initcwd%"
 
 :: update version in docs & appcast
 call "scripts\update_version.bat"

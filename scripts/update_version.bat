@@ -4,14 +4,16 @@ SETLOCAL
 :: set working directory to script directory
 SET initcwd=%cd%
 SET scriptpath=%~dp0
-cd %scriptpath:~0,-1%
+cd "%scriptpath:~0,-1%"
 cd ..
 
 :: define appcast file to update
 set appcast_file=Appcast.xml
 set index_file=index.html
+set doxy_file=Doxyfile
 set tmp_appcast_file=Appcast_tmp.xml
 set tmp_index_file=tmp_index.html
+set tmp_doxy_file=Doxyfile_tmp
 
 :: read i3drsgm version from file
 set /p version=< version.txt
@@ -35,6 +37,12 @@ set appcast_item_title_line=17
 set "appcast_item_title=			^<title^>Version %version%^</title^>"
 set appcast_item_pubDate_line=18
 set "appcast_item_pubDate=			^<pubDate^>%pubDate%^</pubDate^>"
+set appcast_guid_link_line=19
+set "appcast_guid_link=			^<guid isPermaLink=^"true^"^>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/v%version%/release.md^</guid^>"
+set appcast_link_line=22
+set "appcast_link=			^<link^>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/v%version%/release.md^</link^>"
+set appcast_sparkle_link_line=23
+set "appcast_sparkle_link=			^<sparkle:releaseNotesLink^>https://raw.githubusercontent.com/i3drobotics/stereo-vision-toolkit/v%version%/release.md^</sparkle:releaseNotesLink^>"
 set appcast_fevor_url_line=31
 set "appcast_fevor_url=				url=^"https://github.com/i3drobotics/stereo-vision-toolkit/releases/latest/download/StereoVisionToolkit-%version%-Win64.exe^""
 set appcast_fervor_version_line=32
@@ -52,6 +60,12 @@ echo %appcast_fervor_version%
         echo %appcast_item_title%
     ) else if "%%~a"=="%appcast_item_pubDate_line%" (
         echo %appcast_item_pubDate%
+    ) else if "%%~a"=="%appcast_guid_link_line%" (
+        echo %appcast_guid_link%
+    ) else if "%%~a"=="%appcast_link_line%" (
+        echo %appcast_link%
+    ) else if "%%~a"=="%appcast_sparkle_link_line%" (
+        echo %appcast_sparkle_link%
     ) else if "%%~a"=="%appcast_fevor_url_line%" (
         echo %appcast_fevor_url%
     ) else if "%%~a"=="%appcast_fervor_version_line%" (
@@ -64,6 +78,9 @@ echo %appcast_fervor_version%
 copy %tmp_appcast_file% %appcast_file%
 del %tmp_appcast_file%
 
+cd "%initcwd%"
+cd ..\\docs
+
 :: update version in index file
 set index_version_line=10
 set "index_version=  ^<h3^>Latest release: %version%^</h3^>"
@@ -72,8 +89,6 @@ set "index_version_link=  ^<button onclick=^"location.href='https://github.com/i
 
 echo %index_version%
 echo %index_version_link%
-
-cd docs
 
 (for /f "tokens=1* delims=[]" %%a in ('find /n /v "##" ^< "%index_file%"') do (
     if "%%~a"=="%index_version_line%" (
@@ -88,8 +103,28 @@ cd docs
 copy %tmp_index_file% %index_file%
 del %tmp_index_file%
 
+cd "%initcwd%"
+cd ..
+
+:: update version in doxyfile
+set doxy_version_line=40
+set "doxy_version=PROJECT_NUMBER         = %version%"
+
+echo %doxy_version%
+
+(for /f "tokens=1* delims=[]" %%a in ('find /n /v "##" ^< "%doxy_file%"') do (
+    if "%%~a"=="%doxy_version_line%" (
+        echo %doxy_version%
+    ) ELSE (
+        echo.%%b
+    )
+)) > %tmp_doxy_file%
+
+copy %tmp_doxy_file% %doxy_file%
+del %tmp_doxy_file%
+
 :: reset working directory
-cd %initcwd%
+cd "%initcwd%"
 
 :: complete message
 echo update complete.

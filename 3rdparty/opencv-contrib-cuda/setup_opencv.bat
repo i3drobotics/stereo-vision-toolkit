@@ -74,6 +74,6 @@ del %downloadfile%
 echo OpenCV install complete.
 
 :: reset working directory
-cd %initcwd%
+cd "%initcwd%"
 
 ENDLOCAL

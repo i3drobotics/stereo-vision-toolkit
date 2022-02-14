@@ -17,9 +17,10 @@ SVTKWindow::SVTKWindow(QWidget* parent)
     // Required outside of the camera class definitions as 'list_systems' is slow otherwise
     // due to it having to re-initalise api's
     Pylon::PylonInitialize();
+    pylonTlFactory = &Pylon::CTlFactory::GetInstance();
     DShowLib::InitLibrary();
     tisgrabber = new DShowLib::Grabber();
-    pylonTlFactory = &Pylon::CTlFactory::GetInstance();
+
 
     ui->imageViewTab->raise();
     ui->tabWidget->lower();
@@ -291,7 +292,6 @@ void SVTKWindow::downloadUpdateComplete(){
 void SVTKWindow::checkUpdates(){
 
     // Set the Fervor appcast url
-    //TODO fix developer version update system
     FvUpdater::sharedUpdater()->SetFeedURL("https://github.com/i3drobotics/stereo-vision-toolkit/releases/latest/download/Appcast.xml");
 
     // Print current version to debug
@@ -522,7 +522,7 @@ void SVTKWindow::detectionInit(){
     QCoreApplication::processEvents();
 
     object_detector = new DetectorOpenCV();
-    QThread* detector_thread = new QThread;
+    detector_thread = new QThread;
     object_detector->assignThread(detector_thread);
 
     object_detection_display = new CameraDisplayWidget(this);
@@ -2084,16 +2084,12 @@ void SVTKWindow::enableVideoCapture(bool enable){
             vid_fps = measured_fps;
         }
         AbstractStereoCamera::VideoSource vid_src = (AbstractStereoCamera::VideoSource)ui->comboBoxVideoSource->currentIndex();
-        int vid_codec = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
-        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO){ // requires lossless for re-loading of stereo videos without loss
-            //TODO replace this with lossless compression codec as currently creates very large files (raw uncompressed)
-            vid_codec = cv::VideoWriter::fourcc('R', 'G', 'B', 'A');
-        }
-        stereo_cam->setVideoStreamParams("",vid_fps,vid_codec,true,vid_src);
+        stereo_cam->setVideoStreamParams(vid_fps,vid_src);
 
-        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO ||
+        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO_CONCAT ||
                 vid_src == AbstractStereoCamera::VIDEO_SRC_LEFT ||
-                vid_src == AbstractStereoCamera::VIDEO_SRC_RIGHT){
+                vid_src == AbstractStereoCamera::VIDEO_SRC_RIGHT ||
+                vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO_RG){
 
             // Ask user if to record rectified frames
             QMessageBox msgBox;
@@ -2827,6 +2823,12 @@ void SVTKWindow::closeEvent(QCloseEvent *) {
     system.Shutdown();
 #endif
 
+    qDebug() << "Shutting down Pylon...";
+    Pylon::PylonTerminate();
+    
+    qDebug() << "Removing TIS grabber...";
+    delete(tisgrabber);
+
     // Close external windows
     qDebug() << "Closing external windows...";
     about_dialog->close();
@@ -2837,20 +2839,15 @@ void SVTKWindow::closeEvent(QCloseEvent *) {
         calibration_images_dialog->close();
     }
 
-    qDebug() << "Shutting down Pylon...";
-    Pylon::PylonTerminate();
-
-    qDebug() << "Removing TIS grabber...";
-    delete(tisgrabber);
+    qDebug() << "Closing FvUpdater...";
+    FvUpdater::drop();
 
     qDebug() << "Close event complete.";
 }
 
 SVTKWindow::~SVTKWindow() {
-    qDebug() << "Cleaning up threads...";
-    if (object_detector)
-        delete(object_detector);
     qDebug() << "Closing ui...";
     delete ui;
     QApplication::quit();
+    qDebug() << "Done.";
 }

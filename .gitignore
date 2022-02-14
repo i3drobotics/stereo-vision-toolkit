@@ -4,6 +4,7 @@ Doxyfile.bak
 *.tmp
 *.qt_for_python
 .vscode/
+version.txt
 installer/Output/*
 3rdparty/i3drsgm-1.0.9/token.txt
 3rdparty/i3drsgm-1.0.9/i3drsgm

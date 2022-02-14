@@ -93,6 +93,6 @@ cd ..
 del %downloadfile%
 
 :: reset working directory
-cd %initcwd%
+cd "%initcwd%"
 
 EXIT /B %ERRORLEVEL%

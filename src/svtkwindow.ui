@@ -202,7 +202,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>310</width>
-                    <height>201</height>
+                    <height>179</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -837,7 +837,7 @@
                <item row="5" column="0">
                 <widget class="QLabel" name="lblVideoSource">
                  <property name="text">
-                  <string>Source</string>
+                  <string>Format</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -963,30 +963,6 @@
                  </property>
                 </spacer>
                </item>
-               <item row="5" column="1">
-                <widget class="QComboBox" name="comboBoxVideoSource">
-                 <item>
-                  <property name="text">
-                   <string>Stereo</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Left</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Right</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Disparity</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="lblSwapLR">
                  <property name="enabled">
@@ -1003,7 +979,7 @@
                <item row="8" column="0">
                 <widget class="QLabel" name="lblSharedMemSource">
                  <property name="text">
-                  <string>Source</string>
+                  <string>Format</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1144,6 +1120,35 @@
                  <property name="checked">
                   <bool>true</bool>
                  </property>
+                </widget>
+               </item>
+               <item row="5" column="1" colspan="2">
+                <widget class="QComboBox" name="comboBoxVideoSource">
+                 <item>
+                  <property name="text">
+                   <string>Stereo RG</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Stereo Concat</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Left</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Right</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Disparity</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
               </layout>
@@ -2454,6 +2459,11 @@
   <action name="actionLoad_Calibration">
    <property name="text">
     <string>Load Calibration</string>
+   </property>
+  </action>
+  <action name="actionLoad_Stereo_Concat_Video">
+   <property name="text">
+    <string>Load Stereo Concat Video</string>
    </property>
   </action>
  </widget>

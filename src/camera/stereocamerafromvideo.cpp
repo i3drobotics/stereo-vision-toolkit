@@ -5,9 +5,77 @@
 
 #include "stereocamerafromvideo.h"
 
+cv::Mat StereoCameraFromVideo::extractFirstFrame(){
+    if (isConnected()){
+        qDebug() << "Cannot extract first frame when already connected";
+        return cv::Mat();
+    }
+    std::string fname = stereoCameraSerialInfo_.left_camera_serial;
+    stream = cv::VideoCapture(fname);
+
+    cv::Mat firstFrame;
+    stream.read(firstFrame);
+
+    if (stream.isOpened()) {
+        stream.release();
+    }
+
+    return firstFrame;
+}
+
+StereoCameraFromVideo::StereoVideoType StereoCameraFromVideo::detectVideoType(){
+    cv::Mat firstFrame = extractFirstFrame();
+    if (firstFrame.empty()){
+        qDebug() << "Could not extract first frame for video type detection";
+        return StereoVideoType::UNKNOWN_VIDEO;
+    }
+    if (firstFrame.channels() == 1){
+        return StereoVideoType::CONCAT_VIDEO;
+    }
+
+    if (firstFrame.channels() != 3){
+        qDebug() << "Could not detect type version, invalid number of channels";
+        return StereoVideoType::UNKNOWN_VIDEO;
+    }
+
+    std::string fname = stereoCameraSerialInfo_.left_camera_serial;
+    // remove extension from filename
+    std::string filename;
+    size_t lastdot = fname.find_last_of(".");
+    if (lastdot == std::string::npos){
+        qDebug() << "File is missing extension";
+        return StereoVideoType::UNKNOWN_VIDEO;
+    }
+    filename = fname.substr(0, lastdot);
+    std::string extension = fname.substr(lastdot, fname.size() - lastdot);
+    std::string last_6 = filename.substr(filename.size() - 6);
+    qDebug() << last_6.c_str();
+    // rg stereo video must have 'srgvid' before extension in filename
+    if (last_6 == "srgvid"){
+        return StereoVideoType::RG_VIDEO;
+    }
+    // concat stereo video must have 'sctvid' before extension in filename
+    if (last_6 == "sctvid"){
+        return StereoVideoType::CONCAT_VIDEO;
+    }
+    // if it doesn't assume 'mp4' is stereo RG video and 'avi' is stereo concat video
+    if (extension == ".mp4"){
+        return StereoVideoType::RG_VIDEO;
+    } else if (extension == ".avi"){
+        return StereoVideoType::CONCAT_VIDEO;
+    }
+    qDebug() << "Unknown or invalid file extension in stereo video";
+    return StereoVideoType::UNKNOWN_VIDEO;
+}
+
 bool StereoCameraFromVideo::openCamera(){
     if (isConnected()){
         closeCamera();
+    }
+    video_type = detectVideoType();
+    if (video_type == StereoVideoType::UNKNOWN_VIDEO){
+        connected = false;
+        return false;
     }
     int fps = stereoCameraSettings_.fps;
     std::string fname = stereoCameraSerialInfo_.left_camera_serial;
@@ -16,7 +84,15 @@ bool StereoCameraFromVideo::openCamera(){
 
     if (stream.isOpened()) {
         image_height = stream.get(cv::CAP_PROP_FRAME_HEIGHT);
-        image_width = stream.get(cv::CAP_PROP_FRAME_WIDTH) / 2;
+        if (video_type == StereoVideoType::CONCAT_VIDEO){
+            image_width = stream.get(cv::CAP_PROP_FRAME_WIDTH) / 2;
+        } else if (video_type == StereoVideoType::RG_VIDEO){
+            image_width = stream.get(cv::CAP_PROP_FRAME_WIDTH);
+        } else {
+            connected = false;
+            return false;
+        }
+        
         image_bitdepth = 1; //TODO get bit depth
         emit update_size(image_width, image_height, image_bitdepth);
 
@@ -64,12 +140,21 @@ bool StereoCameraFromVideo::captureSingle(){
         //if(image_buffer.channels() == 3)
         //    cv::cvtColor(image_buffer, image_buffer, cv::COLOR_RGB2GRAY);
 
-        cv::Mat(image_buffer,
+        if (video_type == StereoVideoType::CONCAT_VIDEO){
+            cv::Mat(image_buffer,
                 cv::Rect(0, 0, image_buffer.cols / 2, image_buffer.rows))
                 .copyTo(left_raw);
-        cv::Mat(image_buffer, cv::Rect(image_buffer.cols / 2, 0,
-                                       image_buffer.cols / 2, image_buffer.rows))
-                .copyTo(right_raw);
+            cv::Mat(image_buffer, cv::Rect(image_buffer.cols / 2, 0,
+                                        image_buffer.cols / 2, image_buffer.rows))
+                    .copyTo(right_raw);
+        } else if (video_type == StereoVideoType::RG_VIDEO){
+            cv::Mat bgr[3];
+            cv::split(image_buffer, bgr);
+            bgr[1].copyTo(left_raw);
+            bgr[2].copyTo(right_raw);
+        } else {
+            res = false;
+        }
 
         frame_timer.restart();
     }
