@@ -327,11 +327,10 @@ public:
    * @param[in] filename The output filename
    * @param[in] fps frames per second
    * @param[in] codec video codec
-   * @param[in] is_color is color video otherwise grayscale
    * @param[in] vid_src video source type (enum)
    * @return success
   */
-    bool setVideoStreamParams(int fps = 0, bool is_color = false, VideoSource vid_src = VIDEO_SRC_STEREO_RG);
+    bool setVideoStreamParams(int fps = 0, VideoSource vid_src = VIDEO_SRC_STEREO_RG);
     bool addVideoStreamFrame(cv::Mat frame);
 
     bool connected = false;
@@ -741,11 +740,7 @@ private:
     int cal_image_height;
 
     int video_fps = 0;
-    //int video_codec = cv::VideoWriter::fourcc('H', '2', '6', '4');
-    //int video_codec = cv::VideoWriter::fourcc('H', 'E', 'V', 'C');
     int video_codec = cv::VideoWriter::fourcc('M','J','P','G');
-    //int video_codec = cv::VideoWriter::fourcc('a','v','c','1');
-    bool video_is_color = true;
     std::string video_filename = "";
     cv::Mat video_frame;
 

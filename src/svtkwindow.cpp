@@ -2084,11 +2084,7 @@ void SVTKWindow::enableVideoCapture(bool enable){
             vid_fps = measured_fps;
         }
         AbstractStereoCamera::VideoSource vid_src = (AbstractStereoCamera::VideoSource)ui->comboBoxVideoSource->currentIndex();
-        bool vid_color = true;
-        if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO_RG){
-            vid_color = false;
-        }
-        stereo_cam->setVideoStreamParams(vid_fps,vid_color,vid_src);
+        stereo_cam->setVideoStreamParams(vid_fps,vid_src);
 
         if (vid_src == AbstractStereoCamera::VIDEO_SRC_STEREO_CONCAT ||
                 vid_src == AbstractStereoCamera::VIDEO_SRC_LEFT ||
