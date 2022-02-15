@@ -15,14 +15,6 @@ jobs:
       # Checkout submodules (required for fever module used in app update system)
       - name: Checkout submodules
         run: git submodule update --init --recursive
-
-      # Get project version
-      # Get project version
-      - name: Download version file artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: version-file-${{ github.sha }}
-          path: versioning
       - name: Set placeholder project version
         shell: bash
         run: |
