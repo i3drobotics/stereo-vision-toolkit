@@ -17,6 +17,10 @@ void AbstractStereoMatcher::assignThread(QThread *thread) {
     thread->start();
 }
 
+void AbstractStereoMatcher::stopThread(){
+    emit finished();
+}
+
 void AbstractStereoMatcher::convertImages(cv::Mat left_img, cv::Mat right_img, cv::Mat& left_bgr_conv_img, cv::Mat& left_conv_img, cv::Mat& right_conv_img) {
     cv::Mat right_tmp, left_tmp, left_bgr_tmp;
 

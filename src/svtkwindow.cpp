@@ -1556,9 +1556,9 @@ void SVTKWindow::stereoCameraRelease(void) {
 
         QCoreApplication::processEvents();
 
-        //stereo_cam->finishThread();
+        stereo_cam->stopThread();
 
-        delete stereo_cam;
+        //delete stereo_cam;
 
         qDebug() << "Camera disconnected";
 
@@ -2814,6 +2814,7 @@ void SVTKWindow::closeEvent(QCloseEvent *) {
 
     qDebug() << "Closing application...";
     stopDeviceListTimer();
+    //killTimer(this->device_list_timer->timerId());
 
 #ifdef WITH_VIMBA
     // Close the Vimba API here.
@@ -2849,4 +2850,5 @@ SVTKWindow::~SVTKWindow() {
     delete ui;
     QApplication::quit();
     qDebug() << "Done.";
+    Pylon::PylonTerminate();
 }
