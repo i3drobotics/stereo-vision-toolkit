@@ -39,21 +39,24 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
         }
     }
     
-    for (size_t i = 0; i < valid_titania_devices_left.size(); ++i)
+    for (auto& valid_titania_device_left : valid_titania_devices_left)
     {
-        for (size_t j = 0; j < valid_titania_devices_right.size(); ++i)
+        for (auto& valid_titania_device_right : valid_titania_devices_right)
         {
-            std::string left_device_name = std::string(valid_titania_devices_left[i].GetUserDefinedName());
-            std::string right_device_name = std::string(valid_titania_devices_right[j].GetUserDefinedName());
+            std::string left_device_name = std::string(valid_titania_device_left.GetUserDefinedName());
+            std::string right_device_name = std::string(valid_titania_device_right.GetUserDefinedName());
             QString left_device_name_qstr = QString::fromStdString(left_device_name);
             QString right_device_name_qstr = QString::fromStdString(right_device_name);
             QStringList left_device_name_qstrlist = left_device_name_qstr.split('_');
             QStringList right_device_name_qstrlist = right_device_name_qstr.split('_');
             if (left_device_name_qstrlist.at(1) == right_device_name_qstrlist.at(1)){
                 AbstractStereoCamera::StereoCameraSerialInfo camera_info = {
-                    left_device_name, right_device_name, left_device_name_qstrlist.at(1).toStdString()
+                    std::string(valid_titania_device_left.GetSerialNumber()),
+                    std::string(valid_titania_device_right.GetSerialNumber()),
+                    AbstractStereoCamera::StereoCameraType::CAMERA_TYPE_TITANIA_BASLER_USB,
+                    left_device_name_qstrlist.at(1).toStdString()
                 };
-                foundTitanias.append(camera_info);
+                foundTitanias.push_back(camera_info);
             }
         }
     }
@@ -68,7 +71,9 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
     known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_gige.begin(), known_serial_infos_gige.end() );
     known_serial_infos.insert( known_serial_infos.end(), known_serial_infos_usb.begin(), known_serial_infos_usb.end() );
 
-    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos;
+    // auto detect first
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> auto_serial_infos = autoDetectTitanias(tlFactory);
+    std::vector<AbstractStereoCamera::StereoCameraSerialInfo> connected_serial_infos = auto_serial_infos;
     // find basler systems connected
     // Initialise Basler Pylon
     // Create an instant camera object with the camera device found first.
@@ -86,14 +91,25 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
 
     std::vector<std::string> connected_camera_names;
     std::vector<std::string> connected_serials;
-    for (size_t i = 0; i < devices.size(); ++i)
+    for (auto& device : devices)
     {
-        std::string device_class = std::string(devices[i].GetDeviceClass());
-        std::string device_name = std::string(devices[i].GetUserDefinedName());
-        std::string device_serial = std::string(devices[i].GetSerialNumber());
+        std::string device_class = std::string(device.GetDeviceClass());
+        std::string device_name = std::string(device.GetUserDefinedName());
+        std::string device_serial = std::string(device.GetSerialNumber());
         if (device_class == DEVICE_CLASS_GIGE || device_class == DEVICE_CLASS_USB){
-            connected_serials.push_back(device_serial);
-            connected_camera_names.push_back(device_name);
+            // only add if doesn't already exist from auto detection
+            bool found_in_auto = false;
+            for (auto& auto_serial_info : auto_serial_infos)
+            {
+                if (device_serial == auto_serial_info.left_camera_serial || device_serial == auto_serial_info.right_camera_serial){
+                    found_in_auto = true;
+                    break;
+                }
+            }
+            if (!found_in_auto){
+                connected_serials.push_back(device_serial);
+                connected_camera_names.push_back(device_name);
+            }
         } else {
             qDebug() << "Unsupported basler class: " << device_class.c_str();
         }
@@ -129,12 +145,6 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
         }
     }
 
-    //TODO add generic way to recognise i3dr cameras whilst still being
-    //able to make sure the correct right and left cameras are selected together
-    
-    
-
-    //Pylon::PylonTerminate();
     return connected_serial_infos;
 }
 
