@@ -59,6 +59,8 @@ class AbstractStereoMatcher : public QObject {
   */
   void assignThread(QThread *thread);
 
+  void stopThread();
+
   //!  Get the disparity map
   /*!
   * @param[out] dst Output Mat

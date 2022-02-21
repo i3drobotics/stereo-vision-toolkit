@@ -59,7 +59,6 @@ void AbstractStereoCamera::assignThread(QThread *thread){
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(thread_, SIGNAL(finished()), thread_, SLOT(deleteLater()));
     thread_->start();
-    //thread_->setPriority(QThread::LowestPriority);
 }
 
 void AbstractStereoCamera::stopThread(){
