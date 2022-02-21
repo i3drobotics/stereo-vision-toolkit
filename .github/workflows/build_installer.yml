@@ -6,65 +6,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  versioning:
-    runs-on: ubuntu-latest
-    steps:
-      # Get latest released version
-      - uses: oprypin/find-latest-tag@v1
-        with:
-          repository: i3drobotics/stereo-vision-toolkit  # The repository to scan.
-          releases-only: true  # All relevant tags have a GitHub release for them.
-        id: latest-tag  # The step ID to refer to later.
-      # Generate new release version
-      - name: Generate new version
-        uses: actions-ecosystem/action-bump-semver@v1
-        id: bump-version
-        with:
-          current_version: ${{ steps.latest-tag.outputs.tag }}
-          level: patch
-      # Add generated version to VERSION file
-      # remove 'v' character from version string
-      - name: Add to Version file
-        shell: bash
-        run: |
-          PROJ_VERSION=${{ steps.bump-version.outputs.new_version }}
-          PROJ_VERSION=${PROJ_VERSION:1}
-          echo "$PROJ_VERSION" > version.txt
-      # Upload version file for use in other jobs
-      - name: Archive version file
-        uses: actions/upload-artifact@v2
-        with:
-          name: version-file-${{ github.sha }}
-          path: version.txt
-
   build:
-    needs: [versioning]
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
       # Checkout submodules (required for fever module used in app update system)
       - name: Checkout submodules
         run: git submodule update --init --recursive
-
-      # Get project version
-      # Get project version
-      - name: Download version file artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: version-file-${{ github.sha }}
-          path: versioning
+      # Set placeholder project version
       - name: Get project version
         shell: bash
         run: |
-          PROJ_VER=$(cat versioning/version.txt)
+          PROJ_VER=0.0.0
           echo "$PROJ_VER" > version.txt
           echo "PROJ_VER=$PROJ_VER" >> $GITHUB_ENV
-      - name: Get latest released version
-        shell: bash
-        run: | 
-            LATEST_SVTK_VERSION=${{steps.latest-svtk.outputs.tag}}
-            LATEST_SVTK_VERSION=${LATEST_SVTK_VERSION:1}
-            echo "LATEST_SVTK_VERSION=$LATEST_SVTK_VERSION" >> $GITHUB_ENV
       # Setup build environment
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
@@ -110,13 +65,3 @@ jobs:
           path: installer/Output/*.exe
           name: build-installer-${{ github.sha }}
           retention-days: 7
-
-  cleanup:
-    needs: [build]
-    runs-on: ubuntu-latest
-
-    steps:
-      # Cleanup artifacts used for job sharing
-      - uses: geekyeggo/delete-artifact@v1
-        with:
-          name: version-file-${{ github.sha }}

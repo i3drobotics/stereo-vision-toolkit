@@ -2814,7 +2814,6 @@ void SVTKWindow::closeEvent(QCloseEvent *) {
 
     qDebug() << "Closing application...";
     stopDeviceListTimer();
-    while(device_list_timer->isActive()){QCoreApplication::processEvents(QEventLoop::AllEvents);}
 
 #ifdef WITH_VIMBA
     // Close the Vimba API here.

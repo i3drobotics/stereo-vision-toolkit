@@ -13,7 +13,7 @@ on:
 
 jobs:
   versioning:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       # Get latest released version
       - uses: oprypin/find-latest-tag@v1
@@ -27,7 +27,7 @@ jobs:
         id: bump-version
         with:
           current_version: ${{ steps.latest-tag.outputs.tag }}
-          level: patch
+          level: ${{ github.event.inputs.level }}
       # Add generated version to VERSION file
       # remove 'v' character from version string
       - name: Add to Version file
@@ -45,7 +45,7 @@ jobs:
 
   build:
     needs: [versioning]
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
       # Checkout submodules (required for fever module used in app update system)
@@ -130,7 +130,7 @@ jobs:
 
   deploy:
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       # Get project version
@@ -200,7 +200,7 @@ jobs:
   
   cleanup:
     needs: [deploy]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       # Cleanup artifacts used for job sharing

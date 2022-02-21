@@ -78,7 +78,7 @@ echo %appcast_fervor_version%
 copy %tmp_appcast_file% %appcast_file%
 del %tmp_appcast_file%
 
-cd "%initcwd%"
+cd "%scriptpath:~0,-1%"
 cd ..\\docs
 
 :: update version in index file
@@ -103,8 +103,8 @@ echo %index_version_link%
 copy %tmp_index_file% %index_file%
 del %tmp_index_file%
 
-cd "%initcwd%"
-cd ..
+cd "%scriptpath:~0,-1%"
+cd ..\\
 
 :: update version in doxyfile
 set doxy_version_line=40
