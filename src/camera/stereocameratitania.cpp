@@ -38,23 +38,25 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraTitaniaBas
             }
         }
     }
-
-    // list auto detected titanias found using UserDefinedName
-    // for (size_t i = 0; i < connected_serials.size(); ++i){
-    //     std::string connected_serial = connected_serials[i];
-    //     std::string connected_camera_name = connected_camera_names[i];
-
-    //     connected_camera_name_qstr = QString::fromStdString(connected_camera_name);
-    //     if (connected_camera_name_qstr.contains("I3DRTitania")){
-    //         QStringList connected_camera_name_qstrlist = connected_camera_name_qstr.split('_');
-    //         if (connected_camera_name_qstrlist.size() == 3){
-    //             std::string connected_camera_titania_serial = connected_camera_name_qstrlist[1];
-                
-    //         } else {
-    //             qDebug() << "Detected I3DR Titania with malformed device name: " << connected_camera_name.c_str();
-    //         }
-    //     }
-    // }
+    
+    for (size_t i = 0; i < valid_titania_devices_left.size(); ++i)
+    {
+        for (size_t j = 0; j < valid_titania_devices_right.size(); ++i)
+        {
+            std::string left_device_name = std::string(valid_titania_devices_left[i].GetUserDefinedName());
+            std::string right_device_name = std::string(valid_titania_devices_right[j].GetUserDefinedName());
+            QString left_device_name_qstr = QString::fromStdString(left_device_name);
+            QString right_device_name_qstr = QString::fromStdString(right_device_name);
+            QStringList left_device_name_qstrlist = left_device_name_qstr.split('_');
+            QStringList right_device_name_qstrlist = right_device_name_qstr.split('_');
+            if (left_device_name_qstrlist.at(1) == right_device_name_qstrlist.at(1)){
+                AbstractStereoCamera::StereoCameraSerialInfo camera_info = {
+                    left_device_name, right_device_name, left_device_name_qstrlist.at(1).toStdString()
+                };
+                foundTitanias.append(camera_info);
+            }
+        }
+    }
 
     return foundTitanias;
 }
