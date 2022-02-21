@@ -34,6 +34,13 @@ public:
         stereoCameraSettings_.flip_left_y = true;
         stereoCameraSettings_.flip_right_x = false;
         stereoCameraSettings_.flip_right_y = false;
+        // Correct for alternate mounting of cameras on custom welding Titania
+        if (serial_info.i3dr_serial == "746974616e24322"){
+            stereoCameraSettings_.flip_left_x = false;
+            stereoCameraSettings_.flip_left_y = false;
+            stereoCameraSettings_.flip_right_x = true;
+            stereoCameraSettings_.flip_right_y = true;
+        }
     }
 
     static std::vector<AbstractStereoCamera::StereoCameraSerialInfo> autoDetectTitanias(Pylon::CTlFactory* tlFactory);
