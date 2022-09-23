@@ -8,14 +8,10 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "aboutdialog.h", "aboutdialog_8h_source.html", null ],
     [ "asmopencv.h", "asmopencv_8h_source.html", null ],
     [ "cvsharedmemory.hpp", "cvsharedmemory_8hpp_source.html", null ],
-    [ "cvsupport.hpp", "cvsupport_8hpp.html", [
-      [ "CVSupport", "class_c_v_support.html", null ]
-    ] ],
+    [ "cvsupport.hpp", "cvsupport_8hpp.html", "cvsupport_8hpp" ],
     [ "paramfile.cpp", "paramfile_8cpp_source.html", null ],
     [ "paramfile.h", "paramfile_8h_source.html", null ],
-    [ "pclsupport.hpp", "pclsupport_8hpp.html", [
-      [ "PCLSupport", "class_p_c_l_support.html", null ]
-    ] ],
+    [ "pclsupport.hpp", "pclsupport_8hpp.html", "pclsupport_8hpp" ],
     [ "svtkmain.cpp", "svtkmain_8cpp.html", null ],
     [ "svtkwindow.cpp", "svtkwindow_8cpp_source.html", null ],
     [ "svtkwindow.h", "svtkwindow_8h_source.html", null ]
