@@ -383,12 +383,12 @@ std::vector<AbstractStereoCamera::StereoCameraSerialInfo> StereoCameraBasler::li
 
 void StereoCameraBasler::timerEvent(QTimerEvent *event)
 {
-    if(event->timerId() == lineStatusTimerId) {
-        bool status_l, status_r;
-        getLineStatus(2,status_l,status_r);
-        //TODO enable this
-        //qDebug() << "Line Status.. (" << status_l << ", " << status_r << ")";
-    }
+    // if(event->timerId() == lineStatusTimerId) {
+    //     bool status_l, status_r;
+    //     getLineStatus(2,status_l,status_r);
+    //     //TODO enable this
+    //     //qDebug() << "Line Status.. (" << status_l << ", " << status_r << ")";
+    // }
 }
 
 void StereoCameraBasler::getLineStatus(int line, bool &status_l, bool &status_r){
@@ -867,5 +867,5 @@ bool StereoCameraBasler::closeCamera() {
 }
 
 StereoCameraBasler::~StereoCameraBasler() {
-    killTimer(lineStatusTimerId);
+    //killTimer(lineStatusTimerId);
 }

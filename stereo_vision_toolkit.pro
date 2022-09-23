@@ -325,7 +325,7 @@ WITH_I3DRSGM {
 }
 
 # Basler library files
-LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pylon/lib/x64"
+LIBS += -L"$$_PRO_FILE_PWD_/3rdparty/pylon/lib"
 
 win32 {
     # Directshow libraries
@@ -354,8 +354,7 @@ win32 {
     EXTRA_FILES += \
         $$files($$_PRO_FILE_PWD_/3rdparty/opengl/*.dll, true) \
         $$files($$_PRO_FILE_PWD_/3rdparty/cuda/bin/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rdparty/pylon/bin/x64/*.dll, true) \
-        $$files($$_PRO_FILE_PWD_/3rdparty/pylon/dep/x64/*.dll, true) \
+        $$files($$_PRO_FILE_PWD_/3rdparty/pylon/bin/*.dll, true) \
         $$_PRO_FILE_PWD_/3rdparty/hidapi/bin/Release/hidapi.dll \
         $$_PRO_FILE_PWD_/3rdparty/tbb/tbb.dll \
         $$files($$_PRO_FILE_PWD_/3rdparty/openssl-1.1.1g/Win64/bin/*.dll, true)
@@ -392,8 +391,8 @@ win32 {
     }
 
     # Define drivers to copy to build folder
-    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/drivers/*.msi, true)
-    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/drivers/*.bat, true)
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/Redist/Drivers/*.msi, true)
+    EXTRA_FILES += $$files($$_PRO_FILE_PWD_/3rdparty/pylon/install_drivers.bat, true)
 
     # I3DRSGM dlls
     WITH_I3DRSGM {

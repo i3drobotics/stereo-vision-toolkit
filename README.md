@@ -56,6 +56,13 @@ Please read the guides for [contributors](.github/CONTRIBUTOR.md) and [maintaine
 
 Please read the guide for [branches](.github/BRANCHES.md) and how they are used in this repository.
 
+To clone the repository, make sure the clone with recurrsive to also include the sub-modules.
+
+Using the follow command:
+```
+git clone https://github.com/i3drobotics/stereo-vision-toolkit.git --recursive
+```
+
 ### 3rd Party Content
 This repository is used for internal development and so we include both debug and release libraries and DLLs. This makes for quite a large repository for a rather small codebase (around 500MB), so be warned. 
 
