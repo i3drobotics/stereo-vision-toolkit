@@ -36,7 +36,6 @@ var hierarchy =
           [ "StereoCameraPhobosBasler", "class_stereo_camera_phobos_basler.html", null ],
           [ "StereoCameraTitaniaBasler", "class_stereo_camera_titania_basler.html", null ]
         ] ],
-        [ "StereoCameraBasler", "class_stereo_camera_basler.html", null ],
         [ "StereoCameraFromImage", "class_stereo_camera_from_image.html", null ],
         [ "StereoCameraFromVideo", "class_stereo_camera_from_video.html", null ],
         [ "StereoCameraOpenCV", "class_stereo_camera_open_c_v.html", null ],
