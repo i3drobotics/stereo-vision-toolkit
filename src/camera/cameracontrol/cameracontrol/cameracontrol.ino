@@ -4,13 +4,13 @@
 */
 
 #define PHOBOS_USB_TRIGGER_1 5
-#define PHOBOS_USB_TRIGGER_2 6
+#define PHOBOS_USB_TRIGGER_2 0
 
 #define PHOBOS_GIGE_TRIGGER_1 3
 #define PHOBOS_GIGE_TRIGGER_2 2
 
-#define TITANIA_USB_TRIGGER_1 0
-#define TITANIA_USB_TRIGGER_2 3
+#define TITANIA_USB_TRIGGER_1 6
+#define TITANIA_USB_TRIGGER_2 7
 
 //Choose trigger pins based on the camera being used
 #define CAMERA_TRIGGER_1 TITANIA_USB_TRIGGER_1 
